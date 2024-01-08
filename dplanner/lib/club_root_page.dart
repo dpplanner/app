@@ -37,6 +37,9 @@ class _ClubRootPageState extends State<ClubRootPage> {
         title: const Text("Dance P.O.zz",
             style: TextStyle(fontWeight: FontWeight.w900)),
         automaticallyImplyLeading: false,
+        leading: Image.asset(
+          'assets/images/dplanner_logo_mini.png',
+        ),
 
         ///TODO: SFSymbols 아이콘으로 변경
         actions: const [Icon(Icons.notifications_none_rounded)],
