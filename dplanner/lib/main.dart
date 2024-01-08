@@ -1,5 +1,7 @@
-import 'package:dplanner/club_root_page.dart';
+import 'package:dplanner/routes.dart';
+import 'package:dplanner/style.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,13 +12,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'DPlanner',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primaryColor: AppColor.objectColor,
         useMaterial3: true,
       ),
-      home: const ClubRootPage(),
+      initialRoute: '/',
+      getPages: page,
     );
   }
 }
