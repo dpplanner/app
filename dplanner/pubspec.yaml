@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   get: ^4.6.6
+  flutter_sfsymbols: ^2.0.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -96,6 +97,9 @@ flutter:
           weight: 800
         - asset: assets/fonts/Pretendard-Black.ttf
           weight: 900
+    - family: sficonsets
+      fonts:
+        - asset: packages/flutter_sfsymbols/fonts/sficonsets.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:
