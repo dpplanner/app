@@ -33,7 +33,8 @@ class _ClubRootPageState extends State<ClubRootPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const Text("Dance P.O.zz"),
+        title: const Text("Dance P.O.zz",
+            style: TextStyle(fontWeight: FontWeight.w900)),
         automaticallyImplyLeading: false,
         actions: const [Icon(Icons.notifications_none_rounded)],
       ),

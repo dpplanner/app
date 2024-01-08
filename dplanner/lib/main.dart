@@ -15,9 +15,9 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'DPlanner',
       theme: ThemeData(
-        primaryColor: AppColor.objectColor,
-        useMaterial3: true,
-      ),
+          primaryColor: AppColor.objectColor,
+          fontFamily: 'Pretendard',
+          useMaterial3: true),
       initialRoute: '/',
       getPages: page,
     );
