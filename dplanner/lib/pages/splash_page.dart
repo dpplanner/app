@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_svg/svg.dart';
 import '../style.dart';
 
 class SplashPage extends StatefulWidget {
@@ -40,7 +41,9 @@ class _SplashPageState extends State<SplashPage> {
         child: Scaffold(
           backgroundColor: AppColor.backgroundColor,
           body: Center(
-            child: Image.asset('assets/images/login/dplanner_logo_login.png'),
+            child: SvgPicture.asset(
+              'assets/images/login/dplanner_logo_login.svg',
+            ),
           ),
         ),
       ),
