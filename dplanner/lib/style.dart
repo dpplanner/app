@@ -4,7 +4,8 @@ class AppColor extends Color {
   AppColor(super.value);
 
   ///TODO: Color 변수명 바꾸기
-  static const backgroundColor = Color(0xFFF4F4FA);
+  static const backgroundColor = Color(0xFFFFFFFF);
+  static const backgroundColor2 = Color(0xFFF4F4FA);
   static const textColor = Color(0xFF000000);
   static const objectColor = Color(0xFF7646D8);
   static const subColor1 = Color(0xFFA294DB);
