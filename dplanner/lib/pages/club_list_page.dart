@@ -1,4 +1,5 @@
 import 'package:dplanner/style.dart';
+import 'package:dplanner/widgets/club_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -41,8 +42,13 @@ class _ClubListPageState extends State<ClubListPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
+                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+                child: ClubCard(),
+              ),
+              Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: InkWell(
+                  ///TODO: 스플래시 컬러 지정
                   splashColor: AppColor.subColor2.withOpacity(0.8),
                   highlightColor: AppColor.subColor2.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(16),
@@ -64,13 +70,19 @@ class _ClubListPageState extends State<ClubListPage> {
                             color: AppColor.objectColor,
                           ),
                           SizedBox(width: 8),
-                          Text(
-                            "새로운 클럽에 가입해보세요!",
-                            style: TextStyle(
-                              color: AppColor.objectColor,
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16,
-                            ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(height: 5),
+                              Text(
+                                "새로운 클럽에 가입해보세요!",
+                                style: TextStyle(
+                                  color: AppColor.objectColor,
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -90,8 +102,6 @@ class _ClubListPageState extends State<ClubListPage> {
                   ),
                   InkWell(
                     onTap: () {},
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
                     child: const Text(
                       "클럽 만들기",
                       style: TextStyle(
