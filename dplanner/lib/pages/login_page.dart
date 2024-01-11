@@ -49,7 +49,9 @@ class _LoginPageState extends State<LoginPage> {
 
               ///TODO: 이미지 변경 필요
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Get.offNamed('/club_list');
+                },
                 icon: SvgPicture.asset(
                   'assets/images/login/kakao_login.svg',
                 ),
