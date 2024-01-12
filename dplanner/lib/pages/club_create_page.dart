@@ -170,7 +170,9 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Get.offNamed('/club_create_success');
+                },
                 child: SizedBox(
                   height: sizeController.screenHeight.value * 0.05,
                   child: const Center(
