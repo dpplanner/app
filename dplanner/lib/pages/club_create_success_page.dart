@@ -21,7 +21,7 @@ class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
     super.initState();
 
     Timer(const Duration(seconds: 2), () {
-      //Get.offNamed('/');
+      Get.offNamed('/club_create_success_next');
     });
   }
 

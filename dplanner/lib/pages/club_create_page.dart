@@ -187,7 +187,7 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                 ),
               ),
               SizedBox(
-                height: sizeController.screenHeight * 0.03,
+                height: sizeController.screenHeight.value * 0.03,
               ),
             ],
           ),
