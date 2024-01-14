@@ -39,18 +39,20 @@ class _ClubListPageState extends State<ClubListPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 0.0),
                 child: ClubCard(),
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 16.0),
                 child: InkWell(
                   ///TODO: 스플래시 컬러 지정
                   splashColor: AppColor.subColor2.withOpacity(0.8),
                   highlightColor: AppColor.subColor2.withOpacity(0.8),
                   borderRadius: BorderRadius.circular(16),
-                  onTap: () {},
+                  onTap: () {
+                    Get.toNamed('/club_join');
+                  },
                   child: Ink(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
@@ -58,7 +60,7 @@ class _ClubListPageState extends State<ClubListPage> {
                     ),
                     child: SizedBox(
                       width: SizeController.to.screenWidth,
-                      height: SizeController.to.screenHeight * 0.15,
+                      height: SizeController.to.screenHeight * 0.13,
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
