@@ -6,14 +6,15 @@ import '../style.dart';
 import '../widgets/image_button.dart';
 import '../widgets/nextpage_button.dart';
 
-class ClubCreateSuccessNext extends StatefulWidget {
-  const ClubCreateSuccessNext({super.key});
+class ClubCreateSuccessNextPage extends StatefulWidget {
+  const ClubCreateSuccessNextPage({super.key});
 
   @override
-  State<ClubCreateSuccessNext> createState() => _ClubCreateSuccessNextState();
+  State<ClubCreateSuccessNextPage> createState() =>
+      _ClubCreateSuccessNextPageState();
 }
 
-class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
+class _ClubCreateSuccessNextPageState extends State<ClubCreateSuccessNextPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,7 +92,7 @@ class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
               name: '클럽 시작하기',
               buttonColor: AppColor.objectColor,
               onPressed: () {
-                Get.offAllNamed('/');
+                Get.offAllNamed('/club_root');
               },
             ),
             SizedBox(

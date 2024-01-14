@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -12,25 +13,27 @@ class ClubCard extends StatelessWidget {
       splashColor: AppColor.subColor2.withOpacity(0.8),
       highlightColor: AppColor.subColor2.withOpacity(0.8),
       borderRadius: BorderRadius.circular(16),
-      onTap: () {},
+      onTap: () {
+        Get.offAllNamed('/club_root');
+      },
       child: Ink(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          color: AppColor.backgroundColor, // 원하는 색상으로 변경
+          color: AppColor.backgroundColor,
         ),
         child: SizedBox(
           width: SizeController.to.screenWidth,
-          height: SizeController.to.screenHeight * 0.15,
+          height: SizeController.to.screenHeight * 0.13,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
                 'assets/images/dancepozz_logo.png',
-                height: 100,
-                width: 100,
+                height: SizeController.to.screenWidth * 0.2,
+                width: SizeController.to.screenWidth * 0.2,
                 fit: BoxFit.fill,
               ),
-              const SizedBox(width: 18),
+              const SizedBox(width: 15),
               SizedBox(
                 width: SizeController.to.screenWidth * 0.55,
                 child: const Column(
@@ -42,7 +45,7 @@ class ClubCard extends StatelessWidget {
                       style: TextStyle(
                         color: AppColor.textColor,
                         fontWeight: FontWeight.w700,
-                        fontSize: 20,
+                        fontSize: 18,
                       ),
                     ),
                     SizedBox(height: 7),
