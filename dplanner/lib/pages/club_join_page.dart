@@ -137,7 +137,9 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                     NextPageButton(
                       name: '네, 맞아요',
                       buttonColor: AppColor.objectColor,
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.toNamed('/club_join_next');
+                      },
                     ),
                     SizedBox(height: SizeController.to.screenHeight * 0.005),
                     NextPageButton(
