@@ -132,9 +132,8 @@ class _ClubJoinNextPageState extends State<ClubJoinNextPage> {
                     : AppColor.subColor3,
                 onPressed: () {
                   final formKeyState1 = _formKey1.currentState!;
-                  final formKeyState2 = _formKey2.currentState!;
                   if (formKeyState1.validate()) {
-                    //Get.offAllNamed('/club_create_success');
+                    Get.offAllNamed('/club_join_success');
                   }
                 },
               ),
