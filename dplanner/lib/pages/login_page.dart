@@ -1,3 +1,4 @@
+import 'package:dplanner/widgets/image_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_svg/svg.dart';
@@ -48,31 +49,18 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: sizeController.screenHeight.value * 0.3),
 
               ///TODO: 이미지 변경 필요
-              IconButton(
-                onPressed: () {
-                  Get.offNamed('/club_list');
-                },
-                icon: SvgPicture.asset(
-                  'assets/images/login/kakao_login.svg',
-                ),
-                visualDensity: VisualDensity.compact,
-              ),
-              SizedBox(height: sizeController.screenHeight.value * 0.01),
-              IconButton(
-                onPressed: () {},
-                icon: SvgPicture.asset(
-                  'assets/images/login/naver_login.svg',
-                ),
-                visualDensity: VisualDensity.compact,
-              ),
-              SizedBox(height: sizeController.screenHeight.value * 0.01),
-              IconButton(
-                onPressed: () {},
-                icon: SvgPicture.asset(
-                  'assets/images/login/facebook_login.svg',
-                ),
-                visualDensity: VisualDensity.compact,
-              ),
+              ImageButton(
+                  image: 'assets/images/login/kakao_login.svg',
+                  onTap: () {
+                    Get.offNamed('/club_list');
+                  }),
+              SizedBox(height: sizeController.screenHeight.value * 0.005),
+              ImageButton(
+                  image: 'assets/images/login/naver_login.svg', onTap: () {}),
+              SizedBox(height: sizeController.screenHeight.value * 0.005),
+              ImageButton(
+                  image: 'assets/images/login/facebook_login.svg',
+                  onTap: () {}),
             ],
           ),
         ),

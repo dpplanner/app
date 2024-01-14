@@ -101,7 +101,10 @@ class _ClubListPageState extends State<ClubListPage> {
                         fontSize: 14),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Get.toNamed('/club_create');
+                    },
+                    borderRadius: BorderRadius.circular(5),
                     child: const Text(
                       "클럽 만들기",
                       style: TextStyle(
