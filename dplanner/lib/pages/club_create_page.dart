@@ -1,3 +1,5 @@
+import 'package:dplanner/controllers/club.dart';
+import 'package:dplanner/widgets/underline_textform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
@@ -5,6 +7,7 @@ import 'package:get/get.dart';
 import '../controllers/size.dart';
 import '../style.dart';
 import '../widgets/nextpage_button.dart';
+import '../widgets/outline_textform.dart';
 
 class ClubCreatePage extends StatefulWidget {
   const ClubCreatePage({super.key});
@@ -15,11 +18,22 @@ class ClubCreatePage extends StatefulWidget {
 
 class _ClubCreatePageState extends State<ClubCreatePage> {
   final sizeController = Get.put((SizeController()));
+  final clubController = Get.put((ClubController()));
+
   final _formKey1 = GlobalKey<FormState>();
+  final TextEditingController clubName = TextEditingController();
   bool _isFocused1 = false;
 
   final _formKey2 = GlobalKey<FormState>();
+  final TextEditingController clubContent = TextEditingController();
   bool _isFocused2 = false;
+
+  @override
+  void dispose() {
+    clubName.dispose();
+    clubContent.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,44 +80,29 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                 ],
               ),
               SizedBox(height: sizeController.screenHeight.value * 0.01),
-
-              ///TODO:텍스트 입력시 UI 변경하기
               Form(
-                key: _formKey1,
-                child: TextFormField(
-                  decoration: InputDecoration(
+                  key: _formKey1,
+                  child: UnderlineTextForm(
                     hintText: '클럽 이름을 적어주세요',
-                    hintStyle: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: AppColor.textColor2,
-                    ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: _isFocused1
-                              ? AppColor.objectColor
-                              : AppColor.textColor2),
-                    ),
-                    errorBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: AppColor.markColor),
-                    ),
-                    contentPadding:
-                        const EdgeInsets.fromLTRB(10.0, 20.0, 0.0, 5.0),
-                  ),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: AppColor.objectColor,
-                  ),
-                  validator: (value) {},
-                  onSaved: (value) {},
-                  onChanged: (value) {
-                    setState(() {
-                      _isFocused1 = value.isNotEmpty;
-                    });
-                  },
-                ),
-              ),
+                    controller: clubName,
+                    isFocused: _isFocused1,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return '클럽 이름은 영어,한글,숫자,특수문자(,.!?)만 쓸 수 있어요';
+                      } else if (!RegExp('[a-zA-Z가-힣,.!?\s]').hasMatch(value)) {
+                        return '클럽 이름은 영어,한글,숫자,특수문자(,.!?)만 쓸 수 있어요';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      clubController.name.value = value!;
+                    },
+                    onChanged: (value) {
+                      setState(() {
+                        _isFocused1 = value.isNotEmpty;
+                      });
+                    },
+                  )),
               SizedBox(height: sizeController.screenHeight.value * 0.1),
               const Row(
                 children: [
@@ -122,53 +121,37 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                 ],
               ),
               SizedBox(height: sizeController.screenHeight.value * 0.01),
-
-              ///TODO:텍스트 입력시 UI 변경하기
               Form(
-                key: _formKey2,
-                child: TextFormField(
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15.0)),
+                  key: _formKey2,
+                  child: OutlineTextForm(
                     hintText:
                         '000자 내로 작성할 수 있어요\n관리자는 클럽 소개글을 언제든지 수정할 수 있으니\n편하게 작성해주세요',
-                    hintStyle: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: AppColor.textColor2,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: _isFocused2
-                                ? AppColor.objectColor
-                                : AppColor.textColor2),
-                        borderRadius: BorderRadius.circular(15.0)),
-                    errorBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: AppColor.markColor),
-                        borderRadius: BorderRadius.circular(15.0)),
-                    contentPadding: const EdgeInsets.all(10.0),
-                  ),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: AppColor.objectColor,
-                  ),
-                  validator: (value) {},
-                  onSaved: (value) {},
-                  onChanged: (value) {
-                    setState(() {
-                      _isFocused2 = value.isNotEmpty;
-                    });
-                  },
-                ),
-              ),
+                    controller: clubContent,
+                    isFocused: _isFocused2,
+                    maxLines: 5,
+                    onSaved: (value) {
+                      clubController.content.value = value!;
+                    },
+                    onChanged: (value) {
+                      setState(() {
+                        _isFocused2 = value.isNotEmpty;
+                      });
+                    },
+                  )),
               const Expanded(child: SizedBox()),
               NextPageButton(
                 name: '클럽 만들기',
-                buttonColor: AppColor.objectColor,
+                buttonColor: clubName.text.isNotEmpty
+                    ? AppColor.objectColor
+                    : AppColor.subColor3,
                 onPressed: () {
-                  Get.offNamed('/club_create_success');
+                  final formKeyState1 = _formKey1.currentState!;
+                  final formKeyState2 = _formKey2.currentState!;
+                  if (formKeyState1.validate()) {
+                    formKeyState1.save();
+                    formKeyState2.save();
+                    Get.offNamed('/club_create_success');
+                  }
                 },
               ),
               SizedBox(

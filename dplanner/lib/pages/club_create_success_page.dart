@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../controllers/club.dart';
 import '../controllers/size.dart';
 import '../style.dart';
 
@@ -15,6 +16,7 @@ class ClubCreateSuccessPage extends StatefulWidget {
 
 class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
   final sizeController = Get.put((SizeController()));
+  final clubController = Get.find<ClubController>();
 
   @override
   void initState() {
@@ -44,18 +46,19 @@ class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
       body: Column(
         children: [
           SizedBox(height: sizeController.screenHeight.value * 0.3),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 "클럽",
                 style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
               ),
               Text(
-                " Dance P.O.zz ",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+                " ${clubController.name.value} ",
+                style:
+                    const TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
               ),
-              Text(
+              const Text(
                 "를",
                 style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
               ),

@@ -93,7 +93,8 @@ class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
               name: '클럽 시작하기',
               buttonColor: AppColor.objectColor,
               onPressed: () {
-                Get.offAllNamed('/');
+                //Get.offAllNamed('/');
+                Get.offAllNamed('/club_create');
               },
             ),
             SizedBox(
