@@ -15,7 +15,6 @@ class ClubCreateSuccessPage extends StatefulWidget {
 }
 
 class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
-  final sizeController = Get.put((SizeController()));
   final clubController = Get.find<ClubController>();
 
   @override
@@ -45,7 +44,7 @@ class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
       ),
       body: Column(
         children: [
-          SizedBox(height: sizeController.screenHeight.value * 0.3),
+          SizedBox(height: SizeController.to.screenHeight * 0.3),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -68,7 +67,7 @@ class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
             "만들었어요!",
             style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
           ),
-          SizedBox(height: sizeController.screenHeight.value * 0.005),
+          SizedBox(height: SizeController.to.screenHeight * 0.005),
           const Text(
             "더 다양하게 클럽을 꾸미고 싶다면",
             style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15),

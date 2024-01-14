@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
 
 class ClubCard extends StatelessWidget {
-  ClubCard({super.key});
-  final sizeController = Get.put((SizeController()));
+  const ClubCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +19,8 @@ class ClubCard extends StatelessWidget {
           color: AppColor.backgroundColor, // 원하는 색상으로 변경
         ),
         child: SizedBox(
-          width: sizeController.screenWidth.value,
-          height: sizeController.screenHeight.value * 0.15,
+          width: SizeController.to.screenWidth,
+          height: SizeController.to.screenHeight * 0.15,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -34,8 +32,8 @@ class ClubCard extends StatelessWidget {
               ),
               const SizedBox(width: 18),
               SizedBox(
-                width: sizeController.screenWidth.value * 0.55,
-                child: Column(
+                width: SizeController.to.screenWidth * 0.55,
+                child: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

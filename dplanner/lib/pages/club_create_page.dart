@@ -17,7 +17,6 @@ class ClubCreatePage extends StatefulWidget {
 }
 
 class _ClubCreatePageState extends State<ClubCreatePage> {
-  final sizeController = Get.put((SizeController()));
   final clubController = Get.put((ClubController()));
 
   final _formKey1 = GlobalKey<FormState>();
@@ -44,7 +43,7 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
         preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           backgroundColor: AppColor.backgroundColor,
-          leadingWidth: sizeController.screenWidth.value * 0.2,
+          leadingWidth: SizeController.to.screenWidth * 0.2,
           leading: IconButton(
               onPressed: () {
                 Get.back();
@@ -62,7 +61,7 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
           padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
-              SizedBox(height: sizeController.screenHeight.value * 0.05),
+              SizedBox(height: SizeController.to.screenHeight * 0.05),
               const Row(
                 children: [
                   Text(
@@ -79,7 +78,7 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                   ),
                 ],
               ),
-              SizedBox(height: sizeController.screenHeight.value * 0.01),
+              SizedBox(height: SizeController.to.screenHeight * 0.01),
               Form(
                   key: _formKey1,
                   child: UnderlineTextForm(
@@ -103,7 +102,7 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                       });
                     },
                   )),
-              SizedBox(height: sizeController.screenHeight.value * 0.1),
+              SizedBox(height: SizeController.to.screenHeight * 0.1),
               const Row(
                 children: [
                   Text(
@@ -120,7 +119,7 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                   ),
                 ],
               ),
-              SizedBox(height: sizeController.screenHeight.value * 0.01),
+              SizedBox(height: SizeController.to.screenHeight * 0.01),
               Form(
                   key: _formKey2,
                   child: OutlineTextForm(
@@ -155,7 +154,7 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                 },
               ),
               SizedBox(
-                height: sizeController.screenHeight.value * 0.03,
+                height: SizeController.to.screenHeight * 0.03,
               ),
             ],
           ),
