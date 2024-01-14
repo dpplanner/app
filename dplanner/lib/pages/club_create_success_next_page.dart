@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
+import '../widgets/image_button.dart';
+import '../widgets/nextpage_button.dart';
 
 class ClubCreateSuccessNext extends StatefulWidget {
   const ClubCreateSuccessNext({super.key});
@@ -57,13 +59,9 @@ class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
               children: [
                 Column(
                   children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: SvgPicture.asset(
-                        'assets/images/club_create/club_invitecode.svg',
-                      ),
-                      visualDensity: VisualDensity.compact,
-                    ),
+                    ImageButton(
+                        image: 'assets/images/club_create/club_invitecode.svg',
+                        onTap: () {}),
                     SizedBox(
                       height: sizeController.screenHeight.value * 0.01,
                     ),
@@ -76,13 +74,9 @@ class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
                 ),
                 Column(
                   children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: SvgPicture.asset(
-                        'assets/images/club_create/club_qrcode.svg',
-                      ),
-                      visualDensity: VisualDensity.compact,
-                    ),
+                    ImageButton(
+                        image: 'assets/images/club_create/club_qrcode.svg',
+                        onTap: () {}),
                     SizedBox(
                       height: sizeController.screenHeight.value * 0.01,
                     ),
@@ -96,28 +90,12 @@ class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
               ],
             ),
             const Expanded(child: SizedBox()),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.objectColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+            NextPageButton(
+              name: '클럽 시작하기',
+              buttonColor: AppColor.objectColor,
               onPressed: () {
                 Get.offAllNamed('/');
               },
-              child: SizedBox(
-                height: sizeController.screenHeight.value * 0.05,
-                child: const Center(
-                  child: Text(
-                    '클럽 시작하기',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppColor.backgroundColor),
-                  ),
-                ),
-              ),
             ),
             SizedBox(
               height: sizeController.screenHeight.value * 0.03,

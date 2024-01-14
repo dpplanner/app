@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
+import '../widgets/nextpage_button.dart';
 
 class ClubCreatePage extends StatefulWidget {
   const ClubCreatePage({super.key});
@@ -163,28 +164,12 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                 ),
               ),
               const Expanded(child: SizedBox()),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColor.objectColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
+              NextPageButton(
+                name: '클럽 만들기',
+                buttonColor: AppColor.objectColor,
                 onPressed: () {
                   Get.offNamed('/club_create_success');
                 },
-                child: SizedBox(
-                  height: sizeController.screenHeight.value * 0.05,
-                  child: const Center(
-                    child: Text(
-                      '클럽 만들기',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: AppColor.backgroundColor),
-                    ),
-                  ),
-                ),
               ),
               SizedBox(
                 height: sizeController.screenHeight.value * 0.03,

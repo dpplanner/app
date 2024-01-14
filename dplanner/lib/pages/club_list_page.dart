@@ -104,6 +104,7 @@ class _ClubListPageState extends State<ClubListPage> {
                     onTap: () {
                       Get.toNamed('/club_create');
                     },
+                    borderRadius: BorderRadius.circular(5),
                     child: const Text(
                       "클럽 만들기",
                       style: TextStyle(
