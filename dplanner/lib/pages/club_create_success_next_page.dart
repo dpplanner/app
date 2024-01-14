@@ -14,8 +14,6 @@ class ClubCreateSuccessNext extends StatefulWidget {
 }
 
 class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
-  final sizeController = Get.put((SizeController()));
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,12 +34,12 @@ class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            SizedBox(height: sizeController.screenHeight.value * 0.15),
+            SizedBox(height: SizeController.to.screenHeight * 0.15),
             const Text(
               "이제 회원을 모집해볼까요?",
               style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
             ),
-            SizedBox(height: sizeController.screenHeight.value * 0.02),
+            SizedBox(height: SizeController.to.screenHeight * 0.02),
             const Text(
               "초대 링크를 받은 사람은",
               style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
@@ -51,7 +49,7 @@ class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
               style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
             ),
             SizedBox(
-              height: sizeController.screenHeight.value * 0.1,
+              height: SizeController.to.screenHeight * 0.1,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -62,7 +60,7 @@ class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
                         image: 'assets/images/club_create/club_invitecode.svg',
                         onTap: () {}),
                     SizedBox(
-                      height: sizeController.screenHeight.value * 0.01,
+                      height: SizeController.to.screenHeight * 0.01,
                     ),
                     const Text(
                       "초대링크 복사하기",
@@ -77,7 +75,7 @@ class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
                         image: 'assets/images/club_create/club_qrcode.svg',
                         onTap: () {}),
                     SizedBox(
-                      height: sizeController.screenHeight.value * 0.01,
+                      height: SizeController.to.screenHeight * 0.01,
                     ),
                     const Text(
                       "QR코드 저장하기",
@@ -93,12 +91,11 @@ class _ClubCreateSuccessNextState extends State<ClubCreateSuccessNext> {
               name: '클럽 시작하기',
               buttonColor: AppColor.objectColor,
               onPressed: () {
-                //Get.offAllNamed('/');
-                Get.offAllNamed('/club_create');
+                Get.offAllNamed('/');
               },
             ),
             SizedBox(
-              height: sizeController.screenHeight.value * 0.03,
+              height: SizeController.to.screenHeight * 0.03,
             ),
           ],
         ),

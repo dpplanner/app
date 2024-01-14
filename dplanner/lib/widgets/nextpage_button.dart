@@ -8,7 +8,6 @@ class NextPageButton extends StatelessWidget {
   final String name;
   final Color buttonColor;
   final VoidCallback onPressed;
-  final sizeController = Get.put((SizeController()));
 
   NextPageButton(
       {super.key,
@@ -22,8 +21,8 @@ class NextPageButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         backgroundColor: buttonColor,
-        minimumSize: Size(sizeController.screenWidth.value * 0.9,
-            sizeController.screenHeight.value * 0.05), //width, height
+        minimumSize: Size(SizeController.to.screenWidth * 0.9,
+            SizeController.to.screenHeight * 0.05), //width, height
       ),
       onPressed: onPressed,
       child: Text(

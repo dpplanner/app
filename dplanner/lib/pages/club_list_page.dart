@@ -14,8 +14,6 @@ class ClubListPage extends StatefulWidget {
 }
 
 class _ClubListPageState extends State<ClubListPage> {
-  final sizeController = Get.put((SizeController()));
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +22,7 @@ class _ClubListPageState extends State<ClubListPage> {
         preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           backgroundColor: AppColor.backgroundColor,
-          leadingWidth: sizeController.screenWidth.value * 0.25,
+          leadingWidth: SizeController.to.screenWidth * 0.25,
           leading: SvgPicture.asset(
             'assets/images/dplanner_logo_mini.svg',
             fit: BoxFit.none,
@@ -59,8 +57,8 @@ class _ClubListPageState extends State<ClubListPage> {
                       color: AppColor.backgroundColor, // 원하는 색상으로 변경
                     ),
                     child: SizedBox(
-                      width: sizeController.screenWidth.value,
-                      height: sizeController.screenHeight.value * 0.15,
+                      width: SizeController.to.screenWidth,
+                      height: SizeController.to.screenHeight * 0.15,
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

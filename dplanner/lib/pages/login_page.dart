@@ -14,8 +14,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final sizeController = Get.put((SizeController()));
-
   @override
   void initState() {
     super.initState();
@@ -42,11 +40,11 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: sizeController.screenHeight.value * 0.1),
+              SizedBox(height: SizeController.to.screenHeight * 0.1),
               SvgPicture.asset(
                 'assets/images/login/dplanner_logo_login.svg',
               ),
-              SizedBox(height: sizeController.screenHeight.value * 0.3),
+              SizedBox(height: SizeController.to.screenHeight * 0.3),
 
               ///TODO: 이미지 변경 필요
               ImageButton(
@@ -54,10 +52,10 @@ class _LoginPageState extends State<LoginPage> {
                   onTap: () {
                     Get.offNamed('/club_list');
                   }),
-              SizedBox(height: sizeController.screenHeight.value * 0.005),
+              SizedBox(height: SizeController.to.screenHeight * 0.005),
               ImageButton(
                   image: 'assets/images/login/naver_login.svg', onTap: () {}),
-              SizedBox(height: sizeController.screenHeight.value * 0.005),
+              SizedBox(height: SizeController.to.screenHeight * 0.005),
               ImageButton(
                   image: 'assets/images/login/facebook_login.svg',
                   onTap: () {}),

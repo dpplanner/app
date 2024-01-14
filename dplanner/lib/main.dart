@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 
+import 'controllers/size.dart';
+
 void main() {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -15,6 +17,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sizeController = SizeController();
+    sizeController.screenWidth = MediaQuery.of(context).size.width;
+    sizeController.screenHeight = MediaQuery.of(context).size.height;
     return GetMaterialApp(
       title: 'DPlanner',
       theme: ThemeData(
@@ -23,6 +28,9 @@ class MyApp extends StatelessWidget {
           useMaterial3: true),
       initialRoute: '/',
       getPages: page,
+      initialBinding: BindingsBuilder(() {
+        Get.put(sizeController);
+      }),
     );
   }
 }
