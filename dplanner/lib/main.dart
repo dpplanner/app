@@ -4,6 +4,7 @@ import 'package:dplanner/style.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'controllers/size.dart';
 
@@ -34,6 +35,15 @@ class MyApp extends StatelessWidget {
         initialBinding: BindingsBuilder(() {
           Get.put(sizeController);
         }),
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('ko', ''),
+          Locale('en', ''),
+        ],
       ),
     );
   }
