@@ -38,6 +38,7 @@ dependencies:
   flutter_native_splash: ^2.3.9
   flutter_svg: ^2.0.9
   calendar_view: ^1.0.4
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:

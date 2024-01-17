@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 enum ViewSelect {
   room1,
@@ -15,12 +16,6 @@ enum ViewSelect {
         ViewSelect.room1: '동아리방',
         ViewSelect.room2: '3층',
         ViewSelect.room3: '6층',
-      }[this]!;
-
-  int get num => const <ViewSelect, int>{
-        ViewSelect.room1: 1,
-        ViewSelect.room2: 2,
-        ViewSelect.room3: 3,
       }[this]!;
 }
 
@@ -61,9 +56,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               return WeekPageHeader(
                 headerStringBuilder: (DateTime dateTime,
                     {DateTime? secondaryDate}) {
-                  return (dateTime.month == secondaryDate?.month)
-                      ? '${dateTime.year}년 ${dateTime.month < 10 ? '0' : ''}${dateTime.month}월'
-                      : '${dateTime.month < 10 ? '0' : ''}${dateTime.month}월 - ${secondaryDate!.month < 10 ? '0' : ''}${secondaryDate.month}월';
+                  return DateFormat("yy년 MM월").format(dateTime);
                 },
                 headerStyle: HeaderStyle(
                     decoration: BoxDecoration(
@@ -74,7 +67,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         fontWeight: FontWeight.w700, fontSize: 18),
                     headerMargin: EdgeInsets.only(
                         left: SizeController.to.screenWidth * 0.05,
-                        right: SizeController.to.screenWidth * 0.35),
+                        right: SizeController.to.screenWidth * 0.58),
                     rightIconVisible: false,
                     leftIcon: InkWell(
                         onTap: () {
@@ -179,32 +172,47 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
             onDateLongPress: (date) => print(date),
             startDay: WeekDays.sunday, // To change the first day of the week.
           ),
+
+          ///DropdownButton
           Align(
             alignment: Alignment.topRight,
-            child: SizedBox(
-              width: SizeController.to.screenWidth * 0.3,
-              child: DropdownButton<ViewSelect>(
-                  underline: Container(height: 0),
-                  iconEnabledColor: AppColor.objectColor,
-                  dropdownColor: AppColor.backgroundColor,
-                  value: _viewSelect,
-                  isExpanded: true,
-                  onChanged: (ViewSelect? newValue) {
-                    setState(() {
-                      _viewSelect = newValue!;
-                      selectNum = newValue.num;
-                    });
-                  },
-                  items: ViewSelect.values.map((ViewSelect status) {
-                    return DropdownMenuItem<ViewSelect>(
-                      value: status,
-                      child: Text(status.title,
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: AppColor.objectColor)),
-                    );
-                  }).toList()),
+            child: Padding(
+              padding:
+                  EdgeInsets.only(right: SizeController.to.screenWidth * 0.05),
+              child: SizedBox(
+                width: SizeController.to.screenWidth * 0.25,
+                child: DropdownButton<ViewSelect>(
+                    icon: const Icon(
+                      SFSymbols.chevron_down,
+                    ),
+                    iconSize: 15,
+                    iconEnabledColor: AppColor.textColor,
+                    dropdownColor: AppColor.backgroundColor,
+                    value: _viewSelect,
+                    borderRadius: BorderRadius.circular(10),
+                    isExpanded: true,
+                    underline: Container(),
+                    onChanged: (ViewSelect? newValue) {
+                      setState(() {
+                        _viewSelect = newValue!;
+                      });
+                    },
+                    items: ViewSelect.values.map((ViewSelect status) {
+                      return DropdownMenuItem<ViewSelect>(
+                        value: status,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            status.title,
+                            style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: AppColor.textColor),
+                          ),
+                        ),
+                      );
+                    }).toList()),
+              ),
             ),
           ),
         ],
