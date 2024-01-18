@@ -7,6 +7,8 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+DateTime get _now => DateTime.now();
+
 enum ViewSelect {
   room1,
   room2,
@@ -30,6 +32,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   int selectNum = 0;
   ViewSelect _viewSelect = ViewSelect.room1;
   final GlobalKey<WeekViewState> weekViewStateKey = GlobalKey<WeekViewState>();
+  EventController eventController = EventController();
 
   @override
   Widget build(BuildContext context) {
@@ -49,128 +52,207 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       ),
       body: Stack(
         children: [
-          WeekView(
-            key: weekViewStateKey,
-            controller: EventController(),
-            weekPageHeaderBuilder: (DateTime startDate, DateTime endDate) {
-              return WeekPageHeader(
-                headerStringBuilder: (DateTime dateTime,
-                    {DateTime? secondaryDate}) {
-                  return DateFormat("yy년 MM월").format(dateTime);
-                },
-                headerStyle: HeaderStyle(
-                    decoration: BoxDecoration(
-                      color: AppColor.subColor4,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    headerTextStyle: const TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 18),
-                    headerMargin: EdgeInsets.only(
-                        left: SizeController.to.screenWidth * 0.05,
-                        right: SizeController.to.screenWidth * 0.58),
-                    rightIconVisible: false,
-                    leftIcon: InkWell(
-                        onTap: () {
-                          weekViewStateKey.currentState
-                              ?.jumpToWeek(DateTime.now());
-                        },
-                        child: const Icon(SFSymbols.calendar_today,
-                            color: AppColor.textColor)),
-                    titleAlign: TextAlign.center),
-                startDate: startDate,
-                endDate: endDate,
-                onTitleTapped: () async {
-                  DateTime selectedDate = startDate;
-                  await showCupertinoDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (BuildContext context) {
-                      return Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          color: AppColor.subColor4,
-                          height: SizeController.to.screenHeight * 0.4,
-                          child: Column(
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 10.0, right: 10.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      TextButton(
+          Center(
+            child: WeekView(
+              key: weekViewStateKey,
+              controller: eventController,
+              weekPageHeaderBuilder: (DateTime startDate, DateTime endDate) {
+                return WeekPageHeader(
+                  headerStringBuilder: (DateTime dateTime,
+                      {DateTime? secondaryDate}) {
+                    return DateFormat("yy년 MM월").format(dateTime);
+                  },
+                  headerStyle: HeaderStyle(
+                      decoration: BoxDecoration(
+                        color: AppColor.subColor4,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      headerTextStyle: const TextStyle(
+                          fontWeight: FontWeight.w700, fontSize: 18),
+                      headerMargin: EdgeInsets.only(
+                          left: SizeController.to.screenWidth * 0.05,
+                          right: SizeController.to.screenWidth * 0.5),
+                      rightIconVisible: false,
+                      leftIcon: InkWell(
+                          onTap: () {
+                            weekViewStateKey.currentState
+                                ?.jumpToWeek(DateTime.now());
+                          },
+                          child: const Icon(SFSymbols.calendar_today,
+                              color: AppColor.textColor)),
+                      titleAlign: TextAlign.center),
+                  startDate: startDate,
+                  endDate: endDate,
+                  onTitleTapped: () async {
+                    DateTime selectedDate = startDate;
+                    await showCupertinoDialog(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (BuildContext context) {
+                        return Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            color: AppColor.backgroundColor,
+                            height: SizeController.to.screenHeight * 0.4,
+                            child: Column(
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 10.0, right: 10.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Get.back();
+                                            },
+                                            child: const Text(
+                                              "Cancel",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 20),
+                                            )),
+                                        TextButton(
                                           onPressed: () {
+                                            weekViewStateKey.currentState
+                                                ?.jumpToWeek(selectedDate);
                                             Get.back();
                                           },
                                           child: const Text(
-                                            "Cancel",
+                                            "done",
                                             style: TextStyle(
                                                 fontWeight: FontWeight.w700,
                                                 fontSize: 20),
-                                          )),
-                                      TextButton(
-                                        onPressed: () {
-                                          weekViewStateKey.currentState
-                                              ?.jumpToWeek(selectedDate);
-                                          Get.back();
-                                        },
-                                        child: const Text(
-                                          "done",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 20),
-                                        ),
-                                      )
-                                    ],
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                flex: 8,
-                                child: CupertinoDatePicker(
-                                  mode: CupertinoDatePickerMode.date,
-                                  initialDateTime: startDate,
-                                  onDateTimeChanged: (DateTime date) {
-                                    setState(() {
-                                      selectedDate = date;
-                                    });
-                                  },
+                                Expanded(
+                                  flex: 8,
+                                  child: CupertinoDatePicker(
+                                    mode: CupertinoDatePickerMode.date,
+                                    initialDateTime: startDate,
+                                    minimumYear: 2020,
+                                    maximumYear: 2030,
+                                    onDateTimeChanged: (DateTime date) {
+                                      setState(() {
+                                        selectedDate = date;
+                                      });
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+              weekDayBuilder: (DateTime date) {
+                return Container(
+                  color: AppColor.backgroundColor,
+                  alignment: Alignment.center,
+                  child: (date.day == DateTime.now().day)
+                      ? const Text(
+                          '오늘',
+                          style: TextStyle(
+                              color: AppColor.markColor,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15),
+                        )
+                      : Text(
+                          DateFormat.d().format(date),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 15),
                         ),
-                      );
-                    },
+                );
+              },
+              weekTitleHeight: SizeController.to.screenHeight * 0.05,
+              weekNumberBuilder: (DateTime date) {
+                return Container(
+                  color: AppColor.backgroundColor,
+                );
+              },
+              timeLineBuilder: (DateTime date) {
+                return Container(
+                  color: AppColor.backgroundColor,
+                  child: Transform.translate(
+                    offset: const Offset(0, -10),
+                    child: Text(
+                      date.hour < 10 ? "0${date.hour}" : "${date.hour}",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: AppColor.textColor2,
+                        fontWeight: FontWeight.w300,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                );
+              },
+              timeLineWidth: SizeController.to.screenWidth * 0.06,
+              timeLineOffset: 0,
+              hourIndicatorSettings: const HourIndicatorSettings(
+                  height: 0, color: Colors.transparent, offset: 0),
+              liveTimeIndicatorSettings: const HourIndicatorSettings(
+                  color: AppColor.subColor1, height: 2, offset: 5),
+              pageTransitionDuration: const Duration(milliseconds: 300),
+              pageTransitionCurve: Curves.linear,
+              backgroundColor: AppColor.backgroundColor,
+              eventTileBuilder: (date, events, boundry, start, end) {
+                if (events.isNotEmpty) {
+                  return RoundedEventTile(
+                    borderRadius: BorderRadius.circular(0.0),
+                    title: events[0].title,
+                    titleStyle: events[0].titleStyle ??
+                        const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.backgroundColor,
+                          fontSize: 12,
+                        ),
+                    description: events[0].description,
+                    descriptionStyle: events[0].descriptionStyle ??
+                        const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.backgroundColor,
+                          fontSize: 12,
+                        ),
+                    totalEvents: events.length,
+                    padding: const EdgeInsets.all(3.0),
+                    backgroundColor: events[0].color,
                   );
-                },
-              );
-            },
+                } else {
+                  return Container();
+                }
+              },
+              fullDayEventBuilder: (events, date) {
+                return FullDayEventView(
+                  events: events,
+                  boxConstraints: const BoxConstraints(maxHeight: 65),
+                  date: date,
+                );
+              },
+              showLiveTimeLineInAllDays: false,
 
-            eventTileBuilder: (date, events, boundry, start, end) {
-              // Return your widget to display as event tile.
-              return Container();
-            },
-            fullDayEventBuilder: (events, date) {
-              // Return your widget to display full day event view.
-              return Container();
-            },
-            showLiveTimeLineInAllDays:
-                true, // To display live time line in all pages in week view.
-            width: SizeController.to.screenWidth, // width of week view.
-            minDay: DateTime(1990),
-            maxDay: DateTime(2050),
-            initialDay: DateTime(2024),
-            heightPerMinute: SizeController.to.screenHeight *
-                0.0012, // height occupied by 1 minute time span.
-            eventArranger:
-                SideEventArranger(), // To define how simultaneous events will be arranged.
-            onEventTap: (events, date) => print(events),
-            onDateLongPress: (date) => print(date),
-            startDay: WeekDays.sunday, // To change the first day of the week.
+              minuteSlotSize: MinuteSlotSize.minutes60,
+              width: SizeController.to.screenWidth * 0.9,
+              minDay: DateTime(2020),
+              maxDay: DateTime(2030),
+              initialDay: DateTime.now(),
+              startDay: WeekDays.sunday,
+              heightPerMinute: SizeController.to.screenHeight * 0.0012,
+              eventArranger:
+                  SideEventArranger(), // To define how simultaneous events will be arranged.
+              onEventTap: (events, date) => print(events),
+              onDateLongPress: (date) => print(date),
+            ),
           ),
 
           ///DropdownButton
@@ -218,7 +300,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
         ],
       ),
       floatingActionButton: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          eventController.addAll(_events);
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColor.objectColor,
           shape: const CircleBorder(),
@@ -232,3 +316,32 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     );
   }
 }
+
+List<CalendarEventData<Object?>> _events = [
+  CalendarEventData(
+      date: _now.add(const Duration(days: 1)),
+      title: "정찬영\nDP22",
+      startTime: DateTime(_now.year, _now.month, _now.day, 18, 30),
+      endTime: DateTime(_now.year, _now.month, _now.day, 22),
+      color: AppColor.subColor3),
+  CalendarEventData(
+      date: _now,
+      startTime: DateTime(_now.year, _now.month, _now.day, 0),
+      endTime: DateTime(_now.year, _now.month, _now.day, 23, 59),
+      endDate: _now,
+      title: '',
+      color: AppColor.subColor4),
+  CalendarEventData(
+      date: _now.add(const Duration(days: 1)),
+      startTime: DateTime(_now.year, _now.month, _now.day, 0),
+      endTime: DateTime(_now.year, _now.month, _now.day, 2),
+      title: "강지인\nDP23",
+      description: "개인연습",
+      color: AppColor.subColor3),
+  CalendarEventData(
+      date: _now.add(const Duration(days: 1)),
+      startTime: DateTime(_now.year, _now.month, _now.day, 14),
+      endTime: DateTime(_now.year, _now.month, _now.day, 17),
+      title: "집행회의",
+      color: AppColor.subColor1)
+];

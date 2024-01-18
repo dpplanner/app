@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:calendar_view/calendar_view.dart';
 import 'package:dplanner/routes.dart';
 import 'package:dplanner/style.dart';
@@ -7,6 +9,8 @@ import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'controllers/size.dart';
+
+DateTime get _now => DateTime.now();
 
 void main() {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +34,7 @@ class MyApp extends StatelessWidget {
             primaryColor: AppColor.objectColor,
             fontFamily: 'Pretendard',
             useMaterial3: true),
+        debugShowCheckedModeBanner: false,
         initialRoute: '/',
         getPages: page,
         initialBinding: BindingsBuilder(() {
