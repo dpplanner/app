@@ -181,17 +181,27 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 );
               },
               timeLineBuilder: (DateTime date) {
-                return Container(
-                  color: AppColor.backgroundColor,
-                  child: Transform.translate(
-                    offset: const Offset(0, -10),
-                    child: Text(
-                      date.hour < 10 ? "0${date.hour}" : "${date.hour}",
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: AppColor.textColor2,
-                        fontWeight: FontWeight.w300,
-                        fontSize: 14,
+                return Transform.translate(
+                  offset: const Offset(0, -10),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 40.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: DateTime.now().hour == date.hour
+                            ? AppColor.subColor1
+                            : AppColor.backgroundColor,
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      child: Text(
+                        date.hour < 10 ? "0${date.hour}" : "${date.hour}",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: DateTime.now().hour == date.hour
+                              ? AppColor.textColor
+                              : AppColor.textColor2,
+                          fontWeight: FontWeight.w300,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                   ),
@@ -202,10 +212,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               hourIndicatorSettings: const HourIndicatorSettings(
                   height: 0, color: Colors.transparent, offset: 0),
               liveTimeIndicatorSettings: const HourIndicatorSettings(
-                  color: AppColor.subColor1, height: 2, offset: 5),
-              pageTransitionDuration: const Duration(milliseconds: 300),
-              pageTransitionCurve: Curves.linear,
-              backgroundColor: AppColor.backgroundColor,
+                  color: AppColor.subColor1, height: 0, offset: 0),
               eventTileBuilder: (date, events, boundry, start, end) {
                 if (events.isNotEmpty) {
                   return RoundedEventTile(
@@ -239,8 +246,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                   date: date,
                 );
               },
-              showLiveTimeLineInAllDays: false,
 
+              pageTransitionDuration: const Duration(milliseconds: 300),
+              pageTransitionCurve: Curves.linear,
+              showLiveTimeLineInAllDays: false,
+              backgroundColor: AppColor.backgroundColor,
               minuteSlotSize: MinuteSlotSize.minutes60,
               width: SizeController.to.screenWidth * 0.9,
               minDay: DateTime(2020),
