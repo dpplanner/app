@@ -52,6 +52,33 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       ),
       body: Stack(
         children: [
+          Column(
+            children: [
+              Container(
+                height: SizeController.to.screenHeight * 0.08,
+                color: AppColor.backgroundColor,
+              ),
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      width: SizeController.to.screenWidth * 0.11,
+                      color: AppColor.backgroundColor,
+                    ),
+                    Expanded(
+                      child: Container(
+                        color: AppColor.backgroundColor2,
+                      ),
+                    ),
+                    Container(
+                      width: SizeController.to.screenWidth * 0.04,
+                      color: AppColor.backgroundColor,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           Center(
             child: WeekView(
               key: weekViewStateKey,
@@ -174,7 +201,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         ),
                 );
               },
-              weekTitleHeight: SizeController.to.screenHeight * 0.05,
+              weekTitleHeight: SizeController.to.screenHeight * 0.06,
               weekNumberBuilder: (DateTime date) {
                 return Container(
                   color: AppColor.backgroundColor,
@@ -184,12 +211,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 return Transform.translate(
                   offset: const Offset(0, -10),
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 40.0),
+                    padding: const EdgeInsets.fromLTRB(3, 0, 3, 42.0),
                     child: Container(
                       decoration: BoxDecoration(
                         color: DateTime.now().hour == date.hour
                             ? AppColor.subColor1
-                            : AppColor.backgroundColor,
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(20.0),
                       ),
                       child: Text(
@@ -207,7 +234,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                   ),
                 );
               },
-              timeLineWidth: SizeController.to.screenWidth * 0.06,
+              timeLineWidth: SizeController.to.screenWidth * 0.07,
               timeLineOffset: 0,
               hourIndicatorSettings: const HourIndicatorSettings(
                   height: 0, color: Colors.transparent, offset: 0),
@@ -246,20 +273,18 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                   date: date,
                 );
               },
-
               pageTransitionDuration: const Duration(milliseconds: 300),
               pageTransitionCurve: Curves.linear,
               showLiveTimeLineInAllDays: false,
-              backgroundColor: AppColor.backgroundColor,
+              backgroundColor: Colors.transparent,
               minuteSlotSize: MinuteSlotSize.minutes60,
-              width: SizeController.to.screenWidth * 0.9,
+              width: SizeController.to.screenWidth * 0.92,
               minDay: DateTime(2020),
               maxDay: DateTime(2030),
               initialDay: DateTime.now(),
               startDay: WeekDays.sunday,
               heightPerMinute: SizeController.to.screenHeight * 0.0012,
-              eventArranger:
-                  SideEventArranger(), // To define how simultaneous events will be arranged.
+              eventArranger: const SideEventArranger(),
               onEventTap: (events, date) => print(events),
               onDateLongPress: (date) => print(date),
             ),
@@ -336,7 +361,7 @@ List<CalendarEventData<Object?>> _events = [
       color: AppColor.subColor3),
   CalendarEventData(
       date: _now,
-      startTime: DateTime(_now.year, _now.month, _now.day, 0),
+      startTime: DateTime(_now.year, _now.month, _now.day),
       endTime: DateTime(_now.year, _now.month, _now.day, 23, 59),
       endDate: _now,
       title: '',
