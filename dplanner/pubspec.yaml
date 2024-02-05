@@ -30,11 +30,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   get: ^4.6.6
   flutter_sfsymbols: ^2.0.0
   cupertino_icons: ^1.0.2
   flutter_native_splash: ^2.3.9
   flutter_svg: ^2.0.9
+  calendar_view: ^1.0.4
+  intl: ^0.18.0
+  dropdown_button2: ^2.3.9
 
 dev_dependencies:
   flutter_test:
