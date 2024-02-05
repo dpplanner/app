@@ -13,6 +13,8 @@ import '../widgets/nextpage_button.dart';
 
 DateTime get _now => DateTime.now();
 
+enum Open { Yes, No }
+
 class ClubTimetablePage extends StatefulWidget {
   const ClubTimetablePage({super.key});
 
@@ -26,6 +28,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
 
   final itemController = Get.put((ItemController()));
   late String selectedValue = ItemController.to.items[0];
+
+  Open _open = Open.Yes;
 
   @override
   Widget build(BuildContext context) {
@@ -167,30 +171,50 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               },
               weekDayBuilder: (DateTime date) {
                 return Container(
-                  color: AppColor.backgroundColor,
-                  alignment: Alignment.center,
-                  child: (date.isAtSameMomentAs(DateTime.now().withoutTime))
-                      ? const Text(
-                          '오늘',
-                          style: TextStyle(
-                              color: AppColor.markColor,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 15),
-                        )
-                      : (date.day == 1)
-                          ? Text(
-                              DateFormat("M/d").format(date),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 15),
-                            )
-                          : Text(
-                              DateFormat.d().format(date),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 15),
-                            ),
-                );
+                    color: AppColor.backgroundColor,
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        (date.isAtSameMomentAs(DateTime.now().withoutTime))
+                            ? const Text(
+                                '오늘',
+                                style: TextStyle(
+                                    color: AppColor.markColor,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15),
+                              )
+                            : (date.day == 1)
+                                ? Text(
+                                    DateFormat("M/d").format(date),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15),
+                                  )
+                                : Text(
+                                    DateFormat.d().format(date),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15),
+                                  ),
+                        (date.isAtSameMomentAs(DateTime.now().withoutTime))
+                            ? Text(
+                                DateFormat('E', 'ko_KR').format(date),
+                                style: const TextStyle(
+                                    color: AppColor.markColor,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12),
+                              )
+                            : Text(
+                                DateFormat('E', 'ko_KR').format(date),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w400, fontSize: 12),
+                              )
+                      ],
+                    ));
               },
-              weekTitleHeight: SizeController.to.screenHeight * 0.05,
+              weekTitleHeight: SizeController.to.screenHeight * 0.06,
               weekNumberBuilder: (DateTime date) {
                 return Container(
                   color: AppColor.backgroundColor,
@@ -269,7 +293,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               minDay: DateTime(2020),
               maxDay: DateTime(2030),
               initialDay: DateTime.now(),
-              startDay: WeekDays.sunday,
+              startDay: WeekDays.monday,
               heightPerMinute: SizeController.to.screenHeight * 0.0012,
               eventArranger: const SideEventArranger(),
               onEventTap: (events, date) => print(events),
@@ -281,22 +305,24 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
           Align(
             alignment: Alignment.topRight,
             child: Padding(
-              padding: EdgeInsets.only(
-                  top: SizeController.to.screenHeight * 0.01,
-                  right: SizeController.to.screenWidth * 0.05),
+              padding:
+                  EdgeInsets.only(right: SizeController.to.screenWidth * 0.05),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton2<String>(
                   isExpanded: true,
                   items: ItemController.to.items
                       .map((String item) => DropdownMenuItem<String>(
                             value: item,
-                            child: Text(
-                              item,
-                              style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColor.textColor),
-                              overflow: TextOverflow.ellipsis,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                item,
+                                style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColor.textColor),
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ))
                       .toList(),
@@ -347,13 +373,31 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       ),
       floatingActionButton: ElevatedButton(
         onPressed: () {
-          eventController.addAll(_events);
-          showModalBottomSheet(
-            isScrollControlled: true,
-            context: context,
-            builder: (BuildContext context) {
+          _reservationBottomSheet(context);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColor.objectColor,
+          shape: const CircleBorder(),
+          padding: const EdgeInsets.all(15),
+        ),
+        child: const Icon(
+          SFSymbols.plus,
+          color: AppColor.backgroundColor,
+        ),
+      ),
+    );
+  }
+
+  void _reservationBottomSheet(BuildContext context) async {
+    DateTime resetvationTime = _now;
+    showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
               return Container(
-                height: SizeController.to.screenHeight * 0.75,
+                height: SizeController.to.screenHeight * 0.7,
                 decoration: const BoxDecoration(
                   color: AppColor.backgroundColor,
                   borderRadius: BorderRadius.only(
@@ -370,6 +414,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         fit: BoxFit.fill,
                       ),
                     ),
+                    SizedBox(
+                      height: SizeController.to.screenHeight * 0.005,
+                    ),
                     const Text(
                       "예약하기",
                       style:
@@ -378,6 +425,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                     Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -385,12 +434,206 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               const Text(
                                 "신청 품목",
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 18),
+                                    fontWeight: FontWeight.w700, fontSize: 16),
                               ),
-                              SizedBox(
-                                width: SizeController.to.screenWidth * 0.25,
+                              Text(
+                                selectedValue,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500, fontSize: 16),
                               ),
                             ],
+                          ),
+                          SizedBox(
+                            height: SizeController.to.screenHeight * 0.04,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                "신청 날짜",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 16),
+                              ),
+                              InkWell(
+                                  onTap: () async {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return Container(
+                                          height:
+                                              SizeController.to.screenHeight *
+                                                  0.4,
+                                          decoration: const BoxDecoration(
+                                            color: AppColor.backgroundColor,
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(30),
+                                              topRight: Radius.circular(30),
+                                            ),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0, bottom: 8.0),
+                                                child: Image.asset(
+                                                  'assets/images/showmodal_scrollcontrolbar.png',
+                                                  fit: BoxFit.fill,
+                                                ),
+                                              ),
+                                              const Text(
+                                                "날짜",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w800,
+                                                    fontSize: 18),
+                                              ),
+                                              Expanded(
+                                                child: CupertinoDatePicker(
+                                                  mode: CupertinoDatePickerMode
+                                                      .date,
+                                                  initialDateTime:
+                                                      resetvationTime,
+                                                  minimumYear: _now.year,
+                                                  maximumYear: _now.year + 10,
+                                                  onDateTimeChanged:
+                                                      (DateTime date) {
+                                                    setState(() {
+                                                      resetvationTime = date;
+                                                    });
+                                                  },
+                                                ),
+                                              ),
+                                              NextPageButton(
+                                                name: '날짜 변경하기',
+                                                buttonColor:
+                                                    AppColor.objectColor,
+                                                onPressed: () {
+                                                  Get.back();
+                                                },
+                                              ),
+                                              SizedBox(
+                                                height: SizeController
+                                                        .to.screenHeight *
+                                                    0.03,
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: Text(
+                                      DateFormat("yyyy.MM.dd.E요일", 'ko_KR')
+                                          .format(resetvationTime),
+                                      style: const TextStyle(
+                                          color: AppColor.textColor,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16))),
+                            ],
+                          ),
+                          SizedBox(
+                            height: SizeController.to.screenHeight * 0.04,
+                          ),
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "신청 시간",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 16),
+                              ),
+                              Text(
+                                "14:00 ~ 16:00(2시간)",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500, fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: SizeController.to.screenHeight * 0.04,
+                          ),
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "사용 용도(선택)",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 16),
+                              ),
+                              Text(
+                                "사용 용도를 입력해주세요",
+                                style: TextStyle(
+                                    color: AppColor.textColor2,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: SizeController.to.screenHeight * 0.04,
+                          ),
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "함께 사용하는 사람(선택)",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 16),
+                              ),
+                              Text(
+                                "선택하기",
+                                style: TextStyle(
+                                    color: AppColor.textColor2,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: SizeController.to.screenHeight * 0.04,
+                          ),
+                          const Text(
+                            "신청하신 시간에\n다른 사람이 함께 사용할 수 있나요?",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 16),
+                          ),
+                          SizedBox(
+                            height: SizeController.to.screenHeight * 0.04,
+                            child: RadioListTile(
+                              title: const Text(
+                                "누구나 함께 사용 가능합니다",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500, fontSize: 16),
+                              ),
+                              value: Open.Yes,
+                              groupValue: _open,
+                              onChanged: (Open? value) {
+                                setState(() {
+                                  _open = value!;
+                                });
+                              },
+                              contentPadding:
+                                  const EdgeInsets.symmetric(vertical: -5.0),
+                            ),
+                          ),
+                          SizedBox(
+                            height: SizeController.to.screenHeight * 0.04,
+                            child: RadioListTile(
+                              title: const Text(
+                                "허가받은 사람 외에는 불가능합니다",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500, fontSize: 16),
+                              ),
+                              value: Open.No,
+                              groupValue: _open,
+                              onChanged: (Open? value) {
+                                setState(() {
+                                  _open = value!;
+                                });
+                              },
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: -30.0, horizontal: -10),
+                            ),
                           ),
                         ],
                       ),
@@ -404,6 +647,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       buttonColor: AppColor.objectColor,
                       onPressed: () {
                         Get.back();
+                        eventController.addAll(_events);
+                        Future.delayed(const Duration(milliseconds: 200), () {
+                          _reservationConfirmDialog(context);
+                        });
                       },
                     ),
                     SizedBox(
@@ -414,17 +661,82 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               );
             },
           );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColor.objectColor,
-          shape: const CircleBorder(),
-          padding: const EdgeInsets.all(15),
-        ),
-        child: const Icon(
-          SFSymbols.plus,
-          color: AppColor.backgroundColor,
-        ),
-      ),
+        });
+  }
+
+  void _reservationConfirmDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColor.backgroundColor,
+          title: const Center(
+            child: Text(
+              '신청완료',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+            ),
+          ),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '정상적으로 신청이 완료되었습니다.',
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+              ),
+              Text(
+                '관리자가 확인 후, 신청을 승인해드립니다.',
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+              ),
+              Text(
+                '승인이 되면 푸시 알림을 보내드릴까요?',
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+              ),
+            ],
+          ),
+          actions: [
+            Center(
+              child: Column(
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      backgroundColor: AppColor.objectColor,
+                      minimumSize: Size(
+                          SizeController.to.screenWidth * 0.5,
+                          SizeController.to.screenHeight *
+                              0.05), //width, height
+                    ),
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: const Text(
+                      '네, 보내주세요',
+                      style: TextStyle(
+                          color: AppColor.backgroundColor,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16),
+                    ),
+                  ),
+                  SizedBox(
+                    height: SizeController.to.screenHeight * 0.01,
+                  ),
+                  InkWell(
+                      onTap: () {
+                        Get.back();
+                      },
+                      borderRadius: BorderRadius.circular(5),
+                      child: const Text('아니오, 괜찮습니다.',
+                          style: TextStyle(
+                              color: AppColor.textColor2,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 14))),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
