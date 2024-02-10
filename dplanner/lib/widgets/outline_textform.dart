@@ -7,7 +7,9 @@ class OutlineTextForm extends StatelessWidget {
   final TextEditingController controller;
   final TextInputType keyboardType;
   final bool isFocused;
+  final bool isColored;
   final int maxLines;
+  final Widget icon;
   final FormFieldValidator<String>? validator;
   final FormFieldSetter<String>? onSaved;
   final ValueChanged<String>? onChanged;
@@ -18,7 +20,9 @@ class OutlineTextForm extends StatelessWidget {
       required this.controller,
       this.keyboardType = TextInputType.text,
       this.isFocused = false,
+      this.isColored = false,
       this.maxLines = 1,
+      this.icon = const Icon(Icons.arrow_forward),
       this.validator,
       this.onSaved,
       this.onChanged});
@@ -29,6 +33,9 @@ class OutlineTextForm extends StatelessWidget {
       controller: controller,
       maxLines: maxLines,
       decoration: InputDecoration(
+        suffixIcon: (isColored) ? icon : null,
+        fillColor: AppColor.backgroundColor2,
+        filled: (isColored) ? true : false,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15.0)),
         hintText: hintText,
         hintStyle: const TextStyle(
@@ -38,11 +45,15 @@ class OutlineTextForm extends StatelessWidget {
         ),
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: isFocused ? AppColor.textColor : AppColor.textColor2),
+                color: isColored
+                    ? Colors.transparent
+                    : (isFocused ? AppColor.textColor : AppColor.textColor2)),
             borderRadius: BorderRadius.circular(15.0)),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(
-              color: isFocused ? AppColor.textColor : AppColor.textColor2),
+              color: isColored
+                  ? Colors.transparent
+                  : (isFocused ? AppColor.textColor : AppColor.textColor2)),
           borderRadius: BorderRadius.circular(15.0),
         ),
         errorBorder: OutlineInputBorder(
