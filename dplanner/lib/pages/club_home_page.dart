@@ -17,6 +17,7 @@ class ClubHomePage extends StatefulWidget {
 class _ClubHomePageState extends State<ClubHomePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController searchPost = TextEditingController();
+  bool _isFocused = false;
 
   @override
   Widget build(BuildContext context) {
@@ -73,10 +74,17 @@ class _ClubHomePageState extends State<ClubHomePage> {
                           hintText: '게시글 제목, 내용, 작성자를 검색해보세요',
                           controller: searchPost,
                           isColored: true,
-                          icon: const Icon(
+                          icon: Icon(
                             SFSymbols.search,
-                            color: AppColor.textColor2,
+                            color: _isFocused
+                                ? AppColor.objectColor
+                                : AppColor.textColor2,
                           ),
+                          onChanged: (value) {
+                            setState(() {
+                              _isFocused = value.isNotEmpty;
+                            });
+                          },
                         )),
                   ),
                 ),

@@ -1,3 +1,4 @@
+import 'package:dplanner/widgets/post_comment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
@@ -17,7 +18,8 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController searchPost = TextEditingController();
+  final TextEditingController addComment = TextEditingController();
+  bool _isFocused = false;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +50,11 @@ class _PostPageState extends State<PostPage> {
                 color: AppColor.backgroundColor2,
                 height: SizeController.to.screenHeight * 0.01,
               ),
-              Expanded(child: Container()),
+              const Expanded(
+                child: SingleChildScrollView(
+                  child: PostComment(),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(18.0),
                 child: Row(
@@ -68,12 +74,22 @@ class _PostPageState extends State<PostPage> {
                             key: _formKey,
                             child: OutlineTextForm(
                               hintText: '댓글을 남겨보세요',
-                              controller: searchPost,
+                              controller: addComment,
                               isColored: true,
-                              icon: const Icon(
-                                SFSymbols.paperplane,
-                                color: AppColor.textColor2,
-                              ),
+                              icon: _isFocused
+                                  ? const Icon(
+                                      SFSymbols.paperplane_fill,
+                                      color: AppColor.objectColor,
+                                    )
+                                  : const Icon(
+                                      SFSymbols.paperplane,
+                                      color: AppColor.textColor2,
+                                    ),
+                              onChanged: (value) {
+                                setState(() {
+                                  _isFocused = value.isNotEmpty;
+                                });
+                              },
                             )),
                       ),
                     ),
