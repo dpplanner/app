@@ -1,5 +1,7 @@
+import 'package:dplanner/pages/post_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -13,7 +15,9 @@ class PostCard extends StatelessWidget {
       splashColor: AppColor.subColor2.withOpacity(0.8),
       highlightColor: AppColor.subColor2.withOpacity(0.8),
       borderRadius: BorderRadius.circular(16),
-      onTap: () {},
+      onTap: () {
+        Get.to(const PostPage(), arguments: 1);
+      },
       child: Ink(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),

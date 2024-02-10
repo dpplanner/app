@@ -1,4 +1,3 @@
-import 'package:dplanner/club_root_page.dart';
 import 'package:dplanner/pages/club_create_page.dart';
 import 'package:dplanner/pages/club_create_success_next_page.dart';
 import 'package:dplanner/pages/club_create_success_page.dart';
@@ -24,8 +23,16 @@ final page = [
   GetPage(name: '/club_join', page: () => const ClubJoinPage()),
   GetPage(name: '/club_join_next', page: () => const ClubJoinNextPage()),
   GetPage(name: '/club_join_success', page: () => const ClubJoinSuccessPage()),
-  GetPage(name: '/club_root', page: () => const ClubRootPage()),
-  GetPage(name: '/tab1', page: () => const ClubTimetablePage()),
-  GetPage(name: '/tab2', page: () => const ClubHomePage()),
-  GetPage(name: '/tab3', page: () => const ClubMyPage())
+  GetPage(
+      name: '/tab1',
+      page: () => const ClubTimetablePage(),
+      transition: Transition.noTransition),
+  GetPage(
+      name: '/tab2',
+      page: () => const ClubHomePage(),
+      transition: Transition.noTransition),
+  GetPage(
+      name: '/tab3',
+      page: () => const ClubMyPage(),
+      transition: Transition.noTransition)
 ];
