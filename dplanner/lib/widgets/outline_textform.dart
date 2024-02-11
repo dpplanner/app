@@ -9,6 +9,8 @@ class OutlineTextForm extends StatelessWidget {
   final bool isFocused;
   final bool isColored;
   final int maxLines;
+  final bool noLine;
+  final double fontSize;
   final Widget icon;
   final FormFieldValidator<String>? validator;
   final FormFieldSetter<String>? onSaved;
@@ -22,6 +24,8 @@ class OutlineTextForm extends StatelessWidget {
       this.isFocused = false,
       this.isColored = false,
       this.maxLines = 1,
+      this.noLine = false,
+      this.fontSize = 16,
       this.icon = const Icon(Icons.arrow_forward),
       this.validator,
       this.onSaved,
@@ -38,20 +42,20 @@ class OutlineTextForm extends StatelessWidget {
         filled: (isColored) ? true : false,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15.0)),
         hintText: hintText,
-        hintStyle: const TextStyle(
-          fontSize: 16,
+        hintStyle: TextStyle(
+          fontSize: fontSize,
           fontWeight: FontWeight.w400,
           color: AppColor.textColor2,
         ),
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
-                color: isColored
+                color: noLine || isColored
                     ? Colors.transparent
                     : (isFocused ? AppColor.textColor : AppColor.textColor2)),
             borderRadius: BorderRadius.circular(15.0)),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(
-              color: isColored
+              color: noLine || isColored
                   ? Colors.transparent
                   : (isFocused ? AppColor.textColor : AppColor.textColor2)),
           borderRadius: BorderRadius.circular(15.0),
@@ -75,8 +79,8 @@ class OutlineTextForm extends StatelessWidget {
             borderRadius: BorderRadius.circular(15.0)),
         contentPadding: const EdgeInsets.all(10.0),
       ),
-      style: const TextStyle(
-        fontSize: 16,
+      style: TextStyle(
+        fontSize: fontSize,
         fontWeight: FontWeight.w400,
         color: AppColor.textColor,
       ),

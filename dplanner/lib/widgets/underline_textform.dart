@@ -9,6 +9,8 @@ class UnderlineTextForm extends StatelessWidget {
   final bool isFocused;
   final bool isWritten;
   final int maxLength;
+  final bool noLine;
+  final double fontSize;
   final FormFieldValidator<String>? validator;
   final FormFieldSetter<String>? onSaved;
   final ValueChanged<String>? onChanged;
@@ -21,6 +23,8 @@ class UnderlineTextForm extends StatelessWidget {
       this.isFocused = false,
       this.isWritten = false,
       this.maxLength = 0,
+      this.noLine = false,
+      this.fontSize = 16.0,
       this.validator,
       this.onSaved,
       this.onChanged});
@@ -33,22 +37,28 @@ class UnderlineTextForm extends StatelessWidget {
       enabled: isWritten ? false : true,
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(
-          fontSize: 16,
+        hintStyle: TextStyle(
+          fontSize: fontSize,
           fontWeight: FontWeight.w400,
           color: AppColor.textColor2,
         ),
         disabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(
-              color: isFocused ? AppColor.textColor : AppColor.textColor2),
+              color: noLine
+                  ? Colors.transparent
+                  : (isFocused ? AppColor.textColor : AppColor.textColor2)),
         ),
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(
-              color: isFocused ? AppColor.textColor : AppColor.textColor2),
+              color: noLine
+                  ? Colors.transparent
+                  : (isFocused ? AppColor.textColor : AppColor.textColor2)),
         ),
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(
-              color: isFocused ? AppColor.textColor : AppColor.textColor2),
+              color: noLine
+                  ? Colors.transparent
+                  : (isFocused ? AppColor.textColor : AppColor.textColor2)),
         ),
         errorBorder: const UnderlineInputBorder(
           borderSide: BorderSide(
@@ -69,8 +79,8 @@ class UnderlineTextForm extends StatelessWidget {
         ),
         contentPadding: const EdgeInsets.fromLTRB(10.0, 20.0, 0.0, 5.0),
       ),
-      style: const TextStyle(
-        fontSize: 16,
+      style: TextStyle(
+        fontSize: fontSize,
         fontWeight: FontWeight.w400,
         color: AppColor.textColor,
       ),

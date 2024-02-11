@@ -1,6 +1,8 @@
 import 'package:dplanner/controllers/size.dart';
+import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:get/get.dart';
 
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
@@ -110,7 +112,9 @@ class _ClubHomePageState extends State<ClubHomePage> {
           ),
         ),
         floatingActionButton: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Get.to(const PostAddPage());
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColor.objectColor,
             shape: const CircleBorder(),
