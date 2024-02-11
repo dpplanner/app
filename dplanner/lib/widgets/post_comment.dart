@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
+import 'nextpage_button.dart';
 
 class PostComment extends StatelessWidget {
   const PostComment({super.key});
@@ -113,7 +114,9 @@ class PostComment extends StatelessWidget {
                   ],
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _commentMore(context);
+                  },
                   icon: const Icon(
                     SFSymbols.ant,
                     color: AppColor.textColor,
@@ -124,6 +127,110 @@ class PostComment extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _commentMore(BuildContext context) async {
+    await showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: SizeController.to.screenHeight * 0.3,
+          decoration: const BoxDecoration(
+            color: AppColor.backgroundColor,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: Image.asset(
+                  'assets/images/showmodal_scrollcontrolbar.png',
+                  fit: BoxFit.fill,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                child: NextPageButton(
+                  buttonColor: AppColor.backgroundColor2,
+                  text: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        SFSymbols.exclamationmark_octagon,
+                        color: AppColor.markColor,
+                      ),
+                      Text(
+                        " 이 댓글 신고하기",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: AppColor.markColor),
+                      ),
+                    ],
+                  ),
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                child: NextPageButton(
+                  buttonColor: AppColor.backgroundColor2,
+                  text: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        SFSymbols.pencil_outline,
+                        color: AppColor.textColor,
+                      ),
+                      Text(
+                        " 수정하기",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: AppColor.textColor),
+                      ),
+                    ],
+                  ),
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                child: NextPageButton(
+                  buttonColor: AppColor.backgroundColor2,
+                  text: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        SFSymbols.trash,
+                        color: AppColor.markColor,
+                      ),
+                      Text(
+                        " 삭제하기",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: AppColor.markColor),
+                      ),
+                    ],
+                  ),
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

@@ -139,7 +139,13 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                   )),
               const Expanded(child: SizedBox()),
               NextPageButton(
-                name: '클럽 만들기',
+                text: const Text(
+                  "클럽 만들기",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColor.backgroundColor),
+                ),
                 buttonColor: clubName.text.isNotEmpty
                     ? AppColor.objectColor
                     : AppColor.subColor3,

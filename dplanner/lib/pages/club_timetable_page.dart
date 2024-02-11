@@ -152,7 +152,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   ),
                                 ),
                                 NextPageButton(
-                                  name: '날짜 변경하기',
+                                  text: const Text(
+                                    "날짜 변경하기",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColor.backgroundColor),
+                                  ),
                                   buttonColor: AppColor.objectColor,
                                   onPressed: () {
                                     weekViewStateKey.currentState
@@ -506,7 +512,15 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 ),
                                               ),
                                               NextPageButton(
-                                                name: '날짜 변경하기',
+                                                text: const Text(
+                                                  "날짜 변경하기",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: AppColor
+                                                          .backgroundColor),
+                                                ),
                                                 buttonColor:
                                                     AppColor.objectColor,
                                                 onPressed: () {
@@ -646,7 +660,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       width: SizeController.to.screenWidth,
                     )),
                     NextPageButton(
-                      name: '예약 신청하기',
+                      text: const Text(
+                        "예약 신청하기",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColor.backgroundColor),
+                      ),
                       buttonColor: AppColor.objectColor,
                       onPressed: () {
                         Get.back();

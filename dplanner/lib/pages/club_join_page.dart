@@ -119,7 +119,13 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
               Visibility(
                 visible: _isWritten,
                 replacement: NextPageButton(
-                  name: '입력 완료',
+                  text: const Text(
+                    "입력 완료",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.backgroundColor),
+                  ),
                   buttonColor: clubInviteCode.text.isNotEmpty
                       ? AppColor.objectColor
                       : AppColor.subColor3,
@@ -135,7 +141,13 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                 child: Column(
                   children: [
                     NextPageButton(
-                      name: '네, 맞아요',
+                      text: const Text(
+                        "네, 맞아요",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColor.backgroundColor),
+                      ),
                       buttonColor: AppColor.objectColor,
                       onPressed: () {
                         Get.toNamed('/club_join_next');
@@ -143,7 +155,13 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                     ),
                     SizedBox(height: SizeController.to.screenHeight * 0.005),
                     NextPageButton(
-                      name: '아니오, 코드를 다시 입력할게요',
+                      text: const Text(
+                        "아니오, 코드를 다시 입력할게요",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColor.backgroundColor),
+                      ),
                       buttonColor: AppColor.subColor3,
                       onPressed: () {
                         setState(() {
