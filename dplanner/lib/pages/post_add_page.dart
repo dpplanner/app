@@ -1,11 +1,10 @@
-import 'package:dplanner/widgets/image_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
-import '../widgets/bottom_bar.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/underline_textform.dart';
 
@@ -129,21 +128,19 @@ class _PostAddPageState extends State<PostAddPage> {
                       child: Row(
                         children: [
                           InkWell(
-                            onTap: () {},
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.asset(
-                              'assets/images/post_add_photo.png',
-                              fit: BoxFit.fill,
-                            ),
-                          ),
+                              onTap: () {},
+                              borderRadius: BorderRadius.circular(8),
+                              child: SvgPicture.asset(
+                                'assets/images/post_add_photo.svg',
+                              )),
                         ],
                       ),
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 18, 18),
-                  child: const Text(
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0, 18, 18),
+                  child: Text(
                     "2/10",
                     style: TextStyle(
                         fontWeight: FontWeight.w500,

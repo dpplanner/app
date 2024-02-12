@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -127,9 +128,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 Padding(
                                   padding: const EdgeInsets.only(
                                       top: 8.0, bottom: 8.0),
-                                  child: Image.asset(
-                                    'assets/images/showmodal_scrollcontrolbar.png',
-                                    fit: BoxFit.fill,
+                                  child: SvgPicture.asset(
+                                    'assets/images/showmodal_scrollcontrolbar.svg',
                                   ),
                                 ),
                                 const Text(
@@ -418,9 +418,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                      child: Image.asset(
-                        'assets/images/showmodal_scrollcontrolbar.png',
-                        fit: BoxFit.fill,
+                      child: SvgPicture.asset(
+                        'assets/images/showmodal_scrollcontrolbar.svg',
                       ),
                     ),
                     SizedBox(
@@ -484,9 +483,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     top: 8.0, bottom: 8.0),
-                                                child: Image.asset(
-                                                  'assets/images/showmodal_scrollcontrolbar.png',
-                                                  fit: BoxFit.fill,
+                                                child: SvgPicture.asset(
+                                                  'assets/images/showmodal_scrollcontrolbar.svg',
                                                 ),
                                               ),
                                               const Text(

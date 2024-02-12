@@ -1,4 +1,5 @@
 import 'package:dplanner/controllers/size.dart';
+import 'package:dplanner/pages/notification_page.dart';
 import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -50,7 +51,9 @@ class _ClubHomePageState extends State<ClubHomePage> {
             ),
             actions: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Get.to(const NotificationPage(), arguments: 1);
+                },
                 icon: const Icon(
                   SFSymbols.bell,
                   color: AppColor.textColor,

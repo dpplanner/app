@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
@@ -91,9 +92,8 @@ class PostComment extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            Image.asset(
-                              'assets/images/comment_line.png',
-                              fit: BoxFit.fill,
+                            SvgPicture.asset(
+                              'assets/images/comment_line.svg',
                             ),
                             InkWell(
                               onTap: () {},
@@ -118,7 +118,7 @@ class PostComment extends StatelessWidget {
                     _commentMore(context);
                   },
                   icon: const Icon(
-                    SFSymbols.ant,
+                    SFSymbols.ellipsis,
                     color: AppColor.textColor,
                   ),
                 )
@@ -147,9 +147,8 @@ class PostComment extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                child: Image.asset(
-                  'assets/images/showmodal_scrollcontrolbar.png',
-                  fit: BoxFit.fill,
+                child: SvgPicture.asset(
+                  'assets/images/showmodal_scrollcontrolbar.svg',
                 ),
               ),
               Padding(
