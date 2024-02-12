@@ -57,7 +57,13 @@ class ClubJoinSuccessPage extends StatelessWidget {
           ),
           SizedBox(height: SizeController.to.screenHeight * 0.005),
           NextPageButton(
-            name: '알림 승인하기',
+            text: const Text(
+              "알림 승인하기",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppColor.backgroundColor),
+            ),
             buttonColor: AppColor.objectColor,
             onPressed: () {
               Get.offNamed('/club_list');

@@ -126,7 +126,13 @@ class _ClubJoinNextPageState extends State<ClubJoinNextPage> {
                   )),
               const Expanded(child: SizedBox()),
               NextPageButton(
-                name: '가입 신청하기',
+                text: const Text(
+                  "가입 신청하기",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColor.backgroundColor),
+                ),
                 buttonColor: myName.text.isNotEmpty
                     ? AppColor.objectColor
                     : AppColor.subColor3,

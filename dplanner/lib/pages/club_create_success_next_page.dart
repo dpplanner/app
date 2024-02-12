@@ -89,7 +89,13 @@ class _ClubCreateSuccessNextPageState extends State<ClubCreateSuccessNextPage> {
             ),
             const Expanded(child: SizedBox()),
             NextPageButton(
-              name: '클럽 시작하기',
+              text: const Text(
+                "클럽 시작하기",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColor.backgroundColor),
+              ),
               buttonColor: AppColor.objectColor,
               onPressed: () {
                 Get.offAllNamed('/club_root');

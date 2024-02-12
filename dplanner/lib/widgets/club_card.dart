@@ -14,7 +14,7 @@ class ClubCard extends StatelessWidget {
       highlightColor: AppColor.subColor2.withOpacity(0.8),
       borderRadius: BorderRadius.circular(16),
       onTap: () {
-        Get.offAllNamed('/club_root');
+        Get.offAllNamed('/tab2', arguments: 1);
       },
       child: Ink(
         decoration: BoxDecoration(
