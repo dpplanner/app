@@ -49,14 +49,14 @@ class _ReservationListPageState extends State<ReservationListPage> {
           ),
         ],
         tabBarProperties: const TabBarProperties(
-            height: 40.0,
+            height: 48.0,
             indicatorColor: AppColor.objectColor,
-            indicatorWeight: 2.0,
+            indicatorWeight: 3.0,
             labelColor: AppColor.objectColor,
             labelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
             unselectedLabelColor: AppColor.textColor,
             unselectedLabelStyle:
-                TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
+                TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
         views: [
           Container(
             color: AppColor.backgroundColor2,
