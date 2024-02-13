@@ -1,3 +1,4 @@
+import 'package:dplanner/pages/app_setting_page.dart';
 import 'package:dplanner/pages/my_profile_modification_page.dart';
 import 'package:dplanner/pages/reservation_list_page.dart';
 import 'package:flutter/material.dart';
@@ -143,7 +144,9 @@ class ClubMyPage extends StatelessWidget {
                   height: SizeController.to.screenHeight * 0.01,
                   color: AppColor.backgroundColor2,
                 ),
-                selectButton("앱 설정", () {}, false),
+                selectButton("앱 설정", () {
+                  Get.to(const AppSettingPage());
+                }, false),
                 selectButton("로그아웃", () {}, false),
                 selectButton("탈퇴하기", () {}, false),
               ],
