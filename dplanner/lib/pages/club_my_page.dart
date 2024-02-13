@@ -1,5 +1,7 @@
+import 'package:dplanner/pages/reservation_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -94,7 +96,9 @@ class ClubMyPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                selectButton("내 예약 목록", () {}, true),
+                selectButton("내 예약 목록", () {
+                  Get.to(const ReservationListPage());
+                }, true),
                 const Padding(
                   padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
                   child: SingleChildScrollView(
