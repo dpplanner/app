@@ -1,3 +1,4 @@
+import 'package:dplanner/pages/my_profile_modification_page.dart';
 import 'package:dplanner/pages/reservation_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -74,7 +75,9 @@ class ClubMyPage extends StatelessWidget {
                           ],
                         ),
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            Get.to(const MyProfileModificationPage());
+                          },
                           borderRadius: BorderRadius.circular(5),
                           child: const Row(
                             children: [
