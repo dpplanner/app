@@ -1,8 +1,7 @@
+import 'package:dplanner/pages/club_member_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -82,7 +81,9 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                                 fontWeight: FontWeight.w700, fontSize: 16),
                           ),
                           InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              Get.to(const ClubMemberListPage());
+                            },
                             borderRadius: BorderRadius.circular(16),
                             child: const Padding(
                               padding: EdgeInsets.all(4.0),
