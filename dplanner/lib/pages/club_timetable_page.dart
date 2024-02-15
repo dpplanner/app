@@ -398,7 +398,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   }
 
   void _reservationBottomSheet(BuildContext context) async {
-    DateTime resetvationTime = _now;
+    DateTime reservationTime = _now;
     showModalBottomSheet(
         isScrollControlled: true,
         context: context,
@@ -498,13 +498,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                   mode: CupertinoDatePickerMode
                                                       .date,
                                                   initialDateTime:
-                                                      resetvationTime,
+                                                      reservationTime,
                                                   minimumYear: _now.year,
                                                   maximumYear: _now.year + 10,
                                                   onDateTimeChanged:
                                                       (DateTime date) {
                                                     setState(() {
-                                                      resetvationTime = date;
+                                                      reservationTime = date;
                                                     });
                                                   },
                                                 ),
@@ -539,7 +539,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   borderRadius: BorderRadius.circular(5),
                                   child: Text(
                                       DateFormat("yyyy.MM.dd.E요일", 'ko_KR')
-                                          .format(resetvationTime),
+                                          .format(reservationTime),
                                       style: const TextStyle(
                                           color: AppColor.textColor,
                                           fontWeight: FontWeight.w500,
