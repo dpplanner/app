@@ -10,6 +10,7 @@ class UnderlineTextForm extends StatelessWidget {
   final bool isWritten;
   final int maxLength;
   final bool noLine;
+  final bool isRight;
   final double fontSize;
   final FormFieldValidator<String>? validator;
   final FormFieldSetter<String>? onSaved;
@@ -24,6 +25,7 @@ class UnderlineTextForm extends StatelessWidget {
       this.isWritten = false,
       this.maxLength = 0,
       this.noLine = false,
+      this.isRight = false,
       this.fontSize = 16.0,
       this.validator,
       this.onSaved,
@@ -32,6 +34,7 @@ class UnderlineTextForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      textAlign: isRight ? TextAlign.end : TextAlign.start,
       controller: controller,
       maxLength: maxLength != 0 ? maxLength : null,
       enabled: isWritten ? false : true,

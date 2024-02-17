@@ -23,6 +23,12 @@ class _ClubHomePageState extends State<ClubHomePage> {
   bool _isFocused = false;
 
   @override
+  void dispose() {
+    searchPost.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: AppColor.backgroundColor2,
