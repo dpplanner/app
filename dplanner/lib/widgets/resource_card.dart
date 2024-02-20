@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
-import 'nextpage_button.dart';
 
 class ResourceCard extends StatelessWidget {
   final String name;

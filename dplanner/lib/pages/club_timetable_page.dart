@@ -15,7 +15,7 @@ import '../widgets/nextpage_button.dart';
 
 DateTime get _now => DateTime.now();
 
-enum Open { Yes, No }
+enum Open { yes, no }
 
 class ClubTimetablePage extends StatefulWidget {
   const ClubTimetablePage({super.key});
@@ -31,7 +31,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   final itemController = Get.put((ItemController()));
   late String selectedValue = ItemController.to.items[0];
 
-  Open _open = Open.Yes;
+  Open _open = Open.yes;
 
   @override
   Widget build(BuildContext context) {
@@ -305,8 +305,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 startDay: WeekDays.monday,
                 heightPerMinute: SizeController.to.screenHeight * 0.0012,
                 eventArranger: const SideEventArranger(),
-                onEventTap: (events, date) => print(events),
-                onDateLongPress: (date) => print(date),
+                onEventTap: (events, date) => {},
+                onDateLongPress: (date) => {},
               ),
             ),
 
@@ -620,7 +620,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500, fontSize: 16),
                               ),
-                              value: Open.Yes,
+                              value: Open.yes,
                               groupValue: _open,
                               onChanged: (Open? value) {
                                 setState(() {
@@ -639,7 +639,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.w500, fontSize: 16),
                               ),
-                              value: Open.No,
+                              value: Open.no,
                               groupValue: _open,
                               onChanged: (Open? value) {
                                 setState(() {

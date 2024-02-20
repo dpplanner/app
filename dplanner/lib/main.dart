@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:calendar_view/calendar_view.dart';
 import 'package:dplanner/routes.dart';
 import 'package:dplanner/style.dart';
@@ -10,11 +8,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'controllers/size.dart';
 
-DateTime get _now => DateTime.now();
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
