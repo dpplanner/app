@@ -50,7 +50,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyChIxGSyS2SziSKq9xPH-MC55GRQY0UoUQ',
+    apiKey: 'AIzaSyB1gwADkJaqsJZDBvbXby8XjRyskWH-VGM',
     appId: '1:440122903298:android:848cf4550e1ac2b402501b',
     messagingSenderId: '440122903298',
     projectId: 'dplanner-c2b9a',
@@ -58,7 +58,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCMnL-1CT44KF4ReCnBbewBofERymmvltc',
+    apiKey: 'AIzaSyCTrmvpPmfLncQCkYNdBOadJi6s4x1wDHg',
     appId: '1:440122903298:ios:608144e53b7ac4a202501b',
     messagingSenderId: '440122903298',
     projectId: 'dplanner-c2b9a',
