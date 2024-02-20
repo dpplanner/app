@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import '../controllers/size.dart';
-import '../style.dart';
 
 class NextPageButton extends StatelessWidget {
   final Color buttonColor;

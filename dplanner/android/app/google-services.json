@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "440122903298",
+    "project_id": "dplanner-c2b9a",
+    "storage_bucket": "dplanner-c2b9a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:440122903298:android:848cf4550e1ac2b402501b",
+        "android_client_info": {
+          "package_name": "com.dp.dplanner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChIxGSyS2SziSKq9xPH-MC55GRQY0UoUQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

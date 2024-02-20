@@ -88,7 +88,7 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return '클럽 이름은 영어,한글,숫자,특수문자(,.!?)만 쓸 수 있어요';
-                      } else if (!RegExp('[a-zA-Z가-힣,.!?\s]').hasMatch(value)) {
+                      } else if (!RegExp('[a-zA-Z가-힣,.!?s]').hasMatch(value)) {
                         return '클럽 이름은 영어,한글,숫자,특수문자(,.!?)만 쓸 수 있어요';
                       }
                       return null;
