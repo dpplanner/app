@@ -6,12 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import '../style.dart';
 import '../controllers/size.dart';
 
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_naver_login/flutter_naver_login.dart';
 
 enum LoginPlatform { kakao, naver, google, none }
 
@@ -69,6 +70,21 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  void signInWithNaver() async {
+    final NaverLoginResult result = await FlutterNaverLogin.logIn();
+
+    if (result.status == NaverLoginStatus.loggedIn) {
+      print('accessToken = ${result.accessToken}');
+      print('id = ${result.account.id}');
+      print('email = ${result.account.email}');
+      print('name = ${result.account.name}');
+
+      setState(() {
+        _loginPlatform = LoginPlatform.naver;
+      });
+    }
+  }
+
   void signOut() async {
     switch (_loginPlatform) {
       case LoginPlatform.google:
@@ -76,9 +92,9 @@ class _LoginPageState extends State<LoginPage> {
         break;
       case LoginPlatform.kakao:
         await UserApi.instance.logout();
-        print("카카오 로그아웃");
         break;
       case LoginPlatform.naver:
+        await FlutterNaverLogin.logOut();
         break;
       case LoginPlatform.none:
         break;
@@ -132,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
               ImageButton(
                   image: 'assets/images/login/naver_login.svg',
                   onTap: () {
-                    signOut();
+                    signInWithNaver();
                   }),
               SizedBox(height: SizeController.to.screenHeight * 0.005),
               ImageButton(
