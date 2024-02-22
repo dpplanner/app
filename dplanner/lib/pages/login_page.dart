@@ -6,6 +6,12 @@ import 'package:get/get.dart';
 import '../style.dart';
 import '../controllers/size.dart';
 
+import 'package:google_sign_in/google_sign_in.dart';
+
+enum LoginPlatform { kakao, naver, google, none }
+
+GoogleSignIn googleSignIn = GoogleSignIn();
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -14,6 +20,40 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  LoginPlatform _loginPlatform = LoginPlatform.none;
+
+  void signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    if (googleUser != null) {
+      print('name = ${googleUser.displayName}');
+      print('email = ${googleUser.email}');
+      print('id = ${googleUser.id}');
+
+      setState(() {
+        _loginPlatform = LoginPlatform.google;
+      });
+    }
+  }
+
+  void signOut() async {
+    switch (_loginPlatform) {
+      case LoginPlatform.google:
+        await GoogleSignIn().signOut();
+        break;
+      case LoginPlatform.kakao:
+        break;
+      case LoginPlatform.naver:
+        break;
+      case LoginPlatform.none:
+        break;
+    }
+
+    setState(() {
+      _loginPlatform = LoginPlatform.none;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -50,15 +90,20 @@ class _LoginPageState extends State<LoginPage> {
               ImageButton(
                   image: 'assets/images/login/kakao_login.svg',
                   onTap: () {
-                    Get.offNamed('/club_list');
+                    //Get.offNamed('/club_list');
                   }),
               SizedBox(height: SizeController.to.screenHeight * 0.005),
               ImageButton(
-                  image: 'assets/images/login/naver_login.svg', onTap: () {}),
+                  image: 'assets/images/login/naver_login.svg',
+                  onTap: () {
+                    signOut();
+                  }),
               SizedBox(height: SizeController.to.screenHeight * 0.005),
               ImageButton(
                   image: 'assets/images/login/facebook_login.svg',
-                  onTap: () {}),
+                  onTap: () {
+                    signInWithGoogle();
+                  }),
             ],
           ),
         ),
