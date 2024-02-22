@@ -12,7 +12,16 @@
           "package_name": "com.dp.dplanner"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "440122903298-2f2tq11inicd4vr72rs8gg8nuqa5ev6n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dp.dplanner",
+            "certificate_hash": "56473f9b0fa1a6ea7aeda6138f01bb91f868749a"
+          }
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB1gwADkJaqsJZDBvbXby8XjRyskWH-VGM"
