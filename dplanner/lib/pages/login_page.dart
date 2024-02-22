@@ -1,12 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dplanner/widgets/image_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import '../style.dart';
 import '../controllers/size.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 
 enum LoginPlatform { kakao, naver, google, none }
 
@@ -36,12 +41,42 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  void signInWithKakao() async {
+    try {
+      bool isInstalled = await isKakaoTalkInstalled();
+
+      OAuthToken token = isInstalled
+          ? await UserApi.instance.loginWithKakaoTalk()
+          : await UserApi.instance.loginWithKakaoAccount();
+
+      final url = Uri.https('kapi.kakao.com', '/v2/user/me');
+
+      final response = await http.get(
+        url,
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}'
+        },
+      );
+
+      final profileInfo = json.decode(response.body);
+      print(profileInfo.toString());
+
+      setState(() {
+        _loginPlatform = LoginPlatform.kakao;
+      });
+    } catch (error) {
+      print('카카오톡으로 로그인 실패 $error');
+    }
+  }
+
   void signOut() async {
     switch (_loginPlatform) {
       case LoginPlatform.google:
         await GoogleSignIn().signOut();
         break;
       case LoginPlatform.kakao:
+        await UserApi.instance.logout();
+        print("카카오 로그아웃");
         break;
       case LoginPlatform.naver:
         break;
@@ -90,6 +125,7 @@ class _LoginPageState extends State<LoginPage> {
               ImageButton(
                   image: 'assets/images/login/kakao_login.svg',
                   onTap: () {
+                    signInWithKakao();
                     //Get.offNamed('/club_list');
                   }),
               SizedBox(height: SizeController.to.screenHeight * 0.005),
