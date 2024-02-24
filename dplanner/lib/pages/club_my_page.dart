@@ -1,19 +1,53 @@
+import 'package:dplanner/controllers/login.dart';
 import 'package:dplanner/pages/app_setting_page.dart';
 import 'package:dplanner/pages/club_info_page.dart';
 import 'package:dplanner/pages/my_activity_check_page.dart';
 import 'package:dplanner/pages/my_profile_modification_page.dart';
 import 'package:dplanner/pages/reservation_list_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_login/flutter_naver_login.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/reservation_mini_card.dart';
 
-class ClubMyPage extends StatelessWidget {
+class ClubMyPage extends StatefulWidget {
   const ClubMyPage({super.key});
+
+  @override
+  State<ClubMyPage> createState() => _ClubMyPageState();
+}
+
+class _ClubMyPageState extends State<ClubMyPage> {
+  static const storage = FlutterSecureStorage();
+
+  // 소셜 로그아웃
+  void signOut() async {
+    await storage.deleteAll();
+    switch (LoginController.to.loginPlatform) {
+      case LoginPlatform.google:
+        await GoogleSignIn().signOut();
+        break;
+      case LoginPlatform.kakao:
+        await UserApi.instance.logout();
+        break;
+      case LoginPlatform.naver:
+        await FlutterNaverLogin.logOut();
+        break;
+      case LoginPlatform.none:
+        break;
+    }
+
+    setState(() {
+      LoginController.to.loginPlatform.value = LoginPlatform.none;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,7 +187,10 @@ class ClubMyPage extends StatelessWidget {
                 selectButton("앱 설정", () {
                   Get.to(const AppSettingPage());
                 }, false),
-                selectButton("로그아웃", () {}, false),
+                selectButton("로그아웃", () {
+                  signOut();
+                  Get.offAllNamed('login');
+                }, false),
                 selectButton("탈퇴하기", () {}, false),
               ],
             ),

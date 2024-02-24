@@ -7,16 +7,15 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import '../const.dart';
+import '../controllers/login.dart';
 import '../services/user_api_service.dart';
 import '../style.dart';
-import '../controllers/size.dart';
 
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_naver_login/flutter_naver_login.dart';
-
-enum LoginPlatform { kakao, naver, google, none }
 
 GoogleSignIn googleSignIn = GoogleSignIn();
 
@@ -28,82 +27,49 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  LoginPlatform _loginPlatform = LoginPlatform.none;
+  static const storage = FlutterSecureStorage();
+  final loginController = Get.put((LoginController()));
 
   @override
   void initState() {
     super.initState();
-    checkUserLogin();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkUserLogin();
+    });
   }
 
+  // 로그인 상태 확인
   void checkUserLogin() async {
-    // 1.5초간 대기
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 1000));
 
-    // 로그인 상태 확인
-    const storage = FlutterSecureStorage();
-    String? userInfoString = await storage.read(key: 'login');
-    int? isBelongedFamily;
-    // if (userInfoString != null) {
-    //   Map<String, dynamic> userInfo = json.decode(userInfoString);
-    //   if (userInfo['email'] != null) {
-    //     // 자동 로그인 상태; 토큰 정보 자동으로 다시 받아오기
-    //     try {
-    //       await UserApiService.postUserLogin(
-    //           userInfo['email'], userInfo['password']);
-    //     } catch (e) {
-    //       // TODO: 에러 팝업 추가
-    //       print(e.toString());
-    //     }
-    //     if (isBelongedFamily == 1) {
-    //       // 가족이 있는 경우
-    //       Navigator.pushReplacement(context,
-    //           MaterialPageRoute(builder: (context) => const RootPage()));
-    //     } else if (isBelongedFamily == 0) {
-    //       // 가족이 없는 경우
-    //       Navigator.pushReplacement(
-    //           context,
-    //           MaterialPageRoute(
-    //               builder: (context) => const FamilyJoinCreatePage()));
-    //     }
-    //   } else {
-    //     // 자동 로그인 X
-    //     Navigator.pushReplacement(context,
-    //         MaterialPageRoute(builder: (context) => const LoginSignUpPage()));
-    //   }
-    // } else {
-    //   // 최초 로그인 상태
-    //   Navigator.pushReplacement(context,
-    //       MaterialPageRoute(builder: (context) => const LoginSignUpPage()));
-    // }
-
+    // refreshToken 으로 로그인 상태 확인
+    if (await storage.read(key: refreshTokenKey) != null) {
+      Get.offNamed('/club_list');
+    }
     FlutterNativeSplash.remove();
   }
 
-  void signInWithGoogle() async {
+  // 구글 로그인
+  Future<void> signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-    try {
-      await UserApiService.postUserLogin(
-          googleUser!.email, googleUser.displayName ?? "이름없음");
-    } catch (e) {
-      // TODO: 에러 내용 알려주기
-      print(e.toString());
-    }
-
     if (googleUser != null) {
-      print("accessToken =${googleUser.serverAuthCode}");
-      print('id = ${googleUser.id}');
-      print('name = ${googleUser.displayName}');
-      print('email = ${googleUser.email}');
+      try {
+        await UserApiService.postUserLogin(
+            email: googleUser!.email, name: googleUser.displayName ?? "이름없음");
+      } catch (e) {
+        print(e.toString());
+        errorSnackBar(title: "구글 로그인 실패", content: e.toString());
+      }
 
       setState(() {
-        _loginPlatform = LoginPlatform.google;
+        loginController.loginPlatform.value = LoginPlatform.google;
       });
     }
   }
 
-  void signInWithKakao() async {
+  // 카카오 로그인
+  Future<void> signInWithKakao() async {
     try {
       bool isInstalled = await isKakaoTalkInstalled();
 
@@ -124,52 +90,37 @@ class _LoginPageState extends State<LoginPage> {
       print(profileInfo.toString());
 
       User user = await UserApi.instance.me();
-      print("accessToken =${token.toString()}");
-      print("ci =${user.kakaoAccount!.ci}");
-      print("name =${user.kakaoAccount!.name}");
-      print("email =${user.kakaoAccount!.email}");
+
+      await UserApiService.postUserLogin(
+          email: user.kakaoAccount!.email ?? "이메일 없음",
+          name: user.kakaoAccount!.name ?? "이름없음");
 
       setState(() {
-        _loginPlatform = LoginPlatform.kakao;
+        loginController.loginPlatform.value = LoginPlatform.kakao;
       });
     } catch (error) {
       print('카카오톡으로 로그인 실패 $error');
+      errorSnackBar(title: "카카오톡 로그인 실패", content: error.toString());
     }
   }
 
-  void signInWithNaver() async {
+  // 네이버 로그인
+  Future<void> signInWithNaver() async {
     final NaverLoginResult result = await FlutterNaverLogin.logIn();
 
     if (result.status == NaverLoginStatus.loggedIn) {
-      print('accessToken = ${result.accessToken}');
-      print('id = ${result.account.id}');
-      print('name = ${result.account.name}');
-      print('email = ${result.account.email}');
+      try {
+        await UserApiService.postUserLogin(
+            email: result.account.email, name: result.account.name);
+      } catch (e) {
+        print(e.toString());
+        errorSnackBar(title: "구글 로그인 실패", content: e.toString());
+      }
 
       setState(() {
-        _loginPlatform = LoginPlatform.naver;
+        loginController.loginPlatform.value = LoginPlatform.naver;
       });
     }
-  }
-
-  void signOut() async {
-    switch (_loginPlatform) {
-      case LoginPlatform.google:
-        await GoogleSignIn().signOut();
-        break;
-      case LoginPlatform.kakao:
-        await UserApi.instance.logout();
-        break;
-      case LoginPlatform.naver:
-        await FlutterNaverLogin.logOut();
-        break;
-      case LoginPlatform.none:
-        break;
-    }
-
-    setState(() {
-      _loginPlatform = LoginPlatform.none;
-    });
   }
 
   @override
@@ -181,40 +132,82 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: SizeController.to.screenHeight * 0.1),
-              SvgPicture.asset(
-                'assets/images/login/dplanner_logo_login.svg',
+              Padding(
+                padding: const EdgeInsets.only(top: 128.0, bottom: 256.0),
+                child: SvgPicture.asset(
+                  'assets/images/login/dplanner_logo_login.svg',
+                ),
               ),
-              SizedBox(height: SizeController.to.screenHeight * 0.3),
 
               ///TODO: 이미지 변경 필요
-              ImageButton(
-                  image: 'assets/images/login/kakao_login.svg',
-                  onTap: () {
-                    signInWithKakao();
-                    //Get.offNamed('/club_list');
-                  }),
-              SizedBox(height: SizeController.to.screenHeight * 0.005),
-              ImageButton(
-                  image: 'assets/images/login/naver_login.svg',
-                  onTap: () {
-                    signInWithNaver();
-                  }),
-              SizedBox(height: SizeController.to.screenHeight * 0.005),
-              ImageButton(
-                  image: 'assets/images/login/facebook_login.svg',
-                  onTap: () {
-                    signInWithGoogle();
-                  }),
-              TextButton(
-                  onPressed: () {
-                    signOut();
-                  },
-                  child: Text("로그아웃"))
+              //카카오 로그인 버튼
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: ImageButton(
+                    image: 'assets/images/login/kakao_login.svg',
+                    onTap: () async {
+                      if (loginController.loginPlatform.value ==
+                          LoginPlatform.none) {
+                        await signInWithKakao();
+                        Get.offNamed('/club_list');
+                      } else {
+                        errorSnackBar(
+                            title:
+                                "${loginController.loginPlatform.value.title}로그인 중입니다.",
+                            content: "로그아웃을 먼저 진행해주세요");
+                      }
+                    }),
+              ),
+
+              //네이버 로그인 버튼
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: ImageButton(
+                    image: 'assets/images/login/naver_login.svg',
+                    onTap: () async {
+                      if (loginController.loginPlatform.value ==
+                          LoginPlatform.none) {
+                        await signInWithNaver();
+                        Get.offNamed('/club_list');
+                      } else {
+                        errorSnackBar(
+                            title:
+                                "${loginController.loginPlatform.value.title}로그인 중입니다.",
+                            content: "로그아웃을 먼저 진행해주세요");
+                      }
+                    }),
+              ),
+
+              //구글 로그인 버튼
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: ImageButton(
+                    image: 'assets/images/login/facebook_login.svg',
+                    onTap: () async {
+                      if (loginController.loginPlatform.value ==
+                          LoginPlatform.none) {
+                        await signInWithGoogle();
+                        Get.offNamed('/club_list');
+                      } else {
+                        errorSnackBar(
+                            title:
+                                "${loginController.loginPlatform.value.title}로그인 중입니다.",
+                            content: "로그아웃을 먼저 진행해주세요");
+                      }
+                    }),
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  // 에러 메세지 출력 스낵바
+  void errorSnackBar({required String title, required String content}) {
+    Get.snackbar(title, content,
+        colorText: AppColor.textColor,
+        backgroundColor: AppColor.backgroundColor,
+        snackPosition: SnackPosition.BOTTOM);
   }
 }
