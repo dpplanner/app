@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:dplanner/widgets/image_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import '../services/user_api_service.dart';
 import '../style.dart';
 import '../controllers/size.dart';
 
@@ -28,13 +30,72 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   LoginPlatform _loginPlatform = LoginPlatform.none;
 
+  @override
+  void initState() {
+    super.initState();
+    checkUserLogin();
+  }
+
+  void checkUserLogin() async {
+    // 1.5초간 대기
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    // 로그인 상태 확인
+    const storage = FlutterSecureStorage();
+    String? userInfoString = await storage.read(key: 'login');
+    int? isBelongedFamily;
+    // if (userInfoString != null) {
+    //   Map<String, dynamic> userInfo = json.decode(userInfoString);
+    //   if (userInfo['email'] != null) {
+    //     // 자동 로그인 상태; 토큰 정보 자동으로 다시 받아오기
+    //     try {
+    //       await UserApiService.postUserLogin(
+    //           userInfo['email'], userInfo['password']);
+    //     } catch (e) {
+    //       // TODO: 에러 팝업 추가
+    //       print(e.toString());
+    //     }
+    //     if (isBelongedFamily == 1) {
+    //       // 가족이 있는 경우
+    //       Navigator.pushReplacement(context,
+    //           MaterialPageRoute(builder: (context) => const RootPage()));
+    //     } else if (isBelongedFamily == 0) {
+    //       // 가족이 없는 경우
+    //       Navigator.pushReplacement(
+    //           context,
+    //           MaterialPageRoute(
+    //               builder: (context) => const FamilyJoinCreatePage()));
+    //     }
+    //   } else {
+    //     // 자동 로그인 X
+    //     Navigator.pushReplacement(context,
+    //         MaterialPageRoute(builder: (context) => const LoginSignUpPage()));
+    //   }
+    // } else {
+    //   // 최초 로그인 상태
+    //   Navigator.pushReplacement(context,
+    //       MaterialPageRoute(builder: (context) => const LoginSignUpPage()));
+    // }
+
+    FlutterNativeSplash.remove();
+  }
+
   void signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
+    try {
+      await UserApiService.postUserLogin(
+          googleUser!.email, googleUser.displayName ?? "이름없음");
+    } catch (e) {
+      // TODO: 에러 내용 알려주기
+      print(e.toString());
+    }
+
     if (googleUser != null) {
+      print("accessToken =${googleUser.serverAuthCode}");
+      print('id = ${googleUser.id}');
       print('name = ${googleUser.displayName}');
       print('email = ${googleUser.email}');
-      print('id = ${googleUser.id}');
 
       setState(() {
         _loginPlatform = LoginPlatform.google;
@@ -62,6 +123,12 @@ class _LoginPageState extends State<LoginPage> {
       final profileInfo = json.decode(response.body);
       print(profileInfo.toString());
 
+      User user = await UserApi.instance.me();
+      print("accessToken =${token.toString()}");
+      print("ci =${user.kakaoAccount!.ci}");
+      print("name =${user.kakaoAccount!.name}");
+      print("email =${user.kakaoAccount!.email}");
+
       setState(() {
         _loginPlatform = LoginPlatform.kakao;
       });
@@ -76,8 +143,8 @@ class _LoginPageState extends State<LoginPage> {
     if (result.status == NaverLoginStatus.loggedIn) {
       print('accessToken = ${result.accessToken}');
       print('id = ${result.account.id}');
-      print('email = ${result.account.email}');
       print('name = ${result.account.name}');
+      print('email = ${result.account.email}');
 
       setState(() {
         _loginPlatform = LoginPlatform.naver;
@@ -103,23 +170,6 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _loginPlatform = LoginPlatform.none;
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    initialization();
-  }
-
-  void initialization() async {
-    // This is where you can initialize the resources needed by your app while
-    // the splash screen is displayed.  Remove the following example because
-    // delaying the user experience is a bad design practice!
-    // ignore_for_file: avoid_print
-    print('ready...');
-    await Future.delayed(const Duration(seconds: 1));
-    print('go!');
-    FlutterNativeSplash.remove();
   }
 
   @override
@@ -156,6 +206,11 @@ class _LoginPageState extends State<LoginPage> {
                   onTap: () {
                     signInWithGoogle();
                   }),
+              TextButton(
+                  onPressed: () {
+                    signOut();
+                  },
+                  child: Text("로그아웃"))
             ],
           ),
         ),
