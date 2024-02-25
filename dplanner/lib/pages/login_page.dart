@@ -38,12 +38,54 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  // JWT 토큰 디코드
+  String _decodeBase64(String str) {
+    String output = str.replaceAll('-', '+').replaceAll('_', '/');
+
+    switch (output.length % 4) {
+      case 0:
+        break;
+      case 2:
+        output += '==';
+        break;
+      case 3:
+        output += '=';
+        break;
+      default:
+        throw Exception('Illegal base64url string!"');
+    }
+
+    return utf8.decode(base64Url.decode(output));
+  }
+
+  // refresh token 유효성 검사
+  bool checkRefreshToken(String token) {
+    final parts = token.split('.');
+    if (parts.length != 3) {
+      throw Exception('invalid token');
+    }
+
+    final payload = _decodeBase64(parts[1]);
+    final payloadMap = json.decode(payload);
+    if (payloadMap is! Map<String, dynamic>) {
+      throw Exception('invalid payload');
+    }
+
+    if (payloadMap['exp'] * 1000 > DateTime.now().millisecondsSinceEpoch) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // 로그인 상태 확인
   void checkUserLogin() async {
     await Future.delayed(const Duration(milliseconds: 1000));
 
+    String? refreshToken = await storage.read(key: refreshTokenKey);
+
     // refreshToken 으로 로그인 상태 확인
-    if (await storage.read(key: refreshTokenKey) != null) {
+    if (refreshToken != null && checkRefreshToken(refreshToken)) {
       Get.offNamed('/club_list');
     }
     FlutterNativeSplash.remove();
