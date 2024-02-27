@@ -42,6 +42,11 @@ dependencies:
   dropdown_button2: ^2.3.9
   contained_tab_bar_view: ^0.8.0
   firebase_core: ^2.25.4
+  google_sign_in: ^6.2.1
+  kakao_flutter_sdk_user: ^1.2.1
+  http: ^1.2.0
+  flutter_naver_login: ^1.6.0
+  flutter_secure_storage: ^9.0.0
 
 dev_dependencies:
   flutter_test:
