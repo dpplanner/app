@@ -22,16 +22,17 @@
 		<string>????</string>
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
-		<key>CFBundleURLTypes</key>
-		<array>
-			<dict>
-				<key>CFBundleURLSchemes</key>
-				<array>
-        <!-- naver login -->
-				<string>socialloginapp</string>
-				</array>
-			</dict>
-		</array>
+        <key>CFBundleURLTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <string>dplanner</string>
+                </array>
+            </dict>
+        </array>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>UILaunchStoryboardName</key>
@@ -59,13 +60,42 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<true/>
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>naversearchapp</string>
+			<string>naversearchthirdlogin</string>
+        </array>
 		<key>naverConsumerKey</key>
-		<string>Client ID</string>
+		<string>tiMirLbsetoZ7Zh0gBj9</string>
 		<key>naverConsumerSecret</key>
-		<string>Secret</string>
+		<string>n_2wIZwhh8</string>
 		<key>naverServiceAppName</key>
-		<string>AppName</string>
+		<string>dplanner</string>
 		<key>naverServiceAppUrlScheme</key>
-		<string>UrlScheme</string>
+		<string>dplanner</string>
+
+		        <!-- http allows configurations -->
+        <key>NSAppTransportSecurity</key>
+        <dict>
+           <key>NSAllowsArbitraryLoads</key>
+           <true/>
+           <key>NSExceptionDomains</key>
+           <dict>
+              <key>naver.com</key>
+              <dict>
+                 <key>NSExceptionRequiresForwardSecrecy</key>
+                 <false/>
+                 <key>NSIncludesSubdomains</key>
+                 <true/>
+              </dict>
+              <key>naver.net</key>
+              <dict>
+                 <key>NSExceptionRequiresForwardSecrecy</key>
+                 <false/>
+                 <key>NSIncludesSubdomains</key>
+                 <true/>
+              </dict>
+           </dict>
+        </dict>
 	</dict>
 </plist>
