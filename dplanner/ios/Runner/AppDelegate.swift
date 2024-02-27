@@ -11,10 +11,10 @@ import NaverThirdPartyLogin
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
-}
+
 
 //네이버 로그인 설정 추가하면서 추가한 override func
-override func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+override func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
     var applicationResult = false
     if (!applicationResult) {
        applicationResult = NaverThirdPartyLoginConnection.getSharedInstance().application(app, open: url, options: options)
@@ -25,4 +25,5 @@ override func application(_ app: UIApplication, open url: URL, options: [UIAppli
        applicationResult = super.application(app, open: url, options: options)
     }
     return applicationResult
+}
 }
