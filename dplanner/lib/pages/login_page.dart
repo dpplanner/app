@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dplanner/decode_token.dart';
+import 'package:dplanner/models/user_model.dart';
 import 'package:dplanner/widgets/image_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -28,7 +30,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   static const storage = FlutterSecureStorage();
-  final loginController = Get.put((LoginController()));
 
   @override
   void initState() {
@@ -38,38 +39,9 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  // JWT 토큰 디코드
-  String _decodeBase64(String str) {
-    String output = str.replaceAll('-', '+').replaceAll('_', '/');
-
-    switch (output.length % 4) {
-      case 0:
-        break;
-      case 2:
-        output += '==';
-        break;
-      case 3:
-        output += '=';
-        break;
-      default:
-        throw Exception('Illegal base64url string!"');
-    }
-
-    return utf8.decode(base64Url.decode(output));
-  }
-
   // refresh token 유효성 검사
   bool checkRefreshToken(String token) {
-    final parts = token.split('.');
-    if (parts.length != 3) {
-      throw Exception('invalid token');
-    }
-
-    final payload = _decodeBase64(parts[1]);
-    final payloadMap = json.decode(payload);
-    if (payloadMap is! Map<String, dynamic>) {
-      throw Exception('invalid payload');
-    }
+    final payloadMap = decodeToken(token);
 
     if (payloadMap['exp'] * 1000 > DateTime.now().millisecondsSinceEpoch) {
       return true;
@@ -80,12 +52,18 @@ class _LoginPageState extends State<LoginPage> {
 
   // 로그인 상태 확인
   void checkUserLogin() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 1500));
 
     String? refreshToken = await storage.read(key: refreshTokenKey);
+    String? accessToken = await storage.read(key: accessTokenKey);
 
     // refreshToken 으로 로그인 상태 확인
     if (refreshToken != null && checkRefreshToken(refreshToken)) {
+      print("토큰");
+      print(refreshToken);
+      print(accessToken);
+      print(decodeToken(refreshToken!));
+      print(decodeToken(accessToken!));
       Get.offNamed('/club_list');
     }
     FlutterNativeSplash.remove();
@@ -105,7 +83,9 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       setState(() {
-        loginController.loginPlatform.value = LoginPlatform.google;
+        LoginController.to.user.value = UserModel(
+            email: googleUser!.email, name: googleUser.displayName ?? "이름없음");
+        LoginController.to.loginPlatform.value = LoginPlatform.google;
       });
     }
   }
@@ -138,7 +118,10 @@ class _LoginPageState extends State<LoginPage> {
           name: user.kakaoAccount!.name ?? "이름없음");
 
       setState(() {
-        loginController.loginPlatform.value = LoginPlatform.kakao;
+        LoginController.to.user.value = UserModel(
+            email: user.kakaoAccount!.email ?? "이메일 없음",
+            name: user.kakaoAccount!.name ?? "이름없음");
+        LoginController.to.loginPlatform.value = LoginPlatform.kakao;
       });
     } catch (error) {
       print('카카오톡으로 로그인 실패 $error');
@@ -160,7 +143,9 @@ class _LoginPageState extends State<LoginPage> {
       }
 
       setState(() {
-        loginController.loginPlatform.value = LoginPlatform.naver;
+        LoginController.to.user.value =
+            UserModel(email: result.account.email, name: result.account.name);
+        LoginController.to.loginPlatform.value = LoginPlatform.naver;
       });
     }
   }
@@ -188,14 +173,14 @@ class _LoginPageState extends State<LoginPage> {
                 child: ImageButton(
                     image: 'assets/images/login/kakao_login.svg',
                     onTap: () async {
-                      if (loginController.loginPlatform.value ==
+                      if (LoginController.to.loginPlatform.value ==
                           LoginPlatform.none) {
                         await signInWithKakao();
                         Get.offNamed('/club_list');
                       } else {
                         errorSnackBar(
                             title:
-                                "${loginController.loginPlatform.value.title}로그인 중입니다.",
+                                "${LoginController.to.loginPlatform.value.title}로그인 중입니다.",
                             content: "로그아웃을 먼저 진행해주세요");
                       }
                     }),
@@ -207,14 +192,14 @@ class _LoginPageState extends State<LoginPage> {
                 child: ImageButton(
                     image: 'assets/images/login/naver_login.svg',
                     onTap: () async {
-                      if (loginController.loginPlatform.value ==
+                      if (LoginController.to.loginPlatform.value ==
                           LoginPlatform.none) {
                         await signInWithNaver();
                         Get.offNamed('/club_list');
                       } else {
                         errorSnackBar(
                             title:
-                                "${loginController.loginPlatform.value.title}로그인 중입니다.",
+                                "${LoginController.to.loginPlatform.value.title}로그인 중입니다.",
                             content: "로그아웃을 먼저 진행해주세요");
                       }
                     }),
@@ -226,14 +211,14 @@ class _LoginPageState extends State<LoginPage> {
                 child: ImageButton(
                     image: 'assets/images/login/facebook_login.svg',
                     onTap: () async {
-                      if (loginController.loginPlatform.value ==
+                      if (LoginController.to.loginPlatform.value ==
                           LoginPlatform.none) {
                         await signInWithGoogle();
                         Get.offNamed('/club_list');
                       } else {
                         errorSnackBar(
                             title:
-                                "${loginController.loginPlatform.value.title}로그인 중입니다.",
+                                "${LoginController.to.loginPlatform.value.title}로그인 중입니다.",
                             content: "로그아웃을 먼저 진행해주세요");
                       }
                     }),

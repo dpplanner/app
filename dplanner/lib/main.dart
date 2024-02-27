@@ -1,4 +1,5 @@
 import 'package:calendar_view/calendar_view.dart';
+import 'package:dplanner/controllers/login.dart';
 import 'package:dplanner/routes.dart';
 import 'package:dplanner/style.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sizeController = SizeController();
+    final loginController = LoginController();
     sizeController.screenWidth = MediaQuery.of(context).size.width;
     sizeController.screenHeight = MediaQuery.of(context).size.height;
     return CalendarControllerProvider(
@@ -44,6 +46,7 @@ class MyApp extends StatelessWidget {
         getPages: page,
         initialBinding: BindingsBuilder(() {
           Get.put(sizeController);
+          Get.put(loginController);
         }),
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,

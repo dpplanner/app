@@ -1,15 +1,16 @@
 class ClubModel {
-  final bool isConfirmed;
-  final int id, memberCount;
-  final String clubName, info, url;
+  bool? isConfirmed;
+  int? id, memberCount;
+  String clubName, info;
+  String? url;
 
   ClubModel({
-    required this.id,
+    this.id,
     required this.clubName,
     required this.info,
-    required this.memberCount,
-    required this.isConfirmed,
-    required this.url,
+    this.memberCount,
+    this.isConfirmed,
+    this.url,
   });
 
   ClubModel.fromJson(Map<String, dynamic> json)
