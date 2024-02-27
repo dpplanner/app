@@ -7,6 +7,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'controllers/club.dart';
 import 'controllers/size.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final sizeController = SizeController();
     final loginController = LoginController();
+    final clubController = ClubController();
     sizeController.screenWidth = MediaQuery.of(context).size.width;
     sizeController.screenHeight = MediaQuery.of(context).size.height;
     return CalendarControllerProvider(
@@ -47,6 +49,7 @@ class MyApp extends StatelessWidget {
         initialBinding: BindingsBuilder(() {
           Get.put(sizeController);
           Get.put(loginController);
+          Get.put(clubController);
         }),
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,

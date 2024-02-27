@@ -18,8 +18,6 @@ class ClubCreatePage extends StatefulWidget {
 }
 
 class _ClubCreatePageState extends State<ClubCreatePage> {
-  final clubController = Get.put((ClubController()));
-
   final _formKey1 = GlobalKey<FormState>();
   final TextEditingController clubName = TextEditingController();
   bool _isFocused1 = false;
@@ -175,7 +173,7 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                       try {
                         print(clubName.text);
                         print(clubContent.text);
-                        clubController.thisClub.value =
+                        ClubController.to.thisClub.value =
                             await ClubApiService.postClub(
                                 clubName: clubName.text,
                                 info: clubContent.text);

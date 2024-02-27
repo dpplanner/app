@@ -1,11 +1,12 @@
 class ClubModel {
   bool? isConfirmed;
-  int? id, memberCount;
+  int id;
+  int? memberCount;
   String clubName, info;
   String? url;
 
   ClubModel({
-    this.id,
+    required this.id,
     required this.clubName,
     required this.info,
     this.memberCount,

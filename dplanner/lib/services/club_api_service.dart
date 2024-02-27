@@ -41,4 +41,25 @@ class ClubApiService {
     print(errorMessage);
     throw ErrorDescription(errorMessage);
   }
+
+  /// POST: /clubs/(_.club_id)/invite [클럽 초대하기 코드 생성] 클럽 초대하기 코드 생성
+  static Future<String> postClubCode({required int clubId}) async {
+    final url = Uri.parse('$baseUrl/clubs/$clubId/invite');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.post(url, headers: <String, String>{
+      'Authorization': 'Bearer $accessToken',
+    });
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['data']['inviteCode'];
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
 }
