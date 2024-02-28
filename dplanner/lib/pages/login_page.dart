@@ -19,6 +19,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_naver_login/flutter_naver_login.dart';
 
+import '../widgets/snack_bar.dart';
+
 GoogleSignIn googleSignIn = GoogleSignIn();
 
 class LoginPage extends StatefulWidget {
@@ -79,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
             email: googleUser.email, name: googleUser.displayName ?? "이름없음");
       } catch (e) {
         print(e.toString());
-        errorSnackBar(title: "구글 로그인 실패", content: e.toString());
+        snackBar(title: "구글 로그인 실패", content: e.toString());
       }
 
       setState(() {
@@ -125,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
       });
     } catch (error) {
       print('카카오톡으로 로그인 실패 $error');
-      errorSnackBar(title: "카카오톡 로그인 실패", content: error.toString());
+      snackBar(title: "카카오톡 로그인 실패", content: error.toString());
     }
   }
 
@@ -139,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
             email: result.account.email, name: result.account.name);
       } catch (e) {
         print(e.toString());
-        errorSnackBar(title: "구글 로그인 실패", content: e.toString());
+        snackBar(title: "구글 로그인 실패", content: e.toString());
       }
 
       setState(() {
@@ -178,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                         await signInWithKakao();
                         Get.offNamed('/club_list');
                       } else {
-                        errorSnackBar(
+                        snackBar(
                             title:
                                 "${LoginController.to.loginPlatform.value.title}로그인 중입니다.",
                             content: "로그아웃을 먼저 진행해주세요");
@@ -197,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
                         await signInWithNaver();
                         Get.offNamed('/club_list');
                       } else {
-                        errorSnackBar(
+                        snackBar(
                             title:
                                 "${LoginController.to.loginPlatform.value.title}로그인 중입니다.",
                             content: "로그아웃을 먼저 진행해주세요");
@@ -216,7 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                         await signInWithGoogle();
                         Get.offNamed('/club_list');
                       } else {
-                        errorSnackBar(
+                        snackBar(
                             title:
                                 "${LoginController.to.loginPlatform.value.title}로그인 중입니다.",
                             content: "로그아웃을 먼저 진행해주세요");
@@ -228,13 +230,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-
-  // 에러 메세지 출력 스낵바
-  void errorSnackBar({required String title, required String content}) {
-    Get.snackbar(title, content,
-        colorText: AppColor.textColor,
-        backgroundColor: AppColor.backgroundColor,
-        snackPosition: SnackPosition.BOTTOM);
   }
 }
