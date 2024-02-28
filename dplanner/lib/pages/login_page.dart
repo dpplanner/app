@@ -77,16 +77,18 @@ class _LoginPageState extends State<LoginPage> {
       try {
         await UserApiService.postUserLogin(
             email: googleUser.email, name: googleUser.displayName ?? "이름없음");
+
+        setState(() {
+          LoginController.to.user.value = UserModel(
+              email: googleUser.email, name: googleUser.displayName ?? "이름없음");
+          LoginController.to.loginPlatform.value = LoginPlatform.google;
+        });
+
+        Get.offNamed('/club_list');
       } catch (e) {
         print(e.toString());
         snackBar(title: "구글 로그인 실패", content: e.toString());
       }
-
-      setState(() {
-        LoginController.to.user.value = UserModel(
-            email: googleUser.email, name: googleUser.displayName ?? "이름없음");
-        LoginController.to.loginPlatform.value = LoginPlatform.google;
-      });
     }
   }
 
@@ -123,6 +125,8 @@ class _LoginPageState extends State<LoginPage> {
             name: user.kakaoAccount!.name ?? "이름없음");
         LoginController.to.loginPlatform.value = LoginPlatform.kakao;
       });
+
+      Get.offNamed('/club_list');
     } catch (error) {
       print('카카오톡으로 로그인 실패 $error');
       snackBar(title: "카카오톡 로그인 실패", content: error.toString());
@@ -137,16 +141,18 @@ class _LoginPageState extends State<LoginPage> {
       try {
         await UserApiService.postUserLogin(
             email: result.account.email, name: result.account.name);
+
+        setState(() {
+          LoginController.to.user.value =
+              UserModel(email: result.account.email, name: result.account.name);
+          LoginController.to.loginPlatform.value = LoginPlatform.naver;
+        });
+
+        Get.offNamed('/club_list');
       } catch (e) {
         print(e.toString());
         snackBar(title: "구글 로그인 실패", content: e.toString());
       }
-
-      setState(() {
-        LoginController.to.user.value =
-            UserModel(email: result.account.email, name: result.account.name);
-        LoginController.to.loginPlatform.value = LoginPlatform.naver;
-      });
     }
   }
 
@@ -176,7 +182,6 @@ class _LoginPageState extends State<LoginPage> {
                       if (LoginController.to.loginPlatform.value ==
                           LoginPlatform.none) {
                         await signInWithKakao();
-                        Get.offNamed('/club_list');
                       } else {
                         snackBar(
                             title:
@@ -195,7 +200,6 @@ class _LoginPageState extends State<LoginPage> {
                       if (LoginController.to.loginPlatform.value ==
                           LoginPlatform.none) {
                         await signInWithNaver();
-                        Get.offNamed('/club_list');
                       } else {
                         snackBar(
                             title:
@@ -214,7 +218,6 @@ class _LoginPageState extends State<LoginPage> {
                       if (LoginController.to.loginPlatform.value ==
                           LoginPlatform.none) {
                         await signInWithGoogle();
-                        Get.offNamed('/club_list');
                       } else {
                         snackBar(
                             title:
