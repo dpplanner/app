@@ -64,7 +64,7 @@ class _ClubCreateSuccessNextPageState extends State<ClubCreateSuccessNextPage> {
                         onTap: () async {
                           try {
                             print(await ClubApiService.postClubCode(
-                                clubId: ClubController.to.thisClub().id));
+                                clubId: ClubController.to.club().id));
                           } catch (e) {
                             print(e.toString());
                           }

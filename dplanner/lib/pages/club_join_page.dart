@@ -66,27 +66,35 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: SizeController.to.screenHeight * 0.05),
-                      const Text(
-                        "가입할 클럽을 찾기 위해",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400, fontSize: 18),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 32.0, bottom: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "가입할 클럽을 찾기 위해",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 18),
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  "클럽 초대코드",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18),
+                                ),
+                                Text(
+                                  "를 입력해 주세요",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      const Row(
-                        children: [
-                          Text(
-                            "클럽 초대코드",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 18),
-                          ),
-                          Text(
-                            "를 입력해 주세요",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400, fontSize: 18),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: SizeController.to.screenHeight * 0.01),
                       Form(
                           key: _formKey,
                           child: UnderlineTextForm(
@@ -112,37 +120,33 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                           replacement: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SizedBox(
-                                  height: SizeController.to.screenHeight * 0.1),
-                              const Text(
-                                "찾으시는 클럽이 맞나요?",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400, fontSize: 18),
+                              const Padding(
+                                padding: EdgeInsets.only(top: 64.0, bottom: 16),
+                                child: Text(
+                                  "찾으시는 클럽이 맞나요?",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18),
+                                ),
                               ),
-                              SizedBox(
-                                  height:
-                                      SizeController.to.screenHeight * 0.01),
                               Container(
                                 decoration: BoxDecoration(
                                   border: Border.all(color: AppColor.subColor1),
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                                 child: ClubCard(
-                                    thisClub: ClubController.to.thisClub.value,
+                                    thisClub: ClubController.to.club.value,
                                     noEvent: true),
                               ),
                             ],
                           ),
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                  height: SizeController.to.screenHeight * 0.1),
-                              const Text(
-                                "찾으시는 클럽이 없습니다",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400, fontSize: 18),
-                              ),
-                            ],
+                          child: const Padding(
+                            padding: EdgeInsets.only(top: 64.0, bottom: 16),
+                            child: Text(
+                              "찾으시는 클럽이 없습니다",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 18),
+                            ),
                           ),
                         )
                     ],
@@ -170,11 +174,8 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                         try {
                           int clubCode = await ClubApiService.getJoinClub(
                               clubCode: clubInviteCode.text);
-                          ClubModel tempClub =
+                          ClubController.to.club.value =
                               await ClubApiService.getClub(clubID: clubCode);
-                          setState(() {
-                            ClubController.to.thisClub.value = tempClub;
-                          });
                         } catch (e) {
                           print(e.toString());
                           setState(() {
@@ -205,7 +206,7 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                               List<ClubModel> myClubs =
                                   await ClubApiService.getClubList();
                               if (myClubs.any((club) =>
-                                  club.id == ClubController.to.thisClub().id)) {
+                                  club.id == ClubController.to.club().id)) {
                                 snackBar(
                                     title: "해당 클럽에 이미 가입 중입니다.",
                                     content: "다른 클럽 초대코드를 입력해주세요");
@@ -217,22 +218,23 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                             }
                           },
                         ),
-                        SizedBox(
-                            height: SizeController.to.screenHeight * 0.005),
-                        NextPageButton(
-                          text: const Text(
-                            "아니오, 코드를 다시 입력할게요",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColor.backgroundColor),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: NextPageButton(
+                            text: const Text(
+                              "아니오, 코드를 다시 입력할게요",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColor.backgroundColor),
+                            ),
+                            buttonColor: AppColor.subColor3,
+                            onPressed: () {
+                              setState(() {
+                                _isWritten = false;
+                              });
+                            },
                           ),
-                          buttonColor: AppColor.subColor3,
-                          onPressed: () {
-                            setState(() {
-                              _isWritten = false;
-                            });
-                          },
                         ),
                       ],
                     ),

@@ -64,27 +64,28 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      SizedBox(height: SizeController.to.screenHeight * 0.05),
-                      const Row(
-                        children: [
-                          Text(
-                            "만들고 싶은 ",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400, fontSize: 18),
-                          ),
-                          Text(
-                            "클럽의 이름",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 18),
-                          ),
-                          Text(
-                            "을 적어주세요",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400, fontSize: 18),
-                          ),
-                        ],
+                      const Padding(
+                        padding: EdgeInsets.only(top: 32.0, bottom: 16.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              "만들고 싶은 ",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 18),
+                            ),
+                            Text(
+                              "클럽의 이름",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 18),
+                            ),
+                            Text(
+                              "을 적어주세요",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 18),
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(height: SizeController.to.screenHeight * 0.01),
                       Form(
                           key: _formKey1,
                           child: UnderlineTextForm(
@@ -107,27 +108,28 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                               });
                             },
                           )),
-                      SizedBox(height: SizeController.to.screenHeight * 0.1),
-                      const Row(
-                        children: [
-                          Text(
-                            "우리 클럽을 소개하는 ",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400, fontSize: 18),
-                          ),
-                          Text(
-                            "소개글",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 18),
-                          ),
-                          Text(
-                            "도 적어주세요",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400, fontSize: 18),
-                          ),
-                        ],
+                      const Padding(
+                        padding: EdgeInsets.only(top: 64.0, bottom: 16.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              "우리 클럽을 소개하는 ",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 18),
+                            ),
+                            Text(
+                              "소개글",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 18),
+                            ),
+                            Text(
+                              "도 적어주세요",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 18),
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(height: SizeController.to.screenHeight * 0.01),
                       Form(
                           key: _formKey2,
                           child: OutlineTextForm(
@@ -173,7 +175,7 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                       try {
                         print(clubName.text);
                         print(clubContent.text);
-                        ClubController.to.thisClub.value =
+                        ClubController.to.club.value =
                             await ClubApiService.postClub(
                                 clubName: clubName.text,
                                 info: clubContent.text);

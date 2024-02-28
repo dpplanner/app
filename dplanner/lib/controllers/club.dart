@@ -4,5 +4,5 @@ import 'package:get/get.dart';
 class ClubController extends GetxController {
   static ClubController get to => Get.find();
 
-  Rx<ClubModel> thisClub = ClubModel(id: 0, clubName: "", info: "").obs;
+  Rx<ClubModel> club = ClubModel(id: 0, clubName: "", info: "").obs;
 }

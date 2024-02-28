@@ -51,7 +51,7 @@ class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
                 style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
               ),
               Text(
-                " ${ClubController.to.thisClub().clubName} ",
+                " ${ClubController.to.club().clubName} ",
                 style:
                     const TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
               ),

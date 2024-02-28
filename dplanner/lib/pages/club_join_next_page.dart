@@ -1,5 +1,8 @@
 import 'package:dplanner/controllers/club.dart';
+import 'package:dplanner/controllers/member.dart';
+import 'package:dplanner/services/club_api_service.dart';
 import 'package:dplanner/widgets/underline_textform.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
@@ -60,91 +63,124 @@ class _ClubJoinNextPageState extends State<ClubJoinNextPage> {
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: SizeController.to.screenHeight * 0.05),
-              const Row(
-                children: [
-                  Text(
-                    "클럽 ",
-                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(top: 32.0, bottom: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  "클럽 ",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18),
+                                ),
+                                Text(
+                                  "Dance P.O.zz",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18),
+                                ),
+                                Text(
+                                  " 에서",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 18),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              "사용하실 이름을 10글자 이내로 적어주세요",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400, fontSize: 18),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Form(
+                          key: _formKey1,
+                          child: UnderlineTextForm(
+                            hintText: '이름을 적어주세요',
+                            controller: myName,
+                            isFocused: _isFocused1,
+                            maxLength: 10,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return '이름은 영어,한글,숫자,특수문자(,.!?)만 쓸 수 있어요';
+                              } else if (!RegExp('[a-zA-Z가-힣,.!?s]')
+                                  .hasMatch(value)) {
+                                return '이름은 영어,한글,숫자,특수문자(,.!?)만 쓸 수 있어요';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              setState(() {
+                                _isFocused1 = value.isNotEmpty;
+                              });
+                            },
+                          )),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 64.0, bottom: 16),
+                        child: Text(
+                          "자신을 소개하는 글도 적어주세요(선택)",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w400, fontSize: 18),
+                        ),
+                      ),
+                      Form(
+                          key: _formKey2,
+                          child: OutlineTextForm(
+                            hintText:
+                                '000자 내로 작성할 수 있어요\n언제든지 수정할 수 있으니 편하게 작성해주세요',
+                            controller: myContent,
+                            isFocused: _isFocused2,
+                            maxLines: 5,
+                            onChanged: (value) {
+                              setState(() {
+                                _isFocused2 = value.isNotEmpty;
+                              });
+                            },
+                          )),
+                    ],
                   ),
-                  Text(
-                    "Dance P.O.zz",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                  ),
-                  Text(
-                    " 에서",
-                    style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
-                  ),
-                ],
-              ),
-              const Text(
-                "사용하실 이름을 10글자 이내로 적어주세요",
-                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
-              ),
-              SizedBox(height: SizeController.to.screenHeight * 0.01),
-              Form(
-                  key: _formKey1,
-                  child: UnderlineTextForm(
-                    hintText: '이름을 적어주세요',
-                    controller: myName,
-                    isFocused: _isFocused1,
-                    maxLength: 10,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return '이름은 영어,한글,숫자,특수문자(,.!?)만 쓸 수 있어요';
-                      } else if (!RegExp('[a-zA-Z가-힣,.!?s]').hasMatch(value)) {
-                        return '이름은 영어,한글,숫자,특수문자(,.!?)만 쓸 수 있어요';
-                      }
-                      return null;
-                    },
-                    onChanged: (value) {
-                      setState(() {
-                        _isFocused1 = value.isNotEmpty;
-                      });
-                    },
-                  )),
-              SizedBox(height: SizeController.to.screenHeight * 0.1),
-              const Text(
-                "자신을 소개하는 글도 적어주세요(선택)",
-                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
-              ),
-              SizedBox(height: SizeController.to.screenHeight * 0.01),
-              Form(
-                  key: _formKey2,
-                  child: OutlineTextForm(
-                    hintText: '000자 내로 작성할 수 있어요\n언제든지 수정할 수 있으니 편하게 작성해주세요',
-                    controller: myContent,
-                    isFocused: _isFocused2,
-                    maxLines: 5,
-                    onChanged: (value) {
-                      setState(() {
-                        _isFocused2 = value.isNotEmpty;
-                      });
-                    },
-                  )),
-              const Expanded(child: SizedBox()),
-              NextPageButton(
-                text: const Text(
-                  "가입 신청하기",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: AppColor.backgroundColor),
                 ),
-                buttonColor: myName.text.isNotEmpty
-                    ? AppColor.objectColor
-                    : AppColor.subColor3,
-                onPressed: () {
-                  final formKeyState1 = _formKey1.currentState!;
-                  if (formKeyState1.validate()) {
-                    Get.offAllNamed('/club_join_success');
-                  }
-                },
               ),
-              SizedBox(
-                height: SizeController.to.screenHeight * 0.03,
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                child: NextPageButton(
+                  text: const Text(
+                    "가입 신청하기",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.backgroundColor),
+                  ),
+                  buttonColor: myName.text.isNotEmpty
+                      ? AppColor.objectColor
+                      : AppColor.subColor3,
+                  onPressed: () async {
+                    final formKeyState1 = _formKey1.currentState!;
+                    if (formKeyState1.validate()) {
+                      try {
+                        MemberController.to.clubMember.value =
+                            await ClubApiService.postClubMember(
+                                clubId: ClubController.to.club().id,
+                                name: myName.text,
+                                info: myContent.text);
+                        Get.offAllNamed('/club_join_success');
+                      } catch (e) {
+                        print(e.toString());
+                      }
+                    }
+                  },
+                ),
               ),
             ],
           ),
