@@ -93,4 +93,25 @@ class ClubApiService {
     print(errorMessage);
     throw ErrorDescription(errorMessage);
   }
+
+  /// GET: /clubs/join?code=(_.join_code) [클럽 초대 코드 verify] 클럽 초대코드로 클럽 정보 불러오기
+  static Future<int> getJoinClub({required String clubCode}) async {
+    final url = Uri.parse('$baseUrl/clubs/join?code=$clubCode');
+    const storage = FlutterSecureStorage();
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.get(url, headers: <String, String>{
+      'Authorization': 'Bearer $accessToken',
+    });
+
+    if (response.statusCode == 200 &&
+        jsonDecode(response.body)['data']['verify']) {
+      return jsonDecode(response.body)['data']['clubId'];
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
 }

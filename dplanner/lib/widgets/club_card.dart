@@ -10,8 +10,9 @@ import '../style.dart';
 
 class ClubCard extends StatelessWidget {
   final ClubModel thisClub;
+  final bool noEvent;
 
-  const ClubCard({super.key, required this.thisClub});
+  const ClubCard({super.key, required this.thisClub, this.noEvent = false});
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +21,12 @@ class ClubCard extends StatelessWidget {
       highlightColor: AppColor.subColor2.withOpacity(0.5),
       borderRadius: BorderRadius.circular(16),
       onTap: () {
-        if (thisClub.isConfirmed ?? false) {
+        if (noEvent) {
+          null;
+        } else if (thisClub.isConfirmed ?? false) {
           Get.offAllNamed('/tab2', arguments: 1);
         } else {
-          snackBar(title: "클럽에 가입 중입니다.", content: "가입 후에 눌러주세요.");
+          snackBar(title: "해당 클럽에 가입 진행 중입니다.", content: "가입 후에 눌러주세요.");
         }
       },
       child: Ink(
@@ -65,7 +68,7 @@ class ClubCard extends StatelessWidget {
                                 fontSize: 18),
                           ),
                         ),
-                        if (!(thisClub.isConfirmed ?? false))
+                        if (!(thisClub.isConfirmed ?? false) && !noEvent)
                           const Text(
                             "가입 진행 중",
                             style: TextStyle(
