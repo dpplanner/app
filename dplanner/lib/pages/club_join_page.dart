@@ -1,5 +1,6 @@
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/services/club_api_service.dart';
+import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:dplanner/widgets/underline_textform.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -25,8 +26,6 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
   final TextEditingController clubInviteCode = TextEditingController();
   bool _isFocused = false;
   bool _isWritten = false;
-
-  late ClubModel findClub;
   bool noClub = false;
 
   @override
@@ -128,8 +127,9 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                                   border: Border.all(color: AppColor.subColor1),
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
-                                child:
-                                    ClubCard(thisClub: findClub, noEvent: true),
+                                child: ClubCard(
+                                    thisClub: ClubController.to.thisClub.value,
+                                    noEvent: true),
                               ),
                             ],
                           ),
@@ -173,7 +173,7 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                           ClubModel tempClub =
                               await ClubApiService.getClub(clubID: clubCode);
                           setState(() {
-                            findClub = tempClub;
+                            ClubController.to.thisClub.value = tempClub;
                           });
                         } catch (e) {
                           print(e.toString());
@@ -200,8 +200,21 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                                 color: AppColor.backgroundColor),
                           ),
                           buttonColor: AppColor.objectColor,
-                          onPressed: () {
-                            Get.toNamed('/club_join_next');
+                          onPressed: () async {
+                            try {
+                              List<ClubModel> myClubs =
+                                  await ClubApiService.getClubList();
+                              if (myClubs.any((club) =>
+                                  club.id == ClubController.to.thisClub().id)) {
+                                snackBar(
+                                    title: "해당 클럽에 이미 가입 중입니다.",
+                                    content: "다른 클럽 초대코드를 입력해주세요");
+                              } else {
+                                Get.toNamed('/club_join_next');
+                              }
+                            } catch (e) {
+                              print(e.toString());
+                            }
                           },
                         ),
                         SizedBox(

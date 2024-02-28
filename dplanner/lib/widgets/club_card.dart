@@ -17,8 +17,10 @@ class ClubCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      splashColor: AppColor.subColor2.withOpacity(0.5),
-      highlightColor: AppColor.subColor2.withOpacity(0.5),
+      splashColor:
+          noEvent ? Colors.transparent : AppColor.subColor2.withOpacity(0.5),
+      highlightColor:
+          noEvent ? Colors.transparent : AppColor.subColor2.withOpacity(0.5),
       borderRadius: BorderRadius.circular(16),
       onTap: () {
         if (noEvent) {
@@ -40,8 +42,9 @@ class ClubCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              ///URL 처리하기
               Image.asset(
-                thisClub.url ?? 'assets/images/dancepozz_logo.png',
+                'assets/images/dancepozz_logo.png',
                 height: SizeController.to.screenWidth * 0.2,
                 width: SizeController.to.screenWidth * 0.2,
                 fit: BoxFit.fill,

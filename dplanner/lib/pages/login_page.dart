@@ -36,9 +36,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      checkUserLogin();
-    });
+    checkUserLogin();
   }
 
   // refresh token 유효성 검사
@@ -53,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // 로그인 상태 확인
-  void checkUserLogin() async {
+  Future<void> checkUserLogin() async {
     await Future.delayed(const Duration(milliseconds: 1500));
 
     String? refreshToken = await storage.read(key: refreshTokenKey);
