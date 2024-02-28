@@ -1,6 +1,7 @@
 // 클럽 목록에서 보이는 클럽 카드
 
 import 'package:dplanner/models/club_model.dart';
+import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -19,7 +20,11 @@ class ClubCard extends StatelessWidget {
       highlightColor: AppColor.subColor2.withOpacity(0.5),
       borderRadius: BorderRadius.circular(16),
       onTap: () {
-        Get.offAllNamed('/tab2', arguments: 1);
+        if (thisClub.isConfirmed ?? false) {
+          Get.offAllNamed('/tab2', arguments: 1);
+        } else {
+          snackBar(title: "클럽에 가입 중입니다.", content: "가입 후에 눌러주세요.");
+        }
       },
       child: Ink(
         decoration: BoxDecoration(
