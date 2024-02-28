@@ -30,7 +30,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
   // 소셜 로그아웃
   void signOut() async {
     await storage.deleteAll();
-    switch (LoginController.to.loginPlatform) {
+    switch (LoginController.to.loginPlatform.value) {
       case LoginPlatform.google:
         await GoogleSignIn().signOut();
         break;

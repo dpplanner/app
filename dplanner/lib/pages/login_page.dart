@@ -60,10 +60,10 @@ class _LoginPageState extends State<LoginPage> {
     // refreshToken 으로 로그인 상태 확인
     if (refreshToken != null && checkRefreshToken(refreshToken)) {
       print("토큰");
-      print(refreshToken);
       print(accessToken);
-      print(decodeToken(refreshToken!));
+      print(refreshToken);
       print(decodeToken(accessToken!));
+      print(decodeToken(refreshToken));
       Get.offNamed('/club_list');
     }
     FlutterNativeSplash.remove();
@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
     if (googleUser != null) {
       try {
         await UserApiService.postUserLogin(
-            email: googleUser!.email, name: googleUser.displayName ?? "이름없음");
+            email: googleUser.email, name: googleUser.displayName ?? "이름없음");
       } catch (e) {
         print(e.toString());
         errorSnackBar(title: "구글 로그인 실패", content: e.toString());
@@ -84,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
 
       setState(() {
         LoginController.to.user.value = UserModel(
-            email: googleUser!.email, name: googleUser.displayName ?? "이름없음");
+            email: googleUser.email, name: googleUser.displayName ?? "이름없음");
         LoginController.to.loginPlatform.value = LoginPlatform.google;
       });
     }

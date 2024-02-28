@@ -5,6 +5,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
+import '../models/club_model.dart';
 import '../style.dart';
 import '../widgets/club_card.dart';
 import '../widgets/nextpage_button.dart';
@@ -111,7 +112,7 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                         border: Border.all(color: AppColor.subColor1),
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      child: const ClubCard(),
+                      child: ClubCard(thisClub: ClubModel(id: 0, clubName: '', info: '')),
                     ),
                   ],
                 ),

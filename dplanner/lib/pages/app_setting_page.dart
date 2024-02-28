@@ -51,7 +51,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
                         'assets/images/icon_naver.svg',
                       ),
                       Padding(
-                        padding: EdgeInsets.only(left: 12),
+                        padding: const EdgeInsets.only(left: 12),
                         child: Text(
                           LoginController.to.user().email,
                           style: const TextStyle(

@@ -62,8 +62,12 @@ class _ClubCreateSuccessNextPageState extends State<ClubCreateSuccessNextPage> {
                     ImageButton(
                         image: 'assets/images/club_create/club_invitecode.svg',
                         onTap: () async {
-                          print(await ClubApiService.postClubCode(
-                              clubId: ClubController.to.thisClub().id));
+                          try {
+                            print(await ClubApiService.postClubCode(
+                                clubId: ClubController.to.thisClub().id));
+                          } catch (e) {
+                            print(e.toString());
+                          }
                         }),
                     SizedBox(
                       height: SizeController.to.screenHeight * 0.01,
