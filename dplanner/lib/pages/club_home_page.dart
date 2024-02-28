@@ -5,6 +5,7 @@ import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
 import '../style.dart';
 import '../widgets/bottom_bar.dart';

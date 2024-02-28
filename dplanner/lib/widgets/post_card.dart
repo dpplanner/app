@@ -6,9 +6,11 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
+import 'package:dplanner/models/post_model.dart';
 
 class PostCard extends StatelessWidget {
-  const PostCard({super.key});
+  final Post post;
+  const PostCard({Key? key, required this.post}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +48,12 @@ class PostCard extends StatelessWidget {
                           ),
                         ),
                         SizedBox(width: SizeController.to.screenWidth * 0.03),
-                        const Column(
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "DP23 남진",
+                              post.clubMemberName,
                               style: TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.w600,
@@ -59,7 +61,7 @@ class PostCard extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              "2023.11.11 16:28",
+                              '${post.createdTime}',
                               style: TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.w500,
@@ -77,8 +79,8 @@ class PostCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15),
                         color: AppColor.subColor1, // 배경색 설정
                       ),
-                      child: const Text(
-                        "관리자",
+                      child: Text(
+                        post.clubRole,
                         style: TextStyle(
                           color: AppColor.backgroundColor,
                           fontWeight: FontWeight.w400,
@@ -94,8 +96,8 @@ class PostCard extends StatelessWidget {
                     Padding(
                       padding: EdgeInsets.only(
                           bottom: SizeController.to.screenHeight * 0.01),
-                      child: const Text(
-                        "공지",
+                      child: Text(
+                        "공지", //제목 생기면 그때 수정할 것
                         style: TextStyle(
                           color: AppColor.textColor,
                           fontWeight: FontWeight.w800,
@@ -103,8 +105,8 @@ class PostCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Text(
-                      "내용\n내용\n내용",
+                    Text(
+                      post.content,
                       style: TextStyle(
                         color: AppColor.textColor,
                         fontWeight: FontWeight.w600,
@@ -114,29 +116,30 @@ class PostCard extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: SizeController.to.screenHeight * 0.02),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      flex: 1,
-                      child: Row(
-                        children: [
-                          Icon(
-                            SFSymbols.pin_fill,
-                            color: AppColor.textColor2,
-                            size: 14,
-                          ),
-                          Text(
-                            " 고정됨",
-                            style: TextStyle(
+                    if (post.isFixed)
+                      const Expanded(
+                        flex: 1,
+                        child: Row(
+                          children: [
+                            Icon(
+                              SFSymbols.pin_fill,
                               color: AppColor.textColor2,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
+                              size: 14,
                             ),
-                          ),
-                        ],
+                            Text(
+                              '고정됨',
+                              style: TextStyle(
+                                color: AppColor.textColor2,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
                     Expanded(
                       flex: 1,
                       child: Row(
@@ -152,7 +155,7 @@ class PostCard extends StatelessWidget {
                           Expanded(
                             flex: 1,
                             child: Text(
-                              "1",
+                              '${post.commentCount}',
                               style: TextStyle(
                                 color: AppColor.textColor2,
                                 fontWeight: FontWeight.w500,
@@ -163,7 +166,9 @@ class PostCard extends StatelessWidget {
                           Expanded(
                             flex: 1,
                             child: Icon(
-                              SFSymbols.heart,
+                              post.likeStatus
+                                  ? SFSymbols.heart_fill
+                                  : SFSymbols.heart,
                               color: AppColor.textColor2,
                               size: 16,
                             ),
@@ -171,7 +176,7 @@ class PostCard extends StatelessWidget {
                           Expanded(
                             flex: 1,
                             child: Text(
-                              "3",
+                              '${post.likeCount}',
                               style: TextStyle(
                                 color: AppColor.textColor2,
                                 fontWeight: FontWeight.w500,
@@ -179,25 +184,25 @@ class PostCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: Icon(
-                              SFSymbols.eye,
-                              color: AppColor.textColor2,
-                              size: 16,
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Text(
-                              "20",
-                              style: TextStyle(
-                                color: AppColor.textColor2,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
+                          //Expanded(
+                          //  flex: 1,
+                          //  child: Icon(
+                          //    SFSymbols.eye,
+                          //    color: AppColor.textColor2,
+                          //    size: 16,
+                          //  ),
+                          //),
+                          //Expanded(
+                          //  flex: 1,
+                          //  child: Text(
+                          //    "20",
+                          //    style: TextStyle(
+                          //      color: AppColor.textColor2,
+                          //      fontWeight: FontWeight.w500,
+                          //      fontSize: 16,
+                          //    ),
+                          //  ),
+                          //),
                         ],
                       ),
                     ),
