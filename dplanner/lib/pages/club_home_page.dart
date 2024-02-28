@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/post_card.dart';
+import 'package:dplanner/models/post_model.dart';
 
 class ClubHomePage extends StatefulWidget {
   const ClubHomePage({super.key});
@@ -23,11 +25,30 @@ class _ClubHomePageState extends State<ClubHomePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController searchPost = TextEditingController();
   bool _isFocused = false;
+  late List<Post> _posts;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPosts();
+  }
 
   @override
   void dispose() {
     searchPost.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchPosts() async {
+    final response = await http.get(Uri.parse('http://your-api-url/posts'));
+    if (response.statusCode == 200) {
+      final List<dynamic> responseData = json.decode(response.body);
+      setState(() {
+        _posts = responseData.map((data) => Post.fromJson(data)).toList();
+      });
+    } else {
+      throw Exception('Failed to load posts');
+    }
   }
 
   @override
@@ -94,23 +115,33 @@ class _ClubHomePageState extends State<ClubHomePage> {
                         )),
                   ),
                 ),
-                Container(
-                  color: AppColor.backgroundColor,
-                  height: SizeController.to.screenHeight * 0.01,
-                ),
-                const PostCard(),
-                Container(
-                  height: SizeController.to.screenHeight * 0.01,
-                ),
-                const PostCard(),
-                Container(
-                  height: SizeController.to.screenHeight * 0.01,
-                ),
-                const PostCard(),
-                Container(
-                  height: SizeController.to.screenHeight * 0.01,
-                ),
-                const PostCard(),
+                _posts != null
+                    ? ListView.builder(
+                        itemCount: _posts.length,
+                        itemBuilder: (context, index) {
+                          final post = _posts[index];
+                          return PostCard(post: post);
+                        },
+                      )
+                    : Center(child: CircularProgressIndicator()),
+
+                //Container(
+                //  color: AppColor.backgroundColor,
+                //  height: SizeController.to.screenHeight * 0.01,
+                //),
+                //const PostCard(),
+                //Container(
+                //  height: SizeController.to.screenHeight * 0.01,
+                //),
+                //const PostCard(),
+                //Container(
+                //  height: SizeController.to.screenHeight * 0.01,
+                //),
+                //const PostCard(),
+                //Container(
+                //  height: SizeController.to.screenHeight * 0.01,
+                //),
+                //const PostCard(),
               ],
             ),
           ),
