@@ -27,6 +27,7 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
   bool _isWritten = false;
 
   late ClubModel findClub;
+  bool noClub = false;
 
   @override
   void dispose() {
@@ -107,30 +108,43 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                             },
                           )),
                       if (_isWritten)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                                height: SizeController.to.screenHeight * 0.1),
-                            const Text(
-                              "찾으시는 클럽이 맞나요?",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w400, fontSize: 18),
-                            ),
-                            SizedBox(
-                                height: SizeController.to.screenHeight * 0.01),
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: AppColor.subColor1),
-                                borderRadius: BorderRadius.circular(10.0),
+                        Visibility(
+                          visible: noClub,
+                          replacement: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                  height: SizeController.to.screenHeight * 0.1),
+                              const Text(
+                                "찾으시는 클럽이 맞나요?",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400, fontSize: 18),
                               ),
-                              child: ClubCard(
-                                  thisClub:
-                                      ClubModel(id: 0, clubName: '', info: ''),
-                                  noEvent: true),
-                            ),
-                          ],
-                        ),
+                              SizedBox(
+                                  height:
+                                      SizeController.to.screenHeight * 0.01),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: AppColor.subColor1),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                child:
+                                    ClubCard(thisClub: findClub, noEvent: true),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                  height: SizeController.to.screenHeight * 0.1),
+                              const Text(
+                                "찾으시는 클럽이 없습니다",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400, fontSize: 18),
+                              ),
+                            ],
+                          ),
+                        )
                     ],
                   ),
                 ),
@@ -156,9 +170,16 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                         try {
                           int clubCode = await ClubApiService.getJoinClub(
                               clubCode: clubInviteCode.text);
-                          print(clubCode);
+                          ClubModel tempClub =
+                              await ClubApiService.getClub(clubID: clubCode);
+                          setState(() {
+                            findClub = tempClub;
+                          });
                         } catch (e) {
                           print(e.toString());
+                          setState(() {
+                            noClub = true;
+                          });
                         }
                         setState(() {
                           _isWritten = true;
@@ -166,38 +187,57 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                       }
                     },
                   ),
-                  child: Column(
-                    children: [
-                      NextPageButton(
-                        text: const Text(
-                          "네, 맞아요",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppColor.backgroundColor),
+                  child: Visibility(
+                    visible: noClub,
+                    replacement: Column(
+                      children: [
+                        NextPageButton(
+                          text: const Text(
+                            "네, 맞아요",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColor.backgroundColor),
+                          ),
+                          buttonColor: AppColor.objectColor,
+                          onPressed: () {
+                            Get.toNamed('/club_join_next');
+                          },
                         ),
-                        buttonColor: AppColor.objectColor,
-                        onPressed: () {
-                          Get.toNamed('/club_join_next');
-                        },
-                      ),
-                      SizedBox(height: SizeController.to.screenHeight * 0.005),
-                      NextPageButton(
-                        text: const Text(
-                          "아니오, 코드를 다시 입력할게요",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppColor.backgroundColor),
+                        SizedBox(
+                            height: SizeController.to.screenHeight * 0.005),
+                        NextPageButton(
+                          text: const Text(
+                            "아니오, 코드를 다시 입력할게요",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColor.backgroundColor),
+                          ),
+                          buttonColor: AppColor.subColor3,
+                          onPressed: () {
+                            setState(() {
+                              _isWritten = false;
+                            });
+                          },
                         ),
-                        buttonColor: AppColor.subColor3,
-                        onPressed: () {
-                          setState(() {
-                            _isWritten = false;
-                          });
-                        },
+                      ],
+                    ),
+                    child: NextPageButton(
+                      text: const Text(
+                        "코드를 다시 입력할게요",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColor.backgroundColor),
                       ),
-                    ],
+                      buttonColor: AppColor.subColor3,
+                      onPressed: () {
+                        setState(() {
+                          _isWritten = false;
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),
