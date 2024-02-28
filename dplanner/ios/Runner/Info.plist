@@ -22,6 +22,10 @@
 		<string>????</string>
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
+		<key>GIDClientID</key>
+		<!-- TODO Replace this value: -->
+		<!-- Copied from GoogleService-Info.plist key CLIENT_ID -->
+		<string>440122903298-gc2oikv36m4srpou58td5je36d3cpumv.apps.googleusercontent.com</string>
         <key>CFBundleURLTypes</key>
         <array>
             <dict>
@@ -29,7 +33,7 @@
                 <string>Editor</string>
                 <key>CFBundleURLSchemes</key>
                 <array>
-                    <string>dplanner</string>
+                    <string>com.googleusercontent.apps.440122903298-gc2oikv36m4srpou58td5je36d3cpumv</string>
                 </array>
             </dict>
         </array>
