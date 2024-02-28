@@ -1,3 +1,4 @@
+import 'package:dplanner/controllers/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -49,11 +50,11 @@ class _AppSettingPageState extends State<AppSettingPage> {
                       SvgPicture.asset(
                         'assets/images/icon_naver.svg',
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 12),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12),
                         child: Text(
-                          "jinoj@naver.com",
-                          style: TextStyle(
+                          LoginController.to.user().email,
+                          style: const TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 16),
                         ),
                       ),

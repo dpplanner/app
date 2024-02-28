@@ -1,3 +1,4 @@
+import 'package:dplanner/models/user_model.dart';
 import 'package:get/get.dart';
 
 enum LoginPlatform {
@@ -16,5 +17,6 @@ enum LoginPlatform {
 class LoginController extends GetxController {
   static LoginController get to => Get.find();
 
+  Rx<UserModel> user = UserModel(email: '', name: '').obs;
   Rx<LoginPlatform> loginPlatform = LoginPlatform.none.obs;
 }

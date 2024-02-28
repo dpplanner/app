@@ -1,4 +1,6 @@
 import 'package:calendar_view/calendar_view.dart';
+import 'package:dplanner/controllers/login.dart';
+import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/routes.dart';
 import 'package:dplanner/style.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'controllers/club.dart';
 import 'controllers/size.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -29,6 +32,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sizeController = SizeController();
+    final loginController = LoginController();
+    final clubController = ClubController();
+    final memberController = MemberController();
     sizeController.screenWidth = MediaQuery.of(context).size.width;
     sizeController.screenHeight = MediaQuery.of(context).size.height;
     return CalendarControllerProvider(
@@ -44,6 +50,9 @@ class MyApp extends StatelessWidget {
         getPages: page,
         initialBinding: BindingsBuilder(() {
           Get.put(sizeController);
+          Get.put(loginController);
+          Get.put(clubController);
+          Get.put(memberController);
         }),
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,

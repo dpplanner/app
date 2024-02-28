@@ -44,7 +44,7 @@ class UserApiService {
   }
 
   /// POST: /auth/refresh [refresh token] JWT 토큰 재발급
-  static Future<void> postRefreshUserLogin() async {
+  static Future<void> postRefreshUserToken() async {
     final url = Uri.parse('$baseUrl/auth/refresh');
     const storage = FlutterSecureStorage();
 

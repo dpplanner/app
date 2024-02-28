@@ -15,8 +15,6 @@ class ClubCreateSuccessPage extends StatefulWidget {
 }
 
 class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
-  final clubController = Get.find<ClubController>();
-
   @override
   void initState() {
     super.initState();
@@ -53,7 +51,7 @@ class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
                 style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
               ),
               Text(
-                " ${clubController.name.value} ",
+                " ${ClubController.to.club().clubName} ",
                 style:
                     const TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
               ),

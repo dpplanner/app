@@ -1,7 +1,9 @@
+import 'package:dplanner/controllers/club.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
+import '../services/club_api_service.dart';
 import '../style.dart';
 import '../widgets/image_button.dart';
 import '../widgets/nextpage_button.dart';
@@ -59,7 +61,14 @@ class _ClubCreateSuccessNextPageState extends State<ClubCreateSuccessNextPage> {
                   children: [
                     ImageButton(
                         image: 'assets/images/club_create/club_invitecode.svg',
-                        onTap: () {}),
+                        onTap: () async {
+                          try {
+                            print(await ClubApiService.postClubCode(
+                                clubId: ClubController.to.club().id));
+                          } catch (e) {
+                            print(e.toString());
+                          }
+                        }),
                     SizedBox(
                       height: SizeController.to.screenHeight * 0.01,
                     ),
@@ -98,7 +107,7 @@ class _ClubCreateSuccessNextPageState extends State<ClubCreateSuccessNextPage> {
               ),
               buttonColor: AppColor.objectColor,
               onPressed: () {
-                Get.offAllNamed('/club_root');
+                Get.offAllNamed('/club_list');
               },
             ),
             SizedBox(
