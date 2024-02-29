@@ -6,11 +6,11 @@ import 'package:http/http.dart' as http;
 
 import '../const.dart';
 
-class UserApiService {
+class TokenApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
 
   /// POST: /auth/login [client login] 로그인 후 JWT 토큰 발급
-  static Future<void> postUserLogin(
+  static Future<void> postToken(
       {required String email, required String name}) async {
     final url = Uri.parse('$baseUrl/auth/login');
     const storage = FlutterSecureStorage();
@@ -44,7 +44,7 @@ class UserApiService {
   }
 
   /// POST: /auth/refresh [refresh token] JWT 토큰 재발급
-  static Future<void> postRefreshUserToken() async {
+  static Future<void> postUpdateToken() async {
     final url = Uri.parse('$baseUrl/auth/refresh');
     const storage = FlutterSecureStorage();
 

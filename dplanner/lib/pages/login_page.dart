@@ -11,7 +11,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import '../const.dart';
 import '../controllers/login.dart';
-import '../services/user_api_service.dart';
+import '../services/token_api_service.dart';
 import '../style.dart';
 
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (googleUser != null) {
       try {
-        await UserApiService.postUserLogin(
+        await TokenApiService.postToken(
             email: googleUser.email, name: googleUser.displayName ?? "이름없음");
 
         setState(() {
@@ -115,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
 
       User user = await UserApi.instance.me();
 
-      await UserApiService.postUserLogin(
+      await TokenApiService.postToken(
           email: user.kakaoAccount!.email ?? "이메일 없음",
           name: user.kakaoAccount!.name ?? "이름없음");
 
@@ -139,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (result.status == NaverLoginStatus.loggedIn) {
       try {
-        await UserApiService.postUserLogin(
+        await TokenApiService.postToken(
             email: result.account.email, name: result.account.name);
 
         setState(() {
