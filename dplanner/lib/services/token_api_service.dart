@@ -80,4 +80,34 @@ class TokenApiService {
     print(errorMessage);
     throw ErrorDescription(errorMessage);
   }
+
+  /// PATCH: /members/(_.member_id)/changeClub [클럽 변경하기] 가입된 클럽 중 다른 클럽으로 이동
+  static Future<void> patchUpdateClub(
+      {required String memberId, required String clubId}) async {
+    final url = Uri.parse('$baseUrl/members/$memberId/changeClub');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.patch(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({
+        "clubId": clubId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      await TokenApiService.postUpdateToken();
+      return;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
 }

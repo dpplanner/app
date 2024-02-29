@@ -1,3 +1,5 @@
+import 'package:dplanner/controllers/club.dart';
+import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/controllers/size.dart';
 import 'package:dplanner/pages/notification_page.dart';
 import 'package:dplanner/pages/post_add_page.dart';
@@ -29,6 +31,13 @@ class _ClubHomePageState extends State<ClubHomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    print(ClubController.to.club().id);
+    print(MemberController.to.clubMember().id);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: AppColor.backgroundColor2,
@@ -36,6 +45,12 @@ class _ClubHomePageState extends State<ClubHomePage> {
           preferredSize: const Size.fromHeight(60.0),
           child: AppBar(
             backgroundColor: AppColor.backgroundColor,
+            leadingWidth: SizeController.to.screenWidth * 0.2,
+            leading: IconButton(
+                onPressed: () {
+                  Get.offAllNamed('/club_list');
+                },
+                icon: const Icon(SFSymbols.chevron_left)),
             title: Padding(
               padding:
                   EdgeInsets.only(left: SizeController.to.screenWidth * 0.05),

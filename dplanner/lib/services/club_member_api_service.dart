@@ -46,8 +46,8 @@ class ClubMemberApiService {
 
   /// GET: /clubs/(_.club_id)/club-members/(_.club_member_id) [클럽 멤버 상세정보] 클럽 멤버 상세 정보 불러오기
   static Future<ClubMemberModel> getClubMember(
-      {required int clubId, required int clubMemberID}) async {
-    final url = Uri.parse('$baseUrl/clubs/$clubId/club-members/$clubMemberID');
+      {required int clubId, required int clubMemberId}) async {
+    final url = Uri.parse('$baseUrl/clubs/$clubId/club-members/$clubMemberId');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
 

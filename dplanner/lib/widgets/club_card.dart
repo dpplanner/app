@@ -1,11 +1,19 @@
 // 클럽 목록에서 보이는 클럽 카드
 
+import 'package:dplanner/controllers/club.dart';
+import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/club_model.dart';
+import 'package:dplanner/services/club_api_service.dart';
+import 'package:dplanner/services/club_member_api_service.dart';
+import 'package:dplanner/services/token_api_service.dart';
 import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 
+import '../const.dart';
 import '../controllers/size.dart';
+import '../decode_token.dart';
 import '../style.dart';
 
 class ClubCard extends StatelessWidget {
@@ -22,11 +30,29 @@ class ClubCard extends StatelessWidget {
       highlightColor:
           noEvent ? Colors.transparent : AppColor.subColor2.withOpacity(0.5),
       borderRadius: BorderRadius.circular(16),
-      onTap: () {
+      onTap: () async {
         if (noEvent) {
           null;
         } else if (thisClub.isConfirmed ?? false) {
-          Get.offAllNamed('/tab2', arguments: 1);
+          try {
+            const storage = FlutterSecureStorage();
+            String? accessToken = await storage.read(key: accessTokenKey);
+            await TokenApiService.patchUpdateClub(
+                memberId: decodeToken(accessToken!)['sub'],
+                clubId: thisClub.id.toString());
+            String? updatedAccessToken =
+                await storage.read(key: accessTokenKey);
+            ClubController.to.club.value = await ClubApiService.getClub(
+                clubID: decodeToken(updatedAccessToken!)['recent_club_id']);
+            MemberController.to.clubMember.value =
+                await ClubMemberApiService.getClubMember(
+                    clubId: decodeToken(updatedAccessToken!)['recent_club_id'],
+                    clubMemberId:
+                        decodeToken(updatedAccessToken!)['club_member_id']);
+            Get.offAllNamed('/tab2', arguments: 1);
+          } catch (e) {
+            print(e.toString());
+          }
         } else {
           snackBar(title: "해당 클럽에 가입 진행 중입니다.", content: "가입 후에 눌러주세요.");
         }
