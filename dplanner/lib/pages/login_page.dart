@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:dplanner/decode_token.dart';
@@ -10,7 +11,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import '../const.dart';
+import '../controllers/club.dart';
 import '../controllers/login.dart';
+import '../controllers/member.dart';
+import '../services/club_api_service.dart';
+import '../services/club_member_api_service.dart';
 import '../services/token_api_service.dart';
 import '../style.dart';
 
@@ -64,7 +69,21 @@ class _LoginPageState extends State<LoginPage> {
       print(refreshToken);
       print(decodeToken(accessToken!));
       print(decodeToken(refreshToken));
-      Get.offNamed('/club_list');
+      try {
+        ClubController.to.club.value = await ClubApiService.getClub(
+            clubID: decodeToken(accessToken!)['recent_club_id']);
+        MemberController.to.clubMember.value =
+            await ClubMemberApiService.getClubMember(
+                clubId: decodeToken(accessToken!)['recent_club_id'],
+                clubMemberId: decodeToken(accessToken!)['club_member_id']);
+        if (MemberController.to.clubMember().confirmed) {
+          Get.offNamed('/tab2', arguments: 1);
+        } else {
+          Get.offNamed('/club_list');
+        }
+      } catch (e) {
+        print(e.toString());
+      }
     }
     FlutterNativeSplash.remove();
   }
