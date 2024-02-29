@@ -1,13 +1,12 @@
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
-import 'package:dplanner/services/club_api_service.dart';
 import 'package:dplanner/widgets/underline_textform.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
+import '../services/club_member_api_service.dart';
 import '../style.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
@@ -170,7 +169,7 @@ class _ClubJoinNextPageState extends State<ClubJoinNextPage> {
                     if (formKeyState1.validate()) {
                       try {
                         MemberController.to.clubMember.value =
-                            await ClubApiService.postClubMember(
+                            await ClubMemberApiService.postClubMember(
                                 clubId: ClubController.to.club().id,
                                 name: myName.text,
                                 info: myContent.text);

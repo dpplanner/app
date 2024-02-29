@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
       print(refreshToken);
       print(decodeToken(accessToken!));
       print(decodeToken(refreshToken));
-      Get.offNamed('/club_list');
+      Get.offNamed('/club_home');
     }
     FlutterNativeSplash.remove();
   }
