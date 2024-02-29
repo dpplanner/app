@@ -6,11 +6,11 @@ import 'package:http/http.dart' as http;
 
 import '../const.dart';
 
-class UserApiService {
+class TokenApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
 
   /// POST: /auth/login [client login] 로그인 후 JWT 토큰 발급
-  static Future<void> postUserLogin(
+  static Future<void> postToken(
       {required String email, required String name}) async {
     final url = Uri.parse('$baseUrl/auth/login');
     const storage = FlutterSecureStorage();
@@ -44,7 +44,7 @@ class UserApiService {
   }
 
   /// POST: /auth/refresh [refresh token] JWT 토큰 재발급
-  static Future<void> postRefreshUserToken() async {
+  static Future<void> postUpdateToken() async {
     final url = Uri.parse('$baseUrl/auth/refresh');
     const storage = FlutterSecureStorage();
 
@@ -72,6 +72,36 @@ class UserApiService {
       await storage.write(key: refreshTokenKey, value: data['refreshToken']);
 
       print('token updated');
+      return;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
+  /// PATCH: /members/(_.member_id)/changeClub [클럽 변경하기] 가입된 클럽 중 다른 클럽으로 이동
+  static Future<void> patchUpdateClub(
+      {required String memberId, required String clubId}) async {
+    final url = Uri.parse('$baseUrl/members/$memberId/changeClub');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.patch(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({
+        "clubId": clubId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      await TokenApiService.postUpdateToken();
       return;
     }
 

@@ -1,13 +1,15 @@
 class ClubMemberModel {
   bool confirmed;
   int id;
-  String name, info, role;
+  String name, role;
+  String? info, url;
 
   ClubMemberModel({
     required this.id,
     required this.name,
-    required this.info,
+    this.info,
     required this.role,
+    this.url,
     required this.confirmed,
   });
 
@@ -16,5 +18,6 @@ class ClubMemberModel {
         name = json['name'],
         info = json['info'],
         role = json['role'],
+        url = json['url'],
         confirmed = json['confirmed'];
 }
