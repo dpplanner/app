@@ -1,5 +1,6 @@
-import 'package:dplanner/controllers/login.dart';
+import 'package:dplanner/const.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -15,6 +16,19 @@ class AppSettingPage extends StatefulWidget {
 }
 
 class _AppSettingPageState extends State<AppSettingPage> {
+  static const storage = FlutterSecureStorage();
+  String? userInfo = ". . .";
+
+  @override
+  void initState() {
+    super.initState();
+    findLoginInfo();
+  }
+
+  Future<void> findLoginInfo() async {
+    userInfo = await storage.read(key: loginInfo);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,19 +61,22 @@ class _AppSettingPageState extends State<AppSettingPage> {
                 children: [
                   Row(
                     children: [
+                      ///TODO: 이미지 바꾸기
                       SvgPicture.asset(
                         'assets/images/icon_naver.svg',
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 12),
                         child: Text(
-                          LoginController.to.user().email,
+                          userInfo!.split(" ")[0],
                           style: const TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 16),
                         ),
                       ),
                     ],
                   ),
+
+                  ///TODO: 가입 날짜 받기
                   const Text(
                     "23.09.10",
                     style: TextStyle(

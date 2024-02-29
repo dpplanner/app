@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dplanner/decode_token.dart';
-import 'package:dplanner/models/user_model.dart';
 import 'package:dplanner/widgets/image_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -11,7 +10,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import '../const.dart';
 import '../controllers/club.dart';
-import '../controllers/login.dart';
 import '../controllers/member.dart';
 import '../services/club_api_service.dart';
 import '../services/club_member_api_service.dart';
@@ -93,14 +91,10 @@ class _LoginPageState extends State<LoginPage> {
 
     if (googleUser != null) {
       try {
-        await TokenApiService.postToken(
-            email: googleUser.email, name: googleUser.displayName ?? "이름없음");
-
-        setState(() {
-          LoginController.to.user.value = UserModel(
-              email: googleUser.email, name: googleUser.displayName ?? "이름없음");
-          LoginController.to.loginPlatform.value = LoginPlatform.google;
-        });
+        String email = googleUser.email;
+        String name = googleUser.displayName ?? ".";
+        await TokenApiService.postToken(email: email, name: name);
+        await storage.write(key: loginInfo, value: '$email $name google');
 
         Get.offNamed('/club_list');
       } catch (e) {
@@ -133,21 +127,15 @@ class _LoginPageState extends State<LoginPage> {
 
       User user = await UserApi.instance.me();
 
-      await TokenApiService.postToken(
-          email: user.kakaoAccount!.email ?? "이메일 없음",
-          name: user.kakaoAccount!.name ?? "이름없음");
-
-      setState(() {
-        LoginController.to.user.value = UserModel(
-            email: user.kakaoAccount!.email ?? "이메일 없음",
-            name: user.kakaoAccount!.name ?? "이름없음");
-        LoginController.to.loginPlatform.value = LoginPlatform.kakao;
-      });
+      String email = user.kakaoAccount!.email ?? ".";
+      String name = user.kakaoAccount!.name ?? ".";
+      await TokenApiService.postToken(email: email, name: name);
+      await storage.write(key: loginInfo, value: '$email $name kakao');
 
       Get.offNamed('/club_list');
-    } catch (error) {
-      print('카카오톡으로 로그인 실패 $error');
-      snackBar(title: "카카오톡 로그인 실패", content: error.toString());
+    } catch (e) {
+      print(e.toString());
+      snackBar(title: "카카오 로그인 실패", content: e.toString());
     }
   }
 
@@ -157,19 +145,15 @@ class _LoginPageState extends State<LoginPage> {
 
     if (result.status == NaverLoginStatus.loggedIn) {
       try {
-        await TokenApiService.postToken(
-            email: result.account.email, name: result.account.name);
-
-        setState(() {
-          LoginController.to.user.value =
-              UserModel(email: result.account.email, name: result.account.name);
-          LoginController.to.loginPlatform.value = LoginPlatform.naver;
-        });
+        String email = result.account.email;
+        String name = result.account.name;
+        await TokenApiService.postToken(email: email, name: name);
+        await storage.write(key: loginInfo, value: '$email $name naver');
 
         Get.offNamed('/club_list');
       } catch (e) {
         print(e.toString());
-        snackBar(title: "구글 로그인 실패", content: e.toString());
+        snackBar(title: "네이버 로그인 실패", content: e.toString());
       }
     }
   }
@@ -197,15 +181,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: ImageButton(
                     image: 'assets/images/login/kakao_login.svg',
                     onTap: () async {
-                      if (LoginController.to.loginPlatform.value ==
-                          LoginPlatform.none) {
-                        await signInWithKakao();
-                      } else {
-                        snackBar(
-                            title:
-                                "${LoginController.to.loginPlatform.value.title}로그인 중입니다.",
-                            content: "로그아웃을 먼저 진행해주세요");
-                      }
+                      await signInWithKakao();
                     }),
               ),
 
@@ -215,15 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: ImageButton(
                     image: 'assets/images/login/naver_login.svg',
                     onTap: () async {
-                      if (LoginController.to.loginPlatform.value ==
-                          LoginPlatform.none) {
-                        await signInWithNaver();
-                      } else {
-                        snackBar(
-                            title:
-                                "${LoginController.to.loginPlatform.value.title}로그인 중입니다.",
-                            content: "로그아웃을 먼저 진행해주세요");
-                      }
+                      await signInWithNaver();
                     }),
               ),
 
@@ -233,15 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: ImageButton(
                     image: 'assets/images/login/facebook_login.svg',
                     onTap: () async {
-                      if (LoginController.to.loginPlatform.value ==
-                          LoginPlatform.none) {
-                        await signInWithGoogle();
-                      } else {
-                        snackBar(
-                            title:
-                                "${LoginController.to.loginPlatform.value.title}로그인 중입니다.",
-                            content: "로그아웃을 먼저 진행해주세요");
-                      }
+                      await signInWithGoogle();
                     }),
               ),
             ],

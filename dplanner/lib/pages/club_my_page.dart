@@ -1,4 +1,3 @@
-import 'package:dplanner/controllers/login.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/pages/app_setting_page.dart';
 import 'package:dplanner/pages/club_info_page.dart';
@@ -13,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
+import '../const.dart';
 import '../controllers/size.dart';
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
@@ -30,24 +30,21 @@ class _ClubMyPageState extends State<ClubMyPage> {
 
   // 소셜 로그아웃
   void signOut() async {
-    await storage.deleteAll();
-    switch (LoginController.to.loginPlatform.value) {
-      case LoginPlatform.google:
+    String loginPlatform = await storage.read(key: loginInfo) ?? ". . none";
+    switch (loginPlatform.split(" ")[2]) {
+      case "google":
         await GoogleSignIn().signOut();
         break;
-      case LoginPlatform.kakao:
+      case "kakao":
         await UserApi.instance.logout();
         break;
-      case LoginPlatform.naver:
+      case "naver":
         await FlutterNaverLogin.logOut();
         break;
-      case LoginPlatform.none:
+      case "none":
         break;
     }
-
-    setState(() {
-      LoginController.to.loginPlatform.value = LoginPlatform.none;
-    });
+    await storage.deleteAll();
   }
 
   @override
@@ -104,7 +101,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
                                       fontSize: 20),
                                 ),
                                 Text(
-                                  MemberController.to.clubMember().info!,
+                                  MemberController.to.clubMember().info ?? "",
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 18),
