@@ -1,3 +1,7 @@
+import 'package:dplanner/controllers/club.dart';
+import 'package:dplanner/controllers/member.dart';
+import 'package:dplanner/services/club_member_api_service.dart';
+import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
@@ -18,17 +22,24 @@ class MyProfileModificationPage extends StatefulWidget {
 
 class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
   final _formKey1 = GlobalKey<FormState>();
-  final TextEditingController myClubNickName = TextEditingController();
+  final TextEditingController myName = TextEditingController();
   bool _isFocused1 = false;
 
   final _formKey2 = GlobalKey<FormState>();
-  final TextEditingController myClubContent = TextEditingController();
+  final TextEditingController myContent = TextEditingController();
   bool _isFocused2 = false;
 
   @override
+  void initState() {
+    super.initState();
+    myName.text = MemberController.to.clubMember().name;
+    myContent.text = MemberController.to.clubMember().info ?? "";
+  }
+
+  @override
   void dispose() {
-    myClubNickName.dispose();
-    myClubContent.dispose();
+    myName.dispose();
+    myContent.dispose();
     super.dispose();
   }
 
@@ -95,7 +106,7 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                         key: _formKey1,
                         child: UnderlineTextForm(
                           hintText: '닉네임을 작성해주세요',
-                          controller: myClubNickName,
+                          controller: myName,
                           isFocused: _isFocused1,
                           noLine: true,
                           isRight: true,
@@ -124,7 +135,7 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                     key: _formKey2,
                     child: OutlineTextForm(
                       hintText: '소개글을 작성해주세요',
-                      controller: myClubContent,
+                      controller: myContent,
                       isFocused: _isFocused2,
                       noLine: true,
                       fontSize: 16,
@@ -149,8 +160,22 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                         color: AppColor.backgroundColor),
                   ),
                   buttonColor: AppColor.objectColor,
-                  onPressed: () {
-                    Get.back();
+                  onPressed: () async {
+                    try {
+                      int clubMemberId = MemberController.to.clubMember().id;
+                      MemberController.to.clubMember.value =
+                          await ClubMemberApiService.patchClubMember(
+                              clubMemberId: clubMemberId,
+                              clubId: ClubController.to.club().id,
+                              name: myName.text,
+                              info: myContent.text);
+                      Get.offAllNamed('/tab3', arguments: 2);
+                    } catch (e) {
+                      print(e.toString());
+                      snackBar(
+                          title: "프로필 편집하는데 오류가 발생하였습니다.",
+                          content: e.toString());
+                    }
                   },
                 ),
               ),

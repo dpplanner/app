@@ -1,3 +1,4 @@
+import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/pages/club_member_list_page.dart';
 import 'package:dplanner/pages/resource_list_page.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,7 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
         body: SafeArea(
           child: Column(
             children: [
+              ///TODO: 이미지 바꾸기
               Padding(
                 padding: const EdgeInsets.only(top: 16.0, bottom: 24.0),
                 child: Image.asset(
@@ -50,15 +52,17 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                   fit: BoxFit.fitWidth,
                 ),
               ),
-              const Text(
-                "Dance P.O.zz",
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 32),
+              Text(
+                ClubController.to.club().clubName,
+                style:
+                    const TextStyle(fontWeight: FontWeight.w700, fontSize: 32),
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(24, 12, 24, 32),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
                 child: Text(
-                  "중앙대학교 유일무일 스트릿댄스 동아리 Dance P.O.zz입 니다. 어저구저쩌구 룰루랄라 왁킹 짱 블라블라 어디까지 괜찮지?몇자가 적당하지?흠먄얌ㄴ랴먀",
-                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                  ClubController.to.club().info,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w500, fontSize: 16),
                 ),
               ),
               Row(
