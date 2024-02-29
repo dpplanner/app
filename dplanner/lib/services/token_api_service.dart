@@ -67,7 +67,8 @@ class TokenApiService {
       Map<String, dynamic> data = jsonDecode(response.body)['data'];
 
       // 토큰 업데이트
-      await storage.deleteAll();
+      await storage.delete(key: accessTokenKey);
+      await storage.delete(key: refreshTokenKey);
       await storage.write(key: accessTokenKey, value: data['accessToken']);
       await storage.write(key: refreshTokenKey, value: data['refreshToken']);
 

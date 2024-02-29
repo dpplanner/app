@@ -5,4 +5,4 @@ const accessTokenKey = 'access_token';
 const refreshTokenKey = 'refresh_token';
 
 /// login platform key for secure storage
-const loginPlatform = 'login_platform';
+const loginInfo = 'login_information';

@@ -31,13 +31,6 @@ class _ClubHomePageState extends State<ClubHomePage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    print(ClubController.to.club().id);
-    print(MemberController.to.clubMember().id);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: AppColor.backgroundColor2,
@@ -50,25 +43,10 @@ class _ClubHomePageState extends State<ClubHomePage> {
                 onPressed: () {
                   Get.offAllNamed('/club_list');
                 },
-                icon: const Icon(SFSymbols.chevron_left)),
-            title: Padding(
-              padding:
-                  EdgeInsets.only(left: SizeController.to.screenWidth * 0.05),
-              child: Row(
-                children: [
-                  const Text(
-                    "Dance P.O.zz",
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      SFSymbols.info_circle,
-                      color: AppColor.textColor,
-                    ),
-                  )
-                ],
-              ),
+                icon: const Icon(SFSymbols.menu)),
+            title: Text(
+              ClubController.to.club().clubName,
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
             ),
             actions: [
               IconButton(
@@ -83,6 +61,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
               SizedBox(width: SizeController.to.screenWidth * 0.05)
             ],
             automaticallyImplyLeading: false,
+            centerTitle: true,
           ),
         ),
         body: SafeArea(

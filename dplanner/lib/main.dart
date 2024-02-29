@@ -1,5 +1,4 @@
 import 'package:calendar_view/calendar_view.dart';
-import 'package:dplanner/controllers/login.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/routes.dart';
 import 'package:dplanner/style.dart';
@@ -32,7 +31,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sizeController = SizeController();
-    final loginController = LoginController();
     final clubController = ClubController();
     final memberController = MemberController();
     sizeController.screenWidth = MediaQuery.of(context).size.width;
@@ -50,7 +48,6 @@ class MyApp extends StatelessWidget {
         getPages: page,
         initialBinding: BindingsBuilder(() {
           Get.put(sizeController);
-          Get.put(loginController);
           Get.put(clubController);
           Get.put(memberController);
         }),
