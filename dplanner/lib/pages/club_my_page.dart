@@ -1,4 +1,5 @@
 import 'package:dplanner/controllers/login.dart';
+import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/pages/app_setting_page.dart';
 import 'package:dplanner/pages/club_info_page.dart';
 import 'package:dplanner/pages/my_activity_check_page.dart';
@@ -81,6 +82,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
                       children: [
                         Row(
                           children: [
+                            ///TODO: 이미지 바꾸기
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
                               child: ClipOval(
@@ -92,18 +94,18 @@ class _ClubMyPageState extends State<ClubMyPage> {
                                 ),
                               ),
                             ),
-                            const Column(
+                            Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "DP23 남진",
-                                  style: TextStyle(
+                                  MemberController.to.clubMember().name,
+                                  style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 20),
                                 ),
                                 Text(
-                                  "SKRRRR",
-                                  style: TextStyle(
+                                  MemberController.to.clubMember().info!,
+                                  style: const TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 18),
                                 ),

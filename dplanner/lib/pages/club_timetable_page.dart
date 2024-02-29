@@ -42,7 +42,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
           child: AppBar(
             backgroundColor: AppColor.backgroundColor,
             title: const Text(
-              "Dance P.O.zz",
+              "예약 시간표",
               style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
             ),
             centerTitle: true,
