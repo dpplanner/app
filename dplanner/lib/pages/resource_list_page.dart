@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/resource_model.dart';
@@ -42,6 +44,9 @@ class _ResourceListPageState extends State<ResourceListPage> {
   final TextEditingController updateInfo = TextEditingController();
   final TextEditingController updateNotice = TextEditingController();
 
+  final StreamController<List<List<ResourceModel>>> _streamController =
+      StreamController<List<List<ResourceModel>>>.broadcast();
+
   @override
   void dispose() {
     name.dispose();
@@ -50,16 +55,23 @@ class _ResourceListPageState extends State<ResourceListPage> {
     updateName.dispose();
     updateInfo.dispose();
     updateNotice.dispose();
+    _streamController.close();
     super.dispose();
   }
 
-  Future<List<List<ResourceModel>>> getResourceList() async {
+  @override
+  void initState() {
+    super.initState();
+    getResourceList();
+  }
+
+  void getResourceList() async {
     try {
-      return await ResourceApiService.getResources();
+      List<List<ResourceModel>> data = await ResourceApiService.getResources();
+      _streamController.add(data);
     } catch (e) {
       print(e.toString());
     }
-    return [[], []];
   }
 
   @override
@@ -102,8 +114,8 @@ class _ResourceListPageState extends State<ResourceListPage> {
                                 fontWeight: FontWeight.w600, fontSize: 18),
                           ),
                         ),
-                        FutureBuilder(
-                            future: getResourceList(),
+                        StreamBuilder(
+                            stream: _streamController.stream,
                             builder:
                                 (BuildContext context, AsyncSnapshot snapshot) {
                               if (snapshot.hasData == false) {
@@ -142,8 +154,8 @@ class _ResourceListPageState extends State<ResourceListPage> {
                                 fontWeight: FontWeight.w600, fontSize: 18),
                           ),
                         ),
-                        FutureBuilder(
-                            future: getResourceList(),
+                        StreamBuilder(
+                            stream: _streamController.stream,
                             builder:
                                 (BuildContext context, AsyncSnapshot snapshot) {
                               if (snapshot.hasData == false) {
@@ -627,6 +639,10 @@ class _ResourceListPageState extends State<ResourceListPage> {
                                   resourceType: (selectedValue1 == "공간")
                                       ? "PLACE"
                                       : "THING");
+                          name.text = "";
+                          info.text = "";
+                          notice.text = "";
+                          getResourceList();
                           Get.back();
                         } catch (e) {
                           print(e.toString());
@@ -677,6 +693,7 @@ class _ResourceListPageState extends State<ResourceListPage> {
                                     resourceType: (selectedValue1 == "공간")
                                         ? "PLACE"
                                         : "THING");
+                            getResourceList();
                             Get.back();
                           } catch (e) {
                             print(e.toString());
@@ -701,7 +718,7 @@ class _ResourceListPageState extends State<ResourceListPage> {
     );
   }
 
-  void showDialog({required int id}) {
+  void checkDeleteResource({required int id}) {
     Get.dialog(
       AlertDialog(
         backgroundColor: AppColor.backgroundColor,
@@ -752,6 +769,7 @@ class _ResourceListPageState extends State<ResourceListPage> {
                   onPressed: () async {
                     try {
                       await ResourceApiService.deleteResource(resourceId: id);
+                      getResourceList();
                       Get.back();
                     } catch (e) {
                       print(e.toString());
@@ -819,7 +837,7 @@ class _ResourceListPageState extends State<ResourceListPage> {
               if (MemberController.to.clubMember().role == "ADMIN")
                 IconButton(
                   onPressed: () {
-                    showDialog(id: resource.id);
+                    checkDeleteResource(id: resource.id);
                   },
                   icon: const Icon(
                     SFSymbols.trash,
