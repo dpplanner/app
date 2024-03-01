@@ -5,4 +5,5 @@ class ClubController extends GetxController {
   static ClubController get to => Get.find();
 
   Rx<ClubModel> club = ClubModel(id: 0, clubName: "", info: "").obs;
+  RxInt resourceNum = 0.obs;
 }

@@ -68,6 +68,7 @@ class _ResourceListPageState extends State<ResourceListPage> {
   void getResourceList() async {
     try {
       List<List<ResourceModel>> data = await ResourceApiService.getResources();
+      ClubController.to.resourceNum.value = data[0].length + data[1].length;
       _streamController.add(data);
     } catch (e) {
       print(e.toString());
