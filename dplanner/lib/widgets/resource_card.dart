@@ -12,43 +12,31 @@ class ResourceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: SizeController.to.screenWidth,
-      color: AppColor.backgroundColor,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(32, 0, 24, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 12.0),
-                  child: Text(
-                    name,
-                    style: const TextStyle(
-                      color: AppColor.textColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    _resourceInfo(context);
-                  },
-                  icon: const Icon(
-                    SFSymbols.info_circle,
-                    color: AppColor.textColor,
-                    size: 20,
-                  ),
-                )
-              ],
+    return Padding(
+      padding: const EdgeInsets.only(left: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            name,
+            style: const TextStyle(
+              color: AppColor.textColor,
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
             ),
-          ],
-        ),
+          ),
+          IconButton(
+            onPressed: () {
+              _resourceInfo(context);
+            },
+            icon: const Icon(
+              SFSymbols.info_circle,
+              color: AppColor.textColor,
+              size: 20,
+            ),
+          )
+        ],
       ),
     );
   }

@@ -92,9 +92,10 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
               padding: const EdgeInsets.all(24.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   const Padding(
-                    padding: EdgeInsets.only(top: 16.0),
+                    padding: EdgeInsets.only(bottom: 5.0),
                     child: Text(
                       "클럽 닉네임*",
                       style:

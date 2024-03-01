@@ -29,7 +29,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   EventController eventController = EventController();
 
   final itemController = Get.put((ItemController()));
-  late String selectedValue = ItemController.to.items[0];
+  String selectedValue = ItemController.to.items[0];
 
   Open _open = Open.yes;
 
