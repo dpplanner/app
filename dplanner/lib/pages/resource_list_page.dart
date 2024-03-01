@@ -1,4 +1,7 @@
+import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
+import 'package:dplanner/models/resource_model.dart';
+import 'package:dplanner/services/resource_api_service.dart';
 import 'package:dplanner/widgets/resource_card.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
@@ -473,7 +476,22 @@ class _ResourceListPageState extends State<ResourceListPage> {
                         color: AppColor.backgroundColor),
                   ),
                   buttonColor: AppColor.objectColor,
-                  onPressed: () {},
+                  onPressed: () async {
+                    try {
+                      ResourceModel temp =
+                          await ResourceApiService.postResource(
+                              clubId: ClubController.to.club().id,
+                              name: name.text,
+                              info: info.text,
+                              returnMessageRequired: isChecked,
+                              notice: notice.text,
+                              resourceType:
+                                  (selectedValue1 == "공간") ? "PLACE" : "THING");
+                      Get.back();
+                    } catch (e) {
+                      print(e.toString());
+                    }
+                  },
                 ),
               ),
             ],
