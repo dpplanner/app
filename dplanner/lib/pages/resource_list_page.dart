@@ -701,6 +701,91 @@ class _ResourceListPageState extends State<ResourceListPage> {
     );
   }
 
+  void showDialog({required int id}) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColor.backgroundColor,
+        elevation: 0,
+        title: const Padding(
+          padding: EdgeInsets.only(top: 16.0),
+          child: Center(
+            child: Text(
+              "물품 삭제",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "한번 삭제한 공유 물품은",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              "되살릴 수 없습니다",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 4.0),
+              child: Text(
+                "정말 삭제할까요?",
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                child: NextPageButton(
+                  text: const Text(
+                    "삭제하기",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.backgroundColor),
+                  ),
+                  buttonColor: AppColor.objectColor,
+                  onPressed: () async {
+                    try {
+                      await ResourceApiService.deleteResource(resourceId: id);
+                      Get.back();
+                    } catch (e) {
+                      print(e.toString());
+                    }
+                  },
+                ),
+              ),
+              TextButton(
+                onPressed: Get.back,
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.resolveWith<Color>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.pressed)) {
+                        return Colors.transparent;
+                      }
+                      return Colors.transparent;
+                    },
+                  ),
+                ),
+                child: const Text(
+                  "닫기",
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.textColor2),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget resourceCard({required ResourceModel resource}) {
     return Padding(
       padding: const EdgeInsets.only(left: 12),
@@ -733,13 +818,8 @@ class _ResourceListPageState extends State<ResourceListPage> {
               ),
               if (MemberController.to.clubMember().role == "ADMIN")
                 IconButton(
-                  onPressed: () async {
-                    try {
-                      await ResourceApiService.deleteResource(
-                          resourceId: resource.id);
-                    } catch (e) {
-                      print(e.toString());
-                    }
+                  onPressed: () {
+                    showDialog(id: resource.id);
                   },
                   icon: const Icon(
                     SFSymbols.trash,
