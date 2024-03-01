@@ -1,5 +1,4 @@
 import 'package:dplanner/controllers/club.dart';
-import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/controllers/size.dart';
 import 'package:dplanner/pages/notification_page.dart';
 import 'package:dplanner/pages/post_add_page.dart';

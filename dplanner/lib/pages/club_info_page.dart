@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/pages/club_member_list_page.dart';
 import 'package:dplanner/pages/resource_list_page.dart';
@@ -6,9 +8,12 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
+import '../models/resource_model.dart';
+import '../services/resource_api_service.dart';
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/nextpage_button.dart';
+import 'error_page.dart';
 
 class ClubInfoPage extends StatefulWidget {
   const ClubInfoPage({super.key});
@@ -18,6 +23,18 @@ class ClubInfoPage extends StatefulWidget {
 }
 
 class _ClubInfoPageState extends State<ClubInfoPage> {
+  Future<int> getResourceNum() async {
+    try {
+      List<List<ResourceModel>> resources =
+          await ResourceApiService.getResources();
+      ClubController.to.resources.value = resources[0] + resources[1];
+      return resources[0].length + resources[1].length;
+    } catch (e) {
+      print(e.toString());
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,11 +149,26 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                       ),
                       Row(
                         children: [
-                          const Text(
-                            "1",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 16),
-                          ),
+                          FutureBuilder(
+                              future: getResourceNum(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot snapshot) {
+                                if (snapshot.hasData == false) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return const ErrorPage();
+                                } else {
+                                  return Obx(() {
+                                    return Text(
+                                      "${ClubController.to.resources().length}",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16),
+                                    );
+                                  });
+                                }
+                              }),
                           InkWell(
                             onTap: () {
                               Get.to(const ResourceListPage());

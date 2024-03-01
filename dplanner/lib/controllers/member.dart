@@ -5,5 +5,5 @@ class MemberController extends GetxController {
   static MemberController get to => Get.find();
 
   Rx<ClubMemberModel> clubMember =
-      ClubMemberModel(id: 0, name: '', role: '', confirmed: false).obs;
+      ClubMemberModel(id: 0, name: '', role: '', isConfirmed: false).obs;
 }

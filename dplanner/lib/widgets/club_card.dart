@@ -46,9 +46,9 @@ class ClubCard extends StatelessWidget {
                 clubID: decodeToken(updatedAccessToken!)['recent_club_id']);
             MemberController.to.clubMember.value =
                 await ClubMemberApiService.getClubMember(
-                    clubId: decodeToken(updatedAccessToken!)['recent_club_id'],
+                    clubId: decodeToken(updatedAccessToken)['recent_club_id'],
                     clubMemberId:
-                        decodeToken(updatedAccessToken!)['club_member_id']);
+                        decodeToken(updatedAccessToken)['club_member_id']);
             Get.offAllNamed('/tab2', arguments: 1);
           } catch (e) {
             print(e.toString());

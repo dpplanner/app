@@ -45,6 +45,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
         break;
     }
     await storage.deleteAll();
+    Get.offAllNamed('login');
   }
 
   @override
@@ -188,7 +189,6 @@ class _ClubMyPageState extends State<ClubMyPage> {
                 }, false),
                 selectButton("로그아웃", () {
                   signOut();
-                  Get.offAllNamed('login');
                 }, false),
                 selectButton("탈퇴하기", () {}, false),
               ],
