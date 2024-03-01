@@ -69,9 +69,7 @@ class _LoginPageState extends State<LoginPage> {
             await ClubMemberApiService.getClubMember(
                 clubId: decodeToken(accessToken)['recent_club_id'],
                 clubMemberId: decodeToken(accessToken)['club_member_id']);
-        print(MemberController.to.clubMember().confirmed);
-        if (MemberController.to.clubMember().confirmed ?? false) {
-          print("dd");
+        if (MemberController.to.clubMember().isConfirmed) {
           Get.offNamed('/tab2', arguments: 1);
         } else {
           Get.offNamed('/club_list');

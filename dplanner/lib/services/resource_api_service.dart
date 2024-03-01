@@ -83,6 +83,45 @@ class ResourceApiService {
     throw ErrorDescription(errorMessage);
   }
 
+  /// PUT: /resources/(_.resource_id) [클럽 자원 정보 업데이트] 클럽 자원 수정하기
+  static Future<ResourceModel> putResource(
+      {required int id,
+      required String name,
+      required String info,
+      required bool returnMessageRequired,
+      required String notice,
+      required String resourceType}) async {
+    final url = Uri.parse('$baseUrl/resources/$id');
+    const storage = FlutterSecureStorage();
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({
+        "id": id,
+        "name": name,
+        "info": info,
+        "returnMessageRequired": returnMessageRequired,
+        "notice": notice,
+        "resourceType": resourceType,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return ResourceModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes))['data']);
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
   /// DELETE: /resources/(_.resource_id) [클럽 자원 삭제] 클럽 자원 삭제하기
   static Future<void> deleteResource({required int resourceId}) async {
     final url = Uri.parse('$baseUrl/resources/$resourceId');
