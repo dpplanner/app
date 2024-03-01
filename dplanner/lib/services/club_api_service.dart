@@ -78,14 +78,14 @@ class ClubApiService {
     });
 
     if (response.statusCode == 200) {
-      List<ClubModel> chatList = [];
+      List<ClubModel> clubList = [];
 
       List<dynamic> clubData =
           jsonDecode(utf8.decode(response.bodyBytes))['data'];
       for (var club in clubData) {
-        chatList.add(ClubModel.fromJson(club));
+        clubList.add(ClubModel.fromJson(club));
       }
-      return chatList;
+      return clubList;
     }
 
     // 예외 처리; 메시지를 포함한 예외를 던짐

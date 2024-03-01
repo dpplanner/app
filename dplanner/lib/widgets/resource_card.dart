@@ -1,3 +1,5 @@
+import 'package:dplanner/controllers/member.dart';
+import 'package:dplanner/models/resource_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -5,9 +7,9 @@ import 'package:flutter_svg/svg.dart';
 import '../style.dart';
 
 class ResourceCard extends StatelessWidget {
-  final String name;
+  final ResourceModel resource;
 
-  const ResourceCard({super.key, required this.name});
+  const ResourceCard({super.key, required this.resource});
 
   @override
   Widget build(BuildContext context) {
@@ -18,22 +20,35 @@ class ResourceCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            name,
+            resource.name,
             style: const TextStyle(
               color: AppColor.textColor,
               fontWeight: FontWeight.w500,
               fontSize: 16,
             ),
           ),
-          IconButton(
-            onPressed: () {
-              _resourceInfo(context);
-            },
-            icon: const Icon(
-              SFSymbols.info_circle,
-              color: AppColor.textColor,
-              size: 20,
-            ),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  _resourceInfo(context);
+                },
+                icon: const Icon(
+                  SFSymbols.info_circle,
+                  color: AppColor.textColor,
+                  size: 20,
+                ),
+              ),
+              if (MemberController.to.clubMember().role == "ADMIN")
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    SFSymbols.trash,
+                    color: AppColor.textColor,
+                    size: 20,
+                  ),
+                ),
+            ],
           )
         ],
       ),
@@ -88,7 +103,7 @@ class ResourceCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      name,
+                      resource.name,
                       style: const TextStyle(
                         color: AppColor.textColor,
                         fontWeight: FontWeight.w500,

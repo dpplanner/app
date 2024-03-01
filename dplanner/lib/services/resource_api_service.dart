@@ -49,4 +49,37 @@ class ResourceApiService {
     print(errorMessage);
     throw ErrorDescription(errorMessage);
   }
+
+  /// GET: /resources [클럽 자원 목록 가져오기] 클럽 전체 자원 목록 가져오기
+  static Future<List<List<ResourceModel>>> getResources() async {
+    final url = Uri.parse('$baseUrl/resources');
+    const storage = FlutterSecureStorage();
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    });
+
+    if (response.statusCode == 200) {
+      List<ResourceModel> resourceListPlace = [];
+      List<ResourceModel> resourceListThing = [];
+
+      List<dynamic> resourceData =
+          jsonDecode(utf8.decode(response.bodyBytes))['data'];
+      for (var resource in resourceData) {
+        if (resource['resourceType'] == "PLACE") {
+          resourceListPlace.add(ResourceModel.fromJson(resource));
+        } else {
+          resourceListThing.add(ResourceModel.fromJson(resource));
+        }
+      }
+      return [resourceListPlace, resourceListThing];
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
 }

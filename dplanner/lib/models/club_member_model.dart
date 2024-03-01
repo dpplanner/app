@@ -1,5 +1,5 @@
 class ClubMemberModel {
-  bool confirmed;
+  bool? confirmed;
   int id;
   String name, role;
   String? info, url;
@@ -10,7 +10,7 @@ class ClubMemberModel {
     this.info,
     required this.role,
     this.url,
-    required this.confirmed,
+    this.confirmed,
   });
 
   ClubMemberModel.fromJson(Map<String, dynamic> json)

@@ -4,6 +4,7 @@ import 'package:dplanner/models/resource_model.dart';
 import 'package:dplanner/services/resource_api_service.dart';
 import 'package:dplanner/widgets/resource_card.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,6 +15,7 @@ import '../style.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/underline_textform.dart';
+import 'error_page.dart';
 
 List<String> type = ['공간', '물품'];
 List<String> method = ['예약 신청 후 클럽 관리자 승인'];
@@ -50,6 +52,15 @@ class _ResourceListPageState extends State<ResourceListPage> {
     super.dispose();
   }
 
+  Future<List<List<ResourceModel>>> getResourceList() async {
+    try {
+      return await ResourceApiService.getResources();
+    } catch (e) {
+      print(e.toString());
+    }
+    return [[], []];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,12 +87,13 @@ class _ResourceListPageState extends State<ResourceListPage> {
             padding: const EdgeInsets.all(24.0),
             child: Column(
               children: [
-                const Expanded(
+                Expanded(
                   child: SingleChildScrollView(
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
                           child: Text(
                             "공간",
@@ -89,10 +101,39 @@ class _ResourceListPageState extends State<ResourceListPage> {
                                 fontWeight: FontWeight.w600, fontSize: 18),
                           ),
                         ),
-                        ResourceCard(name: "동아리 방"),
-                        ResourceCard(name: "3층 연습실"),
-                        ResourceCard(name: "풍물패"),
-                        Padding(
+                        FutureBuilder(
+                            future: getResourceList(),
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.hasData == false) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return const ErrorPage();
+                              } else if (snapshot.data[0].length == 0) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: SizedBox(
+                                    width: SizeController.to.screenWidth,
+                                    child: const Text(
+                                      "아직 아무것도 없어요",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 15,
+                                          color: AppColor.textColor2),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return Column(
+                                    children: List.generate(
+                                        snapshot.data[0].length, (index) {
+                                  return ResourceCard(
+                                      resource: snapshot.data[0][index]);
+                                }));
+                              }
+                            }),
+                        const Padding(
                           padding: EdgeInsets.only(top: 32.0, bottom: 16.0),
                           child: Text(
                             "물건",
@@ -100,8 +141,38 @@ class _ResourceListPageState extends State<ResourceListPage> {
                                 fontWeight: FontWeight.w600, fontSize: 18),
                           ),
                         ),
-                        ResourceCard(name: "스피커-JBL"),
-                        ResourceCard(name: "스피커-어쩌구"),
+                        FutureBuilder(
+                            future: getResourceList(),
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.hasData == false) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return const ErrorPage();
+                              } else if (snapshot.data[1].length == 0) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: SizedBox(
+                                    width: SizeController.to.screenWidth,
+                                    child: const Text(
+                                      "아직 아무것도 없어요",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 15,
+                                          color: AppColor.textColor2),
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return Column(
+                                    children: List.generate(
+                                        snapshot.data[1].length, (index) {
+                                  return ResourceCard(
+                                      resource: snapshot.data[1][index]);
+                                }));
+                              }
+                            }),
                       ],
                     ),
                   ),
