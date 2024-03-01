@@ -11,6 +11,7 @@ class UnderlineTextForm extends StatelessWidget {
   final int maxLength;
   final bool noLine;
   final bool isRight;
+  final bool noErrorSign;
   final double fontSize;
   final FormFieldValidator<String>? validator;
   final FormFieldSetter<String>? onSaved;
@@ -26,6 +27,7 @@ class UnderlineTextForm extends StatelessWidget {
       this.maxLength = 0,
       this.noLine = false,
       this.isRight = false,
+      this.noErrorSign = false,
       this.fontSize = 16.0,
       this.validator,
       this.onSaved,
@@ -69,8 +71,8 @@ class UnderlineTextForm extends StatelessWidget {
               width: 2,
               strokeAlign: BorderSide.strokeAlignOutside),
         ),
-        errorStyle: const TextStyle(
-          fontSize: 12,
+        errorStyle: TextStyle(
+          fontSize: noErrorSign ? 0 : 12,
           fontWeight: FontWeight.w400,
           color: AppColor.markColor,
         ),

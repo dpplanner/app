@@ -4,8 +4,11 @@ import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/resource_model.dart';
 import 'package:dplanner/services/resource_api_service.dart';
+import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -271,13 +274,15 @@ class _ResourceListPageState extends State<ResourceListPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Padding(
-                              padding: EdgeInsets.only(bottom: 5.0),
-                              child: Text(
-                                "이름",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                            const Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: 5.0),
+                                child: Text(
+                                  "이름",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
@@ -291,8 +296,18 @@ class _ResourceListPageState extends State<ResourceListPage> {
                                     isFocused: isFocused1,
                                     noLine: true,
                                     isRight: true,
+                                    noErrorSign: true,
                                     isWritten: (types == 1) ? true : false,
                                     fontSize: 15,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        snackBar(
+                                            title: "작성이 끝나지 않았습니다",
+                                            content: "공유 물품 이름을 작성해주세요");
+                                        return '';
+                                      }
+                                      return null;
+                                    },
                                     onChanged: (value) {
                                       setState(() {
                                         isFocused1 = value.isNotEmpty;
@@ -413,13 +428,15 @@ class _ResourceListPageState extends State<ResourceListPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Padding(
-                              padding: EdgeInsets.only(bottom: 5.0),
-                              child: Text(
-                                "대여 위치",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                            const Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: 5.0),
+                                child: Text(
+                                  "대여 위치",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
@@ -433,8 +450,18 @@ class _ResourceListPageState extends State<ResourceListPage> {
                                     isFocused: isFocused1,
                                     noLine: true,
                                     isRight: true,
+                                    noErrorSign: true,
                                     isWritten: (types == 1) ? true : false,
                                     fontSize: 15,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        snackBar(
+                                            title: "작성이 끝나지 않았습니다",
+                                            content: "공유 물품 대여 위치를 작성해주세요");
+                                        return '';
+                                      }
+                                      return null;
+                                    },
                                     onChanged: (value) {
                                       setState(() {
                                         isFocused2 = value.isNotEmpty;
@@ -629,24 +656,29 @@ class _ResourceListPageState extends State<ResourceListPage> {
                       ),
                       buttonColor: AppColor.objectColor,
                       onPressed: () async {
-                        try {
-                          ResourceModel temp =
-                              await ResourceApiService.postResource(
-                                  clubId: ClubController.to.club().id,
-                                  name: name.text,
-                                  info: info.text,
-                                  returnMessageRequired: isChecked,
-                                  notice: notice.text,
-                                  resourceType: (selectedValue1 == "공간")
-                                      ? "PLACE"
-                                      : "THING");
-                          name.text = "";
-                          info.text = "";
-                          notice.text = "";
-                          getResourceList();
-                          Get.back();
-                        } catch (e) {
-                          print(e.toString());
+                        final formKeyState1 = formKey1.currentState!;
+                        final formKeyState2 = formKey2.currentState!;
+                        if (formKeyState1.validate() &&
+                            formKeyState2.validate()) {
+                          try {
+                            ResourceModel temp =
+                                await ResourceApiService.postResource(
+                                    clubId: ClubController.to.club().id,
+                                    name: name.text,
+                                    info: info.text,
+                                    returnMessageRequired: isChecked,
+                                    notice: notice.text,
+                                    resourceType: (selectedValue1 == "공간")
+                                        ? "PLACE"
+                                        : "THING");
+                            name.text = "";
+                            info.text = "";
+                            notice.text = "";
+                            getResourceList();
+                            Get.back();
+                          } catch (e) {
+                            print(e.toString());
+                          }
                         }
                       },
                     ),
@@ -683,21 +715,26 @@ class _ResourceListPageState extends State<ResourceListPage> {
                         ),
                         buttonColor: AppColor.objectColor,
                         onPressed: () async {
-                          try {
-                            ResourceModel temp =
-                                await ResourceApiService.putResource(
-                                    id: resource.id,
-                                    name: updateName.text,
-                                    info: updateInfo.text,
-                                    returnMessageRequired: isChecked,
-                                    notice: updateNotice.text,
-                                    resourceType: (selectedValue1 == "공간")
-                                        ? "PLACE"
-                                        : "THING");
-                            getResourceList();
-                            Get.back();
-                          } catch (e) {
-                            print(e.toString());
+                          final formKeyState1 = formKey1.currentState!;
+                          final formKeyState2 = formKey2.currentState!;
+                          if (formKeyState1.validate() &&
+                              formKeyState2.validate()) {
+                            try {
+                              ResourceModel temp =
+                                  await ResourceApiService.putResource(
+                                      id: resource.id,
+                                      name: updateName.text,
+                                      info: updateInfo.text,
+                                      returnMessageRequired: isChecked,
+                                      notice: updateNotice.text,
+                                      resourceType: (selectedValue1 == "공간")
+                                          ? "PLACE"
+                                          : "THING");
+                              getResourceList();
+                              Get.back();
+                            } catch (e) {
+                              print(e.toString());
+                            }
                           }
                         },
                       ),
