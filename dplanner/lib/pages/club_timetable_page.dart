@@ -1,17 +1,23 @@
+import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/controllers/size.dart';
 import 'package:dplanner/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
+import '../controllers/club.dart';
 import '../controllers/item.dart';
+import '../models/resource_model.dart';
+import '../services/resource_api_service.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/nextpage_button.dart';
+import 'error_page.dart';
 
 DateTime get _now => DateTime.now();
 
@@ -29,9 +35,22 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   EventController eventController = EventController();
 
   final itemController = Get.put((ItemController()));
-  String selectedValue = ItemController.to.items[0];
+  String selectedValue = "";
 
   Open _open = Open.yes;
+
+  Future<List<ResourceModel>> getResources() async {
+    try {
+      List<List<ResourceModel>> resources =
+          await ResourceApiService.getResources();
+      ClubController.to.resources.value = resources[0] + resources[1];
+      selectedValue = ClubController.to.resources[0].name;
+      return resources[0] + resources[1];
+    } catch (e) {
+      print(e.toString());
+    }
+    return [];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,31 +70,16 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
         ),
         body: Stack(
           children: [
-            Column(
+            Row(
               children: [
-                Container(
-                  height: SizeController.to.screenHeight * 0.08,
-                  color: AppColor.backgroundColor,
-                ),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        width: SizeController.to.screenWidth * 0.11,
-                        color: AppColor.backgroundColor,
-                      ),
-                      Expanded(
-                        child: Container(
-                          color: AppColor.backgroundColor2,
-                        ),
-                      ),
-                      Container(
-                        width: SizeController.to.screenWidth * 0.04,
-                        color: AppColor.backgroundColor,
-                      ),
-                    ],
-                  ),
-                ),
+                Flexible(
+                    flex: 12,
+                    child: Container(color: AppColor.backgroundColor)),
+                Flexible(
+                    flex: 84,
+                    child: Container(color: AppColor.backgroundColor2)),
+                Flexible(
+                    flex: 4, child: Container(color: AppColor.backgroundColor)),
               ],
             ),
             Center(
@@ -83,98 +87,217 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 key: weekViewStateKey,
                 controller: eventController,
                 weekPageHeaderBuilder: (DateTime startDate, DateTime endDate) {
-                  return WeekPageHeader(
-                    headerStringBuilder: (DateTime dateTime,
-                        {DateTime? secondaryDate}) {
-                      return DateFormat("MM월").format(dateTime);
-                    },
-                    headerStyle: HeaderStyle(
-                        decoration: BoxDecoration(
-                          color: AppColor.subColor4,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        headerTextStyle: const TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 18),
-                        headerMargin: EdgeInsets.only(
-                            left: SizeController.to.screenWidth * 0.05,
-                            right: SizeController.to.screenWidth * 0.63),
-                        rightIconVisible: false,
-                        leftIcon: InkWell(
-                            onTap: () {
-                              weekViewStateKey.currentState
-                                  ?.jumpToWeek(DateTime.now());
+                  return Container(
+                    color: AppColor.backgroundColor,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: WeekPageHeader(
+                            headerStringBuilder: (DateTime dateTime,
+                                {DateTime? secondaryDate}) {
+                              return DateFormat("MM월").format(dateTime);
                             },
-                            child: const Icon(SFSymbols.calendar_today,
-                                color: AppColor.textColor)),
-                        titleAlign: TextAlign.left),
-                    startDate: startDate,
-                    endDate: endDate,
-                    onTitleTapped: () async {
-                      DateTime selectedDate = startDate;
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Container(
-                            height: SizeController.to.screenHeight * 0.4,
-                            decoration: const BoxDecoration(
-                              color: AppColor.backgroundColor,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30),
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 8.0, bottom: 8.0),
-                                  child: SvgPicture.asset(
-                                    'assets/images/showmodal_scrollcontrolbar.svg',
-                                  ),
+                            headerStyle: HeaderStyle(
+                                decoration: BoxDecoration(
+                                  color: AppColor.subColor4,
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                const Text(
-                                  "날짜",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 18),
-                                ),
-                                Expanded(
-                                  child: CupertinoDatePicker(
-                                    mode: CupertinoDatePickerMode.date,
-                                    initialDateTime: startDate,
-                                    minimumYear: 2020,
-                                    maximumYear: 2029,
-                                    onDateTimeChanged: (DateTime date) {
-                                      setState(() {
-                                        selectedDate = date;
-                                      });
+                                headerTextStyle: const TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 18),
+                                rightIconVisible: false,
+                                leftIcon: InkWell(
+                                    onTap: () {
+                                      weekViewStateKey.currentState
+                                          ?.jumpToWeek(DateTime.now());
                                     },
-                                  ),
-                                ),
-                                NextPageButton(
-                                  text: const Text(
-                                    "날짜 변경하기",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: AppColor.backgroundColor),
-                                  ),
-                                  buttonColor: AppColor.objectColor,
-                                  onPressed: () {
-                                    weekViewStateKey.currentState
-                                        ?.jumpToWeek(selectedDate);
-                                    Get.back();
-                                  },
-                                ),
-                                SizedBox(
-                                  height: SizeController.to.screenHeight * 0.03,
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
+                                    child: const Icon(SFSymbols.calendar_today,
+                                        color: AppColor.textColor)),
+                                titleAlign: TextAlign.left),
+                            startDate: startDate,
+                            endDate: endDate,
+                            onTitleTapped: () async {
+                              DateTime selectedDate = startDate;
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Container(
+                                    height:
+                                        SizeController.to.screenHeight * 0.4,
+                                    decoration: const BoxDecoration(
+                                      color: AppColor.backgroundColor,
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(30),
+                                        topRight: Radius.circular(30),
+                                      ),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 8.0, bottom: 8.0),
+                                          child: SvgPicture.asset(
+                                            'assets/images/showmodal_scrollcontrolbar.svg',
+                                          ),
+                                        ),
+                                        const Text(
+                                          "날짜",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 18),
+                                        ),
+                                        Expanded(
+                                          child: CupertinoDatePicker(
+                                            mode: CupertinoDatePickerMode.date,
+                                            initialDateTime: startDate,
+                                            minimumYear: 2020,
+                                            maximumYear: 2029,
+                                            onDateTimeChanged: (DateTime date) {
+                                              setState(() {
+                                                selectedDate = date;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        NextPageButton(
+                                          text: const Text(
+                                            "날짜 변경하기",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                                color:
+                                                    AppColor.backgroundColor),
+                                          ),
+                                          buttonColor: AppColor.objectColor,
+                                          onPressed: () {
+                                            weekViewStateKey.currentState
+                                                ?.jumpToWeek(selectedDate);
+                                            Get.back();
+                                          },
+                                        ),
+                                        SizedBox(
+                                          height:
+                                              SizeController.to.screenHeight *
+                                                  0.03,
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+
+                        ///DropdownButton
+
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                right: SizeController.to.screenWidth * 0.05),
+                            child: FutureBuilder(
+                                future: getResources(),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot snapshot) {
+                                  if (snapshot.hasData == false) {
+                                    return const Center(
+                                        child: CircularProgressIndicator());
+                                  } else if (snapshot.hasError) {
+                                    return const ErrorPage();
+                                  } else if (snapshot.data.length == 0) {
+                                    return const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text(
+                                        "공유 물품 없음",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                          color: AppColor.textColor2,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return DropdownButtonHideUnderline(
+                                      child: DropdownButton2<String>(
+                                        isExpanded: true,
+                                        items: ClubController.to.resources
+                                            .map((ResourceModel resource) =>
+                                                DropdownMenuItem<String>(
+                                                  value: resource.name,
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: Text(
+                                                      resource.name,
+                                                      style: const TextStyle(
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColor
+                                                              .textColor),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ))
+                                            .toList(),
+                                        value: selectedValue,
+                                        onChanged: (String? value) {
+                                          setState(() {
+                                            selectedValue = value!;
+                                          });
+                                        },
+                                        buttonStyleData: ButtonStyleData(
+                                          height: 50,
+                                          width: SizeController.to.screenWidth *
+                                              0.3,
+                                          padding: const EdgeInsets.only(
+                                              left: 15, right: 15),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                            color: AppColor.backgroundColor,
+                                          ),
+                                        ),
+                                        iconStyleData: const IconStyleData(
+                                            icon: Icon(
+                                              SFSymbols.chevron_down,
+                                            ),
+                                            iconSize: 15,
+                                            iconEnabledColor:
+                                                AppColor.textColor),
+                                        dropdownStyleData: DropdownStyleData(
+                                          maxHeight: 200,
+                                          width: SizeController.to.screenWidth *
+                                              0.3,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(14),
+                                            color: AppColor.backgroundColor,
+                                          ),
+                                          offset: const Offset(0, 45),
+                                          scrollbarTheme: ScrollbarThemeData(
+                                            radius: const Radius.circular(40),
+                                            thickness: MaterialStateProperty
+                                                .all<double>(6),
+                                            thumbVisibility:
+                                                MaterialStateProperty.all<bool>(
+                                                    true),
+                                          ),
+                                        ),
+                                        menuItemStyleData:
+                                            const MenuItemStyleData(
+                                          height: 40,
+                                          padding: EdgeInsets.only(
+                                              left: 14, right: 14),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }),
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 },
                 weekDayBuilder: (DateTime date) {
@@ -256,7 +379,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                     ),
                   );
                 },
-                timeLineWidth: SizeController.to.screenWidth * 0.07,
+                timeLineWidth: SizeController.to.screenWidth * 0.08,
                 timeLineOffset: 0,
                 hourIndicatorSettings: const HourIndicatorSettings(
                     height: 0.7, color: AppColor.backgroundColor, offset: 0),
@@ -309,91 +432,85 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 onDateLongPress: (date) => {},
               ),
             ),
-
-            ///DropdownButton
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: EdgeInsets.only(
-                    right: SizeController.to.screenWidth * 0.05),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton2<String>(
-                    isExpanded: true,
-                    items: ItemController.to.items
-                        .map((String item) => DropdownMenuItem<String>(
-                              value: item,
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                  item,
-                                  style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColor.textColor),
-                                  overflow: TextOverflow.ellipsis,
+            if (ClubController.to.resources().isEmpty)
+              RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {});
+                },
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Container(
+                      color: AppColor.backgroundColor,
+                      height: constraints.maxHeight,
+                      width: constraints.maxWidth,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "아직 클럽 공유 물품이 없어요",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 16),
+                          ),
+                          if (MemberController.to.clubMember().role == "ADMIN")
+                            Column(
+                              children: [
+                                const Text(
+                                  "공유 물품을 추가할까요?",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16),
                                 ),
-                              ),
-                            ))
-                        .toList(),
-                    value: selectedValue,
-                    onChanged: (String? value) {
-                      setState(() {
-                        selectedValue = value!;
-                      });
-                    },
-                    buttonStyleData: ButtonStyleData(
-                      height: 50,
-                      width: SizeController.to.screenWidth * 0.3,
-                      padding: const EdgeInsets.only(left: 15, right: 15),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: AppColor.backgroundColor,
+                                TextButton(
+                                  onPressed: () {
+                                    Get.toNamed('/resource_list');
+                                  },
+                                  style: ButtonStyle(
+                                    overlayColor: MaterialStateProperty
+                                        .resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                        if (states
+                                            .contains(MaterialState.pressed)) {
+                                          return Colors.transparent;
+                                        }
+                                        return Colors.transparent;
+                                      },
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "추가하기",
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColor.objectColor),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
                       ),
                     ),
-                    iconStyleData: const IconStyleData(
-                        icon: Icon(
-                          SFSymbols.chevron_down,
-                        ),
-                        iconSize: 15,
-                        iconEnabledColor: AppColor.textColor),
-                    dropdownStyleData: DropdownStyleData(
-                      maxHeight: 200,
-                      width: SizeController.to.screenWidth * 0.3,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        color: AppColor.backgroundColor,
-                      ),
-                      offset: const Offset(0, 45),
-                      scrollbarTheme: ScrollbarThemeData(
-                        radius: const Radius.circular(40),
-                        thickness: MaterialStateProperty.all<double>(6),
-                        thumbVisibility: MaterialStateProperty.all<bool>(true),
-                      ),
-                    ),
-                    menuItemStyleData: const MenuItemStyleData(
-                      height: 40,
-                      padding: EdgeInsets.only(left: 14, right: 14),
-                    ),
-                  ),
-                ),
-              ),
-            )
+                  );
+                }),
+              )
           ],
         ),
-        floatingActionButton: ElevatedButton(
-          onPressed: () {
-            _reservationBottomSheet(context);
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColor.objectColor,
-            shape: const CircleBorder(),
-            padding: const EdgeInsets.all(15),
-          ),
-          child: const Icon(
-            SFSymbols.plus,
-            color: AppColor.backgroundColor,
-          ),
-        ),
+        floatingActionButton: (ClubController.to.resources().isEmpty)
+            ? null
+            : ElevatedButton(
+                onPressed: () {
+                  _reservationBottomSheet(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColor.objectColor,
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(15),
+                ),
+                child: const Icon(
+                  SFSymbols.plus,
+                  color: AppColor.backgroundColor,
+                ),
+              ),
         bottomNavigationBar: const BottomBar());
   }
 

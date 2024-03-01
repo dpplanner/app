@@ -6,9 +6,7 @@ import 'package:dplanner/models/resource_model.dart';
 import 'package:dplanner/services/resource_api_service.dart';
 import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -71,7 +69,7 @@ class _ResourceListPageState extends State<ResourceListPage> {
   void getResourceList() async {
     try {
       List<List<ResourceModel>> data = await ResourceApiService.getResources();
-      ClubController.to.resourceNum.value = data[0].length + data[1].length;
+      ClubController.to.resources.value = data[0] + data[1];
       _streamController.add(data);
     } catch (e) {
       print(e.toString());

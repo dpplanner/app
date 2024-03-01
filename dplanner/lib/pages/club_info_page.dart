@@ -23,13 +23,11 @@ class ClubInfoPage extends StatefulWidget {
 }
 
 class _ClubInfoPageState extends State<ClubInfoPage> {
-  // 공유 물품 갯수 불러오기
   Future<int> getResourceNum() async {
     try {
       List<List<ResourceModel>> resources =
           await ResourceApiService.getResources();
-      ClubController.to.resourceNum.value =
-          resources[0].length + resources[1].length;
+      ClubController.to.resources.value = resources[0] + resources[1];
       return resources[0].length + resources[1].length;
     } catch (e) {
       print(e.toString());
@@ -163,7 +161,7 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                                 } else {
                                   return Obx(() {
                                     return Text(
-                                      "${ClubController.to.resourceNum.value}",
+                                      "${ClubController.to.resources().length}",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w700,
                                           fontSize: 16),
