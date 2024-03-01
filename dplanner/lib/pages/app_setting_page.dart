@@ -1,4 +1,5 @@
 import 'package:dplanner/const.dart';
+import 'package:dplanner/pages/error_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -19,14 +20,8 @@ class _AppSettingPageState extends State<AppSettingPage> {
   static const storage = FlutterSecureStorage();
   String? userInfo = ". . .";
 
-  @override
-  void initState() {
-    super.initState();
-    findLoginInfo();
-  }
-
-  Future<void> findLoginInfo() async {
-    userInfo = await storage.read(key: loginInfo);
+  Future<String?> findLoginInfo() async {
+    return await storage.read(key: loginInfo);
   }
 
   @override
@@ -54,43 +49,57 @@ class _AppSettingPageState extends State<AppSettingPage> {
         child: Column(
           children: [
             selectButton("가입 정보", () {}, false),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      ///TODO: 이미지 바꾸기
-                      SvgPicture.asset(
-                        'assets/images/icon_naver.svg',
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12),
-                        child: Text(
-                          userInfo!.split(" ")[0],
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w500, fontSize: 16),
-                        ),
-                      ),
-                    ],
-                  ),
+            FutureBuilder(
+                future: findLoginInfo(),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData == false) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return const ErrorPage();
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              ///TODO: 이미지 바꾸기
+                              SvgPicture.asset(
+                                'assets/images/icon_naver.svg',
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 12),
+                                child: Text(
+                                  snapshot.data.toString().split(" ")[0],
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16),
+                                ),
+                              ),
+                            ],
+                          ),
 
-                  ///TODO: 가입 날짜 받기
-                  const Text(
-                    "23.09.10",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        color: AppColor.textColor2),
-                  ),
-                ],
-              ),
-            ),
+                          ///TODO: 가입 날짜 받기
+                          const Text(
+                            "23.09.10",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                color: AppColor.textColor2),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                }),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                selectButton("앱 버전 정보", () {}, false),
+                selectButton("앱 버전 정보", () async {
+                  String? a = await storage.read(key: loginInfo);
+                  print(a);
+                }, false),
                 const Padding(
                   padding: EdgeInsets.only(right: 32.0),
                   child: Text(

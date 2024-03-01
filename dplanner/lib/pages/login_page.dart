@@ -35,12 +35,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   static const storage = FlutterSecureStorage();
 
-  @override
-  void initState() {
-    super.initState();
-    checkUserLogin();
-  }
-
   // refresh token 유효성 검사
   bool checkRefreshToken(String token) {
     final payloadMap = decodeToken(token);
@@ -54,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
 
   // 로그인 상태 확인
   Future<void> checkUserLogin() async {
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 1000));
 
     String? refreshToken = await storage.read(key: refreshTokenKey);
     String? accessToken = await storage.read(key: accessTokenKey);
@@ -68,11 +62,11 @@ class _LoginPageState extends State<LoginPage> {
       print(decodeToken(refreshToken));
       try {
         ClubController.to.club.value = await ClubApiService.getClub(
-            clubID: decodeToken(accessToken!)['recent_club_id']);
+            clubID: decodeToken(accessToken)['recent_club_id']);
         MemberController.to.clubMember.value =
             await ClubMemberApiService.getClubMember(
-                clubId: decodeToken(accessToken!)['recent_club_id'],
-                clubMemberId: decodeToken(accessToken!)['club_member_id']);
+                clubId: decodeToken(accessToken)['recent_club_id'],
+                clubMemberId: decodeToken(accessToken)['club_member_id']);
         if (MemberController.to.clubMember().confirmed) {
           Get.offNamed('/tab2', arguments: 1);
         } else {
@@ -162,52 +156,56 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.backgroundColor,
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 128.0, bottom: 256.0),
-                child: SvgPicture.asset(
-                  'assets/images/login/dplanner_logo_login.svg',
+      body: FutureBuilder(
+          future: checkUserLogin(),
+          builder: (context, snapshot) {
+            return SafeArea(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 128.0, bottom: 256.0),
+                      child: SvgPicture.asset(
+                        'assets/images/login/dplanner_logo_login.svg',
+                      ),
+                    ),
+
+                    ///TODO: 이미지 변경 필요
+                    //카카오 로그인 버튼
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: ImageButton(
+                          image: 'assets/images/login/kakao_login.svg',
+                          onTap: () async {
+                            await signInWithKakao();
+                          }),
+                    ),
+
+                    //네이버 로그인 버튼
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: ImageButton(
+                          image: 'assets/images/login/naver_login.svg',
+                          onTap: () async {
+                            await signInWithNaver();
+                          }),
+                    ),
+
+                    //구글 로그인 버튼
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: ImageButton(
+                          image: 'assets/images/login/facebook_login.svg',
+                          onTap: () async {
+                            await signInWithGoogle();
+                          }),
+                    ),
+                  ],
                 ),
               ),
-
-              ///TODO: 이미지 변경 필요
-              //카카오 로그인 버튼
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: ImageButton(
-                    image: 'assets/images/login/kakao_login.svg',
-                    onTap: () async {
-                      await signInWithKakao();
-                    }),
-              ),
-
-              //네이버 로그인 버튼
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: ImageButton(
-                    image: 'assets/images/login/naver_login.svg',
-                    onTap: () async {
-                      await signInWithNaver();
-                    }),
-              ),
-
-              //구글 로그인 버튼
-              Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: ImageButton(
-                    image: 'assets/images/login/facebook_login.svg',
-                    onTap: () async {
-                      await signInWithGoogle();
-                    }),
-              ),
-            ],
-          ),
-        ),
-      ),
+            );
+          }),
     );
   }
 }

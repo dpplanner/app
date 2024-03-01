@@ -1,9 +1,7 @@
 import 'package:dplanner/controllers/club.dart';
-import 'package:dplanner/controllers/member.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../controllers/size.dart';
 import '../style.dart';
 import '../widgets/nextpage_button.dart';
 

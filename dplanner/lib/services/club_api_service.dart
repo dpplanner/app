@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 
 import '../const.dart';
 import '../decode_token.dart';
-import '../models/club_member_model.dart';
 import '../models/club_model.dart';
 
 class ClubApiService {

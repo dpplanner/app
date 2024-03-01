@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../controllers/size.dart';
 import '../style.dart';
 
 class ResourceCard extends StatelessWidget {
