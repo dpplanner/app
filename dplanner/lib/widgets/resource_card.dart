@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../services/resource_api_service.dart';
 import '../style.dart';
 
 class ResourceCard extends StatelessWidget {
@@ -41,7 +42,14 @@ class ResourceCard extends StatelessWidget {
               ),
               if (MemberController.to.clubMember().role == "ADMIN")
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    try {
+                      await ResourceApiService.deleteResource(
+                          resourceId: resource.id);
+                    } catch (e) {
+                      print(e.toString());
+                    }
+                  },
                   icon: const Icon(
                     SFSymbols.trash,
                     color: AppColor.textColor,
