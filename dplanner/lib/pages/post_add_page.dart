@@ -31,14 +31,6 @@ class _PostAddPageState extends State<PostAddPage> {
   late TextEditingController postContent = TextEditingController();
   bool _isFocused2 = false;
 
-  @override
-  void initState() {
-    super.initState();
-    // post가 null이 아닌 경우, 해당 post의 내용을 텍스트 필드에 채워넣기
-    postSubject = TextEditingController(text: widget.post?.title ?? '');
-    postContent = TextEditingController(text: widget.post?.content ?? '');
-  }
-
   Future<void> _submitPost() async {
     if (_formKey1.currentState!.validate() &&
         _formKey2.currentState!.validate()) {
@@ -47,7 +39,6 @@ class _PostAddPageState extends State<PostAddPage> {
         'Authorization':
             'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
       };
-
       final formData = http.MultipartRequest('POST', url);
       formData.headers.addAll(headers);
       final jsonData = {
@@ -67,10 +58,13 @@ class _PostAddPageState extends State<PostAddPage> {
         final response = await formData.send();
 
         if (response.statusCode == 201) {
-          Get.back();
+          // 요청이 성공한 경우
           Get.snackbar('알림', '게시글이 작성되었습니다.');
+          // 페이지를 닫음
+          Get.back();
         } else {
           // 요청이 실패한 경우
+          //print('${response.body} ${response.statusCode}, ${body}');
           Get.snackbar('알림', '게시글 작성에 실패했습니다. error: ${response.statusCode}');
         }
       } catch (e) {
@@ -78,6 +72,14 @@ class _PostAddPageState extends State<PostAddPage> {
         Get.snackbar('알림', '오류가 발생했습니다.');
       }
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // post가 null이 아닌 경우, 해당 post의 내용을 텍스트 필드에 채워넣기
+    postSubject = TextEditingController(text: widget.post?.title ?? '');
+    postContent = TextEditingController(text: widget.post?.content ?? '');
   }
 
   Future<void> _editPost(int postID) async {
