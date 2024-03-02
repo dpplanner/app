@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dplanner/controllers/club.dart';
+import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/pages/club_member_list_page.dart';
 import 'package:dplanner/pages/resource_list_page.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../models/resource_model.dart';
+import '../services/club_api_service.dart';
 import '../services/resource_api_service.dart';
 import '../style.dart';
 import '../widgets/nextpage_button.dart';
@@ -226,24 +228,46 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
               ],
             ),
             Expanded(child: Container()),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0, bottom: 40.0),
-              child: Center(
-                child: NextPageButton(
-                  text: const Text(
-                    "이 클럽 탈퇴하기",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppColor.backgroundColor),
-                  ),
-                  buttonColor: AppColor.markColor,
-                  onPressed: () {
-                    Get.back();
-                  },
-                ),
-              ),
-            ),
+            (MemberController.to.clubMember().role == "ADMIN")
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 40.0),
+                    child: Center(
+                      child: NextPageButton(
+                        text: const Text(
+                          "초대코드 복사하기",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColor.backgroundColor),
+                        ),
+                        buttonColor: AppColor.objectColor,
+                        onPressed: () async {
+                          try {
+                            print(await ClubApiService.postClubCode(
+                                clubId: ClubController.to.club().id));
+                          } catch (e) {
+                            print(e.toString());
+                          }
+                        },
+                      ),
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(top: 16.0, bottom: 40.0),
+                    child: Center(
+                      child: NextPageButton(
+                        text: const Text(
+                          "이 클럽 탈퇴하기",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColor.backgroundColor),
+                        ),
+                        buttonColor: AppColor.markColor,
+                        onPressed: () {},
+                      ),
+                    ),
+                  )
           ],
         ),
       ),
