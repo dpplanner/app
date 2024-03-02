@@ -52,8 +52,8 @@ class _ClubHomePageState extends State<ClubHomePage> {
               'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkxOTE1MzUsImV4cCI6MTcwOTM3MTUzNX0.nLxlPz9gxaO_0pqQwIxWrBQ-4ioVGDp0XeHutL-vSKc',
         });
     if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData = jsonDecode(
-          utf8.decode(response.bodyBytes)); //json.decode(response.body);
+      final Map<String, dynamic> responseData =
+          jsonDecode(utf8.decode(response.bodyBytes));
       final List<dynamic> content = responseData['data']['content'];
       setState(() {
         _posts = content.map((data) => Post.fromJson(data)).toList();

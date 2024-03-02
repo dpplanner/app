@@ -2,13 +2,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../controllers/size.dart';
 import '../style.dart';
 import 'nextpage_button.dart';
+import 'package:dplanner/models/post_model.dart';
+import 'package:dplanner/models/post_comment_model.dart';
 
-class PostComment extends StatelessWidget {
-  const PostComment({super.key});
+class PostComment extends StatefulWidget {
+  final Post post;
+  const PostComment({Key? key, required this.post}) : super(key: key);
+
+  @override
+  State<PostComment> createState() => _PostCommentState();
+}
+
+class _PostCommentState extends State<PostComment> {
+  List<Comment>? _comments;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchComments(widget.post.id);
+  }
+
+  Future<void> fetchComments(int postId) async {
+    final response = await http.get(
+        Uri.parse('http://3.39.102.31:8080/posts/$postId/comments'),
+        headers: {
+          'Authorization':
+              'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkxOTE1MzUsImV4cCI6MTcwOTM3MTUzNX0.nLxlPz9gxaO_0pqQwIxWrBQ-4ioVGDp0XeHutL-vSKc',
+        }); //TODO: token값 받아오도록 변경해야함
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData =
+          jsonDecode(utf8.decode(response.bodyBytes));
+      final List<dynamic> content = responseData['data'];
+
+      setState(() {
+        _comments = content.map((data) => Comment.fromJson(data)).toList();
+        print(_comments);
+      });
+    } else {
+      throw Exception('Failed to load comments');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

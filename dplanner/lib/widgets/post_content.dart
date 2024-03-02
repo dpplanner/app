@@ -110,7 +110,7 @@ class _PostContentState extends State<PostContent> {
                   padding: EdgeInsets.only(
                       bottom: SizeController.to.screenHeight * 0.01),
                   child: const Text(
-                    "공지",
+                    "공지", //TODO: 제목 생기면 수정해야함
                     style: TextStyle(
                       color: AppColor.textColor,
                       fontWeight: FontWeight.w800,

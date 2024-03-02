@@ -54,9 +54,9 @@ class _PostPageState extends State<PostPage> {
                 color: AppColor.backgroundColor2,
                 height: SizeController.to.screenHeight * 0.01,
               ),
-              const Expanded(
+              Expanded(
                 child: SingleChildScrollView(
-                  child: PostComment(),
+                  child: PostComment(post: widget.post),
                 ),
               ),
               Padding(
