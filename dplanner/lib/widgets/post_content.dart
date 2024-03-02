@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -19,6 +20,59 @@ class PostContent extends StatefulWidget {
 }
 
 class _PostContentState extends State<PostContent> {
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('게시글 삭제'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('정말로 이 게시글을 삭제하시겠습니까?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _deletePost(context);
+              },
+              child: Text('예'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deletePost(BuildContext context) async {
+    final url = Uri.parse('http://3.39.102.31:8080/posts/${widget.post.id}');
+    final headers = {
+      'Authorization':
+          'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
+    };
+
+    try {
+      final response = await http.delete(url, headers: headers);
+      if (response.statusCode == 204) {
+        Get.snackbar('알림', '게시글이 성공적으로 삭제되었습니다.');
+        Get.back();
+      } else {
+        Get.snackbar('알림', '게시글이 성공적으로 삭제되지 못했습니다.${response.statusCode}');
+      }
+    } catch (e) {
+      Get.snackbar('알림', '오류가 발생했습니다.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -303,7 +357,8 @@ class _PostContentState extends State<PostContent> {
                     ],
                   ),
                   onPressed: () {
-                    Get.back();
+                    _showDeleteConfirmationDialog(context);
+                    //  Get.back();
                   },
                 ),
               ),
