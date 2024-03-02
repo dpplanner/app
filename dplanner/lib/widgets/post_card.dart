@@ -72,22 +72,24 @@ class PostCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(6, 2, 6, 2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(15),
-                        color: AppColor.subColor1, // 배경색 설정
-                      ),
-                      child: Text(
-                        post.clubRole,
-                        style: TextStyle(
-                          color: AppColor.backgroundColor,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 11,
-                        ),
-                      ),
-                    ),
+                    post.clubRole == 'ADMIN'
+                        ? Container(
+                            padding: const EdgeInsets.fromLTRB(6, 2, 6, 2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(15),
+                              color: AppColor.subColor1, // 배경색 설정
+                            ),
+                            child: Text(
+                              '관리자',
+                              style: TextStyle(
+                                color: AppColor.backgroundColor,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 11,
+                              ),
+                            ),
+                          )
+                        : Container(),
                   ],
                 ),
                 SizedBox(height: SizeController.to.screenHeight * 0.02),

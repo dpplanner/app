@@ -1,6 +1,6 @@
 class Post {
   final int id;
-  final String title;
+//  final String title;
   final String content;
   final bool isFixed;
   final int clubId;
@@ -15,7 +15,7 @@ class Post {
 
   Post({
     required this.id,
-    required this.title,
+    //  required this.title,
     required this.content,
     required this.isFixed,
     required this.clubId,
@@ -32,7 +32,7 @@ class Post {
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
       id: json['id'],
-      title: json['title'],
+      //  title: json['title'],
       content: json['content'],
       isFixed: json['isFixed'],
       clubId: json['clubId'],

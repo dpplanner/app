@@ -1,4 +1,5 @@
 import 'package:dplanner/controllers/club.dart';
+import 'package:dplanner/const.dart';
 import 'package:dplanner/controllers/size.dart';
 import 'package:dplanner/pages/notification_page.dart';
 import 'package:dplanner/pages/post_add_page.dart';
@@ -13,6 +14,7 @@ import '../widgets/bottom_bar.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/post_card.dart';
 import 'package:dplanner/models/post_model.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ClubHomePage extends StatefulWidget {
   const ClubHomePage({super.key});
@@ -25,7 +27,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController searchPost = TextEditingController();
   bool _isFocused = false;
-  late List<Post> _posts;
+  List<Post>? _posts;
 
   @override
   void initState() {
@@ -40,11 +42,21 @@ class _ClubHomePageState extends State<ClubHomePage> {
   }
 
   Future<void> _fetchPosts() async {
-    final response = await http.get(Uri.parse('http://your-api-url/posts'));
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+    final response = await http.get(
+        Uri.parse('http://3.39.102.31:8080/posts/clubs/1?size=10&page=0'),
+        headers: {
+          'Authorization':
+              'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkxOTE1MzUsImV4cCI6MTcwOTM3MTUzNX0.nLxlPz9gxaO_0pqQwIxWrBQ-4ioVGDp0XeHutL-vSKc',
+        });
     if (response.statusCode == 200) {
-      final List<dynamic> responseData = json.decode(response.body);
+      final Map<String, dynamic> responseData = jsonDecode(
+          utf8.decode(response.bodyBytes)); //json.decode(response.body);
+      final List<dynamic> content = responseData['data']['content'];
       setState(() {
-        _posts = responseData.map((data) => Post.fromJson(data)).toList();
+        _posts = content.map((data) => Post.fromJson(data)).toList();
       });
     } else {
       throw Exception('Failed to load posts');
@@ -116,32 +128,20 @@ class _ClubHomePageState extends State<ClubHomePage> {
                   ),
                 ),
                 _posts != null
-                    ? ListView.builder(
-                        itemCount: _posts.length,
-                        itemBuilder: (context, index) {
-                          final post = _posts[index];
-                          return PostCard(post: post);
-                        },
+                    ? Container(
+                        height: MediaQuery.of(context).size.height,
+                        child: ListView.separated(
+                          itemCount: _posts!.length, //null 아닐때만 이 분기로 들어오므로
+                          itemBuilder: (context, index) {
+                            final post = _posts![index];
+                            return PostCard(post: post);
+                          },
+                          separatorBuilder: (BuildContext context, int index) =>
+                              const Divider(
+                                  height: 10, color: Colors.transparent),
+                        ),
                       )
-                    : Center(child: CircularProgressIndicator()),
-
-                //Container(
-                //  color: AppColor.backgroundColor,
-                //  height: SizeController.to.screenHeight * 0.01,
-                //),
-                //const PostCard(),
-                //Container(
-                //  height: SizeController.to.screenHeight * 0.01,
-                //),
-                //const PostCard(),
-                //Container(
-                //  height: SizeController.to.screenHeight * 0.01,
-                //),
-                //const PostCard(),
-                //Container(
-                //  height: SizeController.to.screenHeight * 0.01,
-                //),
-                //const PostCard(),
+                    : const Center(child: CircularProgressIndicator()),
               ],
             ),
           ),
