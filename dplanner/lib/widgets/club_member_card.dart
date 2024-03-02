@@ -1,3 +1,4 @@
+import 'package:dplanner/models/club_member_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,10 +7,9 @@ import '../controllers/size.dart';
 import '../style.dart';
 
 class ClubMemberCard extends StatelessWidget {
-  final String name;
-  final String gradeName;
+  final ClubMemberModel member;
 
-  const ClubMemberCard({super.key, required this.name, this.gradeName = ""});
+  const ClubMemberCard({super.key, required this.member});
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +44,7 @@ class ClubMemberCard extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(right: 12.0),
                           child: Text(
-                            name,
+                            member.name,
                             style: const TextStyle(
                               color: AppColor.textColor,
                               fontWeight: FontWeight.w500,
@@ -52,7 +52,7 @@ class ClubMemberCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (gradeName != "")
+                        if (member.role != "")
                           Container(
                             padding: const EdgeInsets.fromLTRB(6, 2, 6, 2),
                             decoration: BoxDecoration(
@@ -61,7 +61,7 @@ class ClubMemberCard extends StatelessWidget {
                               color: AppColor.subColor1, // 배경색 설정
                             ),
                             child: Text(
-                              gradeName,
+                              member.role,
                               style: const TextStyle(
                                 color: AppColor.backgroundColor,
                                 fontWeight: FontWeight.w400,
@@ -170,7 +170,7 @@ class ClubMemberCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            name,
+                            member.name,
                             style: const TextStyle(
                               color: AppColor.textColor,
                               fontWeight: FontWeight.w500,
@@ -178,7 +178,7 @@ class ClubMemberCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            (gradeName == "") ? "일반" : gradeName,
+                            (member.role == "") ? "일반" : member.role,
                             style: const TextStyle(
                               color: AppColor.textColor,
                               fontWeight: FontWeight.w500,

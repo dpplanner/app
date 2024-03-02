@@ -77,6 +77,35 @@ class ClubMemberApiService {
     throw ErrorDescription(errorMessage);
   }
 
+  /// GET: /clubs/(_.club_id)/club-members [클럽 멤버 목록] 클럽 멤버 목록 불러오기
+  static Future<List<ClubMemberModel>> getClubMemberList(
+      {required int clubId}) async {
+    final url = Uri.parse('$baseUrl/clubs/$clubId/club-members');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.get(url, headers: <String, String>{
+      'Authorization': 'Bearer $accessToken',
+    });
+
+    if (response.statusCode == 200) {
+      List<ClubMemberModel> clubMemberList = [];
+
+      List<dynamic> clubMemberData =
+          jsonDecode(utf8.decode(response.bodyBytes))['data'];
+      for (var clubMember in clubMemberData) {
+        clubMemberList.add(ClubMemberModel.fromJson(clubMember));
+      }
+      return clubMemberList;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
   /// GET: /clubs/(_.club_id)/club-members/(_.club_member_id) [클럽 멤버 상세정보] 클럽 멤버 상세 정보 불러오기
   static Future<ClubMemberModel> getClubMember(
       {required int clubId, required int clubMemberId}) async {
