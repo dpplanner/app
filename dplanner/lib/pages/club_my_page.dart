@@ -17,6 +17,7 @@ import '../controllers/size.dart';
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/reservation_mini_card.dart';
+import 'club_management_page.dart';
 
 class ClubMyPage extends StatefulWidget {
   const ClubMyPage({super.key});
@@ -180,6 +181,10 @@ class _ClubMyPageState extends State<ClubMyPage> {
                 selectButton("클럽 정보", () {
                   Get.to(const ClubInfoPage(), arguments: 2);
                 }, false),
+                if (MemberController.to.clubMember().role == "ADMIN")
+                  selectButton("클럽 관리", () {
+                    Get.to(const ClubManagementPage());
+                  }, false),
                 Container(
                   height: SizeController.to.screenHeight * 0.01,
                   color: AppColor.backgroundColor2,
