@@ -6,10 +6,18 @@ import 'package:get/get.dart';
 import '../controllers/size.dart';
 import '../style.dart';
 import 'nextpage_button.dart';
+import 'package:dplanner/models/post_model.dart';
 
-class PostContent extends StatelessWidget {
-  const PostContent({super.key});
+class PostContent extends StatefulWidget {
+  final Post post;
 
+  const PostContent({Key? key, required this.post}) : super(key: key);
+
+  @override
+  State<PostContent> createState() => _PostContentState();
+}
+
+class _PostContentState extends State<PostContent> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -40,9 +48,9 @@ class PostContent extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Text(
-                              "DP23 남진",
-                              style: TextStyle(
+                            Text(
+                              widget.post.clubMemberName,
+                              style: const TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
@@ -51,27 +59,30 @@ class PostContent extends StatelessWidget {
                             SizedBox(
                               width: SizeController.to.screenWidth * 0.05,
                             ),
-                            Container(
-                              padding: const EdgeInsets.fromLTRB(6, 2, 6, 2),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(15),
-                                color: AppColor.subColor1, // 배경색 설정
-                              ),
-                              child: const Text(
-                                "관리자",
-                                style: TextStyle(
-                                  color: AppColor.backgroundColor,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
+                            widget.post.clubRole == 'ADMIN'
+                                ? Container(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(6, 2, 6, 2),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.rectangle,
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: AppColor.subColor1, // 배경색 설정
+                                    ),
+                                    child: const Text(
+                                      "관리자",
+                                      style: TextStyle(
+                                        color: AppColor.backgroundColor,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
                           ],
                         ),
-                        const Text(
-                          "2023.11.11 16:28",
-                          style: TextStyle(
+                        Text(
+                          '${widget.post.createdTime}',
+                          style: const TextStyle(
                             color: AppColor.textColor,
                             fontWeight: FontWeight.w500,
                             fontSize: 12,
@@ -107,8 +118,8 @@ class PostContent extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Text(
-                  "내용\n내용\n내용",
+                Text(
+                  widget.post.content,
                   style: TextStyle(
                     color: AppColor.textColor,
                     fontWeight: FontWeight.w600,
@@ -118,29 +129,31 @@ class PostContent extends StatelessWidget {
               ],
             ),
             SizedBox(height: SizeController.to.screenHeight * 0.02),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  flex: 1,
-                  child: Row(
-                    children: [
-                      Icon(
-                        SFSymbols.pin_fill,
-                        color: AppColor.textColor2,
-                        size: 14,
-                      ),
-                      Text(
-                        " 고정됨",
-                        style: TextStyle(
-                          color: AppColor.textColor2,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
+                widget.post.isFixed
+                    ? Expanded(
+                        flex: 1,
+                        child: Row(
+                          children: [
+                            Icon(
+                              SFSymbols.pin_fill,
+                              color: AppColor.textColor2,
+                              size: 14,
+                            ),
+                            Text(
+                              " 고정됨",
+                              style: TextStyle(
+                                color: AppColor.textColor2,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                      )
+                    : Container(),
                 Expanded(
                   flex: 1,
                   child: Row(
@@ -156,7 +169,7 @@ class PostContent extends StatelessWidget {
                       Expanded(
                         flex: 1,
                         child: Text(
-                          "1",
+                          '${widget.post.commentCount}',
                           style: TextStyle(
                             color: AppColor.textColor2,
                             fontWeight: FontWeight.w500,
@@ -175,26 +188,7 @@ class PostContent extends StatelessWidget {
                       Expanded(
                         flex: 1,
                         child: Text(
-                          "3",
-                          style: TextStyle(
-                            color: AppColor.textColor2,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Icon(
-                          SFSymbols.eye,
-                          color: AppColor.textColor2,
-                          size: 16,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          "20",
+                          '${widget.post.likeCount}',
                           style: TextStyle(
                             color: AppColor.textColor2,
                             fontWeight: FontWeight.w500,

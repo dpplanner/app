@@ -19,7 +19,7 @@ class PostCard extends StatelessWidget {
       highlightColor: AppColor.subColor2.withOpacity(0.8),
       borderRadius: BorderRadius.circular(16),
       onTap: () {
-        Get.to(const PostPage(), arguments: 1);
+        Get.to(PostPage(post: post), arguments: 1);
       },
       child: Ink(
         decoration: BoxDecoration(
@@ -186,25 +186,6 @@ class PostCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          //Expanded(
-                          //  flex: 1,
-                          //  child: Icon(
-                          //    SFSymbols.eye,
-                          //    color: AppColor.textColor2,
-                          //    size: 16,
-                          //  ),
-                          //),
-                          //Expanded(
-                          //  flex: 1,
-                          //  child: Text(
-                          //    "20",
-                          //    style: TextStyle(
-                          //      color: AppColor.textColor2,
-                          //      fontWeight: FontWeight.w500,
-                          //      fontSize: 16,
-                          //    ),
-                          //  ),
-                          //),
                         ],
                       ),
                     ),

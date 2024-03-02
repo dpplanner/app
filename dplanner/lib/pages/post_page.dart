@@ -8,9 +8,12 @@ import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/post_content.dart';
+import 'package:dplanner/models/post_model.dart';
 
 class PostPage extends StatefulWidget {
-  const PostPage({super.key});
+  final Post post;
+
+  const PostPage({Key? key, required this.post}) : super(key: key);
 
   @override
   State<PostPage> createState() => _PostPageState();
@@ -46,7 +49,7 @@ class _PostPageState extends State<PostPage> {
         body: SafeArea(
           child: Column(
             children: [
-              const PostContent(),
+              PostContent(post: widget.post),
               Container(
                 color: AppColor.backgroundColor2,
                 height: SizeController.to.screenHeight * 0.01,
