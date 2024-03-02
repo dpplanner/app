@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../const.dart';
@@ -68,9 +67,6 @@ class ClubMemberApiService {
     var response = await http.Response.fromStream(await request.send());
 
     if (response.statusCode == 200) {
-      print(ClubMemberModel.fromJson(
-              jsonDecode(utf8.decode(response.bodyBytes))['data'])
-          .url);
       return ClubMemberModel.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes))['data']);
     }

@@ -7,7 +7,9 @@ import 'package:dplanner/pages/club_join_next_page.dart';
 import 'package:dplanner/pages/club_join_page.dart';
 import 'package:dplanner/pages/club_join_success_page.dart';
 import 'package:dplanner/pages/club_list_page.dart';
+import 'package:dplanner/pages/club_management_page.dart';
 import 'package:dplanner/pages/club_my_page.dart';
+import 'package:dplanner/pages/club_setting_page.dart';
 import 'package:dplanner/pages/club_timetable_page.dart';
 import 'package:dplanner/pages/login_page.dart';
 import 'package:dplanner/pages/my_profile_modification_page.dart';
@@ -41,4 +43,6 @@ final page = [
   GetPage(name: '/profile', page: () => const MyProfileModificationPage()),
   GetPage(name: '/club_info', page: () => const ClubInfoPage()),
   GetPage(name: '/resource_list', page: () => const ResourceListPage()),
+  GetPage(name: '/club_manage', page: () => const ClubManagementPage()),
+  GetPage(name: '/club_setting', page: () => const ClubSettingPage()),
 ];

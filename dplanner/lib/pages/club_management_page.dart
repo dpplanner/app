@@ -38,7 +38,9 @@ class _ClubManagementPageState extends State<ClubManagementPage> {
       body: SafeArea(
         child: Column(
           children: [
-            selectButton("클럽 설정", () {}, true),
+            selectButton("클럽 설정", () {
+              Get.toNamed('/club_setting');
+            }, true),
             selectButton("회원 목록", () {}, true),
             selectButton("예약 요청", () {}, true),
             selectButton("공유 물품 목록", () {}, true),
