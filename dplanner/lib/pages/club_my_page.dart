@@ -57,6 +57,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
           preferredSize: const Size.fromHeight(60.0),
           child: AppBar(
             backgroundColor: AppColor.backgroundColor,
+            scrolledUnderElevation: 0,
             leadingWidth: SizeController.to.screenWidth * 0.2,
             title: const Text(
               "마이페이지",

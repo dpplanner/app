@@ -60,6 +60,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
           preferredSize: const Size.fromHeight(60.0),
           child: AppBar(
             backgroundColor: AppColor.backgroundColor,
+            scrolledUnderElevation: 0,
             title: const Text(
               "예약 시간표",
               style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),

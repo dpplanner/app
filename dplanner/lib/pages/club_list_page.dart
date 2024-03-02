@@ -35,6 +35,7 @@ class _ClubListPageState extends State<ClubListPage> {
         preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           backgroundColor: AppColor.backgroundColor,
+          scrolledUnderElevation: 0,
           leadingWidth: SizeController.to.screenWidth * 0.25,
           leading: SvgPicture.asset(
             'assets/images/dplanner_logo_mini.svg',

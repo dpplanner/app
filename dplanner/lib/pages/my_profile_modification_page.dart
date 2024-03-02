@@ -51,6 +51,7 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
         preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           backgroundColor: AppColor.backgroundColor,
+          scrolledUnderElevation: 0,
           leadingWidth: SizeController.to.screenWidth * 0.2,
           leading: IconButton(
               onPressed: () {

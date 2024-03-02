@@ -11,7 +11,6 @@ import '../controllers/size.dart';
 import '../models/resource_model.dart';
 import '../services/resource_api_service.dart';
 import '../style.dart';
-import '../widgets/bottom_bar.dart';
 import '../widgets/nextpage_button.dart';
 import 'error_page.dart';
 
@@ -43,6 +42,7 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
         preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           backgroundColor: AppColor.backgroundColor,
+          scrolledUnderElevation: 0,
           leadingWidth: SizeController.to.screenWidth * 0.2,
           leading: IconButton(
               onPressed: () {
