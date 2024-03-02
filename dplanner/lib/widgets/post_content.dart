@@ -1,3 +1,4 @@
+import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -94,7 +95,7 @@ class _PostContentState extends State<PostContent> {
                 ),
                 IconButton(
                   onPressed: () {
-                    _postMore(context);
+                    _postMore(context, widget.post);
                   },
                   icon: const Icon(
                     SFSymbols.ellipsis,
@@ -207,7 +208,7 @@ class _PostContentState extends State<PostContent> {
     );
   }
 
-  void _postMore(BuildContext context) async {
+  void _postMore(BuildContext context, Post post) async {
     await showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -274,7 +275,10 @@ class _PostContentState extends State<PostContent> {
                     ],
                   ),
                   onPressed: () {
-                    Get.back();
+                    Get.to(PostAddPage(
+                      isEdit: true,
+                      post: post,
+                    ));
                   },
                 ),
               ),

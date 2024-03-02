@@ -10,9 +10,13 @@ import '../controllers/size.dart';
 import '../style.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/underline_textform.dart';
+import 'package:dplanner/models/post_model.dart';
 
 class PostAddPage extends StatefulWidget {
-  const PostAddPage({super.key});
+  final bool isEdit;
+  final Post? post;
+  const PostAddPage({Key? key, this.isEdit = false, this.post})
+      : super(key: key);
 
   @override
   State<PostAddPage> createState() => _PostAddPageState();
@@ -20,12 +24,20 @@ class PostAddPage extends StatefulWidget {
 
 class _PostAddPageState extends State<PostAddPage> {
   final _formKey1 = GlobalKey<FormState>();
-  final TextEditingController postSubject = TextEditingController();
+  late TextEditingController postSubject = TextEditingController();
   bool _isFocused1 = false;
 
   final _formKey2 = GlobalKey<FormState>();
-  final TextEditingController postContent = TextEditingController();
+  late TextEditingController postContent = TextEditingController();
   bool _isFocused2 = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // post가 null이 아닌 경우, 해당 post의 내용을 텍스트 필드에 채워넣기
+    postSubject = TextEditingController(text: widget.post?.title ?? '');
+    postContent = TextEditingController(text: widget.post?.content ?? '');
+  }
 
   Future<void> _submitPost() async {
     if (_formKey1.currentState!.validate() &&
@@ -54,14 +66,51 @@ class _PostAddPageState extends State<PostAddPage> {
         final response = await formData.send();
 
         if (response.statusCode == 201) {
-          // 요청이 성공한 경우
-          Get.snackbar('알림', '게시글이 작성되었습니다.');
-          // 페이지를 닫음
           Get.back();
+          Get.snackbar('알림', '게시글이 작성되었습니다.');
         } else {
           // 요청이 실패한 경우
-          //print('${response.body} ${response.statusCode}, ${body}');
           Get.snackbar('알림', '게시글 작성에 실패했습니다. error: ${response.statusCode}');
+        }
+      } catch (e) {
+        // 요청 중 오류가 발생한 경우
+        Get.snackbar('알림', '오류가 발생했습니다.');
+      }
+    }
+  }
+
+  Future<void> _editPost(int postID) async {
+    if (_formKey1.currentState!.validate() &&
+        _formKey2.currentState!.validate()) {
+      final url = Uri.parse('http://3.39.102.31:8080/posts/$postID');
+      final headers = {
+        'Authorization':
+            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
+      };
+      final formData = http.MultipartRequest('PUT', url);
+      formData.headers.addAll(headers);
+      final jsonData = {
+        'title': postSubject.text,
+        'content': postContent.text,
+        'attatchmentUrl': [],
+      };
+      final jsonPart = http.MultipartFile.fromString(
+        'update',
+        jsonEncode(jsonData),
+        contentType: MediaType('application', 'json'),
+      );
+
+      formData.files.add(jsonPart);
+
+      try {
+        final response = await formData.send();
+
+        if (response.statusCode == 200) {
+          Get.back();
+          Get.snackbar('알림', '게시글이 수정되었습니다.');
+        } else {
+          // 요청이 실패한 경우
+          Get.snackbar('알림', '게시글 수정에 실패했습니다. error: ${response.statusCode}');
         }
       } catch (e) {
         // 요청 중 오류가 발생한 경우
@@ -92,13 +141,17 @@ class _PostAddPageState extends State<PostAddPage> {
                 Get.back();
               },
               icon: const Icon(SFSymbols.chevron_left)),
-          title: const Text(
-            "글 쓰기",
+          title: Text(
+            widget.isEdit ? "글 수정" : "글 쓰기",
             style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
           ),
           actions: [
             TextButton(
-              onPressed: _submitPost,
+              onPressed: widget.isEdit
+                  ? () {
+                      _editPost(widget.post!.id);
+                    }
+                  : _submitPost,
               child: const Text(
                 "완료",
                 style: TextStyle(
@@ -120,7 +173,7 @@ class _PostAddPageState extends State<PostAddPage> {
               child: Form(
                   key: _formKey1,
                   child: UnderlineTextForm(
-                    hintText: '제목을 입력하세요',
+                    hintText: widget.isEdit ? postSubject.text : '제목을 입력하세요',
                     controller: postSubject,
                     isFocused: _isFocused1,
                     noLine: true,
@@ -145,7 +198,7 @@ class _PostAddPageState extends State<PostAddPage> {
                 child: Form(
                     key: _formKey2,
                     child: OutlineTextForm(
-                      hintText: '내용을 입력하세요',
+                      hintText: widget.isEdit ? postContent.text : '내용을 입력하세요',
                       controller: postContent,
                       isFocused: _isFocused2,
                       noLine: true,
