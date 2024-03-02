@@ -62,11 +62,49 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
             ///TODO: 이미지 바꾸기
             Padding(
               padding: const EdgeInsets.only(top: 16.0, bottom: 24.0),
-              child: Image.asset(
-                'assets/images/dancepozz_big_logo.png',
-                height: SizeController.to.screenHeight * 0.28,
-                width: SizeController.to.screenWidth,
-                fit: BoxFit.fitWidth,
+              child: Visibility(
+                visible: (ClubController.to.club().url == null),
+                replacement: Image.network(
+                  "https://${ClubController.to.club().url}",
+                  height: SizeController.to.screenHeight * 0.28,
+                  width: SizeController.to.screenWidth,
+                  fit: BoxFit.fitWidth,
+                  errorBuilder: (BuildContext context, Object error,
+                      StackTrace? stackTrace) {
+                    return Container(
+                      color: AppColor.backgroundColor,
+                      height: SizeController.to.screenHeight * 0.28,
+                      width: SizeController.to.screenWidth,
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Image',
+                            style: TextStyle(
+                              color: AppColor.textColor,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                            ),
+                          ),
+                          Text(
+                            'Failed',
+                            style: TextStyle(
+                              color: AppColor.textColor,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                child: Image.asset(
+                  'assets/images/dancepozz_big_logo.png',
+                  height: SizeController.to.screenHeight * 0.28,
+                  width: SizeController.to.screenWidth,
+                  fit: BoxFit.fitWidth,
+                ),
               ),
             ),
             Text(

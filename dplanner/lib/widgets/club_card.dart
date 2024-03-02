@@ -46,14 +46,42 @@ class ClubCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ///URL 처리하기
               Visibility(
-                visible: true,
+                visible: (thisClub.url == null),
                 replacement: Image.network(
-                  thisClub.url ?? "",
+                  "https://${thisClub.url}",
                   height: SizeController.to.screenWidth * 0.2,
                   width: SizeController.to.screenWidth * 0.2,
                   fit: BoxFit.fill,
+                  errorBuilder: (BuildContext context, Object error,
+                      StackTrace? stackTrace) {
+                    return Container(
+                      color: AppColor.backgroundColor,
+                      height: SizeController.to.screenWidth * 0.2,
+                      width: SizeController.to.screenWidth * 0.2,
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Image',
+                            style: TextStyle(
+                              color: AppColor.textColor,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                            ),
+                          ),
+                          Text(
+                            'Failed',
+                            style: TextStyle(
+                              color: AppColor.textColor,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
                 child: Image.asset(
                   'assets/images/dancepozz_logo.png',
