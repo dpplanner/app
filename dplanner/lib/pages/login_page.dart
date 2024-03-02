@@ -34,7 +34,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  static const storage = FlutterSecureStorage();
+  FlutterSecureStorage storage = const FlutterSecureStorage();
 
   // refresh token 유효성 검사
   bool checkRefreshToken(String token) {
@@ -56,11 +56,13 @@ class _LoginPageState extends State<LoginPage> {
     String? accessToken = await storage.read(key: accessTokenKey);
 
     // refreshToken 으로 로그인 상태 확인
-    if (refreshToken != null && checkRefreshToken(refreshToken)) {
+    if (accessToken != null &&
+        refreshToken != null &&
+        checkRefreshToken(refreshToken)) {
       print("토큰");
       print(accessToken);
       print(refreshToken);
-      print(decodeToken(accessToken!));
+      print(decodeToken(accessToken));
       print(decodeToken(refreshToken));
       try {
         ClubController.to.club.value = await ClubApiService.getClub(
@@ -161,9 +163,7 @@ class _LoginPageState extends State<LoginPage> {
       body: FutureBuilder(
           future: checkUserLogin(),
           builder: (context, snapshot) {
-            if (snapshot.hasData == false) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
+            if (snapshot.hasError) {
               return const ErrorPage();
             } else {
               return SafeArea(

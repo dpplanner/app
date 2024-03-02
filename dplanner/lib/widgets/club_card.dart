@@ -47,11 +47,20 @@ class ClubCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ///URL 처리하기
-              Image.asset(
-                'assets/images/dancepozz_logo.png',
-                height: SizeController.to.screenWidth * 0.2,
-                width: SizeController.to.screenWidth * 0.2,
-                fit: BoxFit.fill,
+              Visibility(
+                visible: true,
+                replacement: Image.network(
+                  thisClub.url ?? "",
+                  height: SizeController.to.screenWidth * 0.2,
+                  width: SizeController.to.screenWidth * 0.2,
+                  fit: BoxFit.fill,
+                ),
+                child: Image.asset(
+                  'assets/images/dancepozz_logo.png',
+                  height: SizeController.to.screenWidth * 0.2,
+                  width: SizeController.to.screenWidth * 0.2,
+                  fit: BoxFit.fill,
+                ),
               ),
               const SizedBox(width: 15),
               SizedBox(

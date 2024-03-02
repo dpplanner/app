@@ -46,7 +46,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
         break;
     }
     await storage.deleteAll();
-    Get.offAllNamed('login');
+    Get.offAllNamed('/');
   }
 
   @override
