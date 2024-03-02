@@ -137,7 +137,7 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                                 ),
                                 child: ClubCard(
                                     thisClub: ClubController.to.club.value,
-                                    noEvent: true),
+                                    event: () {}),
                               ),
                             ],
                           ),

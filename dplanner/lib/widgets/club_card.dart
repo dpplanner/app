@@ -18,44 +18,22 @@ import '../style.dart';
 
 class ClubCard extends StatelessWidget {
   final ClubModel thisClub;
-  final bool noEvent;
+  final Function() event;
 
-  const ClubCard({super.key, required this.thisClub, this.noEvent = false});
+  const ClubCard({super.key, required this.thisClub, required this.event});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      splashColor:
-          noEvent ? Colors.transparent : AppColor.subColor2.withOpacity(0.5),
-      highlightColor:
-          noEvent ? Colors.transparent : AppColor.subColor2.withOpacity(0.5),
+      splashColor: (event == () {})
+          ? Colors.transparent
+          : AppColor.subColor2.withOpacity(0.5),
+      highlightColor: (event == () {})
+          ? Colors.transparent
+          : AppColor.subColor2.withOpacity(0.5),
       borderRadius: BorderRadius.circular(16),
       onTap: () async {
-        if (noEvent) {
-          null;
-        } else if (thisClub.isConfirmed ?? false) {
-          try {
-            const storage = FlutterSecureStorage();
-            String? accessToken = await storage.read(key: accessTokenKey);
-            await TokenApiService.patchUpdateClub(
-                memberId: decodeToken(accessToken!)['sub'],
-                clubId: thisClub.id.toString());
-            String? updatedAccessToken =
-                await storage.read(key: accessTokenKey);
-            ClubController.to.club.value = await ClubApiService.getClub(
-                clubID: decodeToken(updatedAccessToken!)['recent_club_id']);
-            MemberController.to.clubMember.value =
-                await ClubMemberApiService.getClubMember(
-                    clubId: decodeToken(updatedAccessToken)['recent_club_id'],
-                    clubMemberId:
-                        decodeToken(updatedAccessToken)['club_member_id']);
-            Get.offAllNamed('/tab2', arguments: 1);
-          } catch (e) {
-            print(e.toString());
-          }
-        } else {
-          snackBar(title: "해당 클럽에 가입 진행 중입니다.", content: "가입 후에 눌러주세요.");
-        }
+        event();
       },
       child: Ink(
         decoration: BoxDecoration(
@@ -97,7 +75,7 @@ class ClubCard extends StatelessWidget {
                                 fontSize: 18),
                           ),
                         ),
-                        if (!(thisClub.isConfirmed ?? false) && !noEvent)
+                        if (!(thisClub.isConfirmed ?? false))
                           const Text(
                             "가입 진행 중",
                             style: TextStyle(

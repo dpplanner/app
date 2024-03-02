@@ -1,12 +1,22 @@
+import 'dart:async';
+
 import 'package:dplanner/services/club_api_service.dart';
 import 'package:dplanner/style.dart';
 import 'package:dplanner/widgets/club_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import '../const.dart';
+import '../controllers/club.dart';
+import '../controllers/member.dart';
 import '../controllers/size.dart';
+import '../decode_token.dart';
 import '../models/club_model.dart';
+import '../services/club_member_api_service.dart';
+import '../services/token_api_service.dart';
+import '../widgets/snack_bar.dart';
 import 'error_page.dart';
 
 class ClubListPage extends StatefulWidget {
@@ -17,14 +27,28 @@ class ClubListPage extends StatefulWidget {
 }
 
 class _ClubListPageState extends State<ClubListPage> {
+  final StreamController<List<ClubModel>> streamController =
+      StreamController<List<ClubModel>>();
+
+  @override
+  void initState() {
+    super.initState();
+    getClubList();
+  }
+
+  @override
+  void dispose() {
+    streamController.close();
+    super.dispose();
+  }
+
   // 클럽 목록 불러오기
-  Future<List<ClubModel>> getClubList() async {
+  void getClubList() async {
     try {
-      return await ClubApiService.getClubList();
+      streamController.add(await ClubApiService.getClubList());
     } catch (e) {
       print(e.toString());
     }
-    return [];
   }
 
   @override
@@ -48,8 +72,8 @@ class _ClubListPageState extends State<ClubListPage> {
           centerTitle: true,
         ),
       ),
-      body: FutureBuilder(
-          future: getClubList(),
+      body: StreamBuilder(
+          stream: streamController.stream,
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData == false) {
               return const Center(child: CircularProgressIndicator());
@@ -68,7 +92,48 @@ class _ClubListPageState extends State<ClubListPage> {
                           return Padding(
                               padding: const EdgeInsets.fromLTRB(
                                   18.0, 12.0, 18.0, 0.0),
-                              child: ClubCard(thisClub: snapshot.data[index]));
+                              child: ClubCard(
+                                thisClub: snapshot.data[index],
+                                event: () async {
+                                  if (snapshot.data[index].isConfirmed ??
+                                      false) {
+                                    try {
+                                      const storage = FlutterSecureStorage();
+                                      String? accessToken = await storage.read(
+                                          key: accessTokenKey);
+                                      await TokenApiService.patchUpdateClub(
+                                          memberId:
+                                              decodeToken(accessToken!)['sub'],
+                                          clubId: snapshot.data[index].id
+                                              .toString());
+                                      String? updatedAccessToken = await storage
+                                          .read(key: accessTokenKey);
+                                      ClubController.to.club.value =
+                                          await ClubApiService.getClub(
+                                              clubID: decodeToken(
+                                                      updatedAccessToken!)[
+                                                  'recent_club_id']);
+                                      MemberController.to.clubMember.value =
+                                          await ClubMemberApiService
+                                              .getClubMember(
+                                                  clubId: decodeToken(
+                                                          updatedAccessToken)[
+                                                      'recent_club_id'],
+                                                  clubMemberId: decodeToken(
+                                                          updatedAccessToken)[
+                                                      'club_member_id']);
+                                      Get.toNamed('/tab2', arguments: 1);
+                                    } catch (e) {
+                                      print(e.toString());
+                                    }
+                                  } else {
+                                    getClubList();
+                                    snackBar(
+                                        title: "해당 클럽에 가입 진행 중입니다.",
+                                        content: "가입 후에 눌러주세요.");
+                                  }
+                                },
+                              ));
                         })),
                       ),
                       Padding(

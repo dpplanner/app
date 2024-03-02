@@ -46,7 +46,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
                 icon: const Icon(SFSymbols.menu)),
             title: Text(
               ClubController.to.club().clubName,
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
             ),
             actions: [
               IconButton(

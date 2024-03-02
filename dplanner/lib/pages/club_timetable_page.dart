@@ -63,7 +63,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
             scrolledUnderElevation: 0,
             title: const Text(
               "예약 시간표",
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
             ),
             centerTitle: true,
             automaticallyImplyLeading: false,
