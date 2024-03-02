@@ -82,15 +82,59 @@ class _ClubMyPageState extends State<ClubMyPage> {
                       children: [
                         Row(
                           children: [
-                            ///TODO: 이미지 바꾸기
                             Padding(
                               padding: const EdgeInsets.only(right: 8.0),
                               child: ClipOval(
-                                child: Image.asset(
-                                  'assets/images/jin_profile.png',
-                                  height: SizeController.to.screenWidth * 0.25,
-                                  width: SizeController.to.screenWidth * 0.25,
-                                  fit: BoxFit.fill,
+                                child: Visibility(
+                                  visible:
+                                      (MemberController.to.clubMember().url ==
+                                          null),
+                                  replacement: Image.network(
+                                    "https://${MemberController.to.clubMember().url}",
+                                    height:
+                                        SizeController.to.screenWidth * 0.25,
+                                    width: SizeController.to.screenWidth * 0.25,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (BuildContext context,
+                                        Object error, StackTrace? stackTrace) {
+                                      return Container(
+                                        color: AppColor.backgroundColor,
+                                        height: SizeController.to.screenWidth *
+                                            0.25,
+                                        width: SizeController.to.screenWidth *
+                                            0.25,
+                                        child: const Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Image',
+                                              style: TextStyle(
+                                                color: AppColor.textColor,
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Failed',
+                                              style: TextStyle(
+                                                color: AppColor.textColor,
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  child: Image.asset(
+                                    'assets/images/jin_profile.png',
+                                    height:
+                                        SizeController.to.screenWidth * 0.25,
+                                    width: SizeController.to.screenWidth * 0.25,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),
@@ -115,7 +159,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
                         ),
                         InkWell(
                           onTap: () {
-                            Get.to(const MyProfileModificationPage());
+                            Get.toNamed('/profile');
                           },
                           borderRadius: BorderRadius.circular(5),
                           child: const Row(

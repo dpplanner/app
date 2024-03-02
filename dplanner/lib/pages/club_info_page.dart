@@ -59,7 +59,6 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
       body: SafeArea(
         child: Column(
           children: [
-            ///TODO: 이미지 바꾸기
             Padding(
               padding: const EdgeInsets.only(top: 16.0, bottom: 24.0),
               child: Visibility(

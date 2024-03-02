@@ -10,6 +10,7 @@ import 'package:dplanner/pages/club_list_page.dart';
 import 'package:dplanner/pages/club_my_page.dart';
 import 'package:dplanner/pages/club_timetable_page.dart';
 import 'package:dplanner/pages/login_page.dart';
+import 'package:dplanner/pages/my_profile_modification_page.dart';
 import 'package:dplanner/pages/resource_list_page.dart';
 import 'package:get/get.dart';
 
@@ -37,6 +38,7 @@ final page = [
       name: '/tab3',
       page: () => const ClubMyPage(),
       transition: Transition.noTransition),
+  GetPage(name: '/profile', page: () => const MyProfileModificationPage()),
   GetPage(name: '/club_info', page: () => const ClubInfoPage()),
   GetPage(name: '/resource_list', page: () => const ResourceListPage()),
 ];

@@ -56,13 +56,11 @@ class _LoginPageState extends State<LoginPage> {
     String? accessToken = await storage.read(key: accessTokenKey);
 
     // refreshToken 으로 로그인 상태 확인
-    if (accessToken != null &&
-        refreshToken != null &&
-        checkRefreshToken(refreshToken)) {
+    if (refreshToken != null && checkRefreshToken(refreshToken)) {
       print("토큰");
       print(accessToken);
       print(refreshToken);
-      print(decodeToken(accessToken));
+      print(decodeToken(accessToken!));
       print(decodeToken(refreshToken));
       try {
         ClubController.to.club.value = await ClubApiService.getClub(
