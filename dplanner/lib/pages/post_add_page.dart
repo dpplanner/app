@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:http_parser/http_parser.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -23,6 +26,49 @@ class _PostAddPageState extends State<PostAddPage> {
   final _formKey2 = GlobalKey<FormState>();
   final TextEditingController postContent = TextEditingController();
   bool _isFocused2 = false;
+
+  Future<void> _submitPost() async {
+    if (_formKey1.currentState!.validate() &&
+        _formKey2.currentState!.validate()) {
+      final url = Uri.parse('http://3.39.102.31:8080/posts');
+      final headers = {
+        'Authorization':
+            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
+      };
+      final formData = http.MultipartRequest('POST', url);
+      formData.headers.addAll(headers);
+      final jsonData = {
+        'clubId': 1,
+        'title': postSubject.text,
+        'content': postContent.text,
+      };
+      final jsonPart = http.MultipartFile.fromString(
+        'create',
+        jsonEncode(jsonData),
+        contentType: MediaType('application', 'json'),
+      );
+
+      formData.files.add(jsonPart);
+
+      try {
+        final response = await formData.send();
+
+        if (response.statusCode == 201) {
+          // 요청이 성공한 경우
+          Get.snackbar('알림', '게시글이 작성되었습니다.');
+          // 페이지를 닫음
+          Get.back();
+        } else {
+          // 요청이 실패한 경우
+          //print('${response.body} ${response.statusCode}, ${body}');
+          Get.snackbar('알림', '게시글 작성에 실패했습니다. error: ${response.statusCode}');
+        }
+      } catch (e) {
+        // 요청 중 오류가 발생한 경우
+        Get.snackbar('알림', '오류가 발생했습니다.');
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -52,7 +98,7 @@ class _PostAddPageState extends State<PostAddPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {},
+              onPressed: _submitPost,
               child: const Text(
                 "완료",
                 style: TextStyle(

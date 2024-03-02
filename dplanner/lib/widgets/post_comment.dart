@@ -33,7 +33,7 @@ class _PostCommentState extends State<PostComment> {
         Uri.parse('http://3.39.102.31:8080/posts/$postId/comments'),
         headers: {
           'Authorization':
-              'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzNzE5OTgsImV4cCI6MTcwOTU1MTk5OH0.cI6GclGk93kuBpwQ_abXWKfGURJlZNft58zZc_CmMCk',
+              'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
         }); //TODO: token값 받아오도록 변경해야함
 
     if (response.statusCode == 200) {
