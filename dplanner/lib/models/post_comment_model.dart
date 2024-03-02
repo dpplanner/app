@@ -4,6 +4,7 @@ class Comment {
   final int postId;
   final int clubMemberId;
   final String clubMemberName;
+  final String? profileUrl;
   final int likeCount;
   final String content;
   final bool isDeleted;
@@ -18,6 +19,7 @@ class Comment {
     required this.postId,
     required this.clubMemberId,
     required this.clubMemberName,
+    this.profileUrl,
     required this.likeCount,
     required this.content,
     required this.isDeleted,
@@ -34,6 +36,7 @@ class Comment {
       postId: json['postId'] as int,
       clubMemberId: json['clubMemberId'] as int,
       clubMemberName: json['clubMemberName'] as String,
+      profileUrl: json['profileUrl'] != null ? json['profileUrl'] : null,
       likeCount: json['likeCount'] as int,
       content: json['content'] as String,
       isDeleted: json['isDeleted'] as bool,

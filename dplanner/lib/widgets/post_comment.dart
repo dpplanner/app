@@ -33,7 +33,7 @@ class _PostCommentState extends State<PostComment> {
         Uri.parse('http://3.39.102.31:8080/posts/$postId/comments'),
         headers: {
           'Authorization':
-              'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkxOTE1MzUsImV4cCI6MTcwOTM3MTUzNX0.nLxlPz9gxaO_0pqQwIxWrBQ-4ioVGDp0XeHutL-vSKc',
+              'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzNzE5OTgsImV4cCI6MTcwOTU1MTk5OH0.cI6GclGk93kuBpwQ_abXWKfGURJlZNft58zZc_CmMCk',
         }); //TODO: token값 받아오도록 변경해야함
 
     if (response.statusCode == 200) {
@@ -59,114 +59,141 @@ class _PostCommentState extends State<PostComment> {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          children: _comments == null
+              ? [
+                  const Center(
+                    child: Text(
+                      "아무것도 없습니다", //TODO: 이거 사라지는데..왜지
+                    ),
+                  ),
+                ]
+              : [
+                  // 댓글 데이터를 화면에 표시하는 부분
+                  for (var comment in _comments!) commentBlock(comment),
+                ],
+        ),
+      ),
+    );
+  }
+
+  Widget commentBlock(Comment comment) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ClipOval(
+                child:
+                    //comment.profileUrl != null
+                    //    ? Image.network(
+                    //        comment.profileUrl!,
+                    //        height: SizeController.to.screenWidth * 0.09,
+                    //        width: SizeController.to.screenWidth * 0.09,
+                    //        fit: BoxFit.fill,
+                    //      )
+                    //    :
+                    SvgPicture.asset(
+              'assets/images/base_image/base_member_image.svg',
+              height: SizeController.to.screenWidth * 0.09,
+              width: SizeController.to.screenWidth * 0.09,
+              fit: BoxFit.fill,
+            )),
+            SizedBox(width: SizeController.to.screenWidth * 0.03),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ClipOval(
-                      child: SvgPicture.asset(
-                        'assets/images/base_image/base_member_image.svg',
-                        height: SizeController.to.screenWidth * 0.09,
-                        width: SizeController.to.screenWidth * 0.09,
-                        fit: BoxFit.fill,
+                    Text(
+                      comment.clubMemberName,
+                      style: TextStyle(
+                        color: AppColor.textColor,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
                       ),
                     ),
-                    SizedBox(width: SizeController.to.screenWidth * 0.03),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Text(
-                              "DP23 남진",
-                              style: TextStyle(
-                                color: AppColor.textColor,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                            SizedBox(
-                              width: SizeController.to.screenWidth * 0.05,
-                            ),
-                          ],
+                    SizedBox(
+                      width: SizeController.to.screenWidth * 0.05,
+                    ),
+                  ],
+                ),
+                Text(
+                  comment.content,
+                  style: TextStyle(
+                    color: AppColor.textColor,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      comment.createdTime != null
+                          ? '${comment.createdTime}'
+                          : "2023.11.11 16:28", //TODO: nullable아님
+                      style: TextStyle(
+                        color: AppColor.textColor2,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12,
+                      ),
+                    ),
+                    SizedBox(
+                      width: SizeController.to.screenWidth * 0.03,
+                    ),
+                    InkWell(
+                      onTap: () {},
+                      borderRadius: BorderRadius.circular(5),
+                      child: const Text(
+                        "댓글 달기",
+                        style: TextStyle(
+                          color: AppColor.textColor2,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
                         ),
-                        const Text(
-                          "댓글\n댓글",
-                          style: TextStyle(
-                            color: AppColor.textColor,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                comment.children.length != 0
+                    ? Row(
+                        children: [
+                          SvgPicture.asset(
+                            'assets/images/extra/comment_line.svg',
                           ),
-                        ),
-                        Row(
-                          children: [
-                            const Text(
-                              "2023.11.11 16:28",
+                          InkWell(
+                            onTap: () {},
+                            borderRadius: BorderRadius.circular(5),
+                            child: Text(
+                              "  답글 ${comment.children.length}개 더 보기",
                               style: TextStyle(
                                 color: AppColor.textColor2,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12,
                               ),
                             ),
-                            SizedBox(
-                              width: SizeController.to.screenWidth * 0.03,
-                            ),
-                            InkWell(
-                              onTap: () {},
-                              borderRadius: BorderRadius.circular(5),
-                              child: const Text(
-                                "댓글 달기",
-                                style: TextStyle(
-                                  color: AppColor.textColor2,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            SvgPicture.asset(
-                              'assets/images/extra/comment_line.svg',
-                            ),
-                            InkWell(
-                              onTap: () {},
-                              borderRadius: BorderRadius.circular(5),
-                              child: const Text(
-                                "  답글 2개 더 보기",
-                                style: TextStyle(
-                                  color: AppColor.textColor2,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                IconButton(
-                  onPressed: () {
-                    _commentMore(context);
-                  },
-                  icon: const Icon(
-                    SFSymbols.ellipsis,
-                    color: AppColor.textColor,
-                  ),
-                )
+                          ),
+                        ],
+                      )
+                    //  children: [Text(comment.children[0].content)],
+
+                    : Container(),
               ],
             ),
           ],
         ),
-      ),
+        IconButton(
+          onPressed: () {
+            _commentMore(context);
+          },
+          icon: const Icon(
+            SFSymbols.ellipsis,
+            color: AppColor.textColor,
+          ),
+        )
+      ],
     );
   }
 

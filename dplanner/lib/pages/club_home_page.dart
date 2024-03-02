@@ -28,6 +28,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
   final TextEditingController searchPost = TextEditingController();
   bool _isFocused = false;
   List<Post>? _posts;
+  String temp = '';
 
   @override
   void initState() {
@@ -45,11 +46,12 @@ class _ClubHomePageState extends State<ClubHomePage> {
     const storage = FlutterSecureStorage();
 
     String? accessToken = await storage.read(key: accessTokenKey);
+    temp =
+        'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzNzE5OTgsImV4cCI6MTcwOTU1MTk5OH0.cI6GclGk93kuBpwQ_abXWKfGURJlZNft58zZc_CmMCk';
     final response = await http.get(
         Uri.parse('http://3.39.102.31:8080/posts/clubs/1?size=10&page=0'),
         headers: {
-          'Authorization':
-              'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkxOTE1MzUsImV4cCI6MTcwOTM3MTUzNX0.nLxlPz9gxaO_0pqQwIxWrBQ-4ioVGDp0XeHutL-vSKc',
+          'Authorization': 'Bearer $temp',
         });
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData =
