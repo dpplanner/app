@@ -168,4 +168,32 @@ class ClubApiService {
     print(errorMessage);
     throw ErrorDescription(errorMessage);
   }
+
+  /// PATCH: /clubs/(_.club_id) [클럽 정보 수정] 클럽 정보 변경하기
+  static Future<ClubModel> patchClub(
+      {required int clubId, required String info}) async {
+    final url = Uri.parse('$baseUrl/clubs/$clubId');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.patch(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({"info": info}),
+    );
+
+    if (response.statusCode == 200) {
+      return ClubModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes))['data']);
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
 }

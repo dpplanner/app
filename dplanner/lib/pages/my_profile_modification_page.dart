@@ -278,35 +278,46 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                           ? AppColor.objectColor
                           : AppColor.subColor3,
                   onPressed: () async {
-                    if ((myName.text !=
-                            MemberController.to.clubMember().name) ||
-                        (myContent.text !=
-                            MemberController.to.clubMember().info) ||
-                        (file != null)) {
+                    int clubMemberId = MemberController.to.clubMember().id;
+                    int clubId = ClubController.to.club().id;
+                    if ((myName.text ==
+                            MemberController.to.clubMember().name) &&
+                        (myContent.text ==
+                            MemberController.to.clubMember().info) &&
+                        (file == null)) {
+                      return;
+                    } else if (file != null) {
                       try {
-                        int clubMemberId = MemberController.to.clubMember().id;
-                        int clubId = ClubController.to.club().id;
-                        MemberController.to.clubMember.value =
-                            await ClubMemberApiService.patchClubMember(
-                                clubMemberId: clubMemberId,
-                                clubId: clubId,
-                                name: myName.text,
-                                info: myContent.text);
                         MemberController.to.clubMember.value =
                             await ClubMemberApiService.postProfile(
                                 clubId: clubId,
                                 clubMemberId: clubMemberId,
                                 image: file);
-                        Get.offAllNamed('/tab3', arguments: 2);
                       } catch (e) {
                         print(e.toString());
                         snackBar(
                             title: "프로필 편집하는데 오류가 발생하였습니다.",
                             content: e.toString());
                       }
-                    } else {
-                      null;
+                    } else if ((myName.text !=
+                            MemberController.to.clubMember().name) ||
+                        (myContent.text !=
+                            MemberController.to.clubMember().info)) {
+                      try {
+                        MemberController.to.clubMember.value =
+                            await ClubMemberApiService.patchClubMember(
+                                clubMemberId: clubMemberId,
+                                clubId: clubId,
+                                name: myName.text,
+                                info: myContent.text);
+                      } catch (e) {
+                        print(e.toString());
+                        snackBar(
+                            title: "프로필 편집하는데 오류가 발생하였습니다.",
+                            content: e.toString());
+                      }
                     }
+                    Get.offAllNamed('/tab3', arguments: 2);
                   },
                 ),
               ),

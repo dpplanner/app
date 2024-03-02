@@ -9,11 +9,10 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../controllers/size.dart';
-import '../models/resource_model.dart';
 import '../services/club_api_service.dart';
-import '../services/resource_api_service.dart';
 import '../style.dart';
 import '../widgets/nextpage_button.dart';
+import '../widgets/outline_textform.dart';
 import '../widgets/snack_bar.dart';
 import 'error_page.dart';
 
@@ -25,9 +24,25 @@ class ClubSettingPage extends StatefulWidget {
 }
 
 class _ClubSettingPageState extends State<ClubSettingPage> {
+  final _formKey1 = GlobalKey<FormState>();
+  final TextEditingController info = TextEditingController();
+  bool _isFocused1 = false;
+
   final StreamController<XFile> _streamController = StreamController<XFile>();
 
   XFile? file;
+
+  @override
+  void initState() {
+    super.initState();
+    info.text = ClubController.to.club().info;
+  }
+
+  @override
+  void dispose() {
+    info.dispose();
+    super.dispose();
+  }
 
   void pickImage() async {
     try {
@@ -71,6 +86,7 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Stack(
                       children: [
@@ -81,8 +97,7 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                                 return const ErrorPage();
                               } else {
                                 return Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 16.0, bottom: 24.0),
+                                  padding: const EdgeInsets.only(top: 16.0),
                                   child: (file != null)
                                       ? Image.file(
                                           File(file!.path),
@@ -176,7 +191,7 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                                   "클럽 사진 수정하기",
                                   style: TextStyle(
                                       color: AppColor.textColor,
-                                      fontWeight: FontWeight.w400,
+                                      fontWeight: FontWeight.w500,
                                       fontSize: 12),
                                 ),
                               ],
@@ -185,17 +200,57 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                         ),
                       ],
                     ),
-                    Text(
-                      ClubController.to.club().clubName,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 32),
-                    ),
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-                      child: Text(
-                        ClubController.to.club().info,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 16),
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Text(
+                                "클럽명",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    color: AppColor.textColor2),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: Text(
+                                  ClubController.to.club().clubName,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                      color: AppColor.textColor2),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.only(bottom: 12.0, top: 24.0),
+                            child: Text(
+                              "소개",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: AppColor.textColor),
+                            ),
+                          ),
+                          Form(
+                              key: _formKey1,
+                              child: OutlineTextForm(
+                                hintText: '소개글을 작성해주세요',
+                                controller: info,
+                                isFocused: _isFocused1,
+                                fontSize: 15,
+                                maxLines: 7,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isFocused1 = value.isNotEmpty;
+                                  });
+                                },
+                              )),
+                        ],
                       ),
                     ),
                   ],
@@ -213,17 +268,31 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                         fontWeight: FontWeight.w700,
                         color: AppColor.backgroundColor),
                   ),
-                  buttonColor: (file != null)
+                  buttonColor: ((file != null) ||
+                          (info.text != ClubController.to.club().info))
                       ? AppColor.objectColor
                       : AppColor.subColor3,
                   onPressed: () async {
-                    if (file != null) {
+                    int clubId = ClubController.to.club().id;
+                    if ((file == null) &&
+                        (info.text == ClubController.to.club().info)) {
+                      return;
+                    } else if (file != null) {
                       try {
-                        int clubId = ClubController.to.club().id;
                         ClubController.to.club.value =
                             await ClubApiService.postClubImage(
                                 clubId: clubId, image: file);
-                        Get.back();
+                      } catch (e) {
+                        print(e.toString());
+                        snackBar(
+                            title: "프로필 편집하는데 오류가 발생하였습니다.",
+                            content: e.toString());
+                      }
+                    } else if (info.text != ClubController.to.club().info) {
+                      try {
+                        ClubController.to.club.value =
+                            await ClubApiService.patchClub(
+                                clubId: clubId, info: info.text);
                       } catch (e) {
                         print(e.toString());
                         snackBar(
@@ -231,6 +300,7 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                             content: e.toString());
                       }
                     }
+                    Get.back();
                   },
                 ),
               ),
