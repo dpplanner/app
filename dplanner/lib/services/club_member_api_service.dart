@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../const.dart';
 import '../models/club_member_model.dart';
@@ -31,6 +33,44 @@ class ClubMemberApiService {
     );
 
     if (response.statusCode == 201) {
+      return ClubMemberModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes))['data']);
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
+  /// POST: /clubs/(_.club_id)/club-members/(_.club_member_id)/updateProfileImage [클럽 멤버 프로필 이미지 변경] 클럽 멤버 프로필 이미지 변경하기
+  static Future<ClubMemberModel> postProfile(
+      {required int clubId,
+      required int clubMemberId,
+      required XFile? image}) async {
+    final url = Uri.parse(
+        '$baseUrl/clubs/$clubId/club-members/$clubMemberId/updateProfileImage');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    var request = http.MultipartRequest('POST', url);
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer $accessToken',
+    });
+
+    if (image != null) {
+      var imageFile = await http.MultipartFile.fromPath('image', image.path);
+      request.files.add(imageFile);
+    }
+
+    var response = await http.Response.fromStream(await request.send());
+
+    if (response.statusCode == 200) {
+      print(ClubMemberModel.fromJson(
+              jsonDecode(utf8.decode(response.bodyBytes))['data'])
+          .url);
       return ClubMemberModel.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes))['data']);
     }

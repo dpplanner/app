@@ -2,7 +2,6 @@ import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/pages/app_setting_page.dart';
 import 'package:dplanner/pages/club_info_page.dart';
 import 'package:dplanner/pages/my_activity_check_page.dart';
-import 'package:dplanner/pages/my_profile_modification_page.dart';
 import 'package:dplanner/pages/reservation_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';

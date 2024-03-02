@@ -285,12 +285,18 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                         (file != null)) {
                       try {
                         int clubMemberId = MemberController.to.clubMember().id;
+                        int clubId = ClubController.to.club().id;
                         MemberController.to.clubMember.value =
                             await ClubMemberApiService.patchClubMember(
                                 clubMemberId: clubMemberId,
-                                clubId: ClubController.to.club().id,
+                                clubId: clubId,
                                 name: myName.text,
                                 info: myContent.text);
+                        MemberController.to.clubMember.value =
+                            await ClubMemberApiService.postProfile(
+                                clubId: clubId,
+                                clubMemberId: clubMemberId,
+                                image: file);
                         Get.offAllNamed('/tab3', arguments: 2);
                       } catch (e) {
                         print(e.toString());
