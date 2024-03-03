@@ -4,6 +4,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -20,6 +21,9 @@ class PostContent extends StatefulWidget {
 }
 
 class _PostContentState extends State<PostContent> {
+  late bool isLiked = widget.post.likeStatus;
+  late int likeCount = widget.post.likeCount;
+
   Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
@@ -70,6 +74,39 @@ class _PostContentState extends State<PostContent> {
       }
     } catch (e) {
       Get.snackbar('알림', '오류가 발생했습니다.');
+    }
+  }
+
+  void _toggleLike() async {
+    final url =
+        Uri.parse('http://3.39.102.31:8080/posts/${widget.post.id}/like');
+    final headers = {
+      'Authorization':
+          'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
+    };
+
+    try {
+      final response = await http.put(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['data']['status'] == 'LIKE') {
+          setState(() {
+            isLiked = true;
+            likeCount += 1; //서버에서 실시간으로 좋아요가 올라가는건 페이지를 새로고침해야지만 볼 수 있음
+          });
+        } else if (data['data']['status'] == 'DISLIKE') {
+          setState(() {
+            isLiked = false;
+            likeCount -= 1;
+          });
+        }
+      } else {
+        Get.snackbar('알림', '오류가 발생했습니다. 다시 시도해주세요  no ${response.statusCode}');
+      }
+    } catch (e) {
+      Get.snackbar('알림', '오류가 발생했습니다. 다시 시도해주세요 ${e}');
     }
   }
 
@@ -234,16 +271,19 @@ class _PostContentState extends State<PostContent> {
                       ),
                       Expanded(
                         flex: 1,
-                        child: Icon(
-                          SFSymbols.heart,
-                          color: AppColor.textColor2,
-                          size: 16,
+                        child: GestureDetector(
+                          onTap: _toggleLike,
+                          child: Icon(
+                            isLiked ? SFSymbols.heart_fill : SFSymbols.heart,
+                            color: AppColor.textColor2,
+                            size: 16,
+                          ),
                         ),
                       ),
                       Expanded(
                         flex: 1,
                         child: Text(
-                          '${widget.post.likeCount}',
+                          '${likeCount}',
                           style: TextStyle(
                             color: AppColor.textColor2,
                             fontWeight: FontWeight.w500,

@@ -8,18 +8,24 @@ import '../controllers/size.dart';
 import '../style.dart';
 import 'package:dplanner/models/post_model.dart';
 
-class PostCard extends StatelessWidget {
+class PostCard extends StatefulWidget {
   final Post post;
   const PostCard({Key? key, required this.post}) : super(key: key);
 
+  @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
       splashColor: AppColor.subColor2.withOpacity(0.8),
       highlightColor: AppColor.subColor2.withOpacity(0.8),
       borderRadius: BorderRadius.circular(16),
-      onTap: () {
-        Get.to(PostPage(post: post), arguments: 1);
+      onTap: () async {
+        await Get.to(() => PostPage(post: widget.post), arguments: 1);
+        setState(() {});
       },
       child: Ink(
         decoration: BoxDecoration(
@@ -53,7 +59,7 @@ class PostCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              post.clubMemberName,
+                              widget.post.clubMemberName,
                               style: TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.w600,
@@ -61,7 +67,7 @@ class PostCard extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              '${post.createdTime}',
+                              '${widget.post.createdTime}',
                               style: TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.w500,
@@ -72,7 +78,7 @@ class PostCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    post.clubRole == 'ADMIN'
+                    widget.post.clubRole == 'ADMIN'
                         ? Container(
                             padding: const EdgeInsets.fromLTRB(6, 2, 6, 2),
                             decoration: BoxDecoration(
@@ -99,7 +105,9 @@ class PostCard extends StatelessWidget {
                       padding: EdgeInsets.only(
                           bottom: SizeController.to.screenHeight * 0.01),
                       child: Text(
-                        "공지", //제목 생기면 그때 수정할 것
+                        widget.post.title != null
+                            ? widget.post.title!
+                            : "공지", //제목 생기면 그때 수정할 것
                         style: TextStyle(
                           color: AppColor.textColor,
                           fontWeight: FontWeight.w800,
@@ -108,7 +116,7 @@ class PostCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      post.content,
+                      widget.post.content,
                       style: TextStyle(
                         color: AppColor.textColor,
                         fontWeight: FontWeight.w600,
@@ -121,7 +129,7 @@ class PostCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (post.isFixed)
+                    if (widget.post.isFixed)
                       const Expanded(
                         flex: 1,
                         child: Row(
@@ -157,7 +165,7 @@ class PostCard extends StatelessWidget {
                           Expanded(
                             flex: 1,
                             child: Text(
-                              '${post.commentCount}',
+                              '${widget.post.commentCount}',
                               style: TextStyle(
                                 color: AppColor.textColor2,
                                 fontWeight: FontWeight.w500,
@@ -168,7 +176,7 @@ class PostCard extends StatelessWidget {
                           Expanded(
                             flex: 1,
                             child: Icon(
-                              post.likeStatus
+                              widget.post.likeStatus
                                   ? SFSymbols.heart_fill
                                   : SFSymbols.heart,
                               color: AppColor.textColor2,
@@ -178,7 +186,7 @@ class PostCard extends StatelessWidget {
                           Expanded(
                             flex: 1,
                             child: Text(
-                              '${post.likeCount}',
+                              '${widget.post.likeCount}',
                               style: TextStyle(
                                 color: AppColor.textColor2,
                                 fontWeight: FontWeight.w500,
