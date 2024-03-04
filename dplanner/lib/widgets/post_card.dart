@@ -8,6 +8,11 @@ import '../controllers/size.dart';
 import '../style.dart';
 import 'package:dplanner/models/post_model.dart';
 
+///
+///
+/// 클럽 홈에서 POST 리스트 컨텐츠를 보여줄 때 사용되는 단일 컨텐츠용 CARD
+///
+///
 class PostCard extends StatefulWidget {
   final Post post;
   const PostCard({Key? key, required this.post}) : super(key: key);
@@ -23,9 +28,8 @@ class _PostCardState extends State<PostCard> {
       splashColor: AppColor.subColor2.withOpacity(0.8),
       highlightColor: AppColor.subColor2.withOpacity(0.8),
       borderRadius: BorderRadius.circular(16),
-      onTap: () async {
-        await Get.to(() => PostPage(post: widget.post), arguments: 1);
-        setState(() {});
+      onTap: () {
+        Get.to(PostPage(post: widget.post), arguments: 1);
       },
       child: Ink(
         decoration: BoxDecoration(
@@ -60,7 +64,7 @@ class _PostCardState extends State<PostCard> {
                           children: [
                             Text(
                               widget.post.clubMemberName,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
@@ -68,7 +72,7 @@ class _PostCardState extends State<PostCard> {
                             ),
                             Text(
                               '${widget.post.createdTime}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 12,
@@ -86,7 +90,7 @@ class _PostCardState extends State<PostCard> {
                               borderRadius: BorderRadius.circular(15),
                               color: AppColor.subColor1, // 배경색 설정
                             ),
-                            child: Text(
+                            child: const Text(
                               '관리자',
                               style: TextStyle(
                                 color: AppColor.backgroundColor,
@@ -108,7 +112,7 @@ class _PostCardState extends State<PostCard> {
                         widget.post.title != null
                             ? widget.post.title!
                             : "공지", //제목 생기면 그때 수정할 것
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: AppColor.textColor,
                           fontWeight: FontWeight.w800,
                           fontSize: 20,
@@ -117,7 +121,7 @@ class _PostCardState extends State<PostCard> {
                     ),
                     Text(
                       widget.post.content,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColor.textColor,
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
@@ -154,7 +158,7 @@ class _PostCardState extends State<PostCard> {
                       flex: 1,
                       child: Row(
                         children: [
-                          Expanded(
+                          const Expanded(
                             flex: 1,
                             child: Icon(
                               SFSymbols.text_bubble,
@@ -166,7 +170,7 @@ class _PostCardState extends State<PostCard> {
                             flex: 1,
                             child: Text(
                               '${widget.post.commentCount}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: AppColor.textColor2,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
@@ -187,7 +191,7 @@ class _PostCardState extends State<PostCard> {
                             flex: 1,
                             child: Text(
                               '${widget.post.likeCount}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: AppColor.textColor2,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,

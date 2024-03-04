@@ -11,6 +11,12 @@ import '../style.dart';
 import 'nextpage_button.dart';
 import 'package:dplanner/models/post_model.dart';
 
+///
+///
+/// POST 자세히보기 화면에서 글 내용 그리는 class
+///
+///
+
 class PostContent extends StatefulWidget {
   final Post post;
 
@@ -201,8 +207,8 @@ class _PostContentState extends State<PostContent> {
                 Padding(
                   padding: EdgeInsets.only(
                       bottom: SizeController.to.screenHeight * 0.01),
-                  child: const Text(
-                    "공지", //TODO: 제목 생기면 수정해야함
+                  child: Text(
+                    widget.post.title ?? "제목없음", //TODO: 제목 생기면 수정해야함
                     style: TextStyle(
                       color: AppColor.textColor,
                       fontWeight: FontWeight.w800,

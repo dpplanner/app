@@ -47,6 +47,7 @@ class _PostAddPageState extends State<PostAddPage> {
         'Authorization':
             'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
       };
+
       final formData = http.MultipartRequest('POST', url);
       formData.headers.addAll(headers);
       final jsonData = {

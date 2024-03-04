@@ -8,6 +8,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
@@ -27,8 +28,11 @@ class _ClubHomePageState extends State<ClubHomePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController searchPost = TextEditingController();
   bool _isFocused = false;
-  List<Post>? _posts;
+  List<Post> _posts = [];
   String temp = '';
+
+  final StreamController<List<Post>> _postsController =
+      StreamController<List<Post>>();
 
   @override
   void initState() {
@@ -38,6 +42,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
 
   @override
   void dispose() {
+    _postsController.close();
     searchPost.dispose();
     super.dispose();
   }
@@ -60,7 +65,11 @@ class _ClubHomePageState extends State<ClubHomePage> {
       setState(() {
         _posts = content.map((data) => Post.fromJson(data)).toList();
       });
+      _postsController.add(_posts);
     } else {
+      setState(() {
+        _posts = []; //POST init값이 빈 리스트라서 할 필요 없는 줄이긴 함.
+      });
       throw Exception('Failed to load posts');
     }
   }
@@ -129,21 +138,45 @@ class _ClubHomePageState extends State<ClubHomePage> {
                         )),
                   ),
                 ),
-                _posts != null
-                    ? Container(
+                StreamBuilder<List<Post>>(
+                  stream: _postsController.stream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Container(
                         height: MediaQuery.of(context).size.height,
                         child: ListView.separated(
-                          itemCount: _posts!.length, //null 아닐때만 이 분기로 들어오므로
+                          itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
-                            final post = _posts![index];
+                            final post = snapshot.data![index];
                             return PostCard(post: post);
                           },
                           separatorBuilder: (BuildContext context, int index) =>
                               const Divider(
                                   height: 10, color: Colors.transparent),
                         ),
-                      )
-                    : const Center(child: CircularProgressIndicator()),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+                //_posts != null
+                //    ? Container(
+                //        height: MediaQuery.of(context).size.height,
+                //        child: ListView.separated(
+                //          itemCount: _posts!.length, //null 아닐때만 이 분기로 들어오므로
+                //          itemBuilder: (context, index) {
+                //            final post = _posts![index];
+                //            return PostCard(post: post);
+                //          },
+                //          separatorBuilder: (BuildContext context, int index) =>
+                //              const Divider(
+                //                  height: 10, color: Colors.transparent),
+                //        ),
+                //      )
+                //    : const Center(child: CircularProgressIndicator()),
               ],
             ),
           ),
@@ -151,6 +184,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
         floatingActionButton: ElevatedButton(
           onPressed: () {
             Get.to(const PostAddPage());
+            _fetchPosts();
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColor.objectColor,

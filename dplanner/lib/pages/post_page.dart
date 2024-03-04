@@ -10,6 +10,12 @@ import '../widgets/outline_textform.dart';
 import '../widgets/post_content.dart';
 import 'package:dplanner/models/post_model.dart';
 
+///
+///
+/// POST카드를 클릭하면 연결되는 POST 자세히보기 화면. 내용(글, 댓글)은 다른 class에서
+///
+///
+
 class PostPage extends StatefulWidget {
   final Post post;
 

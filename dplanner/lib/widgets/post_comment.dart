@@ -11,6 +11,11 @@ import 'nextpage_button.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'package:dplanner/models/post_comment_model.dart';
 
+///
+///
+/// POST 자세히보기 화면에서 댓글 내용 그리는 class
+///
+///
 class PostComment extends StatefulWidget {
   final Post post;
   const PostComment({Key? key, required this.post}) : super(key: key);
