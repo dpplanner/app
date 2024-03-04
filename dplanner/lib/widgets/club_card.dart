@@ -1,24 +1,13 @@
 // 클럽 목록에서 보이는 클럽 카드
 
-import 'package:dplanner/controllers/club.dart';
-import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/club_model.dart';
-import 'package:dplanner/services/club_api_service.dart';
-import 'package:dplanner/services/club_member_api_service.dart';
-import 'package:dplanner/services/token_api_service.dart';
-import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get/get.dart';
-
-import '../const.dart';
 import '../controllers/size.dart';
-import '../decode_token.dart';
 import '../style.dart';
 
 class ClubCard extends StatelessWidget {
   final ClubModel thisClub;
-  final Function() event;
+  final VoidCallback event;
 
   const ClubCard({super.key, required this.thisClub, required this.event});
 

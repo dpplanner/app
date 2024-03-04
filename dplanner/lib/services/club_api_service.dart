@@ -35,7 +35,8 @@ class ClubApiService {
 
     if (response.statusCode == 201) {
       await TokenApiService.postUpdateToken();
-      return ClubModel.fromJson(jsonDecode(response.body)['data']);
+      return ClubModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes))['data']);
     }
 
     // 예외 처리; 메시지를 포함한 예외를 던짐

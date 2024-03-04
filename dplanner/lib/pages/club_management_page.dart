@@ -41,9 +41,13 @@ class _ClubManagementPageState extends State<ClubManagementPage> {
             selectButton("클럽 설정", () {
               Get.toNamed('/club_setting');
             }, true),
-            selectButton("회원 목록", () {}, true),
+            selectButton("회원 목록", () {
+              Get.toNamed('/club_member_list');
+            }, true),
             selectButton("예약 요청", () {}, true),
-            selectButton("공유 물품 목록", () {}, true),
+            selectButton("공유 물품 목록", () {
+              Get.toNamed('/resource_list');
+            }, true),
             selectButton("게시판 신고 관리", () {}, true),
           ],
         ),
