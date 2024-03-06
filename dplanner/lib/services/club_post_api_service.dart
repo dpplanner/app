@@ -9,6 +9,27 @@ import 'package:dplanner/models/post_comment_model.dart';
 class PostApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
 
+  static Future<void> deletePost(int postId) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final url = Uri.parse('$baseUrl/posts/$postId');
+    final headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    try {
+      final response = await http.delete(url, headers: headers);
+      if (response.statusCode == 204) {
+        return; // 성공적으로 삭제되면 아무것도 반환하지 않음
+      } else {
+        throw Exception('Failed to delete post: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to delete post: $e');
+    }
+  }
+
   static Future<List<Post>> fetchPosts({required int clubID}) async {
     final storage = FlutterSecureStorage();
     final accessToken = await storage.read(key: accessTokenKey);
