@@ -55,4 +55,31 @@ class PostApiService {
       throw Exception('Failed to load comments');
     }
   }
+
+  static Future<bool> toggleLike(int postId) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final url = Uri.parse('$baseUrl/posts/$postId/like');
+    final headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    try {
+      final response = await http.put(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['data']['status'] == 'LIKE') {
+          return true;
+        } else if (data['data']['status'] == 'DISLIKE') {
+          return false;
+        }
+      }
+      throw Exception('Failed to toggle like');
+    } catch (e) {
+      throw Exception('Failed to toggle like: $e');
+    }
+  }
 }

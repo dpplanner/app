@@ -126,7 +126,6 @@ class _ClubHomePageState extends State<ClubHomePage> {
                   stream: _postsController.stream,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      print("데이터 있당");
                       return Container(
                         height: MediaQuery.of(context).size.height,
                         child: ListView.separated(
@@ -141,10 +140,8 @@ class _ClubHomePageState extends State<ClubHomePage> {
                         ),
                       );
                     } else if (snapshot.hasError) {
-                      print("데이터 없땅");
                       return Text('Error: ${snapshot.error}');
                     } else {
-                      print("모지");
                       return const Center(child: CircularProgressIndicator());
                     }
                   },

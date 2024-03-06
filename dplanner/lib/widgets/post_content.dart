@@ -10,6 +10,7 @@ import '../controllers/size.dart';
 import '../style.dart';
 import 'nextpage_button.dart';
 import 'package:dplanner/models/post_model.dart';
+import 'package:dplanner/services/club_post_api_service.dart';
 
 ///
 ///
@@ -84,35 +85,19 @@ class _PostContentState extends State<PostContent> {
   }
 
   void _toggleLike() async {
-    final url =
-        Uri.parse('http://3.39.102.31:8080/posts/${widget.post.id}/like');
-    final headers = {
-      'Authorization':
-          'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
-    };
-
     try {
-      final response = await http.put(url, headers: headers);
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        if (data['data']['status'] == 'LIKE') {
-          setState(() {
-            isLiked = true;
-            likeCount += 1; //서버에서 실시간으로 좋아요가 올라가는건 페이지를 새로고침해야지만 볼 수 있음
-          });
-        } else if (data['data']['status'] == 'DISLIKE') {
-          setState(() {
-            isLiked = false;
-            likeCount -= 1;
-          });
+      final bool newLikeStatus =
+          await PostApiService.toggleLike(widget.post.id);
+      setState(() {
+        isLiked = newLikeStatus;
+        if (isLiked) {
+          likeCount += 1;
+        } else {
+          likeCount -= 1;
         }
-      } else {
-        Get.snackbar('알림', '오류가 발생했습니다. 다시 시도해주세요  no ${response.statusCode}');
-      }
+      });
     } catch (e) {
-      Get.snackbar('알림', '오류가 발생했습니다. 다시 시도해주세요 ${e}');
+      Get.snackbar('알림', '오류가 발생했습니다. 다시 시도해주세요: $e');
     }
   }
 
