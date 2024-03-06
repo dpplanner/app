@@ -16,6 +16,7 @@ class ClubJoinSuccessPage extends StatelessWidget {
         preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           backgroundColor: AppColor.backgroundColor,
+          scrolledUnderElevation: 0,
           automaticallyImplyLeading: false,
           title: const Text(
             "클럽 가입하기",

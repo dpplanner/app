@@ -32,11 +32,12 @@ class _ClubHomePageState extends State<ClubHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: AppColor.backgroundColor2,
+        backgroundColor: AppColor.backgroundColor,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(60.0),
           child: AppBar(
             backgroundColor: AppColor.backgroundColor,
+            scrolledUnderElevation: 0,
             leadingWidth: SizeController.to.screenWidth * 0.2,
             leading: IconButton(
                 onPressed: () {
@@ -45,7 +46,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
                 icon: const Icon(SFSymbols.menu)),
             title: Text(
               ClubController.to.club().clubName,
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
             ),
             actions: [
               IconButton(

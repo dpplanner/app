@@ -20,7 +20,7 @@ class NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: (isNew) ? AppColor.markColor2 : Colors.transparent,
+      color: (isNew) ? AppColor.markColor : Colors.transparent,
       child: Padding(
         padding: const EdgeInsets.all(18.0),
         child: Row(

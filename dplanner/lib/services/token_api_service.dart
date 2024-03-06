@@ -82,10 +82,10 @@ class TokenApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// PATCH: /members/(_.member_id)/changeClub [클럽 변경하기] 가입된 클럽 중 다른 클럽으로 이동
+  /// PATCH: /members/(_.member_id)/change-club [클럽 변경하기] 가입된 클럽 중 다른 클럽으로 이동
   static Future<void> patchUpdateClub(
       {required String memberId, required String clubId}) async {
-    final url = Uri.parse('$baseUrl/members/$memberId/changeClub');
+    final url = Uri.parse('$baseUrl/members/$memberId/change-club');
     const storage = FlutterSecureStorage();
 
     String? accessToken = await storage.read(key: accessTokenKey);

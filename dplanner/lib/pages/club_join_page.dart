@@ -43,6 +43,7 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
         preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           backgroundColor: AppColor.backgroundColor,
+          scrolledUnderElevation: 0,
           leadingWidth: SizeController.to.screenWidth * 0.2,
           leading: IconButton(
               onPressed: () {
@@ -135,8 +136,7 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                                 child: ClubCard(
-                                    thisClub: ClubController.to.club.value,
-                                    noEvent: true),
+                                    thisClub: ClubController.to.club.value),
                               ),
                             ],
                           ),

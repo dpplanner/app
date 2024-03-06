@@ -13,6 +13,7 @@ class ErrorPage extends StatelessWidget {
         preferredSize: const Size.fromHeight(60.0),
         child: AppBar(
           backgroundColor: AppColor.backgroundColor,
+          scrolledUnderElevation: 0,
         ),
       ),
       body: const Center(

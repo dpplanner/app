@@ -34,7 +34,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  static const storage = FlutterSecureStorage();
+  FlutterSecureStorage storage = const FlutterSecureStorage();
 
   // refresh token 유효성 검사
   bool checkRefreshToken(String token) {
@@ -161,9 +161,7 @@ class _LoginPageState extends State<LoginPage> {
       body: FutureBuilder(
           future: checkUserLogin(),
           builder: (context, snapshot) {
-            if (snapshot.hasData == false) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
+            if (snapshot.hasError) {
               return const ErrorPage();
             } else {
               return SafeArea(
