@@ -10,6 +10,7 @@ import '../style.dart';
 import 'nextpage_button.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'package:dplanner/models/post_comment_model.dart';
+import 'package:dplanner/services/club_post_api_service.dart';
 
 ///
 ///
@@ -30,29 +31,14 @@ class _PostCommentState extends State<PostComment> {
   @override
   void initState() {
     super.initState();
-    fetchComments(widget.post.id);
+    _fetchComments();
   }
 
-  Future<void> fetchComments(int postId) async {
-    final response = await http.get(
-        Uri.parse('http://3.39.102.31:8080/posts/$postId/comments'),
-        headers: {
-          'Authorization':
-              'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
-        }); //TODO: token값 받아오도록 변경해야함
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData =
-          jsonDecode(utf8.decode(response.bodyBytes));
-      final List<dynamic> content = responseData['data'];
-
-      setState(() {
-        _comments = content.map((data) => Comment.fromJson(data)).toList();
-        print(_comments);
-      });
-    } else {
-      throw Exception('Failed to load comments');
-    }
+  Future<void> _fetchComments() async {
+    final comments = await PostApiService.fetchComments(widget.post.id);
+    setState(() {
+      _comments = comments;
+    });
   }
 
   @override

@@ -149,21 +149,6 @@ class _ClubHomePageState extends State<ClubHomePage> {
                     }
                   },
                 ),
-                //_posts != null
-                //    ? Container(
-                //        height: MediaQuery.of(context).size.height,
-                //        child: ListView.separated(
-                //          itemCount: _posts!.length, //null 아닐때만 이 분기로 들어오므로
-                //          itemBuilder: (context, index) {
-                //            final post = _posts![index];
-                //            return PostCard(post: post);
-                //          },
-                //          separatorBuilder: (BuildContext context, int index) =>
-                //              const Divider(
-                //                  height: 10, color: Colors.transparent),
-                //        ),
-                //      )
-                //    : const Center(child: CircularProgressIndicator()),
               ],
             ),
           ),
