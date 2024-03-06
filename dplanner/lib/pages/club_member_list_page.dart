@@ -2,9 +2,7 @@ import 'dart:async';
 
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -127,6 +125,8 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                                         child: CircularProgressIndicator());
                                   } else if (snapshot.hasError) {
                                     return const ErrorPage();
+                                  } else if (snapshot.data!.isEmpty) {
+                                    return const SizedBox();
                                   } else {
                                     return Column(
                                       children: [
@@ -277,25 +277,35 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                         size: 20,
                       ),
                     ),
-                    Visibility(
-                      visible: member.isConfirmed,
-                      replacement: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          SFSymbols.person_badge_plus,
-                          color: AppColor.textColor,
-                          size: 20,
+                    if (MemberController.to.clubMember().role == "ADMIN")
+                      Visibility(
+                        visible: member.isConfirmed,
+                        replacement: IconButton(
+                          onPressed: () async {
+                            try {
+                              await ClubMemberApiService.patchMemberToClub(
+                                  clubMemberId: member.id,
+                                  clubId: ClubController.to.club().id);
+                              getClubMemberList();
+                            } catch (e) {
+                              print(e.toString());
+                            }
+                          },
+                          icon: const Icon(
+                            SFSymbols.person_badge_plus,
+                            color: AppColor.textColor,
+                            size: 20,
+                          ),
                         ),
-                      ),
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          SFSymbols.person_badge_minus,
-                          color: AppColor.textColor,
-                          size: 20,
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            SFSymbols.person_badge_minus,
+                            color: AppColor.textColor,
+                            size: 20,
+                          ),
                         ),
-                      ),
-                    )
+                      )
                   ],
                 ),
               ],

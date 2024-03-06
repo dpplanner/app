@@ -80,8 +80,10 @@ class ClubMemberApiService {
   /// GET: /clubs/(_.club_id)/club-members [클럽 멤버 목록] 클럽 멤버 목록 불러오기
   static Future<List<ClubMemberModel>> getClubMemberList(
       {required int clubId, required bool confirmed}) async {
-    final url =
-        Uri.parse('$baseUrl/clubs/$clubId/club-members?confirmed=$confirmed');
+    ///TODO: API 수정 요청
+    final url = confirmed
+        ? Uri.parse('$baseUrl/clubs/$clubId/club-members')
+        : Uri.parse('$baseUrl/clubs/$clubId/club-members?confirmed=$confirmed');
     const storage = FlutterSecureStorage();
 
     String? accessToken = await storage.read(key: accessTokenKey);
@@ -152,6 +154,33 @@ class ClubMemberApiService {
     if (response.statusCode == 200) {
       return ClubMemberModel.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes))['data']);
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
+  /// PATCH: /clubs/(_.club_id)/club-members/confirm [클럽 멤버 승인] 클럽 멤버로 승인하기
+  static Future<void> patchMemberToClub(
+      {required int clubMemberId, required int clubId}) async {
+    final url = Uri.parse('$baseUrl/clubs/$clubId/club-members/confirm');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.patch(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({"id": clubMemberId}),
+    );
+
+    if (response.statusCode == 204) {
+      return;
     }
 
     // 예외 처리; 메시지를 포함한 예외를 던짐

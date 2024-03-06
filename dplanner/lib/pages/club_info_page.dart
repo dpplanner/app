@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
+import 'package:dplanner/models/club_member_model.dart';
 import 'package:dplanner/pages/club_member_list_page.dart';
 import 'package:dplanner/pages/resource_list_page.dart';
+import 'package:dplanner/services/club_member_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
@@ -135,11 +137,13 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                     ),
                     Row(
                       children: [
-                        const Text(
-                          "133",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 16),
-                        ),
+                        Obx(() {
+                          return Text(
+                            "${ClubController.to.club().memberCount}",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 16),
+                          );
+                        }),
                         InkWell(
                           onTap: () {
                             Get.to(const ClubMemberListPage());
@@ -187,26 +191,13 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                     ),
                     Row(
                       children: [
-                        FutureBuilder(
-                            future: getResourceNum(),
-                            builder:
-                                (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.hasData == false) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              } else if (snapshot.hasError) {
-                                return const ErrorPage();
-                              } else {
-                                return Obx(() {
-                                  return Text(
-                                    "${ClubController.to.resources().length}",
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16),
-                                  );
-                                });
-                              }
-                            }),
+                        Obx(() {
+                          return Text(
+                            "${ClubController.to.resources().length}",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 16),
+                          );
+                        }),
                         InkWell(
                           onTap: () {
                             Get.to(const ResourceListPage());
