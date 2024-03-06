@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
+import 'package:dplanner/services/club_api_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -11,6 +14,7 @@ import '../controllers/size.dart';
 import '../models/club_member_model.dart';
 import '../services/club_member_api_service.dart';
 import '../style.dart';
+import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import 'error_page.dart';
 
@@ -306,30 +310,24 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                 ),
                 Row(
                   children: [
-                    IconButton(
-                      onPressed: () {
-                        _clubMemberInfo(member: member);
-                      },
-                      icon: const Icon(
-                        SFSymbols.info_circle,
-                        color: AppColor.textColor,
-                        size: 20,
+                    if (member.isConfirmed)
+                      IconButton(
+                        onPressed: () {
+                          _clubMemberInfo(member: member);
+                        },
+                        icon: const Icon(
+                          SFSymbols.info_circle,
+                          color: AppColor.textColor,
+                          size: 20,
+                        ),
                       ),
-                    ),
                     if (MemberController.to.clubMember().role == "ADMIN" &&
                         member.role != "ADMIN")
                       Visibility(
                         visible: member.isConfirmed,
                         replacement: IconButton(
                           onPressed: () async {
-                            try {
-                              await ClubMemberApiService.patchMemberToClub(
-                                  clubMemberId: member.id,
-                                  clubId: ClubController.to.club().id);
-                              getClubMemberList();
-                            } catch (e) {
-                              print(e.toString());
-                            }
+                            _clubMemberInfo(member: member);
                           },
                           icon: const Icon(
                             SFSymbols.person_badge_plus,
@@ -338,7 +336,9 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                           ),
                         ),
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            checkDeleteClubMember(member: member);
+                          },
                           icon: const Icon(
                             SFSymbols.person_badge_minus,
                             color: AppColor.textColor,
@@ -498,9 +498,9 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
-              child: Expanded(
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
                 child: Text(
                   member.info ?? "",
                   style: const TextStyle(
@@ -508,6 +508,67 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                     fontWeight: FontWeight.w500,
                     fontSize: 16,
                   ),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: !member.isConfirmed,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  children: [
+                    NextPageButton(
+                      text: const Text(
+                        "가입 승인하기",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColor.backgroundColor),
+                      ),
+                      buttonColor: AppColor.objectColor,
+                      onPressed: () async {
+                        try {
+                          await ClubMemberApiService.patchMemberToClub(
+                              clubMemberId: member.id,
+                              clubId: ClubController.to.club().id);
+                          ClubController.to.club.value =
+                              await ClubApiService.getClub(
+                                  clubID: ClubController.to.club().id);
+                          getClubMemberList();
+                          Get.back();
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0, top: 5),
+                      child: NextPageButton(
+                        text: const Text(
+                          "가입 거절하기",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColor.backgroundColor),
+                        ),
+                        buttonColor: AppColor.markColor,
+                        onPressed: () async {
+                          try {
+                            await ClubMemberApiService.deleteClubMember(
+                                clubMemberId: member.id,
+                                clubId: ClubController.to.club().id);
+                            getClubMemberList();
+                            ClubController.to.club.value =
+                                await ClubApiService.getClub(
+                                    clubID: ClubController.to.club().id);
+                            Get.back();
+                          } catch (e) {
+                            print(e.toString());
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -521,6 +582,171 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
         ),
+      ),
+    );
+  }
+
+  void checkDeleteClubMember({required ClubMemberModel member}) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColor.backgroundColor,
+        elevation: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "정말 이 회원을 ${ClubController.to.club().clubName}에서",
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              ),
+              const Text(
+                "퇴출하시나요?",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "한번 퇴출된 회원은 재가입이 어려워요",
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 24.0),
+                    child: ClipOval(
+                      child: Visibility(
+                        visible: (member.url == null),
+                        replacement: Image.network(
+                          "https://${member.url}",
+                          height: SizeController.to.screenWidth * 0.1,
+                          width: SizeController.to.screenWidth * 0.1,
+                          fit: BoxFit.fill,
+                          errorBuilder: (BuildContext context, Object error,
+                              StackTrace? stackTrace) {
+                            return Container(
+                              color: AppColor.backgroundColor,
+                              height: SizeController.to.screenWidth * 0.1,
+                              width: SizeController.to.screenWidth * 0.1,
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Image',
+                                    style: TextStyle(
+                                      color: AppColor.textColor,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Failed',
+                                    style: TextStyle(
+                                      color: AppColor.textColor,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        child: Image.asset(
+                          'assets/images/jin_profile.png',
+                          height: SizeController.to.screenWidth * 0.1,
+                          width: SizeController.to.screenWidth * 0.1,
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        member.name,
+                        style: const TextStyle(
+                          color: AppColor.textColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        member.role,
+                        style: const TextStyle(
+                          color: AppColor.textColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+        actions: [
+          Padding(
+            padding:
+                const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 24.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: NextPageButton(
+                    text: const Text(
+                      "취소",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColor.backgroundColor),
+                    ),
+                    buttonColor: AppColor.objectColor,
+                    onPressed: Get.back,
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: NextPageButton(
+                    text: const Text(
+                      "퇴출하기",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppColor.backgroundColor),
+                    ),
+                    buttonColor: AppColor.markColor,
+                    onPressed: () async {
+                      try {
+                        await ClubMemberApiService.deleteClubMember(
+                            clubMemberId: member.id,
+                            clubId: ClubController.to.club().id);
+                        getClubMemberList();
+                        ClubController.to.club.value =
+                            await ClubApiService.getClub(
+                                clubID: ClubController.to.club().id);
+                        Get.back();
+                      } catch (e) {
+                        print(e.toString());
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
