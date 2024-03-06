@@ -66,10 +66,10 @@ class ClubApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// POST: /clubs/(_.club_id)/updateClubImage [클럽 대표 이미지 변경] 클럽 대표 이미지 변경하기
+  /// POST: /clubs/(_.club_id)/update-club-image [클럽 대표 이미지 변경] 클럽 대표 이미지 변경하기
   static Future<ClubModel> postClubImage(
       {required int clubId, required XFile? image}) async {
-    final url = Uri.parse('$baseUrl/clubs/$clubId/updateClubImage');
+    final url = Uri.parse('$baseUrl/clubs/$clubId/update-club-image');
     const storage = FlutterSecureStorage();
 
     String? accessToken = await storage.read(key: accessTokenKey);

@@ -42,13 +42,13 @@ class ClubMemberApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// POST: /clubs/(_.club_id)/club-members/(_.club_member_id)/updateProfileImage [클럽 멤버 프로필 이미지 변경] 클럽 멤버 프로필 이미지 변경하기
+  /// POST: /clubs/(_.club_id)/club-members/(_.club_member_id)/update-profile-image [클럽 멤버 프로필 이미지 변경] 클럽 멤버 프로필 이미지 변경하기
   static Future<ClubMemberModel> postProfile(
       {required int clubId,
       required int clubMemberId,
       required XFile? image}) async {
     final url = Uri.parse(
-        '$baseUrl/clubs/$clubId/club-members/$clubMemberId/updateProfileImage');
+        '$baseUrl/clubs/$clubId/club-members/$clubMemberId/update-profile-image');
     const storage = FlutterSecureStorage();
 
     String? accessToken = await storage.read(key: accessTokenKey);
