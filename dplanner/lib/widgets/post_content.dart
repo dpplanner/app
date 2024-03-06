@@ -72,26 +72,6 @@ class _PostContentState extends State<PostContent> {
     );
   }
 
-  //Future<void> _deletePost(BuildContext context) async {
-  //  final url = Uri.parse('http://3.39.102.31:8080/posts/${widget.post.id}');
-  //  final headers = {
-  //    'Authorization':
-  //        'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
-  //  };
-
-  //  try {
-  //    final response = await http.delete(url, headers: headers);
-  //    if (response.statusCode == 204) {
-  //      Get.snackbar('알림', '게시글이 성공적으로 삭제되었습니다.');
-  //      Get.back();
-  //    } else {
-  //      Get.snackbar('알림', '게시글이 성공적으로 삭제되지 못했습니다.${response.statusCode}');
-  //    }
-  //  } catch (e) {
-  //    Get.snackbar('알림', '오류가 발생했습니다.');
-  //  }
-  //}
-
   void _toggleLike() async {
     try {
       final bool newLikeStatus =
@@ -371,6 +351,7 @@ class _PostContentState extends State<PostContent> {
                     Get.to(PostAddPage(
                       isEdit: true,
                       post: post,
+                      clubID: post.clubId,
                     ));
                   },
                 ),

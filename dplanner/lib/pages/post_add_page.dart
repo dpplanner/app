@@ -11,11 +11,14 @@ import '../style.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/underline_textform.dart';
 import 'package:dplanner/models/post_model.dart';
+import 'package:dplanner/services/club_post_api_service.dart';
 
 class PostAddPage extends StatefulWidget {
   final bool isEdit;
   final Post? post;
-  const PostAddPage({Key? key, this.isEdit = false, this.post})
+  final int clubID;
+  const PostAddPage(
+      {Key? key, this.isEdit = false, this.post, required this.clubID})
       : super(key: key);
 
   @override
@@ -31,95 +34,12 @@ class _PostAddPageState extends State<PostAddPage> {
   late TextEditingController postContent = TextEditingController();
   bool _isFocused2 = false;
 
-  Future<void> _submitPost() async {
-    if (_formKey1.currentState!.validate() &&
-        _formKey2.currentState!.validate()) {
-      final url = Uri.parse('http://3.39.102.31:8080/posts');
-      final headers = {
-        'Authorization':
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
-      };
-      final formData = http.MultipartRequest('POST', url);
-      formData.headers.addAll(headers);
-      final jsonData = {
-        'clubId': 1,
-        'title': postSubject.text,
-        'content': postContent.text,
-      };
-      final jsonPart = http.MultipartFile.fromString(
-        'create',
-        jsonEncode(jsonData),
-        contentType: MediaType('application', 'json'),
-      );
-
-      formData.files.add(jsonPart);
-
-      try {
-        final response = await formData.send();
-
-        if (response.statusCode == 201) {
-          // 요청이 성공한 경우
-          Get.snackbar('알림', '게시글이 작성되었습니다.');
-          // 페이지를 닫음
-          Get.back();
-        } else {
-          // 요청이 실패한 경우
-          //print('${response.body} ${response.statusCode}, ${body}');
-          Get.snackbar('알림', '게시글 작성에 실패했습니다. error: ${response.statusCode}');
-        }
-      } catch (e) {
-        // 요청 중 오류가 발생한 경우
-        Get.snackbar('알림', '오류가 발생했습니다.');
-      }
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     // post가 null이 아닌 경우, 해당 post의 내용을 텍스트 필드에 채워넣기
     postSubject = TextEditingController(text: widget.post?.title ?? '');
     postContent = TextEditingController(text: widget.post?.content ?? '');
-  }
-
-  Future<void> _editPost(int postID) async {
-    if (_formKey1.currentState!.validate() &&
-        _formKey2.currentState!.validate()) {
-      final url = Uri.parse('http://3.39.102.31:8080/posts/$postID');
-      final headers = {
-        'Authorization':
-            'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU',
-      };
-      final formData = http.MultipartRequest('PUT', url);
-      formData.headers.addAll(headers);
-      final jsonData = {
-        'title': postSubject.text,
-        'content': postContent.text,
-        'attatchmentUrl': [],
-      };
-      final jsonPart = http.MultipartFile.fromString(
-        'update',
-        jsonEncode(jsonData),
-        contentType: MediaType('application', 'json'),
-      );
-
-      formData.files.add(jsonPart);
-
-      try {
-        final response = await formData.send();
-
-        if (response.statusCode == 200) {
-          Get.back();
-          Get.snackbar('알림', '게시글이 수정되었습니다.');
-        } else {
-          // 요청이 실패한 경우
-          Get.snackbar('알림', '게시글 수정에 실패했습니다. error: ${response.statusCode}');
-        }
-      } catch (e) {
-        // 요청 중 오류가 발생한 경우
-        Get.snackbar('알림', '오류가 발생했습니다.');
-      }
-    }
   }
 
   @override
@@ -152,9 +72,21 @@ class _PostAddPageState extends State<PostAddPage> {
             TextButton(
               onPressed: widget.isEdit
                   ? () {
-                      _editPost(widget.post!.id);
+                      PostApiService.editPost(
+                          postID: widget.post!.id,
+                          title: postSubject.text,
+                          content: postContent.text);
                     }
-                  : _submitPost,
+                  : () {
+                      if (_formKey1.currentState!.validate() &&
+                          _formKey2.currentState!.validate()) {
+                        //TODO: 비어있지 않은 것 제대로 확인하도록 수정
+                        PostApiService.submitPost(
+                            clubId: widget.clubID,
+                            title: postSubject.text,
+                            content: postContent.text);
+                      }
+                    },
               child: const Text(
                 "완료",
                 style: TextStyle(

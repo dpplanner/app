@@ -152,7 +152,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
         ),
         floatingActionButton: ElevatedButton(
           onPressed: () {
-            Get.to(const PostAddPage());
+            Get.to(PostAddPage(clubID: ClubController.to.club().id));
             PostApiService.fetchPosts(clubID: ClubController.to.club().id);
           },
           style: ElevatedButton.styleFrom(

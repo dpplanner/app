@@ -1,6 +1,8 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:get/get.dart';
 
 import '../const.dart';
 import 'package:dplanner/models/post_model.dart';
@@ -8,6 +10,109 @@ import 'package:dplanner/models/post_comment_model.dart';
 
 class PostApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
+
+  static Future<void> submitPost({
+    required int clubId,
+    required String title,
+    required String content,
+  }) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final url = Uri.parse('$baseUrl/posts');
+    final headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+    final formData = http.MultipartRequest('POST', url);
+    formData.headers.addAll(headers);
+    final jsonData = {
+      'clubId': clubId,
+      'title': title,
+      'content': content,
+    };
+    final jsonPart = http.MultipartFile.fromString(
+      'create',
+      jsonEncode(jsonData),
+      contentType: MediaType('application', 'json'),
+    );
+
+    formData.files.add(jsonPart);
+
+    try {
+      final response = await formData.send();
+
+      if (response.statusCode == 201) {
+        Get.back();
+        // 요청이 성공한 경우
+        Get.snackbar('알림', '게시글이 작성되었습니다.');
+      } else {
+        // 요청이 실패한 경우
+        Get.snackbar('알림', '게시글 작성에 실패했습니다. error: ${response.statusCode}');
+      }
+    } catch (e) {
+      // 요청 중 오류가 발생한 경우
+      Get.snackbar('알림', '오류가 발생했습니다.');
+    }
+  }
+
+  static Future<List<Post>> fetchPosts({required int clubID}) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/posts/clubs/$clubID?size=10&page=0'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(utf8.decode(response.bodyBytes));
+      final List<dynamic> content = responseData['data']['content'];
+      return content.map((data) => Post.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load posts');
+    }
+  }
+
+  static Future<void> editPost({
+    required int postID,
+    required String title,
+    required String content,
+  }) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final url = Uri.parse('$baseUrl/posts/$postID');
+    final headers = {'Authorization': 'Bearer  $accessToken'};
+    final formData = http.MultipartRequest('PUT', url);
+    formData.headers.addAll(headers);
+    final jsonData = {
+      'title': title,
+      'content': content,
+      'attachmentUrl': [],
+    };
+    final jsonPart = http.MultipartFile.fromString(
+      'update',
+      jsonEncode(jsonData),
+      contentType: MediaType('application', 'json'),
+    );
+
+    formData.files.add(jsonPart);
+
+    try {
+      final response = await formData.send();
+
+      if (response.statusCode == 200) {
+        Get.back();
+        Get.snackbar('알림', '게시글이 수정되었습니다.');
+      } else {
+        // 요청이 실패한 경우
+        Get.snackbar('알림', '게시글 수정에 실패했습니다. error: ${response.statusCode}');
+      }
+    } catch (e) {
+      // 요청 중 오류가 발생한 경우
+      Get.snackbar('알림', '오류가 발생했습니다.');
+    }
+  }
 
   static Future<void> deletePost(int postId) async {
     final storage = FlutterSecureStorage();
@@ -27,24 +132,6 @@ class PostApiService {
       }
     } catch (e) {
       throw Exception('Failed to delete post: $e');
-    }
-  }
-
-  static Future<List<Post>> fetchPosts({required int clubID}) async {
-    final storage = FlutterSecureStorage();
-    final accessToken = await storage.read(key: accessTokenKey);
-
-    final response = await http.get(
-      Uri.parse('$baseUrl/posts/clubs/$clubID?size=10&page=0'),
-      headers: {'Authorization': 'Bearer $accessToken'},
-    );
-
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(utf8.decode(response.bodyBytes));
-      final List<dynamic> content = responseData['data']['content'];
-      return content.map((data) => Post.fromJson(data)).toList();
-    } else {
-      throw Exception('Failed to load posts');
     }
   }
 
