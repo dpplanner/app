@@ -191,3 +191,47 @@ class PostApiService {
     }
   }
 }
+
+class PostCommentApiService {
+  static const String baseUrl = 'http://3.39.102.31:8080';
+
+  static Future<void> postComment({
+    required int postId,
+    required String content,
+  }) async {
+    try {
+      // AccessToken 가져오기
+      final storage = FlutterSecureStorage();
+      final accessToken = await storage.read(key: accessTokenKey);
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      };
+
+      final body = jsonEncode({
+        "postId": postId,
+        "parentId": null,
+        "content": content,
+      });
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/comments'),
+        headers: headers,
+        body: body,
+      );
+
+      // 응답 확인
+      if (response.statusCode == 201) {
+        // 성공한 경우
+        Get.snackbar('알림', '댓글이 성공적으로 게시되었습니다.');
+      } else {
+        // 실패한 경우
+        Get.snackbar('알림', '댓글 게시에 실패했습니다. 에러 코드: ${response.statusCode}');
+      }
+    } catch (e) {
+      // 오류 처리
+      print('오류 발생: $e');
+    }
+  }
+}

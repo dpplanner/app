@@ -9,6 +9,7 @@ import '../widgets/bottom_bar.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/post_content.dart';
 import 'package:dplanner/models/post_model.dart';
+import 'package:dplanner/services/club_post_api_service.dart';
 
 ///
 ///
@@ -81,12 +82,31 @@ class _PostPageState extends State<PostPage> {
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
                         child: Form(
-                            key: _formKey,
-                            child: OutlineTextForm(
-                              hintText: '댓글을 남겨보세요',
-                              controller: addComment,
-                              isColored: true,
-                              icon: _isFocused
+                          key: _formKey,
+                          child: OutlineTextForm(
+                            hintText: '댓글을 남겨보세요',
+                            controller: addComment,
+                            isColored: true,
+                            onChanged: (value) {
+                              setState(() {
+                                _isFocused = value.isNotEmpty;
+                              });
+                            },
+                            icon: GestureDetector(
+                              onTap: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  // 폼이 유효한 경우 댓글을 서버에 게시
+                                  print(
+                                      "==post id: ${widget.post.id}, ==content: ${addComment.text}");
+                                  await PostCommentApiService.postComment(
+                                    postId: widget.post.id,
+                                    content: addComment.text,
+                                  );
+                                  // 댓글 입력 필드 초기화
+                                  addComment.clear();
+                                }
+                              },
+                              child: _isFocused
                                   ? const Icon(
                                       SFSymbols.paperplane_fill,
                                       color: AppColor.objectColor,
@@ -95,12 +115,9 @@ class _PostPageState extends State<PostPage> {
                                       SFSymbols.paperplane,
                                       color: AppColor.textColor2,
                                     ),
-                              onChanged: (value) {
-                                setState(() {
-                                  _isFocused = value.isNotEmpty;
-                                });
-                              },
-                            )),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
