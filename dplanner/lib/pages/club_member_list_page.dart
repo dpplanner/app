@@ -207,11 +207,50 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                         Padding(
                           padding: const EdgeInsets.only(right: 12.0),
                           child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/jin_profile.png',
-                              height: SizeController.to.screenWidth * 0.1,
-                              width: SizeController.to.screenWidth * 0.1,
-                              fit: BoxFit.fill,
+                            child: Visibility(
+                              visible: (member.url == null),
+                              replacement: Image.network(
+                                "https://${member.url}",
+                                height: SizeController.to.screenWidth * 0.1,
+                                width: SizeController.to.screenWidth * 0.1,
+                                fit: BoxFit.fill,
+                                errorBuilder: (BuildContext context,
+                                    Object error, StackTrace? stackTrace) {
+                                  return Container(
+                                    color: AppColor.backgroundColor,
+                                    height: SizeController.to.screenWidth * 0.1,
+                                    width: SizeController.to.screenWidth * 0.1,
+                                    child: const Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Image',
+                                          style: TextStyle(
+                                            color: AppColor.textColor,
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Failed',
+                                          style: TextStyle(
+                                            color: AppColor.textColor,
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              child: Image.asset(
+                                'assets/images/jin_profile.png',
+                                height: SizeController.to.screenWidth * 0.1,
+                                width: SizeController.to.screenWidth * 0.1,
+                                fit: BoxFit.fill,
+                              ),
                             ),
                           ),
                         ),
@@ -277,7 +316,8 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                         size: 20,
                       ),
                     ),
-                    if (MemberController.to.clubMember().role == "ADMIN")
+                    if (MemberController.to.clubMember().role == "ADMIN" &&
+                        member.role != "ADMIN")
                       Visibility(
                         visible: member.isConfirmed,
                         replacement: IconButton(
@@ -316,133 +356,172 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
     );
   }
 
-  void _clubMemberInfo({required ClubMemberModel member}) async {
-    await showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: AppColor.backgroundColor,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            ),
+  void _clubMemberInfo({required ClubMemberModel member}) {
+    Get.bottomSheet(
+      Container(
+        decoration: const BoxDecoration(
+          color: AppColor.backgroundColor,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                  child: SvgPicture.asset(
-                    'assets/images/showmodal_scrollcontrolbar.svg',
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                    child: SvgPicture.asset(
+                      'assets/images/showmodal_scrollcontrolbar.svg',
+                    ),
                   ),
-                ),
-              ),
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
+                  const Text(
                     "회원 정보",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 24.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 12.0),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/images/jin_profile.png',
-                            fit: BoxFit.fill,
-                          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 24.0),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 24.0),
+                    child: ClipOval(
+                      child: Visibility(
+                        visible: (member.url == null),
+                        replacement: Image.network(
+                          "https://${member.url}",
+                          height: SizeController.to.screenWidth * 0.25,
+                          width: SizeController.to.screenWidth * 0.25,
+                          fit: BoxFit.fill,
+                          errorBuilder: (BuildContext context, Object error,
+                              StackTrace? stackTrace) {
+                            return Container(
+                              color: AppColor.backgroundColor,
+                              height: SizeController.to.screenWidth * 0.25,
+                              width: SizeController.to.screenWidth * 0.25,
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Image',
+                                    style: TextStyle(
+                                      color: AppColor.textColor,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Failed',
+                                    style: TextStyle(
+                                      color: AppColor.textColor,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        child: Image.asset(
+                          'assets/images/jin_profile.png',
+                          height: SizeController.to.screenWidth * 0.25,
+                          width: SizeController.to.screenWidth * 0.25,
+                          fit: BoxFit.fill,
                         ),
                       ),
                     ),
-                    const Expanded(
-                      flex: 2,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "클럽 닉네임",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                  ),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "클럽 닉네임",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
-                          Text(
-                            "회원 등급",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                        ),
+                        Text(
+                          "회원 등급",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      flex: 3,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            member.name,
-                            style: const TextStyle(
-                              color: AppColor.textColor,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                            ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          member.name,
+                          style: const TextStyle(
+                            color: AppColor.textColor,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
                           ),
-                          Text(
-                            (member.role == "") ? "일반" : member.role,
-                            style: const TextStyle(
-                              color: AppColor.textColor,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                            ),
+                        ),
+                        Text(
+                          (member.role == "") ? "일반" : member.role,
+                          style: const TextStyle(
+                            color: AppColor.textColor,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                ],
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(32, 32, 32, 16),
+              child: Text(
+                "소개글",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(32, 32, 32, 16),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
+              child: Expanded(
                 child: Text(
-                  "소개글",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                  member.info ?? "",
+                  style: const TextStyle(
+                    color: AppColor.textColor,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
                   ),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(32, 0, 32, 16),
-                child: Expanded(
-                  child: Text(
-                    "안녕하세요 22기부회장 임동현입니다 감성코레오전문인데 어쩌구 저쩌구 이 앱 만든 장본인중 1나입니다 블라블라 룰루랄라",
-                    style: TextStyle(
-                      color: AppColor.textColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+            ),
+          ],
+        ),
+      ),
+      backgroundColor: AppColor.backgroundColor,
+      elevation: 0,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
     );
   }
 }
