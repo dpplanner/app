@@ -136,8 +136,7 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                                   borderRadius: BorderRadius.circular(10.0),
                                 ),
                                 child: ClubCard(
-                                    thisClub: ClubController.to.club.value,
-                                    event: () {}),
+                                    thisClub: ClubController.to.club.value),
                               ),
                             ],
                           ),

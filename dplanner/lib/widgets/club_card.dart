@@ -7,22 +7,22 @@ import '../style.dart';
 
 class ClubCard extends StatelessWidget {
   final ClubModel thisClub;
-  final VoidCallback event;
+  final VoidCallback? event;
 
-  const ClubCard({super.key, required this.thisClub, required this.event});
+  const ClubCard({super.key, required this.thisClub, this.event});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      splashColor: (event == () {})
+      splashColor: (event == null)
           ? Colors.transparent
           : AppColor.subColor2.withOpacity(0.5),
-      highlightColor: (event == () {})
+      highlightColor: (event == null)
           ? Colors.transparent
           : AppColor.subColor2.withOpacity(0.5),
       borderRadius: BorderRadius.circular(16),
       onTap: () async {
-        event();
+        event!();
       },
       child: Ink(
         decoration: BoxDecoration(
@@ -101,7 +101,7 @@ class ClubCard extends StatelessWidget {
                                 fontSize: 18),
                           ),
                         ),
-                        if (!(thisClub.isConfirmed ?? false))
+                        if (!(thisClub.isConfirmed ?? false) && event != null)
                           const Text(
                             "가입 진행 중",
                             style: TextStyle(

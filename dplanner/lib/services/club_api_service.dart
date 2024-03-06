@@ -197,4 +197,28 @@ class ClubApiService {
     print(errorMessage);
     throw ErrorDescription(errorMessage);
   }
+
+  /// DELETE: /clubs/(_.club_id)/club-members/(_.club_member_id)/leave [클럽 탈퇴] 클럽 탈퇴하기
+  static Future<void> deleteClub(
+      {required int clubId, required int clubMemberId}) async {
+    final url =
+        Uri.parse('$baseUrl/clubs/$clubId/club-members/$clubMemberId/leave');
+    const storage = FlutterSecureStorage();
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.delete(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    });
+
+    if (response.statusCode == 204) {
+      return;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage =
+        jsonDecode(utf8.decode(response.bodyBytes))['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
 }

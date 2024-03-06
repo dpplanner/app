@@ -255,7 +255,18 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                               color: AppColor.backgroundColor),
                         ),
                         buttonColor: AppColor.markColor,
-                        onPressed: () {},
+                        onPressed: () async {
+                          try {
+                            print(MemberController.to.clubMember().id);
+                            await ClubApiService.deleteClub(
+                                clubId: ClubController.to.club().id,
+                                clubMemberId:
+                                    MemberController.to.clubMember().id);
+                            Get.offAllNamed('club_list');
+                          } catch (e) {
+                            print(e.toString());
+                          }
+                        },
                       ),
                     ),
                   )
