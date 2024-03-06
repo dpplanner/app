@@ -16,6 +16,8 @@ import '../widgets/outline_textform.dart';
 import '../widgets/post_card.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:dplanner/services/club_post_api_service.dart';
+import 'package:dplanner/controllers/club.dart';
 
 class ClubHomePage extends StatefulWidget {
   const ClubHomePage({super.key});
@@ -48,30 +50,12 @@ class _ClubHomePageState extends State<ClubHomePage> {
   }
 
   Future<void> _fetchPosts() async {
-    const storage = FlutterSecureStorage();
-
-    String? accessToken = await storage.read(key: accessTokenKey);
-    temp =
-        'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MDg1MyIsInJlY2VudF9jbHViX2lkIjoxLCJjbHViX21lbWJlcl9pZCI6MTA0MywiaXNzIjoiZHBsYW5uZXIiLCJpYXQiOjE3MDkzODQ1MjAsImV4cCI6MTcwOTU2NDUyMH0.aaQFRCYkHMA5k6Ot8rIEEdQKXivC5H0Th3O-TaArmWU';
-    final response = await http.get(
-        Uri.parse('http://3.39.102.31:8080/posts/clubs/1?size=10&page=0'),
-        headers: {
-          'Authorization': 'Bearer $temp',
-        });
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData =
-          jsonDecode(utf8.decode(response.bodyBytes));
-      final List<dynamic> content = responseData['data']['content'];
-      setState(() {
-        _posts = content.map((data) => Post.fromJson(data)).toList();
-      });
-      _postsController.add(_posts);
-    } else {
-      setState(() {
-        _posts = []; //POST init값이 빈 리스트라서 할 필요 없는 줄이긴 함.
-      });
-      throw Exception('Failed to load posts');
-    }
+    final posts =
+        await PostApiService.fetchPosts(clubID: ClubController.to.club().id);
+    setState(() {
+      _posts = posts;
+    });
+    _postsController.add(_posts);
   }
 
   @override
@@ -142,6 +126,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
                   stream: _postsController.stream,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
+                      print("데이터 있당");
                       return Container(
                         height: MediaQuery.of(context).size.height,
                         child: ListView.separated(
@@ -156,8 +141,10 @@ class _ClubHomePageState extends State<ClubHomePage> {
                         ),
                       );
                     } else if (snapshot.hasError) {
+                      print("데이터 없땅");
                       return Text('Error: ${snapshot.error}');
                     } else {
+                      print("모지");
                       return const Center(child: CircularProgressIndicator());
                     }
                   },
@@ -184,7 +171,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
         floatingActionButton: ElevatedButton(
           onPressed: () {
             Get.to(const PostAddPage());
-            _fetchPosts();
+            PostApiService.fetchPosts(clubID: ClubController.to.club().id);
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColor.objectColor,
