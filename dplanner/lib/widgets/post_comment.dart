@@ -177,7 +177,7 @@ class _PostCommentState extends State<PostComment> {
         ),
         IconButton(
           onPressed: () {
-            _commentMore(context);
+            _commentMore(context, comment);
           },
           icon: const Icon(
             SFSymbols.ellipsis,
@@ -188,7 +188,8 @@ class _PostCommentState extends State<PostComment> {
     );
   }
 
-  void _commentMore(BuildContext context) async {
+  void _commentMore(BuildContext context, Comment comment) async {
+    print("dd");
     await showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -280,6 +281,7 @@ class _PostCommentState extends State<PostComment> {
                     ],
                   ),
                   onPressed: () {
+                    PostCommentApiService.deleteComment(comment.id);
                     Get.back();
                   },
                 ),
