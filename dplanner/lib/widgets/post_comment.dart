@@ -27,7 +27,8 @@ class PostComment extends StatefulWidget {
 
 class _PostCommentState extends State<PostComment> {
   List<Comment>? _comments;
-
+  bool showReplies = false;
+  Map<int, bool> showRepliesMap = {};
   @override
   void initState() {
     super.initState();
@@ -36,9 +37,15 @@ class _PostCommentState extends State<PostComment> {
 
   Future<void> _fetchComments() async {
     final comments = await PostApiService.fetchComments(widget.post.id);
-    setState(() {
-      _comments = comments;
-    });
+    if (comments != null)
+      setState(() {
+        _comments = comments;
+        showRepliesMap = Map.fromIterable(
+          comments!.whereType<Comment>(), // Filter out null values if any
+          key: (comment) => (comment as Comment).id,
+          value: (_) => false,
+        );
+      });
   }
 
   @override
@@ -54,7 +61,7 @@ class _PostCommentState extends State<PostComment> {
               ? [
                   const Center(
                     child: Text(
-                      "아무것도 없습니다", //TODO: 이거 사라지는데..왜지
+                      "댓글이 없습니다",
                     ),
                   ),
                 ]
@@ -138,7 +145,7 @@ class _PostCommentState extends State<PostComment> {
                       onTap: () {},
                       borderRadius: BorderRadius.circular(5),
                       child: const Text(
-                        "댓글 달기",
+                        "답글 달기",
                         style: TextStyle(
                           color: AppColor.textColor2,
                           fontWeight: FontWeight.w500,
@@ -148,23 +155,44 @@ class _PostCommentState extends State<PostComment> {
                     ),
                   ],
                 ),
-                comment.children.length != 0
-                    ? Row(
+                comment.children.isNotEmpty
+                    ? Column(
                         children: [
-                          SvgPicture.asset(
-                            'assets/images/extra/comment_line.svg',
-                          ),
-                          InkWell(
-                            onTap: () {},
-                            borderRadius: BorderRadius.circular(5),
-                            child: Text(
-                              "  답글 ${comment.children.length}개 더 보기",
-                              style: TextStyle(
-                                color: AppColor.textColor2,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                              ),
+                          if (showRepliesMap[comment.id]!) ...[
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: comment.children.map((child) {
+                                // 답글 블록 생성
+                                return commentBlock(child);
+                              }).toList(),
                             ),
+                          ],
+                          Row(
+                            children: [
+                              SvgPicture.asset(
+                                'assets/images/extra/comment_line.svg',
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    showRepliesMap[comment.id] =
+                                        !showRepliesMap[comment.id]!;
+                                    print("aaaaaaa $showReplies");
+                                  });
+                                },
+                                borderRadius: BorderRadius.circular(5),
+                                child: Text(
+                                  showRepliesMap[comment.id]!
+                                      ? "답글 숨기기"
+                                      : "  답글 ${comment.children.length}개 더 보기",
+                                  style: TextStyle(
+                                    color: AppColor.textColor2,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       )
@@ -189,7 +217,6 @@ class _PostCommentState extends State<PostComment> {
   }
 
   void _commentMore(BuildContext context, Comment comment) async {
-    print("dd");
     await showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {

@@ -30,6 +30,7 @@ class _PostPageState extends State<PostPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController addComment = TextEditingController();
   bool _isFocused = false;
+  bool _isReplying = false; //답글을 다는 중인지 체크
 
   @override
   Widget build(BuildContext context) {
@@ -96,8 +97,6 @@ class _PostPageState extends State<PostPage> {
                               onTap: () async {
                                 if (_formKey.currentState!.validate()) {
                                   // 폼이 유효한 경우 댓글을 서버에 게시
-                                  print(
-                                      "==post id: ${widget.post.id}, ==content: ${addComment.text}");
                                   await PostCommentApiService.postComment(
                                     postId: widget.post.id,
                                     content: addComment.text,
