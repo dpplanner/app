@@ -28,7 +28,7 @@ class PostComment extends StatefulWidget {
 class _PostCommentState extends State<PostComment> {
   List<Comment>? _comments;
   bool showReplies = false;
-  Map<int, bool> showRepliesMap = {};
+  Map<int, bool>? showRepliesMap = {};
   @override
   void initState() {
     super.initState();
@@ -158,7 +158,7 @@ class _PostCommentState extends State<PostComment> {
                 comment.children.isNotEmpty
                     ? Column(
                         children: [
-                          if (showRepliesMap[comment.id]!) ...[
+                          if (showRepliesMap?[comment.id] ?? false) ...[
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: comment.children.map((child) {
@@ -175,14 +175,16 @@ class _PostCommentState extends State<PostComment> {
                               InkWell(
                                 onTap: () {
                                   setState(() {
-                                    showRepliesMap[comment.id] =
-                                        !showRepliesMap[comment.id]!;
-                                    print("aaaaaaa $showReplies");
+                                    if (showRepliesMap != null) {
+                                      showRepliesMap![comment.id] =
+                                          !(showRepliesMap![comment.id] ??
+                                              false);
+                                    }
                                   });
                                 },
                                 borderRadius: BorderRadius.circular(5),
                                 child: Text(
-                                  showRepliesMap[comment.id]!
+                                  (showRepliesMap?[comment.id] ?? false)
                                       ? "답글 숨기기"
                                       : "  답글 ${comment.children.length}개 더 보기",
                                   style: TextStyle(
@@ -196,8 +198,6 @@ class _PostCommentState extends State<PostComment> {
                           ),
                         ],
                       )
-                    //  children: [Text(comment.children[0].content)],
-
                     : Container(),
               ],
             ),
