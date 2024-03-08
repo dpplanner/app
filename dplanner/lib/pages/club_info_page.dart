@@ -4,7 +4,7 @@ import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/club_member_model.dart';
 import 'package:dplanner/pages/club_member_list_page.dart';
-import 'package:dplanner/pages/resource_list_page.dart';
+import 'package:dplanner/pages/club_resource_list_page.dart';
 import 'package:dplanner/services/club_member_api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -200,7 +200,7 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                         }),
                         InkWell(
                           onTap: () {
-                            Get.to(const ResourceListPage());
+                            Get.to(const ClubResourceListPage());
                           },
                           borderRadius: BorderRadius.circular(16),
                           child: const Padding(

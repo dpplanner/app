@@ -41,6 +41,7 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
   @override
   void dispose() {
     info.dispose();
+    _streamController.close();
     super.dispose();
   }
 
