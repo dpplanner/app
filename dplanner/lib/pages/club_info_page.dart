@@ -137,13 +137,26 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                     ),
                     Row(
                       children: [
-                        Obx(() {
-                          return Text(
-                            "${ClubController.to.club().memberCount}",
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 16),
-                          );
-                        }),
+                        FutureBuilder(
+                            future: getResourceNum(),
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.hasData == false) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return const ErrorPage();
+                              } else {
+                                return Obx(() {
+                                  return Text(
+                                    "${ClubController.to.resources().length}",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  );
+                                });
+                              }
+                            }),
                         InkWell(
                           onTap: () {
                             Get.to(const ClubMemberListPage());

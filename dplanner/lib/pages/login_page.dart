@@ -52,8 +52,15 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> checkUserLogin() async {
     await Future.delayed(const Duration(milliseconds: 1000));
 
-    String? refreshToken = await storage.read(key: refreshTokenKey);
-    String? accessToken = await storage.read(key: accessTokenKey);
+    ///TODO: fluttersecurestorage 일부 기종 문제 해결
+    String? refreshToken;
+    String? accessToken;
+    try {
+      refreshToken = await storage.read(key: refreshTokenKey);
+      accessToken = await storage.read(key: accessTokenKey);
+    } catch (e) {
+      print(e.toString());
+    }
 
     // refreshToken 으로 로그인 상태 확인
     if (refreshToken != null && checkRefreshToken(refreshToken)) {
