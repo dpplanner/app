@@ -11,6 +11,7 @@ import '../controllers/size.dart';
 import '../models/club_manager_model.dart';
 import '../services/club_manager_api_service.dart';
 import '../style.dart';
+import '../widgets/mini_text_button.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/underline_textform.dart';
 import 'error_page.dart';
@@ -152,6 +153,14 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
 
   //types: 0-물품 추가, 1-물품 정보, 2-물품 수정
   void addManager({required int types, required ClubManagerModel manager}) {
+    bool isChecked1 =
+        (manager.authorities.contains("SCHEDULE_ALL")) ? true : false;
+    bool isChecked2 = (manager.authorities.contains("POST_ALL")) ? true : false;
+    bool isChecked3 =
+        (manager.authorities.contains("MEMBER_ALL")) ? true : false;
+    bool isChecked4 =
+        (manager.authorities.contains("RESOURCE_ALL")) ? true : false;
+
     Get.bottomSheet(
       isScrollControlled: true,
       StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
@@ -236,12 +245,115 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                             ),
                           ],
                         ),
-                        const Text(
-                          "권한 설정",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                        const Padding(
+                          padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
+                          child: Text(
+                            "권한 설정",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  isChecked1 = !isChecked1;
+                                });
+                              },
+                              icon: const Icon(SFSymbols.square),
+                              selectedIcon: const Icon(
+                                SFSymbols.checkmark_square_fill,
+                                color: AppColor.objectColor,
+                              ),
+                              isSelected: isChecked1 ? true : false,
+                            ),
+                            const Text(
+                              "예약 관리 권한",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  isChecked2 = !isChecked2;
+                                });
+                              },
+                              icon: const Icon(SFSymbols.square),
+                              selectedIcon: const Icon(
+                                SFSymbols.checkmark_square_fill,
+                                color: AppColor.objectColor,
+                              ),
+                              isSelected: isChecked2 ? true : false,
+                            ),
+                            const Text(
+                              "게시글 관리 권한",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  isChecked3 = !isChecked3;
+                                });
+                              },
+                              icon: const Icon(SFSymbols.square),
+                              selectedIcon: const Icon(
+                                SFSymbols.checkmark_square_fill,
+                                color: AppColor.objectColor,
+                              ),
+                              isSelected: isChecked3 ? true : false,
+                            ),
+                            const Text(
+                              "멤버 관리 권한",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  isChecked4 = !isChecked4;
+                                });
+                              },
+                              icon: const Icon(SFSymbols.square),
+                              selectedIcon: const Icon(
+                                SFSymbols.checkmark_square_fill,
+                                color: AppColor.objectColor,
+                              ),
+                              isSelected: isChecked4 ? true : false,
+                            ),
+                            const Text(
+                              "공유 물품 관리 권한",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -265,16 +377,22 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                       final formKeyState1 = formKey1.currentState!;
                       if (formKeyState1.validate()) {
                         try {
-                          // ClubManagerModel temp =
-                          //     await ClubManagerApiService.postClubManager(
-                          //         clubId: ClubController.to.club().id,
-                          //         name: name.text,
-                          //         info: info.text,
-                          //         returnMessageRequired: isChecked,
-                          //         notice: notice.text,
-                          //         resourceType: (selectedValue1 == "공간")
-                          //             ? "PLACE"
-                          //             : "THING");
+                          List<dynamic> authorities = [];
+                          if (isChecked1) {
+                            authorities.add("SCHEDULE_ALL");
+                          } else if (isChecked2) {
+                            authorities.add("POST_ALL");
+                          } else if (isChecked3) {
+                            authorities.add("MEMBER_ALL");
+                          } else if (isChecked4) {
+                            authorities.add("RESOURCE_ALL");
+                          }
+                          ClubManagerModel temp =
+                              await ClubManagerApiService.postClubManager(
+                                  clubId: ClubController.to.club().id,
+                                  name: name.text,
+                                  description: '',
+                                  authorities: authorities);
                           name.text = "";
                           getClubManagerList();
                           Get.back();
@@ -320,16 +438,22 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                         final formKeyState1 = formKey1.currentState!;
                         if (formKeyState1.validate()) {
                           try {
-                            // ResourceModel temp =
-                            //     await ResourceApiService.putResource(
-                            //         id: resource.id,
-                            //         name: updateName.text,
-                            //         info: updateInfo.text,
-                            //         returnMessageRequired: isChecked,
-                            //         notice: updateNotice.text,
-                            //         resourceType: (selectedValue1 == "공간")
-                            //             ? "PLACE"
-                            //             : "THING");
+                            List<dynamic> authorities = [];
+                            if (isChecked1) {
+                              authorities.add("SCHEDULE_ALL");
+                            } else if (isChecked2) {
+                              authorities.add("POST_ALL");
+                            } else if (isChecked3) {
+                              authorities.add("MEMBER_ALL");
+                            } else if (isChecked4) {
+                              authorities.add("RESOURCE_ALL");
+                            }
+                            ClubManagerModel temp =
+                                await ClubManagerApiService.postClubManager(
+                                    clubId: ClubController.to.club().id,
+                                    name: updateName.text,
+                                    description: '',
+                                    authorities: authorities);
                             getClubManagerList();
                             Get.back();
                           } catch (e) {

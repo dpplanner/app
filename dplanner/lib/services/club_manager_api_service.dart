@@ -11,15 +11,13 @@ import '../models/resource_model.dart';
 class ClubManagerApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
 
-  /// POST: /resources [자원 생성하기] 클럽 자원 생성하기
-  static Future<ResourceModel> postResource(
+  /// POST: /clubs/(_.club_id)/authorities [클럽 매니저 권한 생성] 클럽 매니저 권한 생성하기
+  static Future<ClubManagerModel> postClubManager(
       {required int clubId,
       required String name,
-      required String info,
-      required bool returnMessageRequired,
-      required String notice,
-      required String resourceType}) async {
-    final url = Uri.parse('$baseUrl/resources');
+      required String description,
+      required List<dynamic> authorities}) async {
+    final url = Uri.parse('$baseUrl/clubs/$clubId/authorities');
     const storage = FlutterSecureStorage();
 
     String? accessToken = await storage.read(key: accessTokenKey);
@@ -32,16 +30,14 @@ class ClubManagerApiService {
       },
       body: jsonEncode({
         "name": name,
-        "info": info,
         "clubId": clubId,
-        "returnMessageRequired": returnMessageRequired,
-        "notice": notice,
-        "resourceType": resourceType,
+        "description": description,
+        "authorities": authorities,
       }),
     );
 
-    if (response.statusCode == 201) {
-      return ResourceModel.fromJson(
+    if (response.statusCode == 200) {
+      return ClubManagerModel.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes))['data']);
     }
 
