@@ -260,6 +260,9 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                           children: [
                             IconButton(
                               onPressed: () {
+                                if (types == 1) {
+                                  return;
+                                }
                                 setState(() {
                                   isChecked1 = !isChecked1;
                                 });
@@ -285,6 +288,9 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                           children: [
                             IconButton(
                               onPressed: () {
+                                if (types == 1) {
+                                  return;
+                                }
                                 setState(() {
                                   isChecked2 = !isChecked2;
                                 });
@@ -310,6 +316,9 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                           children: [
                             IconButton(
                               onPressed: () {
+                                if (types == 1) {
+                                  return;
+                                }
                                 setState(() {
                                   isChecked3 = !isChecked3;
                                 });
@@ -335,6 +344,9 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                           children: [
                             IconButton(
                               onPressed: () {
+                                if (types == 1) {
+                                  return;
+                                }
                                 setState(() {
                                   isChecked4 = !isChecked4;
                                 });
@@ -380,11 +392,14 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                           List<dynamic> authorities = [];
                           if (isChecked1) {
                             authorities.add("SCHEDULE_ALL");
-                          } else if (isChecked2) {
+                          }
+                          if (isChecked2) {
                             authorities.add("POST_ALL");
-                          } else if (isChecked3) {
+                          }
+                          if (isChecked3) {
                             authorities.add("MEMBER_ALL");
-                          } else if (isChecked4) {
+                          }
+                          if (isChecked4) {
                             authorities.add("RESOURCE_ALL");
                           }
                           ClubManagerModel temp =
@@ -441,16 +456,20 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                             List<dynamic> authorities = [];
                             if (isChecked1) {
                               authorities.add("SCHEDULE_ALL");
-                            } else if (isChecked2) {
+                            }
+                            if (isChecked2) {
                               authorities.add("POST_ALL");
-                            } else if (isChecked3) {
+                            }
+                            if (isChecked3) {
                               authorities.add("MEMBER_ALL");
-                            } else if (isChecked4) {
+                            }
+                            if (isChecked4) {
                               authorities.add("RESOURCE_ALL");
                             }
                             ClubManagerModel temp =
-                                await ClubManagerApiService.postClubManager(
-                                    clubId: ClubController.to.club().id,
+                                await ClubManagerApiService.putClubManager(
+                                    id: manager.id,
+                                    clubId: manager.clubId,
                                     name: updateName.text,
                                     description: '',
                                     authorities: authorities);

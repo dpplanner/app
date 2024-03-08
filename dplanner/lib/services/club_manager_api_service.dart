@@ -74,16 +74,16 @@ class ClubManagerApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// PUT: /resources/(_.resource_id) [클럽 자원 정보 업데이트] 클럽 자원 수정하기
-  static Future<ResourceModel> putResource(
+  /// PUT: /clubs/(_.club_id)/authorities [클럽 매니저 권한 수정] 클럽 매니저 권한 수정하기
+  static Future<ClubManagerModel> putClubManager(
       {required int id,
+      required int clubId,
       required String name,
-      required String info,
-      required bool returnMessageRequired,
-      required String notice,
-      required String resourceType}) async {
-    final url = Uri.parse('$baseUrl/resources/$id');
+      required String description,
+      required List<dynamic> authorities}) async {
+    final url = Uri.parse('$baseUrl/clubs/$clubId/authorities');
     const storage = FlutterSecureStorage();
+
     String? accessToken = await storage.read(key: accessTokenKey);
 
     final response = await http.put(
@@ -95,15 +95,14 @@ class ClubManagerApiService {
       body: jsonEncode({
         "id": id,
         "name": name,
-        "info": info,
-        "returnMessageRequired": returnMessageRequired,
-        "notice": notice,
-        "resourceType": resourceType,
+        "clubId": clubId,
+        "description": description,
+        "authorities": authorities,
       }),
     );
 
     if (response.statusCode == 200) {
-      return ResourceModel.fromJson(
+      return ClubManagerModel.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes))['data']);
     }
 
