@@ -90,7 +90,9 @@ class _PostAddPageState extends State<PostAddPage> {
                       PostApiService.editPost(
                           postID: widget.post!.id,
                           title: postSubject.text,
-                          content: postContent.text);
+                          content: postContent.text,
+                          imageFileList: selectedImages,
+                          previousImageFileList: widget.post!.attachmentsUrl);
                     }
                   : () {
                       if (_formKey1.currentState!.validate() &&
@@ -197,22 +199,34 @@ class _PostAddPageState extends State<PostAddPage> {
                         100, // Set the height according to your requirements
                     child: ListView(
                       scrollDirection: Axis.horizontal,
-                      children: [
-                        for (var image in selectedImages)
-                          Padding(
+                      children: <Widget>[
+                        if (widget.isEdit &&
+                            widget.post!.attachmentsUrl != null)
+                          ...widget.post!.attachmentsUrl!.map((url) {
+                            String formattedUrl = url.startsWith('https://')
+                                ? url
+                                : 'https://$url';
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.network(formattedUrl), // 원격 이미지를 표시
+                            );
+                          }).toList(),
+                        ...selectedImages.map((image) {
+                          return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: AspectRatio(
                               aspectRatio: 1 / 1,
                               child: Image.file(File(image.path),
-                                  fit: BoxFit.fill),
+                                  fit: BoxFit.fill), // 로컬 이미지를 표시
                             ),
-                          )
+                          );
+                        }).toList(),
                       ],
                     ),
                   ),
                 ),
                 Text(
-                  '${selectedImages.length}/$maxImageCount',
+                  '${selectedImages.length + (widget.post != null ? widget.post!.attachmentsUrl.length : 0)}/$maxImageCount',
                   style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 12,

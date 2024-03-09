@@ -108,12 +108,13 @@ class PostApiService {
     }
   }
 
-  static Future<List<Post>> fetchPosts({required int clubID}) async {
+  static Future<List<Post>> fetchPosts(
+      {required int clubID, required int page}) async {
     final storage = FlutterSecureStorage();
     final accessToken = await storage.read(key: accessTokenKey);
 
     final response = await http.get(
-      Uri.parse('$baseUrl/posts/clubs/$clubID?size=10&page=0'),
+      Uri.parse('$baseUrl/posts/clubs/$clubID?size=100&page=$page'),
       headers: {'Authorization': 'Bearer $accessToken'},
     );
 
@@ -126,11 +127,12 @@ class PostApiService {
     }
   }
 
-  static Future<void> editPost({
-    required int postID,
-    required String title,
-    required String content,
-  }) async {
+  static Future<void> editPost(
+      {required int postID,
+      required String title,
+      required String content,
+      List<XFile>? imageFileList,
+      List<String>? previousImageFileList}) async {
     final storage = FlutterSecureStorage();
     final accessToken = await storage.read(key: accessTokenKey);
 
@@ -141,7 +143,7 @@ class PostApiService {
     final jsonData = {
       'title': title,
       'content': content,
-      'attachmentUrl': [],
+      'attachmentUrl': previousImageFileList,
     };
     final jsonPart = http.MultipartFile.fromString(
       'update',
@@ -150,6 +152,27 @@ class PostApiService {
     );
 
     formData.files.add(jsonPart);
+
+    // 이미지 파일이 있을 경우 멀티파트 파일로 추가
+    if (imageFileList != null) {
+      for (var imageFile in imageFileList) {
+        final compressedFile =
+            await compressImageFile(imageFile); //이미지 퀄리티를 떨어뜨려 용량을 줄임
+        if (compressedFile != null) {
+          final stream = http.ByteStream(compressedFile.openRead());
+          stream.cast();
+          final length = await compressedFile.length();
+          final multipartFile = http.MultipartFile(
+            'files',
+            stream,
+            length,
+            filename: basename(compressedFile.path),
+          );
+          print("${basename(compressedFile.path)}");
+          formData.files.add(multipartFile);
+        }
+      }
+    }
 
     try {
       final response = await formData.send();
