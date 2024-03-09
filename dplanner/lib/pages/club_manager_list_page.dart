@@ -548,7 +548,8 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                   buttonColor: AppColor.objectColor,
                   onPressed: () async {
                     try {
-                      //await ResourceApiService.deleteResource(resourceId: id);
+                      await ClubManagerApiService.deleteManager(
+                          clubId: ClubController.to.club().id, id: id);
                       getClubManagerList();
                       Get.back();
                     } catch (e) {

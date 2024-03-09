@@ -6,7 +6,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 import '../const.dart';
-import '../models/resource_model.dart';
 
 class ClubManagerApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
@@ -112,16 +111,21 @@ class ClubManagerApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// DELETE: /resources/(_.resource_id) [클럽 자원 삭제] 클럽 자원 삭제하기
-  static Future<void> deleteResource({required int resourceId}) async {
-    final url = Uri.parse('$baseUrl/resources/$resourceId');
+  /// DELETE: /clubs/(_.club_id)/authorities [클럽 매니저 삭제] 클럽 매니저 삭제하기
+  static Future<void> deleteManager(
+      {required int clubId, required int id}) async {
+    final url = Uri.parse('$baseUrl/clubs/$clubId/authorities');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
 
-    final response = await http.delete(url, headers: <String, String>{
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $accessToken',
-    });
+    final response = await http.delete(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({"id": id}),
+    );
 
     if (response.statusCode == 204) {
       return;
