@@ -62,7 +62,7 @@ class _ClubListPageState extends State<ClubListPage> {
             scrolledUnderElevation: 0,
             leadingWidth: SizeController.to.screenWidth * 0.25,
             leading: SvgPicture.asset(
-              'assets/images/dplanner_logo_mini.svg',
+              'assets/images/base_image/dplanner_logo_mini.svg',
               fit: BoxFit.none,
             ),
             title: const Text(

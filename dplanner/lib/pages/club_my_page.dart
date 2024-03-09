@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
@@ -82,7 +83,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
                         Row(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
+                              padding: const EdgeInsets.only(right: 16.0),
                               child: ClipOval(
                                 child: Visibility(
                                   visible:
@@ -127,8 +128,8 @@ class _ClubMyPageState extends State<ClubMyPage> {
                                       );
                                     },
                                   ),
-                                  child: Image.asset(
-                                    'assets/images/jin_profile.png',
+                                  child: SvgPicture.asset(
+                                    'assets/images/base_image/base_member_image.svg',
                                     height:
                                         SizeController.to.screenWidth * 0.25,
                                     width: SizeController.to.screenWidth * 0.25,

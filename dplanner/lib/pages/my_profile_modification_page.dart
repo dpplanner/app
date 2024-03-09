@@ -4,6 +4,7 @@ import 'package:dplanner/services/club_member_api_service.dart';
 import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -158,8 +159,8 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                                             );
                                           },
                                         ),
-                                        child: Image.asset(
-                                          'assets/images/jin_profile.png',
+                                        child: SvgPicture.asset(
+                                          'assets/images/base_image/base_member_image.svg',
                                           height:
                                               SizeController.to.screenWidth *
                                                   0.35,
@@ -177,7 +178,7 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                                     pickImage();
                                   },
                                   style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColor.subColor2,
+                                      backgroundColor: AppColor.subColor1,
                                       shape: const CircleBorder(),
                                       minimumSize: Size(
                                         SizeController.to.screenWidth * 0.08,

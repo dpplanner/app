@@ -132,7 +132,7 @@ class _PostAddPageState extends State<PostAddPage> {
                               onTap: () {},
                               borderRadius: BorderRadius.circular(8),
                               child: SvgPicture.asset(
-                                'assets/images/post_add_photo.svg',
+                                'assets/images/base_image/base_post_image.svg',
                               )),
                         ],
                       ),

@@ -2,12 +2,11 @@ import 'dart:async';
 
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
-import 'package:dplanner/models/club_member_model.dart';
 import 'package:dplanner/pages/club_member_list_page.dart';
-import 'package:dplanner/pages/resource_list_page.dart';
-import 'package:dplanner/services/club_member_api_service.dart';
+import 'package:dplanner/pages/club_resource_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
@@ -102,8 +101,8 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                     );
                   },
                 ),
-                child: Image.asset(
-                  'assets/images/dancepozz_big_logo.png',
+                child: SvgPicture.asset(
+                  'assets/images/base_image/base_club_big_image.svg',
                   height: SizeController.to.screenHeight * 0.28,
                   width: SizeController.to.screenWidth,
                   fit: BoxFit.fitWidth,
@@ -191,16 +190,29 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                     ),
                     Row(
                       children: [
-                        Obx(() {
-                          return Text(
-                            "${ClubController.to.resources().length}",
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w700, fontSize: 16),
-                          );
-                        }),
+                        FutureBuilder(
+                            future: getResourceNum(),
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.hasData == false) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return const ErrorPage();
+                              } else {
+                                return Obx(() {
+                                  return Text(
+                                    "${ClubController.to.resources().length}",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  );
+                                });
+                              }
+                            }),
                         InkWell(
                           onTap: () {
-                            Get.to(const ResourceListPage());
+                            Get.to(const ClubResourceListPage());
                           },
                           borderRadius: BorderRadius.circular(16),
                           child: const Padding(

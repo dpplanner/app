@@ -21,14 +21,14 @@ import 'error_page.dart';
 List<String> type = ['공간', '물품'];
 List<String> method = ['예약 신청 후 클럽 관리자 승인'];
 
-class ResourceListPage extends StatefulWidget {
-  const ResourceListPage({super.key});
+class ClubResourceListPage extends StatefulWidget {
+  const ClubResourceListPage({super.key});
 
   @override
-  State<ResourceListPage> createState() => _ResourceListPageState();
+  State<ClubResourceListPage> createState() => _ClubResourceListPageState();
 }
 
-class _ResourceListPageState extends State<ResourceListPage> {
+class _ClubResourceListPageState extends State<ClubResourceListPage> {
   final formKey1 = GlobalKey<FormState>();
   final TextEditingController name = TextEditingController();
   bool isFocused1 = false;
@@ -245,7 +245,7 @@ class _ResourceListPageState extends State<ResourceListPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
                       child: SvgPicture.asset(
-                        'assets/images/showmodal_scrollcontrolbar.svg',
+                        'assets/images/extra/showmodal_scrollcontrolbar.svg',
                       ),
                     ),
                     Text(

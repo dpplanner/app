@@ -59,7 +59,7 @@ class PostMiniCard extends StatelessWidget {
             ),
             if (isPhoto)
               SvgPicture.asset(
-                'assets/images/post_add_photo.svg',
+                'assets/images/base_image/base_post_image.svg',
                 height: 64,
                 width: 64,
               )

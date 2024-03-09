@@ -67,7 +67,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
                             children: [
                               ///TODO: 이미지 바꾸기
                               SvgPicture.asset(
-                                'assets/images/icon_naver.svg',
+                                'assets/images/login/icon_naver.svg',
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 12),

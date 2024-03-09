@@ -189,6 +189,38 @@ class ClubMemberApiService {
     throw ErrorDescription(errorMessage);
   }
 
+  /// PATCH: /clubs/(_.club_id)/club-members/(_.club_member_id)/role [클럽 멤버 권한 및 롤 변경] 클럽 멤버 등급 변경하기
+  static Future<ClubMemberModel> patchAuthorities(
+      {required int clubMemberId,
+      required int clubId,
+      required String role,
+      required int? clubAuthorityId}) async {
+    final url =
+        Uri.parse('$baseUrl/clubs/$clubId/club-members/$clubMemberId/role');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.patch(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({"role": role, "clubAuthorityId": clubAuthorityId}),
+    );
+
+    if (response.statusCode == 200) {
+      return ClubMemberModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes))['data']);
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
   /// DELETE: /clubs/(_.club_id)/club-members/(_.club_member_id)/kickout [클럽 멤버 퇴출] 클럽 멤버 퇴출하기
   static Future<void> deleteClubMember(
       {required int clubId, required int clubMemberId}) async {

@@ -26,8 +26,8 @@ class PostContent extends StatelessWidget {
                 Row(
                   children: [
                     ClipOval(
-                      child: Image.asset(
-                        'assets/images/jin_profile.png',
+                      child: SvgPicture.asset(
+                        'assets/images/base_image/base_member_image.svg',
                         height: SizeController.to.screenWidth * 0.1,
                         width: SizeController.to.screenWidth * 0.1,
                         fit: BoxFit.fill,
@@ -231,7 +231,7 @@ class PostContent extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                 child: SvgPicture.asset(
-                  'assets/images/showmodal_scrollcontrolbar.svg',
+                  'assets/images/extra/showmodal_scrollcontrolbar.svg',
                 ),
               ),
               Padding(
