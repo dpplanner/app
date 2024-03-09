@@ -1,6 +1,7 @@
 import 'package:dplanner/pages/post_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
@@ -37,8 +38,8 @@ class PostCard extends StatelessWidget {
                     Row(
                       children: [
                         ClipOval(
-                          child: Image.asset(
-                            'assets/images/jin_profile.png',
+                          child: SvgPicture.asset(
+                            'assets/images/base_image/base_member_image.svg',
                             height: SizeController.to.screenWidth * 0.1,
                             width: SizeController.to.screenWidth * 0.1,
                             fit: BoxFit.fill,

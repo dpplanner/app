@@ -11,7 +11,6 @@ import '../controllers/size.dart';
 import '../models/club_manager_model.dart';
 import '../services/club_manager_api_service.dart';
 import '../style.dart';
-import '../widgets/mini_text_button.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/underline_textform.dart';
 import 'error_page.dart';
@@ -174,7 +173,7 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
                       child: SvgPicture.asset(
-                        'assets/images/showmodal_scrollcontrolbar.svg',
+                        'assets/images/extra/showmodal_scrollcontrolbar.svg',
                       ),
                     ),
                     Text(

@@ -28,8 +28,8 @@ class PostComment extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ClipOval(
-                      child: Image.asset(
-                        'assets/images/jin_profile.png',
+                      child: SvgPicture.asset(
+                        'assets/images/base_image/base_member_image.svg',
                         height: SizeController.to.screenWidth * 0.09,
                         width: SizeController.to.screenWidth * 0.09,
                         fit: BoxFit.fill,
@@ -93,7 +93,7 @@ class PostComment extends StatelessWidget {
                         Row(
                           children: [
                             SvgPicture.asset(
-                              'assets/images/comment_line.svg',
+                              'assets/images/extra/comment_line.svg',
                             ),
                             InkWell(
                               onTap: () {},
@@ -148,7 +148,7 @@ class PostComment extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                 child: SvgPicture.asset(
-                  'assets/images/showmodal_scrollcontrolbar.svg',
+                  'assets/images/extra/showmodal_scrollcontrolbar.svg',
                 ),
               ),
               Padding(

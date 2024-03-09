@@ -74,9 +74,12 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
-    - assets/images/login/
+    - assets/images/base_image/
     - assets/images/club_create/
+    - assets/images/extra/
+    - assets/images/login/
     - assets/images/notification_icon/
+    - assets/images/splash/
 
   # assets:
   #   - images/a_dot_burr.jpeg

@@ -250,8 +250,8 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                                   );
                                 },
                               ),
-                              child: Image.asset(
-                                'assets/images/jin_profile.png',
+                              child: SvgPicture.asset(
+                                'assets/images/base_image/base_member_image.svg',
                                 height: SizeController.to.screenWidth * 0.1,
                                 width: SizeController.to.screenWidth * 0.1,
                                 fit: BoxFit.fill,
@@ -397,7 +397,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
                       child: SvgPicture.asset(
-                        'assets/images/showmodal_scrollcontrolbar.svg',
+                        'assets/images/extra/showmodal_scrollcontrolbar.svg',
                       ),
                     ),
                     Text(
@@ -466,8 +466,8 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                                       );
                                     },
                                   ),
-                                  child: Image.asset(
-                                    'assets/images/jin_profile.png',
+                                  child: SvgPicture.asset(
+                                    'assets/images/base_image/base_member_image.svg',
                                     height:
                                         SizeController.to.screenWidth * 0.25,
                                     width: SizeController.to.screenWidth * 0.25,
@@ -655,8 +655,8 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                                       );
                                     },
                                   ),
-                                  child: Image.asset(
-                                    'assets/images/jin_profile.png',
+                                  child: SvgPicture.asset(
+                                    'assets/images/base_image/base_member_image.svg',
                                     height:
                                         SizeController.to.screenWidth * 0.25,
                                     width: SizeController.to.screenWidth * 0.25,

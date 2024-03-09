@@ -2,6 +2,7 @@
 
 import 'package:dplanner/models/club_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../controllers/size.dart';
 import '../style.dart';
 
@@ -72,8 +73,8 @@ class ClubCard extends StatelessWidget {
                     );
                   },
                 ),
-                child: Image.asset(
-                  'assets/images/dancepozz_logo.png',
+                child: SvgPicture.asset(
+                  'assets/images/base_image/base_club_image.svg',
                   height: SizeController.to.screenWidth * 0.2,
                   width: SizeController.to.screenWidth * 0.2,
                   fit: BoxFit.fill,

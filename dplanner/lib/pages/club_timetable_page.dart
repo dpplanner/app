@@ -137,7 +137,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           padding: const EdgeInsets.only(
                                               top: 8.0, bottom: 8.0),
                                           child: SvgPicture.asset(
-                                            'assets/images/showmodal_scrollcontrolbar.svg',
+                                            'assets/images/extra/showmodal_scrollcontrolbar.svg',
                                           ),
                                         ),
                                         const Text(
@@ -537,7 +537,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                       child: SvgPicture.asset(
-                        'assets/images/showmodal_scrollcontrolbar.svg',
+                        'assets/images/extra/showmodal_scrollcontrolbar.svg',
                       ),
                     ),
                     SizedBox(
@@ -602,7 +602,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 padding: const EdgeInsets.only(
                                                     top: 8.0, bottom: 8.0),
                                                 child: SvgPicture.asset(
-                                                  'assets/images/showmodal_scrollcontrolbar.svg',
+                                                  'assets/images/extra/showmodal_scrollcontrolbar.svg',
                                                 ),
                                               ),
                                               const Text(
