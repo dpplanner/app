@@ -55,76 +55,79 @@ class _PostPageState extends State<PostPage> {
           ),
         ),
         body: SafeArea(
-          child: Column(
-            children: [
-              PostContent(post: widget.post),
-              Container(
-                color: AppColor.backgroundColor2,
-                height: SizeController.to.screenHeight * 0.01,
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: PostComment(post: widget.post),
+            child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    PostContent(post: widget.post),
+                    Container(
+                      color: AppColor.backgroundColor2,
+                      height: SizeController.to.screenHeight * 0.01,
+                    ),
+                    PostComment(post: widget.post),
+                  ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Row(
-                  children: [
-                    ClipOval(
-                      child: Image.asset(
-                        'assets/images/jin_profile.png',
-                        height: SizeController.to.screenWidth * 0.1,
-                        width: SizeController.to.screenWidth * 0.1,
-                        fit: BoxFit.fill,
-                      ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Row(
+                children: [
+                  ClipOval(
+                    child: Image.asset(
+                      'assets/images/jin_profile.png',
+                      height: SizeController.to.screenWidth * 0.1,
+                      width: SizeController.to.screenWidth * 0.1,
+                      fit: BoxFit.fill,
                     ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
-                        child: Form(
-                          key: _formKey,
-                          child: OutlineTextForm(
-                            hintText: '댓글을 남겨보세요',
-                            controller: addComment,
-                            isColored: true,
-                            onChanged: (value) {
-                              setState(() {
-                                _isFocused = value.isNotEmpty;
-                              });
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
+                      child: Form(
+                        key: _formKey,
+                        child: OutlineTextForm(
+                          hintText: '댓글을 남겨보세요',
+                          controller: addComment,
+                          isColored: true,
+                          onChanged: (value) {
+                            setState(() {
+                              _isFocused = value.isNotEmpty;
+                            });
+                          },
+                          icon: GestureDetector(
+                            onTap: () async {
+                              if (_formKey.currentState!.validate()) {
+                                // 폼이 유효한 경우 댓글을 서버에 게시
+                                await PostCommentApiService.postComment(
+                                  postId: widget.post.id,
+                                  content: addComment.text,
+                                );
+                                // 댓글 입력 필드 초기화
+                                addComment.clear();
+                              }
                             },
-                            icon: GestureDetector(
-                              onTap: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  // 폼이 유효한 경우 댓글을 서버에 게시
-                                  await PostCommentApiService.postComment(
-                                    postId: widget.post.id,
-                                    content: addComment.text,
-                                  );
-                                  // 댓글 입력 필드 초기화
-                                  addComment.clear();
-                                }
-                              },
-                              child: _isFocused
-                                  ? const Icon(
-                                      SFSymbols.paperplane_fill,
-                                      color: AppColor.objectColor,
-                                    )
-                                  : const Icon(
-                                      SFSymbols.paperplane,
-                                      color: AppColor.textColor2,
-                                    ),
-                            ),
+                            child: _isFocused
+                                ? const Icon(
+                                    SFSymbols.paperplane_fill,
+                                    color: AppColor.objectColor,
+                                  )
+                                : const Icon(
+                                    SFSymbols.paperplane,
+                                    color: AppColor.textColor2,
+                                  ),
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        )),
         bottomNavigationBar: const BottomBar());
   }
 }

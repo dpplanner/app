@@ -197,6 +197,24 @@ class _PostContentState extends State<PostContent> {
                     fontSize: 16,
                   ),
                 ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: widget.post.attachmentsUrl.map((imageUrl) {
+                      String formattedUrl = imageUrl.startsWith('https://')
+                          ? imageUrl
+                          : 'https://$imageUrl';
+                      return Container(
+                        height: 100,
+                        width: 100,
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Image.network(formattedUrl, fit: BoxFit.cover),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
               ],
             ),
             SizedBox(height: SizeController.to.screenHeight * 0.02),
