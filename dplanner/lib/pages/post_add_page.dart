@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -33,6 +32,22 @@ class _PostAddPageState extends State<PostAddPage> {
   final _formKey2 = GlobalKey<FormState>();
   late TextEditingController postContent = TextEditingController();
   bool _isFocused2 = false;
+
+  List<XFile> selectedImages = []; // 이미지를 저장할 리스트
+  int maxImageCount = 10; // 최대 선택 가능한 이미지 수
+
+  Future<void> pickImage() async {
+    try {
+      XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        setState(() {
+          selectedImages.add(image); // 선택한 이미지를 리스트에 추가
+        });
+      }
+    } catch (e) {
+      print('Error while picking an image: $e');
+    }
+  }
 
   @override
   void initState() {
@@ -84,7 +99,8 @@ class _PostAddPageState extends State<PostAddPage> {
                         PostApiService.submitPost(
                             clubId: widget.clubID,
                             title: postSubject.text,
-                            content: postContent.text);
+                            content: postContent.text,
+                            imageFileList: selectedImages);
                       }
                     },
               child: const Text(
@@ -156,31 +172,51 @@ class _PostAddPageState extends State<PostAddPage> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
+                  flex: 2, // Adjust the flex value as needed
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 18),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          InkWell(
-                              onTap: () {},
-                              borderRadius: BorderRadius.circular(8),
-                              child: SvgPicture.asset(
-                                'assets/images/base_image/base_post_image.svg',
-                              )),
-                        ],
-                      ),
+                    padding: const EdgeInsets.fromLTRB(24, 12, 12, 18),
+                    child: Row(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            pickImage();
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          child: SvgPicture.asset(
+                            'assets/images/base_image/base_post_image.svg',
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(0, 0, 18, 18),
-                  child: Text(
-                    "2/10",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                        color: AppColor.textColor2),
+                Expanded(
+                  flex: 3, // Adjust the flex value as needed
+                  child: Container(
+                    height:
+                        100, // Set the height according to your requirements
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        for (var image in selectedImages)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: AspectRatio(
+                              aspectRatio: 1 / 1,
+                              child: Image.file(File(image.path),
+                                  fit: BoxFit.fill),
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                ),
+                Text(
+                  '${selectedImages.length}/$maxImageCount',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                    color: AppColor.textColor2,
                   ),
                 ),
               ],

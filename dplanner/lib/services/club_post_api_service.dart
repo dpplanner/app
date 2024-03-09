@@ -1,8 +1,12 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../const.dart';
 import 'package:dplanner/models/post_model.dart';
@@ -11,11 +15,37 @@ import 'package:dplanner/models/post_comment_model.dart';
 class PostApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
 
-  static Future<void> submitPost({
-    required int clubId,
-    required String title,
-    required String content,
-  }) async {
+  static String basename(String filePath) {
+    return filePath.split('/').last;
+  }
+
+  Future<String> getTempDirectoryPath() async {
+    Directory tempDir = await getTemporaryDirectory();
+    return tempDir.path;
+  }
+
+  static Future<XFile?> compressImageFile(XFile file) async {
+    final tempDir = await getTemporaryDirectory();
+    final tempPath = tempDir.path;
+
+    // 압축된 파일의 새 경로를 지정합니다.
+    final outPath = "${tempPath}/${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+    final compressedFile = await FlutterImageCompress.compressAndGetFile(
+      file.path,
+      outPath,
+      quality: 1, // 값을 조정하여 압축률을 제어할 수 있습니다.
+    );
+
+    // 'XFile' 객체로 변환하여 반환합니다.
+    return compressedFile != null ? XFile(compressedFile.path) : null;
+  }
+
+  static Future<void> submitPost(
+      {required int clubId,
+      required String title,
+      required String content,
+      List<XFile>? imageFileList}) async {
     final storage = FlutterSecureStorage();
     final accessToken = await storage.read(key: accessTokenKey);
 
@@ -38,16 +68,39 @@ class PostApiService {
 
     formData.files.add(jsonPart);
 
+    // 이미지 파일이 있을 경우 멀티파트 파일로 추가
+    if (imageFileList != null) {
+      for (var imageFile in imageFileList) {
+        final compressedFile = await compressImageFile(imageFile); //이미지 압축~!
+        if (compressedFile != null) {
+          final stream = http.ByteStream(compressedFile.openRead());
+          stream.cast();
+          final length = await compressedFile.length();
+          final multipartFile = http.MultipartFile(
+            'files',
+            stream,
+            length,
+            filename: basename(compressedFile.path),
+          );
+          print("${basename(compressedFile.path)}");
+          formData.files.add(multipartFile);
+        }
+      }
+    }
+
     try {
       final response = await formData.send();
+      final responseBody = await http.Response.fromStream(response);
 
       if (response.statusCode == 201) {
         Get.back();
         // 요청이 성공한 경우
         Get.snackbar('알림', '게시글이 작성되었습니다.');
+        print(responseBody.body);
       } else {
         // 요청이 실패한 경우
-        Get.snackbar('알림', '게시글 작성에 실패했습니다. error: ${response.statusCode}');
+        Get.snackbar('알림',
+            '게시글 작성에 실패했습니다. error: ${response.statusCode} ${responseBody.body}');
       }
     } catch (e) {
       // 요청 중 오류가 발생한 경우
