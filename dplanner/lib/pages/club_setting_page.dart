@@ -5,6 +5,7 @@ import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/widgets/mini_text_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -159,8 +160,8 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                                               );
                                             },
                                           ),
-                                          child: Image.asset(
-                                            'assets/images/dancepozz_big_logo.png',
+                                          child: SvgPicture.asset(
+                                            'assets/images/base_image/base_club_big_image.svg',
                                             height:
                                                 SizeController.to.screenHeight *
                                                     0.28,

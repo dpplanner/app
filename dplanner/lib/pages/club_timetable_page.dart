@@ -4,7 +4,6 @@ import 'package:dplanner/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -74,10 +73,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
             Row(
               children: [
                 Flexible(
-                    flex: 12,
+                    flex: 11,
                     child: Container(color: AppColor.backgroundColor)),
                 Flexible(
-                    flex: 84,
+                    flex: 85,
                     child: Container(color: AppColor.backgroundColor2)),
                 Flexible(
                     flex: 4, child: Container(color: AppColor.backgroundColor)),
@@ -92,6 +91,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                     color: AppColor.backgroundColor,
                     child: Row(
                       children: [
+                        SizedBox(width: SizeController.to.screenWidth * 0.12),
                         Expanded(
                           child: WeekPageHeader(
                             headerStringBuilder: (DateTime dateTime,
@@ -380,7 +380,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                     ),
                   );
                 },
-                timeLineWidth: SizeController.to.screenWidth * 0.08,
+                timeLineWidth: SizeController.to.screenWidth * 0.07,
                 timeLineOffset: 0,
                 hourIndicatorSettings: const HourIndicatorSettings(
                     height: 0.7, color: AppColor.backgroundColor, offset: 0),
