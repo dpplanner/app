@@ -19,7 +19,7 @@ class ReservationApiService {
       required String startDateTime,
       required String endDateTime,
       required List<dynamic> reservationInvitees}) async {
-    final url = Uri.parse('$baseUrl/resources');
+    final url = Uri.parse('$baseUrl/reservations');
     const storage = FlutterSecureStorage();
 
     String? accessToken = await storage.read(key: accessTokenKey);
@@ -42,6 +42,7 @@ class ReservationApiService {
     );
 
     if (response.statusCode == 204) {
+      print(response.statusCode);
       return;
     }
 

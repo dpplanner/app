@@ -14,6 +14,7 @@ import 'package:table_calendar/table_calendar.dart' as calendar;
 import '../controllers/club.dart';
 import '../controllers/item.dart';
 import '../models/resource_model.dart';
+import '../services/reservation_api_service.dart';
 import '../services/resource_api_service.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/nextpage_button.dart';
@@ -42,11 +43,16 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   Open _open = Open.yes;
 
   final formKey1 = GlobalKey<FormState>();
-  final TextEditingController usage = TextEditingController();
+  final TextEditingController title = TextEditingController();
   bool isFocused1 = false;
+
+  final formKey2 = GlobalKey<FormState>();
+  final TextEditingController usage = TextEditingController();
+  bool isFocused2 = false;
 
   @override
   void dispose() {
+    title.dispose();
     usage.dispose();
     super.dispose();
   }
@@ -56,7 +62,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       List<List<ResourceModel>> resources =
           await ResourceApiService.getResources();
       ClubController.to.resources.value = resources[0] + resources[1];
-      selectedValue = ClubController.to.resources[0].name;
+      if (selectedValue == "") {
+        selectedValue = ClubController.to.resources[0].name;
+      }
       return resources[0] + resources[1];
     } catch (e) {
       print(e.toString());
@@ -283,7 +291,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               ),
 
                               ///DropdownButton
-
                               Expanded(
                                   child: Padding(
                                       padding: EdgeInsets.only(
@@ -526,7 +533,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               } else {
                 return ElevatedButton(
                   onPressed: () {
-                    addReservation(types: 0);
+                    String notice = snapshot.data
+                        .firstWhere((r) => r.name == selectedValue)
+                        .notice;
+                    if (notice == "") {
+                      addReservation(types: 0);
+                    } else {
+                      showNotice(notice: notice);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColor.objectColor,
@@ -547,6 +561,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     DateTime reservationTime = _now;
     DateTime focusedDay = DateTime.now();
     DateTime selectedDay = DateTime.now();
+
+    int startTime = 0;
+    int endTime = 0;
+
+    title.text = MemberController.to.clubMember().name;
+
+    bool isChecked = false;
+    bool isChecked2 = false;
 
     List<int> checkedTime = [];
     List<bool> timeButton = List.generate(24, (index) => false);
@@ -671,16 +693,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     child: Visibility(
                                       visible: checkedTime.isEmpty,
                                       replacement: Text(
-                                          checkedTime.isEmpty
-                                              ? "시간을 선택해주세요"
-                                              : checkedTime.length == 1
-                                                  ? "${checkedTime[0]}:00 ~ ${checkedTime[0] + 1}:00 (1시간)"
-                                                  : "${checkedTime[0]}:00 ~ ${checkedTime[checkedTime.length - 1] + 1}:00 (${checkedTime[checkedTime.length - 1] + 1 - checkedTime[0]}시간)",
+                                          "$startTime:00 ~ $endTime:00 (${endTime - startTime}시간)",
                                           style: const TextStyle(
                                               color: AppColor.textColor,
                                               fontWeight: FontWeight.w500,
                                               fontSize: 15)),
-                                      child: const Text("신청 시간을 선택해주세요",
+                                      child: const Text("예약 시간을 선택해주세요",
                                           style: TextStyle(
                                               color: AppColor.textColor2,
                                               fontWeight: FontWeight.w400,
@@ -689,14 +707,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               ],
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 16.0, bottom: 16.0),
+                              padding: const EdgeInsets.only(top: 16.0),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "사용 용도(선택)",
+                                    "예약자",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16),
@@ -708,8 +725,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       child: Form(
                                           key: formKey1,
                                           child: UnderlineTextForm(
-                                            hintText: '사용 용도를 입력해주세요',
-                                            controller: usage,
+                                            hintText: '예약 제목을 입력해주세요',
+                                            controller: title,
                                             isFocused: isFocused1,
                                             noLine: true,
                                             isRight: true,
@@ -717,6 +734,16 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             isWritten:
                                                 (types == 1) ? true : false,
                                             fontSize: 15,
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                snackBar(
+                                                    title: "작성이 끝나지 않았습니다",
+                                                    content: "예약 제목을 작성해주세요");
+                                                return '';
+                                              }
+                                              return null;
+                                            },
                                             onChanged: (value) {
                                               setState(() {
                                                 isFocused1 = value.isNotEmpty;
@@ -728,34 +755,70 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 ],
                               ),
                             ),
-                            const Row(
+                            Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  "함께 사용하는 사람(선택)",
+                                const Text(
+                                  "사용 용도(선택)",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 16),
                                 ),
-                                Text(
-                                  "선택하기",
-                                  style: TextStyle(
-                                      color: AppColor.textColor2,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 15),
+                                Expanded(
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 14.0),
+                                    child: Form(
+                                        key: formKey2,
+                                        child: UnderlineTextForm(
+                                          hintText: '사용 용도를 입력해주세요',
+                                          controller: usage,
+                                          isFocused: isFocused2,
+                                          noLine: true,
+                                          isRight: true,
+                                          noErrorSign: true,
+                                          isWritten:
+                                              (types == 1) ? true : false,
+                                          fontSize: 15,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              isFocused2 = value.isNotEmpty;
+                                            });
+                                          },
+                                        )),
+                                  ),
                                 ),
                               ],
                             ),
                             const Padding(
-                              padding: EdgeInsets.only(top: 32.0),
-                              child: Text(
-                                "신청하신 시간에\n다른 사람이 함께 사용할 수 있나요?",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w700, fontSize: 16),
+                              padding: EdgeInsets.only(top: 16.0, bottom: 32.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "함께 사용하는 사람(선택)",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  ),
+                                  Text(
+                                    "선택하기",
+                                    style: TextStyle(
+                                        color: AppColor.textColor2,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 15),
+                                  ),
+                                ],
                               ),
                             ),
+                            const Text(
+                              "신청하신 시간에\n다른 사람이 함께 사용할 수 있나요?",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 16),
+                            ),
                             SizedBox(
-                              height: SizeController.to.screenHeight * 0.04,
+                              height: SizeController.to.screenHeight * 0.05,
                               child: RadioListTile(
                                 title: const Text(
                                   "누구나 함께 사용 가능합니다",
@@ -763,6 +826,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       fontWeight: FontWeight.w500,
                                       fontSize: 15),
                                 ),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
                                 value: Open.yes,
                                 groupValue: _open,
                                 onChanged: (Open? value) {
@@ -771,11 +836,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   });
                                 },
                                 contentPadding:
-                                    const EdgeInsets.symmetric(vertical: -5.0),
+                                    const EdgeInsets.symmetric(vertical: -10.0),
                               ),
                             ),
                             SizedBox(
-                              height: SizeController.to.screenHeight * 0.04,
+                              height: SizeController.to.screenHeight * 0.05,
                               child: RadioListTile(
                                 title: const Text(
                                   "허가받은 사람 외에는 불가능합니다",
@@ -783,6 +848,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       fontWeight: FontWeight.w500,
                                       fontSize: 15),
                                 ),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
                                 value: Open.no,
                                 groupValue: _open,
                                 onChanged: (Open? value) {
@@ -790,8 +857,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     _open = value!;
                                   });
                                 },
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: -30.0, horizontal: -10),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(vertical: -30.0),
                               ),
                             ),
                           ],
@@ -928,9 +995,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           if (checkedTime.contains(index)) {
                                             timeButton[index] = false;
                                             checkedTime.remove(index);
+                                            if (checkedTime.isEmpty) {
+                                              isChecked2 = false;
+                                            }
                                           } else if (checkedTime.isEmpty) {
                                             timeButton[index] = true;
                                             checkedTime.add(index);
+                                            isChecked2 = true;
                                           } else {
                                             if (!checkTime(index)) {
                                               snackBar(
@@ -1000,13 +1071,49 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             fontWeight: FontWeight.w700,
                             color: AppColor.backgroundColor),
                       ),
-                      buttonColor: AppColor.objectColor,
-                      onPressed: () {
-                        Get.back();
-                        eventController.addAll(_events);
-                        Future.delayed(const Duration(milliseconds: 200), () {
-                          _reservationConfirmDialog(context);
-                        });
+                      buttonColor:
+                          isChecked ? AppColor.objectColor : AppColor.subColor3,
+                      onPressed: () async {
+                        final formKeyState1 = formKey1.currentState!;
+                        if (formKeyState1.validate() &&
+                            checkedTime.isNotEmpty) {
+                          try {
+                            int resourceId = ClubController.to.resources
+                                .firstWhere((r) => r.name == selectedValue)
+                                .id;
+                            String startDateTime = (0 <= startTime &&
+                                    startTime <= 9)
+                                ? DateFormat(
+                                        "yyyy-MM-dd 00:0$startTime:00", 'ko_KR')
+                                    .format(reservationTime)
+                                : DateFormat(
+                                        "yyyy-MM-dd 00:$startTime:00", 'ko_KR')
+                                    .format(reservationTime);
+                            String endDateTime = (0 <= endTime && endTime <= 9)
+                                ? DateFormat(
+                                        "yyyy-MM-dd 00:0$endTime:00", 'ko_KR')
+                                    .format(reservationTime)
+                                : DateFormat(
+                                        "yyyy-MM-dd 00:$endTime:00", 'ko_KR')
+                                    .format(reservationTime);
+                            await ReservationApiService.postReservation(
+                                resourceId: resourceId,
+                                title: title.text,
+                                usage: usage.text,
+                                sharing: (_open == Open.yes) ? true : false,
+                                startDateTime: startDateTime,
+                                endDateTime: endDateTime,
+                                reservationInvitees: []);
+                            getResources();
+                            Get.back();
+                          } catch (e) {
+                            print(e.toString());
+                          }
+                        }
+                        // eventController.addAll(_events);
+                        // Future.delayed(const Duration(milliseconds: 200), () {
+                        //   _reservationConfirmDialog(context);
+                        // });
                       },
                     ),
                     child: NextPageButton(
@@ -1017,11 +1124,25 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             fontWeight: FontWeight.w700,
                             color: AppColor.backgroundColor),
                       ),
-                      buttonColor: AppColor.objectColor,
+                      buttonColor: isChecked2
+                          ? AppColor.objectColor
+                          : AppColor.subColor3,
                       onPressed: () {
-                        setState(() {
-                          types = 0;
-                        });
+                        if (types == 2 && checkedTime.isNotEmpty) {
+                          setState(() {
+                            isChecked = true;
+                            types = 0;
+                            startTime = checkedTime[0];
+                            endTime = checkedTime[0] + 1;
+                            if (checkedTime.length > 1) {
+                              endTime = checkedTime[checkedTime.length - 1] + 1;
+                            }
+                          });
+                        } else {
+                          snackBar(
+                              title: "시간을 선택하지 않았습니다",
+                              content: "최소 한시간을 선택해주세요");
+                        }
                       },
                     ),
                   ),
@@ -1038,6 +1159,51 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
         ),
+      ),
+    );
+  }
+
+  void showNotice({required String notice}) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColor.backgroundColor,
+        elevation: 0,
+        title: const Padding(
+          padding: EdgeInsets.only(top: 8.0),
+          child: Center(
+            child: Text(
+              "주의 사항",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ),
+        content: SafeArea(
+          child: SingleChildScrollView(
+            child: Text(
+              notice,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+          ),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+            child: NextPageButton(
+              text: const Text(
+                "위 공지에 동의하기",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColor.backgroundColor),
+              ),
+              buttonColor: AppColor.objectColor,
+              onPressed: () {
+                Get.back();
+                addReservation(types: 0);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
