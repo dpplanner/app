@@ -9,6 +9,7 @@ import '../style.dart';
 import 'nextpage_button.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'package:dplanner/services/club_post_api_service.dart';
+import 'full_screen_image.dart';
 
 ///
 ///
@@ -202,12 +203,19 @@ class _PostContentState extends State<PostContent> {
                       String formattedUrl = imageUrl.startsWith('https://')
                           ? imageUrl
                           : 'https://$imageUrl';
-                      return Container(
-                        height: 100,
-                        width: 100,
-                        child: Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: Image.network(formattedUrl, fit: BoxFit.cover),
+                      return GestureDetector(
+                        onTap: () {
+                          // Getx의 Get.to()를 사용하여 전체 화면 이미지 페이지로 이동
+                          Get.to(() => FullScreenImage(imageUrl: formattedUrl));
+                        },
+                        child: Container(
+                          height: 100,
+                          width: 100,
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child:
+                                Image.network(formattedUrl, fit: BoxFit.cover),
+                          ),
                         ),
                       );
                     }).toList(),
