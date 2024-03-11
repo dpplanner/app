@@ -31,6 +31,20 @@ class _PostPageState extends State<PostPage> {
   final TextEditingController addComment = TextEditingController();
   bool _isFocused = false;
   bool _isReplying = false; //답글을 다는 중인지 체크
+  int? _replyingCommentId; //답글을 달려고 클릭한 댓글의 ID
+
+  void startReplying(int commentId) {
+    setState(() {
+      _isReplying = true;
+      _replyingCommentId = commentId;
+    });
+  }
+
+  void _handleCommentSelected(int commentId) {
+    setState(() {
+      _replyingCommentId = commentId;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +80,9 @@ class _PostPageState extends State<PostPage> {
                       color: AppColor.backgroundColor2,
                       height: SizeController.to.screenHeight * 0.01,
                     ),
-                    PostComment(post: widget.post),
+                    PostComment(
+                        post: widget.post,
+                        onCommentSelected: _handleCommentSelected),
                   ],
                 ),
               ),
@@ -101,12 +117,15 @@ class _PostPageState extends State<PostPage> {
                             onTap: () async {
                               if (_formKey.currentState!.validate()) {
                                 // 폼이 유효한 경우 댓글을 서버에 게시
+                                print("==parentID: ${_replyingCommentId}");
                                 await PostCommentApiService.postComment(
-                                  postId: widget.post.id,
-                                  content: addComment.text,
-                                );
+                                    postId: widget.post.id,
+                                    content: addComment.text,
+                                    parentId: _replyingCommentId);
                                 // 댓글 입력 필드 초기화
                                 addComment.clear();
+                                _isReplying = false;
+                                _replyingCommentId = null;
                               }
                             },
                             child: _isFocused

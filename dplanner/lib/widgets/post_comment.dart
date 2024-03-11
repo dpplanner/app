@@ -16,8 +16,11 @@ import 'package:dplanner/services/club_post_api_service.dart';
 ///
 ///
 class PostComment extends StatefulWidget {
+  final Function(int) onCommentSelected;
   final Post post;
-  const PostComment({Key? key, required this.post}) : super(key: key);
+  const PostComment(
+      {Key? key, required this.post, required this.onCommentSelected})
+      : super(key: key);
 
   @override
   State<PostComment> createState() => _PostCommentState();
@@ -27,10 +30,15 @@ class _PostCommentState extends State<PostComment> {
   List<Comment>? _comments;
   bool showReplies = false;
   Map<int, bool>? showRepliesMap = {};
+
   @override
   void initState() {
     super.initState();
     _fetchComments();
+  }
+
+  void _onReplyButtonTapped(int commentId) {
+    widget.onCommentSelected(commentId);
   }
 
   Future<void> _fetchComments() async {
@@ -136,21 +144,25 @@ class _PostCommentState extends State<PostComment> {
                         fontSize: 12,
                       ),
                     ),
-                    SizedBox(
-                      width: SizeController.to.screenWidth * 0.03,
-                    ),
-                    InkWell(
-                      onTap: () {},
-                      borderRadius: BorderRadius.circular(5),
-                      child: const Text(
-                        "답글 달기",
-                        style: TextStyle(
-                          color: AppColor.textColor2,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
+                    if (comment.parentId == null)
+                      SizedBox(
+                        width: SizeController.to.screenWidth * 0.03,
+                      ),
+                    if (comment.parentId == null)
+                      InkWell(
+                        onTap: () {
+                          _onReplyButtonTapped(comment.id); //답글이 달리는 댓글의 아이디
+                        },
+                        borderRadius: BorderRadius.circular(5),
+                        child: const Text(
+                          "답글 달기",
+                          style: TextStyle(
+                            color: AppColor.textColor2,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
                 comment.children.isNotEmpty
