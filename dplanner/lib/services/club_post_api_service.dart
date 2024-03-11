@@ -242,14 +242,13 @@ class PostApiService {
 class PostCommentApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
 
-  static Future<void> postComment({
-    required int postId,
-    required String content,
-  }) async {
+  static Future<void> postComment(
+      {required int postId, required String content, int? parentId}) async {
     try {
       // AccessToken 가져오기
       final storage = FlutterSecureStorage();
       final accessToken = await storage.read(key: accessTokenKey);
+      final url = Uri.parse('$baseUrl/comments');
 
       final headers = {
         'Content-Type': 'application/json',
@@ -258,12 +257,12 @@ class PostCommentApiService {
 
       final body = jsonEncode({
         "postId": postId,
-        "parentId": null,
+        "parentId": parentId,
         "content": content,
       });
 
       final response = await http.post(
-        Uri.parse('$baseUrl/comments'),
+        url,
         headers: headers,
         body: body,
       );
@@ -332,40 +331,6 @@ class PostCommentApiService {
     } catch (e) {
       // 요청 중 오류 발생
       print('댓글 삭제 중 오류가 발생했습니다. 오류: $e');
-    }
-  }
-
-  static Future<void> postReplyComment(
-      int postId, int parentId, String content) async {
-    final storage = FlutterSecureStorage();
-    final accessToken = await storage.read(key: accessTokenKey);
-    final url = Uri.parse('$baseUrl/comments');
-    final headers = {
-      'Authorization': 'Bearer $accessToken',
-      'Content-Type': 'application/json',
-    };
-    final body = {
-      'postId': postId,
-      'parentId': parentId,
-      'content': content,
-    };
-
-    try {
-      final response = await http.post(
-        url,
-        headers: headers,
-        body: jsonEncode(body),
-      );
-      if (response.statusCode == 201) {
-        // 답댓글 작성 성공
-        Get.snackbar('알림', '답댓글이 성공적으로 게시되었습니다.');
-      } else {
-        // 답댓글 작성 실패
-        Get.snackbar('알림', '답댓글 작성에 실패했습니다. 에러 코드: ${response.statusCode}');
-      }
-    } catch (e) {
-      // 요청 중 오류 발생
-      print('답댓글 작성 중 오류가 발생했습니다. 오류: $e');
     }
   }
 }
