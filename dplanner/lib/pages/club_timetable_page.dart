@@ -4,7 +4,6 @@ import 'package:dplanner/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -18,6 +17,8 @@ import '../models/resource_model.dart';
 import '../services/resource_api_service.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/nextpage_button.dart';
+import '../widgets/snack_bar.dart';
+import '../widgets/underline_textform.dart';
 import 'error_page.dart';
 
 DateTime get _now => DateTime.now();
@@ -39,6 +40,16 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   String selectedValue = "";
 
   Open _open = Open.yes;
+
+  final formKey1 = GlobalKey<FormState>();
+  final TextEditingController usage = TextEditingController();
+  bool isFocused1 = false;
+
+  @override
+  void dispose() {
+    usage.dispose();
+    super.dispose();
+  }
 
   Future<List<ResourceModel>> getResources() async {
     try {
@@ -70,164 +81,215 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
             automaticallyImplyLeading: false,
           ),
         ),
-        body: Visibility(
-          visible: ClubController.to.resources().isEmpty,
-          replacement: Stack(
-            children: [
-              Row(
-                children: [
-                  Flexible(
-                      flex: 11,
-                      child: Container(color: AppColor.backgroundColor)),
-                  Flexible(
-                      flex: 85,
-                      child: Container(color: AppColor.backgroundColor2)),
-                  Flexible(
-                      flex: 4,
-                      child: Container(color: AppColor.backgroundColor)),
-                ],
-              ),
-              Center(
-                child: WeekView(
-                  key: weekViewStateKey,
-                  controller: eventController,
-                  weekPageHeaderBuilder:
-                      (DateTime startDate, DateTime endDate) {
-                    return Container(
-                      color: AppColor.backgroundColor,
-                      child: Row(
-                        children: [
-                          SizedBox(width: SizeController.to.screenWidth * 0.12),
-                          Expanded(
-                            child: WeekPageHeader(
-                              headerStringBuilder: (DateTime dateTime,
-                                  {DateTime? secondaryDate}) {
-                                return DateFormat("MM월").format(dateTime);
-                              },
-                              headerStyle: HeaderStyle(
-                                  decoration: BoxDecoration(
-                                    color: AppColor.subColor4,
-                                    borderRadius: BorderRadius.circular(10),
+        body: FutureBuilder(
+            future: getResources(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData == false) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return const ErrorPage();
+              } else if (snapshot.data.length == 0) {
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    setState(() {});
+                  },
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Container(
+                        color: AppColor.backgroundColor,
+                        height: constraints.maxHeight,
+                        width: constraints.maxWidth,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "아직 클럽 공유 물품이 없어요",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 16),
+                            ),
+                            if (MemberController.to.clubMember().role ==
+                                "ADMIN")
+                              Column(
+                                children: [
+                                  const Text(
+                                    "공유 물품을 추가할까요?",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16),
                                   ),
-                                  headerTextStyle: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 18),
-                                  rightIconVisible: false,
-                                  leftIcon: InkWell(
-                                      onTap: () {
-                                        weekViewStateKey.currentState
-                                            ?.jumpToWeek(DateTime.now());
-                                      },
-                                      child: const Icon(
-                                          SFSymbols.calendar_today,
-                                          color: AppColor.textColor)),
-                                  titleAlign: TextAlign.left),
-                              startDate: startDate,
-                              endDate: endDate,
-                              onTitleTapped: () async {
-                                DateTime selectedDate = startDate;
-                                showModalBottomSheet(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return Container(
-                                      height:
-                                          SizeController.to.screenHeight * 0.4,
-                                      decoration: const BoxDecoration(
-                                        color: AppColor.backgroundColor,
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(30),
-                                          topRight: Radius.circular(30),
-                                        ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Get.toNamed('/resource_list');
+                                    },
+                                    style: ButtonStyle(
+                                      overlayColor: MaterialStateProperty
+                                          .resolveWith<Color>(
+                                        (Set<MaterialState> states) {
+                                          if (states.contains(
+                                              MaterialState.pressed)) {
+                                            return Colors.transparent;
+                                          }
+                                          return Colors.transparent;
+                                        },
                                       ),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 8.0, bottom: 8.0),
-                                            child: SvgPicture.asset(
-                                              'assets/images/extra/showmodal_scrollcontrolbar.svg',
+                                    ),
+                                    child: const Text(
+                                      "추가하기",
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColor.objectColor),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                );
+              } else {
+                return Stack(
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                            flex: 11,
+                            child: Container(color: AppColor.backgroundColor)),
+                        Flexible(
+                            flex: 85,
+                            child: Container(color: AppColor.backgroundColor2)),
+                        Flexible(
+                            flex: 4,
+                            child: Container(color: AppColor.backgroundColor)),
+                      ],
+                    ),
+                    Center(
+                      child: WeekView(
+                        key: weekViewStateKey,
+                        controller: eventController,
+                        weekPageHeaderBuilder:
+                            (DateTime startDate, DateTime endDate) {
+                          return Container(
+                            color: AppColor.backgroundColor,
+                            child: Row(children: [
+                              SizedBox(
+                                  width: SizeController.to.screenWidth * 0.12),
+                              Expanded(
+                                child: WeekPageHeader(
+                                  headerStringBuilder: (DateTime dateTime,
+                                      {DateTime? secondaryDate}) {
+                                    return DateFormat("MM월").format(dateTime);
+                                  },
+                                  headerStyle: HeaderStyle(
+                                      decoration: BoxDecoration(
+                                        color: AppColor.subColor4,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      headerTextStyle: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 18),
+                                      rightIconVisible: false,
+                                      leftIcon: InkWell(
+                                          onTap: () {
+                                            weekViewStateKey.currentState
+                                                ?.jumpToWeek(DateTime.now());
+                                          },
+                                          child: const Icon(
+                                              SFSymbols.calendar_today,
+                                              color: AppColor.textColor)),
+                                      titleAlign: TextAlign.left),
+                                  startDate: startDate,
+                                  endDate: endDate,
+                                  onTitleTapped: () async {
+                                    DateTime selectedDate = startDate;
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return Container(
+                                          height:
+                                              SizeController.to.screenHeight *
+                                                  0.4,
+                                          decoration: const BoxDecoration(
+                                            color: AppColor.backgroundColor,
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(30),
+                                              topRight: Radius.circular(30),
                                             ),
                                           ),
-                                          const Text(
-                                            "날짜",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w800,
-                                                fontSize: 18),
-                                          ),
-                                          Expanded(
-                                            child: CupertinoDatePicker(
-                                              mode:
-                                                  CupertinoDatePickerMode.date,
-                                              initialDateTime: startDate,
-                                              minimumYear: 2020,
-                                              maximumYear: 2029,
-                                              onDateTimeChanged:
-                                                  (DateTime date) {
-                                                setState(() {
-                                                  selectedDate = date;
-                                                });
-                                              },
-                                            ),
-                                          ),
-                                          NextPageButton(
-                                            text: const Text(
-                                              "날짜 변경하기",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w700,
-                                                  color:
-                                                      AppColor.backgroundColor),
-                                            ),
-                                            buttonColor: AppColor.objectColor,
-                                            onPressed: () {
-                                              weekViewStateKey.currentState
-                                                  ?.jumpToWeek(selectedDate);
-                                              Get.back();
-                                            },
-                                          ),
-                                          SizedBox(
-                                            height:
-                                                SizeController.to.screenHeight *
+                                          child: Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0, bottom: 8.0),
+                                                child: SvgPicture.asset(
+                                                  'assets/images/extra/showmodal_scrollcontrolbar.svg',
+                                                ),
+                                              ),
+                                              const Text(
+                                                "날짜",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w800,
+                                                    fontSize: 18),
+                                              ),
+                                              Expanded(
+                                                child: CupertinoDatePicker(
+                                                  mode: CupertinoDatePickerMode
+                                                      .date,
+                                                  initialDateTime: startDate,
+                                                  minimumYear: 2020,
+                                                  maximumYear: 2029,
+                                                  onDateTimeChanged:
+                                                      (DateTime date) {
+                                                    setState(() {
+                                                      selectedDate = date;
+                                                    });
+                                                  },
+                                                ),
+                                              ),
+                                              NextPageButton(
+                                                text: const Text(
+                                                  "날짜 변경하기",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: AppColor
+                                                          .backgroundColor),
+                                                ),
+                                                buttonColor:
+                                                    AppColor.objectColor,
+                                                onPressed: () {
+                                                  weekViewStateKey.currentState
+                                                      ?.jumpToWeek(
+                                                          selectedDate);
+                                                  Get.back();
+                                                },
+                                              ),
+                                              SizedBox(
+                                                height: SizeController
+                                                        .to.screenHeight *
                                                     0.03,
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                        );
+                                      },
                                     );
                                   },
-                                );
-                              },
-                            ),
-                          ),
+                                ),
+                              ),
 
-                          ///DropdownButton
+                              ///DropdownButton
 
-                          Expanded(
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  right: SizeController.to.screenWidth * 0.05),
-                              child: FutureBuilder(
-                                  future: getResources(),
-                                  builder: (BuildContext context,
-                                      AsyncSnapshot snapshot) {
-                                    if (snapshot.hasData == false) {
-                                      return const Center(
-                                          child: CircularProgressIndicator());
-                                    } else if (snapshot.hasError) {
-                                      return const ErrorPage();
-                                    } else if (snapshot.data.length == 0) {
-                                      return const Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          "공유 물품 없음",
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 16,
-                                            color: AppColor.textColor2,
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      return DropdownButtonHideUnderline(
+                              Expanded(
+                                  child: Padding(
+                                      padding: EdgeInsets.only(
+                                          right: SizeController.to.screenWidth *
+                                              0.05),
+                                      child: DropdownButtonHideUnderline(
                                         child: DropdownButton2<String>(
                                           isExpanded: true,
                                           items: ClubController.to.resources
@@ -304,225 +366,180 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 left: 14, right: 14),
                                           ),
                                         ),
-                                      );
-                                    }
-                                  }),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  weekDayBuilder: (DateTime date) {
-                    return Container(
-                        color: AppColor.backgroundColor,
-                        alignment: Alignment.center,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            (date.isAtSameMomentAs(DateTime.now().withoutTime))
-                                ? const Text(
-                                    '오늘',
-                                    style: TextStyle(
-                                        color: AppColor.markColor,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 15),
-                                  )
-                                : (date.day == 1)
-                                    ? Text(
-                                        DateFormat("M/d").format(date),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 15),
-                                      )
-                                    : Text(
-                                        DateFormat.d().format(date),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 15),
-                                      ),
-                            (date.isAtSameMomentAs(DateTime.now().withoutTime))
-                                ? Text(
-                                    DateFormat('E', 'ko_KR').format(date),
-                                    style: const TextStyle(
-                                        color: AppColor.markColor,
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 12),
-                                  )
-                                : Text(
-                                    DateFormat('E', 'ko_KR').format(date),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 12),
-                                  )
-                          ],
-                        ));
-                  },
-                  weekTitleHeight: SizeController.to.screenHeight * 0.06,
-                  weekNumberBuilder: (DateTime date) {
-                    return Container(
-                      color: AppColor.backgroundColor,
-                    );
-                  },
-                  timeLineBuilder: (DateTime date) {
-                    return Transform.translate(
-                      offset: const Offset(0, -10),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(3, 0, 3, 42.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: DateTime.now().hour == date.hour
-                                ? AppColor.subColor1
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          child: Text(
-                            date.hour < 10 ? "0${date.hour}" : "${date.hour}",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: DateTime.now().hour == date.hour
-                                  ? AppColor.textColor
-                                  : AppColor.textColor2,
-                              fontWeight: FontWeight.w300,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  timeLineWidth: SizeController.to.screenWidth * 0.07,
-                  timeLineOffset: 0,
-                  hourIndicatorSettings: const HourIndicatorSettings(
-                      height: 0.7, color: AppColor.backgroundColor, offset: 0),
-                  liveTimeIndicatorSettings: const HourIndicatorSettings(
-                      color: AppColor.subColor1, height: 0, offset: 5),
-                  eventTileBuilder: (date, events, boundry, start, end) {
-                    if (events.isNotEmpty) {
-                      return RoundedEventTile(
-                        borderRadius: BorderRadius.circular(0.0),
-                        title: events[0].title,
-                        titleStyle: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: AppColor.backgroundColor,
-                          fontSize: 12,
-                        ),
-                        description: events[0].description,
-                        descriptionStyle: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: AppColor.backgroundColor,
-                          fontSize: 12,
-                        ),
-                        totalEvents: events.length,
-                        padding: const EdgeInsets.all(3.0),
-                        backgroundColor: events[0].color,
-                      );
-                    } else {
-                      return Container();
-                    }
-                  },
-                  fullDayEventBuilder: (events, date) {
-                    return FullDayEventView(
-                      events: events,
-                      boxConstraints: const BoxConstraints(maxHeight: 65),
-                      date: date,
-                    );
-                  },
-                  pageTransitionDuration: const Duration(milliseconds: 300),
-                  pageTransitionCurve: Curves.linear,
-                  showLiveTimeLineInAllDays: false,
-                  backgroundColor: Colors.transparent,
-                  minuteSlotSize: MinuteSlotSize.minutes60,
-                  width: SizeController.to.screenWidth * 0.92,
-                  minDay: DateTime(2020),
-                  maxDay: DateTime(2030),
-                  initialDay: DateTime.now(),
-                  startDay: WeekDays.monday,
-                  heightPerMinute: SizeController.to.screenHeight * 0.0012,
-                  eventArranger: const SideEventArranger(),
-                  onEventTap: (events, date) => {},
-                  onDateLongPress: (date) => {},
-                ),
-              ),
-            ],
-          ),
-          child: RefreshIndicator(
-            onRefresh: () async {
-              setState(() {});
-            },
-            child: LayoutBuilder(builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  color: AppColor.backgroundColor,
-                  height: constraints.maxHeight,
-                  width: constraints.maxWidth,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "아직 클럽 공유 물품이 없어요",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 16),
-                      ),
-                      if (MemberController.to.clubMember().role == "ADMIN")
-                        Column(
-                          children: [
-                            const Text(
-                              "공유 물품을 추가할까요?",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 16),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Get.toNamed('/resource_list');
-                              },
-                              style: ButtonStyle(
-                                overlayColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
-                                    if (states
-                                        .contains(MaterialState.pressed)) {
-                                      return Colors.transparent;
-                                    }
-                                    return Colors.transparent;
-                                  },
+                                      )))
+                            ]),
+                          );
+                        },
+                        weekDayBuilder: (DateTime date) {
+                          return Container(
+                              color: AppColor.backgroundColor,
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  (date.isAtSameMomentAs(
+                                          DateTime.now().withoutTime))
+                                      ? const Text(
+                                          '오늘',
+                                          style: TextStyle(
+                                              color: AppColor.markColor,
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 15),
+                                        )
+                                      : (date.day == 1)
+                                          ? Text(
+                                              DateFormat("M/d").format(date),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 15),
+                                            )
+                                          : Text(
+                                              DateFormat.d().format(date),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 15),
+                                            ),
+                                  (date.isAtSameMomentAs(
+                                          DateTime.now().withoutTime))
+                                      ? Text(
+                                          DateFormat('E', 'ko_KR').format(date),
+                                          style: const TextStyle(
+                                              color: AppColor.markColor,
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 12),
+                                        )
+                                      : Text(
+                                          DateFormat('E', 'ko_KR').format(date),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 12),
+                                        )
+                                ],
+                              ));
+                        },
+                        weekTitleHeight: SizeController.to.screenHeight * 0.06,
+                        weekNumberBuilder: (DateTime date) {
+                          return Container(
+                            color: AppColor.backgroundColor,
+                          );
+                        },
+                        timeLineBuilder: (DateTime date) {
+                          return Transform.translate(
+                            offset: const Offset(0, -10),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(3, 0, 3, 42.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: DateTime.now().hour == date.hour
+                                      ? AppColor.subColor1
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                                child: Text(
+                                  date.hour < 10
+                                      ? "0${date.hour}"
+                                      : "${date.hour}",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: DateTime.now().hour == date.hour
+                                        ? AppColor.textColor
+                                        : AppColor.textColor2,
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ),
-                              child: const Text(
-                                "추가하기",
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColor.objectColor),
-                              ),
                             ),
-                          ],
-                        ),
-                    ],
-                  ),
-                ),
-              );
+                          );
+                        },
+                        timeLineWidth: SizeController.to.screenWidth * 0.07,
+                        timeLineOffset: 0,
+                        hourIndicatorSettings: const HourIndicatorSettings(
+                            height: 0.7,
+                            color: AppColor.backgroundColor,
+                            offset: 0),
+                        liveTimeIndicatorSettings: const HourIndicatorSettings(
+                            color: AppColor.subColor1, height: 0, offset: 5),
+                        eventTileBuilder: (date, events, boundry, start, end) {
+                          if (events.isNotEmpty) {
+                            return RoundedEventTile(
+                              borderRadius: BorderRadius.circular(0.0),
+                              title: events[0].title,
+                              titleStyle: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: AppColor.backgroundColor,
+                                fontSize: 12,
+                              ),
+                              description: events[0].description,
+                              descriptionStyle: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: AppColor.backgroundColor,
+                                fontSize: 12,
+                              ),
+                              totalEvents: events.length,
+                              padding: const EdgeInsets.all(3.0),
+                              backgroundColor: events[0].color,
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                        fullDayEventBuilder: (events, date) {
+                          return FullDayEventView(
+                            events: events,
+                            boxConstraints: const BoxConstraints(maxHeight: 65),
+                            date: date,
+                          );
+                        },
+                        pageTransitionDuration:
+                            const Duration(milliseconds: 300),
+                        pageTransitionCurve: Curves.linear,
+                        showLiveTimeLineInAllDays: false,
+                        backgroundColor: Colors.transparent,
+                        minuteSlotSize: MinuteSlotSize.minutes60,
+                        width: SizeController.to.screenWidth * 0.92,
+                        minDay: DateTime(2020),
+                        maxDay: DateTime(2030),
+                        initialDay: DateTime.now(),
+                        startDay: WeekDays.monday,
+                        heightPerMinute:
+                            SizeController.to.screenHeight * 0.0012,
+                        eventArranger: const SideEventArranger(),
+                        onEventTap: (events, date) => {},
+                        onDateLongPress: (date) => {},
+                      ),
+                    ),
+                  ],
+                );
+              }
             }),
-          ),
-        ),
-        floatingActionButton: (ClubController.to.resources().isEmpty)
-            ? null
-            : ElevatedButton(
-                onPressed: () {
-                  addReservation(types: 0);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColor.objectColor,
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(15),
-                ),
-                child: const Icon(
-                  SFSymbols.plus,
-                  color: AppColor.backgroundColor,
-                ),
-              ),
+        floatingActionButton: FutureBuilder(
+            future: getResources(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData == false) {
+                return const SizedBox();
+              } else if (snapshot.hasError) {
+                return const ErrorPage();
+              } else if (snapshot.data.length == 0) {
+                return const SizedBox();
+              } else {
+                return ElevatedButton(
+                  onPressed: () {
+                    addReservation(types: 0);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColor.objectColor,
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(15),
+                  ),
+                  child: const Icon(
+                    SFSymbols.plus,
+                    color: AppColor.backgroundColor,
+                  ),
+                );
+              }
+            }),
         bottomNavigationBar: const BottomBar());
   }
 
@@ -530,6 +547,21 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     DateTime reservationTime = _now;
     DateTime focusedDay = DateTime.now();
     DateTime selectedDay = DateTime.now();
+
+    List<int> checkedTime = [];
+    List<bool> timeButton = List.generate(24, (index) => false);
+
+    bool checkTime(int newTime) {
+      checkedTime.add(newTime);
+      checkedTime.sort();
+      for (int i = 0; i < checkedTime.length - 1; i++) {
+        if ((checkedTime[i + 1] - checkedTime[i]) != 1) {
+          checkedTime.remove(newTime);
+          return false;
+        }
+      }
+      return true;
+    }
 
     Get.bottomSheet(
       isScrollControlled: true,
@@ -585,18 +617,46 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   selectedValue,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w500,
-                                      fontSize: 16),
+                                      fontSize: 15),
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: SizeController.to.screenHeight * 0.04,
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 32.0, bottom: 32.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "신청 날짜",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  ),
+                                  InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          types = 1;
+                                        });
+                                      },
+                                      borderRadius: BorderRadius.circular(5),
+                                      child: Text(
+                                          DateFormat(
+                                                  "yyyy. MM. dd. E요일", 'ko_KR')
+                                              .format(reservationTime),
+                                          style: const TextStyle(
+                                              color: AppColor.textColor,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 15))),
+                                ],
+                              ),
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text(
-                                  "신청 날짜",
+                                  "신청 시간",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 16),
@@ -604,62 +664,69 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 InkWell(
                                     onTap: () {
                                       setState(() {
-                                        types = 1;
+                                        types = 2;
                                       });
                                     },
                                     borderRadius: BorderRadius.circular(5),
-                                    child: Text(
-                                        DateFormat("yyyy. MM. dd. E요일", 'ko_KR')
-                                            .format(reservationTime),
-                                        style: const TextStyle(
-                                            color: AppColor.textColor,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 16))),
+                                    child: Visibility(
+                                      visible: checkedTime.isEmpty,
+                                      replacement: Text(
+                                          checkedTime.isEmpty
+                                              ? "시간을 선택해주세요"
+                                              : checkedTime.length == 1
+                                                  ? "${checkedTime[0]}:00 ~ ${checkedTime[0] + 1}:00 (1시간)"
+                                                  : "${checkedTime[0]}:00 ~ ${checkedTime[checkedTime.length - 1] + 1}:00 (${checkedTime[checkedTime.length - 1] + 1 - checkedTime[0]}시간)",
+                                          style: const TextStyle(
+                                              color: AppColor.textColor,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 15)),
+                                      child: const Text("신청 시간을 선택해주세요",
+                                          style: TextStyle(
+                                              color: AppColor.textColor2,
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 15)),
+                                    )),
                               ],
                             ),
-                            SizedBox(
-                              height: SizeController.to.screenHeight * 0.04,
-                            ),
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "신청 시간",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16),
-                                ),
-                                Text(
-                                  "14:00 ~ 16:00(2시간)",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: SizeController.to.screenHeight * 0.04,
-                            ),
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "사용 용도(선택)",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16),
-                                ),
-                                Text(
-                                  "사용 용도를 입력해주세요",
-                                  style: TextStyle(
-                                      color: AppColor.textColor2,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: SizeController.to.screenHeight * 0.04,
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 16.0, bottom: 16.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "사용 용도(선택)",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 14.0),
+                                      child: Form(
+                                          key: formKey1,
+                                          child: UnderlineTextForm(
+                                            hintText: '사용 용도를 입력해주세요',
+                                            controller: usage,
+                                            isFocused: isFocused1,
+                                            noLine: true,
+                                            isRight: true,
+                                            noErrorSign: true,
+                                            isWritten:
+                                                (types == 1) ? true : false,
+                                            fontSize: 15,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                isFocused1 = value.isNotEmpty;
+                                              });
+                                            },
+                                          )),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             const Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -674,18 +741,18 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   "선택하기",
                                   style: TextStyle(
                                       color: AppColor.textColor2,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16),
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 15),
                                 ),
                               ],
                             ),
-                            SizedBox(
-                              height: SizeController.to.screenHeight * 0.04,
-                            ),
-                            const Text(
-                              "신청하신 시간에\n다른 사람이 함께 사용할 수 있나요?",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 16),
+                            const Padding(
+                              padding: EdgeInsets.only(top: 32.0),
+                              child: Text(
+                                "신청하신 시간에\n다른 사람이 함께 사용할 수 있나요?",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 16),
+                              ),
                             ),
                             SizedBox(
                               height: SizeController.to.screenHeight * 0.04,
@@ -694,7 +761,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   "누구나 함께 사용 가능합니다",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w500,
-                                      fontSize: 16),
+                                      fontSize: 15),
                                 ),
                                 value: Open.yes,
                                 groupValue: _open,
@@ -714,7 +781,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   "허가받은 사람 외에는 불가능합니다",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w500,
-                                      fontSize: 16),
+                                      fontSize: 15),
                                 ),
                                 value: Open.no,
                                 groupValue: _open,
@@ -729,101 +796,193 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             ),
                           ],
                         ),
-                        child: Column(
-                          children: [
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                "예약할 날짜를 선택해주세요",
-                                style: TextStyle(
-                                    color: AppColor.textColor,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16),
-                              ),
-                            ),
-                            calendar.TableCalendar(
-                              rowHeight: SizeController.to.screenHeight * 0.045,
-                              daysOfWeekHeight:
-                                  SizeController.to.screenHeight * 0.03,
-                              daysOfWeekStyle: const calendar.DaysOfWeekStyle(
-                                  weekdayStyle: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColor.textColor),
-                                  weekendStyle: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColor.markColor)),
-                              headerStyle: const calendar.HeaderStyle(
-                                  headerPadding:
-                                      EdgeInsets.fromLTRB(24, 24, 24, 12),
-                                  leftChevronIcon: Icon(SFSymbols.chevron_left,
-                                      color: AppColor.textColor),
-                                  rightChevronIcon: Icon(
-                                      SFSymbols.chevron_right,
-                                      color: AppColor.textColor),
-                                  titleTextStyle: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColor.textColor),
-                                  formatButtonTextStyle: TextStyle(
-                                      fontSize: 15, color: AppColor.textColor),
-                                  formatButtonVisible: false,
-                                  titleCentered: true),
-                              focusedDay: focusedDay,
-                              firstDay: DateTime(2023, 1, 1),
-                              lastDay: DateTime(2024, 12, 31),
-                              locale: 'ko-KR',
-                              selectedDayPredicate: (day) {
-                                return calendar.isSameDay(selectedDay, day);
-                              },
-                              calendarStyle: const calendar.CalendarStyle(
-                                  isTodayHighlighted: false,
-                                  outsideTextStyle: TextStyle(
-                                      color: AppColor.textColor2,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                  defaultTextStyle: TextStyle(
-                                      color: AppColor.textColor,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                  weekendTextStyle: TextStyle(
-                                      color: AppColor.markColor,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 12),
-                                  selectedDecoration: BoxDecoration(
-                                    color: AppColor.objectColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  selectedTextStyle: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColor.backgroundColor,
-                                      fontSize: 12)),
-                              onDaySelected: (newSelectedDay, newFocusedDay) {
-                                setState(() {
-                                  selectedDay = newSelectedDay;
-                                  focusedDay = newFocusedDay;
-                                  reservationTime = selectedDay;
-                                  if (selectedDay.month != focusedDay.month) {
-                                    focusedDay = DateTime(
-                                        selectedDay.year, selectedDay.month, 1);
-                                  }
-                                });
-                              },
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: Center(
+                        child: Visibility(
+                          visible: types != 1,
+                          replacement: Column(
+                            children: [
+                              const Align(
+                                alignment: Alignment.centerLeft,
                                 child: Text(
-                                  "선택한 날짜: ${DateFormat("yyyy년 MM월 dd일 E요일", 'ko_KR').format(reservationTime)}",
-                                  style: const TextStyle(
+                                  "예약할 날짜를 선택해주세요",
+                                  style: TextStyle(
                                       color: AppColor.textColor,
                                       fontWeight: FontWeight.w500,
-                                      fontSize: 14),
+                                      fontSize: 16),
                                 ),
                               ),
-                            ),
-                          ],
+                              calendar.TableCalendar(
+                                rowHeight:
+                                    SizeController.to.screenHeight * 0.045,
+                                daysOfWeekHeight:
+                                    SizeController.to.screenHeight * 0.03,
+                                daysOfWeekStyle: const calendar.DaysOfWeekStyle(
+                                    weekdayStyle: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColor.textColor),
+                                    weekendStyle: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColor.markColor)),
+                                headerStyle: const calendar.HeaderStyle(
+                                    headerPadding:
+                                        EdgeInsets.fromLTRB(24, 24, 24, 12),
+                                    leftChevronIcon: Icon(
+                                        SFSymbols.chevron_left,
+                                        color: AppColor.textColor),
+                                    rightChevronIcon: Icon(
+                                        SFSymbols.chevron_right,
+                                        color: AppColor.textColor),
+                                    titleTextStyle: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColor.textColor),
+                                    formatButtonTextStyle: TextStyle(
+                                        fontSize: 15,
+                                        color: AppColor.textColor),
+                                    formatButtonVisible: false,
+                                    titleCentered: true),
+                                focusedDay: focusedDay,
+                                firstDay: DateTime(2023, 1, 1),
+                                lastDay: DateTime(2024, 12, 31),
+                                locale: 'ko-KR',
+                                selectedDayPredicate: (day) {
+                                  return calendar.isSameDay(selectedDay, day);
+                                },
+                                calendarStyle: const calendar.CalendarStyle(
+                                    isTodayHighlighted: false,
+                                    outsideTextStyle: TextStyle(
+                                        color: AppColor.textColor2,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                    defaultTextStyle: TextStyle(
+                                        color: AppColor.textColor,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                    weekendTextStyle: TextStyle(
+                                        color: AppColor.markColor,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                    selectedDecoration: BoxDecoration(
+                                      color: AppColor.objectColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    selectedTextStyle: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColor.backgroundColor,
+                                        fontSize: 12)),
+                                onDaySelected: (newSelectedDay, newFocusedDay) {
+                                  setState(() {
+                                    selectedDay = newSelectedDay;
+                                    focusedDay = newFocusedDay;
+                                    reservationTime = selectedDay;
+                                    if (selectedDay.month != focusedDay.month) {
+                                      focusedDay = DateTime(selectedDay.year,
+                                          selectedDay.month, 1);
+                                    }
+                                  });
+                                },
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: Center(
+                                  child: Text(
+                                    "선택한 날짜: ${DateFormat("yyyy년 MM월 dd일 E요일", 'ko_KR').format(reservationTime)}",
+                                    style: const TextStyle(
+                                        color: AppColor.textColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "예약할 시간을 선택해주세요",
+                                  style: TextStyle(
+                                      color: AppColor.textColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 3, bottom: 24),
+                                  child: Text(
+                                    "블록 하나당 1시간입니다",
+                                    style: TextStyle(
+                                        color: AppColor.textColor2,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14),
+                                  ),
+                                ),
+                                GridView.count(
+                                  crossAxisCount: 4,
+                                  childAspectRatio: 1.8,
+                                  shrinkWrap: true,
+                                  children: List.generate(24, (index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          if (checkedTime.contains(index)) {
+                                            timeButton[index] = false;
+                                            checkedTime.remove(index);
+                                          } else if (checkedTime.isEmpty) {
+                                            timeButton[index] = true;
+                                            checkedTime.add(index);
+                                          } else {
+                                            if (!checkTime(index)) {
+                                              snackBar(
+                                                  title: "연속된 시간을 선택해주세요",
+                                                  content: "연속된 시간만 신청 가능합니다");
+                                            } else {
+                                              timeButton[index] = true;
+                                            }
+                                          }
+                                        });
+                                      },
+                                      child: Container(
+                                        margin: const EdgeInsets.all(2.0),
+                                        decoration: BoxDecoration(
+                                          color: timeButton[index]
+                                              ? AppColor.objectColor
+                                              : AppColor.backgroundColor2,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            '$index:00',
+                                            style: TextStyle(
+                                              color: timeButton[index]
+                                                  ? AppColor.backgroundColor
+                                                  : AppColor.textColor,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                                if (checkedTime.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16.0),
+                                    child: Center(
+                                      child: Text(
+                                        checkedTime.length == 1
+                                            ? "선택한 시간: ${checkedTime[0]}시~${checkedTime[0] + 1}시 (총 1시간)"
+                                            : "선택한 시간: ${checkedTime[0]}시~${checkedTime[checkedTime.length - 1] + 1}시 (총 ${checkedTime[checkedTime.length - 1] + 1 - checkedTime[0]}시간)",
+                                        style: const TextStyle(
+                                            color: AppColor.textColor,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                  ),
+                              ]),
                         ),
                       ),
                     ),
