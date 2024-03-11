@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -181,7 +182,16 @@ class _PostAddPageState extends State<PostAddPage> {
                       children: [
                         InkWell(
                           onTap: () {
-                            pickImage();
+                            if (widget.isEdit) {
+                              if (selectedImages.length +
+                                      widget.post!.attachmentsUrl.length <
+                                  maxImageCount) {
+                                pickImage();
+                              }
+                            } else {
+                              if (selectedImages.length < maxImageCount)
+                                pickImage();
+                            }
                           },
                           borderRadius: BorderRadius.circular(8),
                           child: SvgPicture.asset(
