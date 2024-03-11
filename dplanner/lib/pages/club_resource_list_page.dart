@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/resource_model.dart';

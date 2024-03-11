@@ -8,9 +8,19 @@ import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/post_content.dart';
+import 'package:dplanner/models/post_model.dart';
+import 'package:dplanner/services/club_post_api_service.dart';
+
+///
+///
+/// POST카드를 클릭하면 연결되는 POST 자세히보기 화면. 내용(글, 댓글)은 다른 class에서
+///
+///
 
 class PostPage extends StatefulWidget {
-  const PostPage({super.key});
+  final Post post;
+
+  const PostPage({Key? key, required this.post}) : super(key: key);
 
   @override
   State<PostPage> createState() => _PostPageState();
@@ -20,6 +30,21 @@ class _PostPageState extends State<PostPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController addComment = TextEditingController();
   bool _isFocused = false;
+  bool _isReplying = false; //답글을 다는 중인지 체크
+  int? _replyingCommentId; //답글을 달려고 클릭한 댓글의 ID
+
+  void startReplying(int commentId) {
+    setState(() {
+      _isReplying = true;
+      _replyingCommentId = commentId;
+    });
+  }
+
+  void _handleCommentSelected(int commentId) {
+    setState(() {
+      _replyingCommentId = commentId;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,62 +69,84 @@ class _PostPageState extends State<PostPage> {
           ),
         ),
         body: SafeArea(
-          child: Column(
-            children: [
-              const PostContent(),
-              Container(
-                color: AppColor.backgroundColor2,
-                height: SizeController.to.screenHeight * 0.01,
-              ),
-              const Expanded(
-                child: SingleChildScrollView(
-                  child: PostComment(),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Row(
+            child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    ClipOval(
-                      child: Image.asset(
-                        'assets/images/jin_profile.png',
-                        height: SizeController.to.screenWidth * 0.1,
-                        width: SizeController.to.screenWidth * 0.1,
-                        fit: BoxFit.fill,
-                      ),
+                    PostContent(post: widget.post),
+                    Container(
+                      color: AppColor.backgroundColor2,
+                      height: SizeController.to.screenHeight * 0.01,
                     ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
-                        child: Form(
-                            key: _formKey,
-                            child: OutlineTextForm(
-                              hintText: '댓글을 남겨보세요',
-                              controller: addComment,
-                              isColored: true,
-                              icon: _isFocused
-                                  ? const Icon(
-                                      SFSymbols.paperplane_fill,
-                                      color: AppColor.objectColor,
-                                    )
-                                  : const Icon(
-                                      SFSymbols.paperplane,
-                                      color: AppColor.textColor2,
-                                    ),
-                              onChanged: (value) {
-                                setState(() {
-                                  _isFocused = value.isNotEmpty;
-                                });
-                              },
-                            )),
-                      ),
-                    ),
+                    PostComment(
+                        post: widget.post,
+                        onCommentSelected: _handleCommentSelected),
                   ],
                 ),
-              )
-            ],
-          ),
-        ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Row(
+                children: [
+                  ClipOval(
+                    child: Image.asset(
+                      'assets/images/jin_profile.png',
+                      height: SizeController.to.screenWidth * 0.1,
+                      width: SizeController.to.screenWidth * 0.1,
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
+                      child: Form(
+                        key: _formKey,
+                        child: OutlineTextForm(
+                          hintText: '댓글을 남겨보세요',
+                          controller: addComment,
+                          isColored: true,
+                          onChanged: (value) {
+                            setState(() {
+                              _isFocused = value.isNotEmpty;
+                            });
+                          },
+                          icon: GestureDetector(
+                            onTap: () async {
+                              if (_formKey.currentState!.validate()) {
+                                // 폼이 유효한 경우 댓글을 서버에 게시
+                                print("==parentID: ${_replyingCommentId}");
+                                await PostCommentApiService.postComment(
+                                    postId: widget.post.id,
+                                    content: addComment.text,
+                                    parentId: _replyingCommentId);
+                                // 댓글 입력 필드 초기화
+                                addComment.clear();
+                                _isReplying = false;
+                                _replyingCommentId = null;
+                              }
+                            },
+                            child: _isFocused
+                                ? const Icon(
+                                    SFSymbols.paperplane_fill,
+                                    color: AppColor.objectColor,
+                                  )
+                                : const Icon(
+                                    SFSymbols.paperplane,
+                                    color: AppColor.textColor2,
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        )),
         bottomNavigationBar: const BottomBar());
   }
 }
