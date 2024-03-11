@@ -34,7 +34,7 @@ class _PostCommentState extends State<PostComment> {
   }
 
   Future<void> _fetchComments() async {
-    final comments = await PostApiService.fetchComments(widget.post.id);
+    final comments = await PostCommentApiService.fetchComments(widget.post.id);
     if (comments != null)
       setState(() {
         _comments = comments;
