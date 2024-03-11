@@ -18,7 +18,9 @@ class MiniTextButton extends StatelessWidget {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           backgroundColor: buttonColor,
+
           minimumSize: const Size(0, 32),
+
           padding: const EdgeInsets.symmetric(
               vertical: 0.0, horizontal: 10.0), // 여기서 간격을 조절
         ),

@@ -5,11 +5,14 @@ import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
+import 'dart:async';
 
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/post_card.dart';
+import 'package:dplanner/models/post_model.dart';
+import 'package:dplanner/services/club_post_api_service.dart';
 
 class ClubHomePage extends StatefulWidget {
   const ClubHomePage({super.key});
@@ -22,11 +25,50 @@ class _ClubHomePageState extends State<ClubHomePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController searchPost = TextEditingController();
   bool _isFocused = false;
+  List<Post> _posts = [];
+  String temp = '';
+  int _currentPage = 0;
+  bool _hasNextPage = true;
+
+  final StreamController<List<Post>> _postsController =
+      StreamController<List<Post>>();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPosts();
+  }
 
   @override
   void dispose() {
+    _postsController.close();
     searchPost.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchPosts() async {
+    if (!_hasNextPage) return; // 다음 페이지가 없으면 요청을 중단합니다.
+
+    final posts = await PostApiService.fetchPosts(
+      clubID: ClubController.to.club().id,
+      page: _currentPage++,
+    );
+
+    if (posts.isNotEmpty) {
+      setState(() {
+        _posts.addAll(posts);
+      });
+      _postsController.add(_posts);
+    } else {
+      _hasNextPage = false; // 받아온 포스트가 없다면, 다음 페이지가 없는 것으로 간주합니다.
+    }
+  }
+
+  void _onScrollNotification(ScrollNotification scrollInfo) {
+    if (scrollInfo is ScrollEndNotification &&
+        scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+      _fetchPosts(); // 스크롤이 끝에 도달하면 다음 페이지의 포스트를 로드
+    }
   }
 
   @override
@@ -93,30 +135,44 @@ class _ClubHomePageState extends State<ClubHomePage> {
                         )),
                   ),
                 ),
-                Container(
-                  color: AppColor.backgroundColor,
-                  height: SizeController.to.screenHeight * 0.01,
-                ),
-                const PostCard(),
-                Container(
-                  height: SizeController.to.screenHeight * 0.01,
-                ),
-                const PostCard(),
-                Container(
-                  height: SizeController.to.screenHeight * 0.01,
-                ),
-                const PostCard(),
-                Container(
-                  height: SizeController.to.screenHeight * 0.01,
-                ),
-                const PostCard(),
+                NotificationListener<ScrollNotification>(
+                  onNotification: (ScrollNotification scrollInfo) {
+                    _onScrollNotification(scrollInfo);
+                    return true;
+                  },
+                  child: StreamBuilder<List<Post>>(
+                    stream: _postsController.stream,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Container(
+                          height: MediaQuery.of(context).size.height,
+                          child: ListView.separated(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              final post = snapshot.data![index];
+                              return PostCard(post: post);
+                            },
+                            separatorBuilder:
+                                (BuildContext context, int index) =>
+                                    const Divider(
+                                        height: 10, color: Colors.transparent),
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  ),
+                )
               ],
             ),
           ),
         ),
         floatingActionButton: ElevatedButton(
           onPressed: () {
-            Get.to(const PostAddPage());
+            Get.to(PostAddPage(clubID: ClubController.to.club().id)); //게시글
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColor.objectColor,

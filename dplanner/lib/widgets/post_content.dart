@@ -1,3 +1,4 @@
+import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -6,9 +7,86 @@ import 'package:get/get.dart';
 import '../controllers/size.dart';
 import '../style.dart';
 import 'nextpage_button.dart';
+import 'package:dplanner/models/post_model.dart';
+import 'package:dplanner/services/club_post_api_service.dart';
+import 'full_screen_image.dart';
 
-class PostContent extends StatelessWidget {
-  const PostContent({super.key});
+///
+///
+/// POST 자세히보기 화면에서 글 내용 그리는 class
+///
+///
+
+class PostContent extends StatefulWidget {
+  final Post post;
+
+  const PostContent({Key? key, required this.post}) : super(key: key);
+
+  @override
+  State<PostContent> createState() => _PostContentState();
+}
+
+class _PostContentState extends State<PostContent> {
+  late bool isLiked = widget.post.likeStatus;
+  late int likeCount = widget.post.likeCount;
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('게시글 삭제'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('정말로 이 게시글을 삭제하시겠습니까?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () async {
+                try {
+                  await PostApiService.deletePost(widget.post.id);
+                  Get.back();
+                  Get.back();
+                  Get.snackbar('알림', '게시글이 성공적으로 삭제되었습니다.');
+                } catch (e) {
+                  Get.snackbar('알림', '게시글 삭제 중 오류가 발생했습니다.');
+                  print('게시글 삭제 중 오류: $e');
+                }
+              },
+              child: Text('예'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _toggleLike() async {
+    try {
+      final bool newLikeStatus =
+          await PostApiService.toggleLike(widget.post.id);
+      setState(() {
+        isLiked = newLikeStatus;
+        if (isLiked) {
+          likeCount += 1;
+        } else {
+          likeCount -= 1;
+        }
+      });
+    } catch (e) {
+      Get.snackbar('알림', '오류가 발생했습니다. 다시 시도해주세요: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +118,9 @@ class PostContent extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            const Text(
-                              "DP23 남진",
-                              style: TextStyle(
+                            Text(
+                              widget.post.clubMemberName,
+                              style: const TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16,
@@ -51,27 +129,30 @@ class PostContent extends StatelessWidget {
                             SizedBox(
                               width: SizeController.to.screenWidth * 0.05,
                             ),
-                            Container(
-                              padding: const EdgeInsets.fromLTRB(6, 2, 6, 2),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(15),
-                                color: AppColor.subColor1, // 배경색 설정
-                              ),
-                              child: const Text(
-                                "관리자",
-                                style: TextStyle(
-                                  color: AppColor.backgroundColor,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
+                            widget.post.clubRole == 'ADMIN'
+                                ? Container(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(6, 2, 6, 2),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.rectangle,
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: AppColor.subColor1, // 배경색 설정
+                                    ),
+                                    child: const Text(
+                                      "관리자",
+                                      style: TextStyle(
+                                        color: AppColor.backgroundColor,
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
                           ],
                         ),
-                        const Text(
-                          "2023.11.11 16:28",
-                          style: TextStyle(
+                        Text(
+                          '${widget.post.createdTime}',
+                          style: const TextStyle(
                             color: AppColor.textColor,
                             fontWeight: FontWeight.w500,
                             fontSize: 12,
@@ -83,7 +164,7 @@ class PostContent extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    _postMore(context);
+                    _postMore(context, widget.post);
                   },
                   icon: const Icon(
                     SFSymbols.ellipsis,
@@ -98,8 +179,8 @@ class PostContent extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(
                       bottom: SizeController.to.screenHeight * 0.01),
-                  child: const Text(
-                    "공지",
+                  child: Text(
+                    widget.post.title ?? "제목없음", //TODO: 제목 생기면 수정해야함
                     style: TextStyle(
                       color: AppColor.textColor,
                       fontWeight: FontWeight.w800,
@@ -107,40 +188,67 @@ class PostContent extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Text(
-                  "내용\n내용\n내용",
+                Text(
+                  widget.post.content,
                   style: TextStyle(
                     color: AppColor.textColor,
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
                   ),
                 ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: widget.post.attachmentsUrl.map((imageUrl) {
+                      String formattedUrl = imageUrl.startsWith('https://')
+                          ? imageUrl
+                          : 'https://$imageUrl';
+                      return GestureDetector(
+                        onTap: () {
+                          // Getx의 Get.to()를 사용하여 전체 화면 이미지 페이지로 이동
+                          Get.to(() => FullScreenImage(imageUrl: formattedUrl));
+                        },
+                        child: Container(
+                          height: 100,
+                          width: 100,
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child:
+                                Image.network(formattedUrl, fit: BoxFit.cover),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
               ],
             ),
             SizedBox(height: SizeController.to.screenHeight * 0.02),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  flex: 1,
-                  child: Row(
-                    children: [
-                      Icon(
-                        SFSymbols.pin_fill,
-                        color: AppColor.textColor2,
-                        size: 14,
-                      ),
-                      Text(
-                        " 고정됨",
-                        style: TextStyle(
-                          color: AppColor.textColor2,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
+                widget.post.isFixed
+                    ? Expanded(
+                        flex: 1,
+                        child: Row(
+                          children: [
+                            Icon(
+                              SFSymbols.pin_fill,
+                              color: AppColor.textColor2,
+                              size: 14,
+                            ),
+                            Text(
+                              " 고정됨",
+                              style: TextStyle(
+                                color: AppColor.textColor2,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                      )
+                    : Container(),
                 Expanded(
                   flex: 1,
                   child: Row(
@@ -156,7 +264,7 @@ class PostContent extends StatelessWidget {
                       Expanded(
                         flex: 1,
                         child: Text(
-                          "1",
+                          '${widget.post.commentCount}',
                           style: TextStyle(
                             color: AppColor.textColor2,
                             fontWeight: FontWeight.w500,
@@ -166,35 +274,19 @@ class PostContent extends StatelessWidget {
                       ),
                       Expanded(
                         flex: 1,
-                        child: Icon(
-                          SFSymbols.heart,
-                          color: AppColor.textColor2,
-                          size: 16,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          "3",
-                          style: TextStyle(
+                        child: GestureDetector(
+                          onTap: _toggleLike,
+                          child: Icon(
+                            isLiked ? SFSymbols.heart_fill : SFSymbols.heart,
                             color: AppColor.textColor2,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
+                            size: 16,
                           ),
                         ),
                       ),
                       Expanded(
                         flex: 1,
-                        child: Icon(
-                          SFSymbols.eye,
-                          color: AppColor.textColor2,
-                          size: 16,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
                         child: Text(
-                          "20",
+                          '${likeCount}',
                           style: TextStyle(
                             color: AppColor.textColor2,
                             fontWeight: FontWeight.w500,
@@ -213,7 +305,7 @@ class PostContent extends StatelessWidget {
     );
   }
 
-  void _postMore(BuildContext context) async {
+  void _postMore(BuildContext context, Post post) async {
     await showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -280,7 +372,11 @@ class PostContent extends StatelessWidget {
                     ],
                   ),
                   onPressed: () {
-                    Get.back();
+                    Get.to(PostAddPage(
+                      isEdit: true,
+                      post: post,
+                      clubID: post.clubId,
+                    ));
                   },
                 ),
               ),
@@ -305,7 +401,8 @@ class PostContent extends StatelessWidget {
                     ],
                   ),
                   onPressed: () {
-                    Get.back();
+                    _showDeleteConfirmationDialog(context);
+                    //  Get.back();
                   },
                 ),
               ),

@@ -15,7 +15,9 @@ import 'package:dplanner/pages/club_setting_page.dart';
 import 'package:dplanner/pages/club_timetable_page.dart';
 import 'package:dplanner/pages/login_page.dart';
 import 'package:dplanner/pages/my_profile_modification_page.dart';
+
 import 'package:dplanner/pages/club_resource_list_page.dart';
+
 import 'package:get/get.dart';
 
 final page = [
