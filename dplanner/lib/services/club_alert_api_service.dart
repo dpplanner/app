@@ -19,13 +19,10 @@ class ClubAlertApiService {
 
     try {
       final response = await http.get(url, headers: headers);
-
       if (response.statusCode == 200) {
-        final List<dynamic> responseData = json.decode(response.body);
-        final List<AlertMessageModel> alertList = responseData
-            .map((json) => AlertMessageModel.fromJson(json))
-            .toList();
-        return alertList;
+        final responseData = jsonDecode(utf8.decode(response.bodyBytes));
+        final List<dynamic> content = responseData['data']['responseList'];
+        return content.map((data) => AlertMessageModel.fromJson(data)).toList();
       }
       throw Exception('Failed to connect to the server');
     } catch (e) {
