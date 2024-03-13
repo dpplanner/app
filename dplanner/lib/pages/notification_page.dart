@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import '../controllers/size.dart';
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
+import 'package:dplanner/services/club_alert_api_service.dart';
+import 'package:dplanner/models/club_alert_message_model.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
@@ -15,6 +17,14 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
+  Future<List<AlertMessageModel>>? alertListFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    alertListFuture = ClubAlertApiService.fetchAlertList(); // 알림 목록 불러오기
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,45 +47,33 @@ class _NotificationPageState extends State<NotificationPage> {
           centerTitle: true,
         ),
       ),
-      body: const SafeArea(
+      body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              NotificationCard(
-                  isNew: true,
-                  icon: "icon_accept",
-                  title: "예약 신청이 승인되었어요",
-                  content: "동아리 방의 12월 29일 17:00 ~ 19:00시 예약 신청을 관리자가 승인했어요"),
-              NotificationCard(
-                  isNew: true,
-                  icon: "icon_reject",
-                  title: "예약 신청이 거절되었어요",
-                  content: "동아리 방의 12월 29일 17:00 ~ 19:00시 예약 신청을 관리자가 거절했어요"),
-              NotificationCard(
-                  isNew: true,
-                  icon: "icon_invite",
-                  title: "예약에 초대되었어요",
-                  content:
-                      "DP23 강지인 님의 12월 29일 17:00 ~ 19:00 동아리 방 예약에 초대되었어요"),
-              NotificationCard(
-                  isChecked: true,
-                  icon: "icon_request",
-                  title: "새로운 예약 요청이 있어요",
-                  content:
-                      "DP23 강지인 님의 12월 29일 17:00 ~ 19:00 동아리 방 예약 요청이 있어요"),
-              NotificationCard(
-                  icon: "icon_request",
-                  title: "새로운 가입 요청이 있어요",
-                  content: "DP23 강지인 님의 클럽 가입 요청이 있어요"),
-              NotificationCard(
-                  icon: "icon_report",
-                  title: "신고된 게시글을 검토해주세요",
-                  content: "12월 25일 19:12분에 작성된 게시글에 신고가 들어왔어요"),
-              NotificationCard(
-                  icon: "icon_notice",
-                  title: "새로운 공지가 있어요",
-                  content: "클럽 소식을 확인해주세요"),
-            ],
+          child: FutureBuilder<List<AlertMessageModel>>(
+            future: alertListFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text("데이터를 불러오는데 실패했습니다."));
+              } else if (snapshot.hasData) {
+                final alerts = snapshot.data!;
+                return Column(
+                  children: alerts
+                      .map((alert) => NotificationCard(
+                            ID: alert.id,
+                            isRead: alert.isRead,
+                            // icon: alert.icon,
+                            title: alert.title,
+                            content: alert.content,
+                            redirectUrl: alert.redirectUrl,
+                          ))
+                      .toList(),
+                );
+              } else {
+                return Center(child: Text("알림이 없습니다."));
+              }
+            },
           ),
         ),
       ),
