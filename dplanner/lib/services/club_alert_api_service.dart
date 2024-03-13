@@ -29,4 +29,25 @@ class ClubAlertApiService {
       throw Exception('Failed to connect to the server');
     }
   }
+
+  static Future<void> markAsRead(int messageID) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final url =
+        Uri.parse('$baseUrl/messages/$messageID'); // 예시 URL, 실제 API에 맞게 조정 필요
+    final headers = {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json'
+    };
+
+    try {
+      final response = await http.patch(url, headers: headers);
+      if (response.statusCode != 200) {
+        throw Exception('Failed to mark message as read');
+      }
+    } catch (e) {
+      throw Exception('Failed to connect to the server: $e');
+    }
+  }
 }
