@@ -90,11 +90,25 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
             date: DateTime.parse(i.startDateTime),
             startTime: DateTime.parse(i.startDateTime),
             endTime: DateTime.parse(i.endDateTime),
-            title: i.title == ""
-                ? "${i.reservationId} ${i.clubMemberName}"
-                : "${i.reservationId} ${i.title}",
-            description: i.title == "" ? i.usage : "",
-            color: AppColor.subColor3));
+            title: i.status == "REQUEST" &&
+                    i.clubMemberId != MemberController.to.clubMember().id &&
+                    MemberController.to.clubMember().role != "ADMIN"
+                ? "${i.reservationId}"
+                : i.title == ""
+                    ? "${i.reservationId} ${i.clubMemberName}"
+                    : "${i.reservationId} ${i.title}",
+            description: i.status == "REQUEST" &&
+                    i.clubMemberId != MemberController.to.clubMember().id &&
+                    MemberController.to.clubMember().role != "ADMIN"
+                ? ""
+                : i.title == ""
+                    ? i.usage
+                    : "",
+            color: i.title != ""
+                ? AppColor.subColor1
+                : i.status == "CONFIRMED"
+                    ? AppColor.subColor3
+                    : AppColor.subColor4));
       }
 
       eventController.addAll(events);
@@ -751,9 +765,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           fontSize: 16),
                                     ),
                                     Text(
-                                      types == 0 || types == 1 || types == 2
+                                      types == 0 ||
+                                              types == 1 ||
+                                              types == 2 ||
+                                              reservation == null
                                           ? ""
-                                          : reservation!.clubMemberName,
+                                          : reservation.clubMemberName,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 15),
@@ -803,8 +820,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           null;
                                         } else {
                                           setState(() {
-                                            types = 1;
                                             lastType = types == 0 ? 0 : 4;
+                                            types = 1;
                                           });
                                         }
                                       },
@@ -835,8 +852,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                         null;
                                       } else {
                                         setState(() {
-                                          types = 2;
                                           lastType = types == 0 ? 0 : 4;
+                                          types = 2;
                                         });
                                       }
                                     },
@@ -1275,47 +1292,71 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                     ),
                     child: Visibility(
                       visible: types != 3,
-                      replacement: Padding(
-                        padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: NextPageButton(
-                                text: const Text(
-                                  "예약 취소하기",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColor.backgroundColor),
+                      replacement: Visibility(
+                        visible: reservation?.clubMemberId ==
+                            MemberController.to.clubMember().id,
+                        replacement: Visibility(
+                          visible:
+                              MemberController.to.clubMember().role == "ADMIN",
+                          child: NextPageButton(
+                            text: const Text(
+                              "예약 삭제하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColor.backgroundColor),
+                            ),
+                            buttonColor: AppColor.markColor,
+                            onPressed: () {
+                              checkDeleteReservation(
+                                  id: reservation!.reservationId, types: 0);
+                            },
+                          ),
+                        ),
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(left: 24.0, right: 24.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: NextPageButton(
+                                  text: const Text(
+                                    "예약 취소하기",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColor.backgroundColor),
+                                  ),
+                                  buttonColor: AppColor.markColor,
+                                  onPressed: () {
+                                    checkDeleteReservation(
+                                        id: reservation!.reservationId,
+                                        types: 1);
+                                  },
                                 ),
-                                buttonColor: AppColor.markColor,
-                                onPressed: () {
-                                  checkDeleteReservation(
-                                      id: reservation!.reservationId);
-                                },
                               ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Expanded(
-                              child: NextPageButton(
-                                text: const Text(
-                                  "예약 수정하기",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColor.backgroundColor),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                child: NextPageButton(
+                                  text: const Text(
+                                    "예약 수정하기",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColor.backgroundColor),
+                                  ),
+                                  buttonColor: AppColor.objectColor,
+                                  onPressed: () {
+                                    setState(() {
+                                      types = 4;
+                                    });
+                                  },
                                 ),
-                                buttonColor: AppColor.objectColor,
-                                onPressed: () {
-                                  setState(() {
-                                    types = 4;
-                                  });
-                                },
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       child: NextPageButton(
@@ -1418,36 +1459,39 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     );
   }
 
-  void checkDeleteReservation({required int id}) {
+  /// types == 0 : 삭제
+  /// types == 1 : 취소
+  void checkDeleteReservation({required int types, required int id}) {
     Get.dialog(
       AlertDialog(
         backgroundColor: AppColor.backgroundColor,
         elevation: 0,
-        title: const Padding(
-          padding: EdgeInsets.only(top: 16.0),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 16.0),
           child: Center(
             child: Text(
-              "예약 취소",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              types == 0 ? "예약 삭제" : "예약 취소",
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             ),
           ),
         ),
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "한번 취소한 예약은",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              types == 0 ? "한번 삭제한 예약은" : "한번 취소한 예약은",
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
             Text(
-              "되돌릴 수 없습니다",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              types == 0 ? "되살릴 수 없습니다" : "되돌릴 수 없습니다",
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 4.0),
+              padding: const EdgeInsets.only(top: 4.0),
               child: Text(
-                "정말 취소할까요?",
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                types == 0 ? "정말 삭제할까요?" : "정말 취소할까요?",
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
               ),
             ),
           ],
@@ -1458,9 +1502,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               Padding(
                 padding: const EdgeInsets.only(left: 24.0, right: 24.0),
                 child: NextPageButton(
-                  text: const Text(
-                    "취소하기",
-                    style: TextStyle(
+                  text: Text(
+                    types == 0 ? "삭제하기" : "취소하기",
+                    style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: AppColor.backgroundColor),
@@ -1468,8 +1512,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                   buttonColor: AppColor.objectColor,
                   onPressed: () async {
                     try {
-                      await ReservationApiService.deleteReservation(
-                          reservationId: id);
+                      if (types == 0) {
+                        await ReservationApiService.deleteReservation(
+                            reservationId: id);
+                      } else {
+                        await ReservationApiService.cancelReservation(
+                            reservationId: id);
+                      }
                       getReservations();
                       Get.back();
                       Get.back();
