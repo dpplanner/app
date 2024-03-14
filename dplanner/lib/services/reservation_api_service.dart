@@ -53,7 +53,30 @@ class ReservationApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// GET: /resources [클럽 자원 목록 가져오기] 클럽 전체 자원 목록 가져오기
+  /// GET: /reservations/(_.reservation_id) [예약 상세 정보 확인하기] 클럽 예약 상세 정보 확인하기
+  static Future<ReservationModel> getReservation(
+      {required int reservationId}) async {
+    final url = Uri.parse('$baseUrl/reservations/$reservationId');
+    const storage = FlutterSecureStorage();
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    });
+
+    if (response.statusCode == 200) {
+      return ReservationModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes))['data']);
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
+  /// GET: /reservations?resourceId=(_.resource_id)&start=(_.start_datetime)&end=(_.end_datetime)&status=(_.status) [예약 목록 확인하기] 클럽 예약 목록 가져오기
   static Future<List<ReservationModel>> getReservations(
       {required int resourceId,
       required String startDateTime,
@@ -125,16 +148,22 @@ class ReservationApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// DELETE: /resources/(_.resource_id) [클럽 자원 삭제] 클럽 자원 삭제하기
-  static Future<void> deleteResource({required int resourceId}) async {
-    final url = Uri.parse('$baseUrl/resources/$resourceId');
+  /// DELETE: /reservations [예약 삭제하기] 클럽 예약 삭제하기
+  static Future<void> deleteReservation({required int reservationId}) async {
+    final url = Uri.parse('$baseUrl/reservations');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
 
-    final response = await http.delete(url, headers: <String, String>{
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $accessToken',
-    });
+    final response = await http.delete(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({
+        "reservationId": reservationId,
+      }),
+    );
 
     if (response.statusCode == 204) {
       return;

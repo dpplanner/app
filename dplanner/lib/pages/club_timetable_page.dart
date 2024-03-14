@@ -39,7 +39,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
 
   final itemController = Get.put((ItemController()));
   ResourceModel? selectedValue;
-  Open _open = Open.yes;
 
   final formKey1 = GlobalKey<FormState>();
   final TextEditingController title = TextEditingController();
@@ -66,8 +65,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       List<List<ResourceModel>> resources =
           await ResourceApiService.getResources();
       ClubController.to.resources.value = resources[0] + resources[1];
-
       selectedValue ??= ClubController.to.resources.first;
+
+      for (var i in events) {
+        eventController.remove(i);
+      }
+      events.clear();
 
       int weekday = standardDay.weekday;
       startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
@@ -87,8 +90,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
             date: DateTime.parse(i.startDateTime),
             startTime: DateTime.parse(i.startDateTime),
             endTime: DateTime.parse(i.endDateTime),
-            title: i.title,
-            description: i.usage,
+            title: i.title == ""
+                ? "${i.reservationId} ${i.clubMemberName}"
+                : "${i.reservationId} ${i.title}",
+            description: i.title == "" ? i.usage : "",
             color: AppColor.subColor3));
       }
 
@@ -234,10 +239,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           onTap: () {
                                             setState(() {
                                               standardDay = now;
-                                              for (var i in events) {
-                                                eventController.remove(i);
-                                              }
-                                              events.clear();
                                             });
                                             getReservations();
                                             weekViewStateKey.currentState
@@ -310,10 +311,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 onPressed: () {
                                                   setState(() {
                                                     standardDay = selectedDate;
-                                                    for (var i in events) {
-                                                      eventController.remove(i);
-                                                    }
-                                                    events.clear();
                                                   });
                                                   getReservations();
                                                   weekViewStateKey.currentState
@@ -488,7 +485,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   color: DateTime.now().hour == date.hour
                                       ? AppColor.subColor1
                                       : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(20.0),
+                                  borderRadius: BorderRadius.circular(7.0),
                                 ),
                                 child: Text(
                                   date.hour < 10
@@ -519,7 +516,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                           if (events.isNotEmpty) {
                             return RoundedEventTile(
                               borderRadius: BorderRadius.circular(0.0),
-                              title: events[0].title,
+                              title: events[0]
+                                  .title
+                                  .split(" ")
+                                  .sublist(1)
+                                  .join(" "),
                               titleStyle: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 color: AppColor.backgroundColor,
@@ -560,16 +561,22 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         heightPerMinute:
                             SizeController.to.screenHeight * 0.0012,
                         eventArranger: const SideEventArranger(),
-                        onEventTap: (events, date) => {},
+                        onEventTap: (events, date) async {
+                          try {
+                            ReservationModel reservation =
+                                await ReservationApiService.getReservation(
+                                    reservationId: int.parse(
+                                        events[0].title.split(" ")[0]));
+                            addReservation(types: 3, reservation: reservation);
+                          } catch (e) {
+                            print(e.toString());
+                          }
+                        },
                         onDateLongPress: (date) => {},
                         onPageChange:
                             (DateTime firstDayOfWeek, int daysInWeek) {
                           setState(() {
                             standardDay = firstDayOfWeek;
-                            for (var i in events) {
-                              eventController.remove(i);
-                            }
-                            events.clear();
                           });
                           getReservations();
                         },
@@ -592,7 +599,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 return ElevatedButton(
                   onPressed: () {
                     if (selectedValue!.notice == "") {
-                      addReservation(types: 0);
+                      addReservation(types: 0, reservation: null);
                     } else {
                       showNotice(notice: selectedValue!.notice);
                     }
@@ -612,21 +619,42 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
         bottomNavigationBar: const BottomBar());
   }
 
-  void addReservation({required int types}) async {
-    DateTime reservationTime = now;
-    DateTime focusedDay = DateTime.now();
-    DateTime selectedDay = DateTime.now();
+  /// types == 0 : 예약하기
+  /// types == 1 : 예약 날짜
+  /// types == 2 : 예약 시간
+  /// types == 3 : 예약 정보
+  /// types == 4 : 예약 수정
 
+  void addReservation(
+      {required int types, required ReservationModel? reservation}) async {
+    DateTime reservationTime = now;
+    DateTime focusedDay = now;
+    DateTime selectedDay = now;
     int startTime = 0;
     int endTime = 0;
-
-    title.text = MemberController.to.clubMember().name;
-
     bool isChecked = false;
     bool isChecked2 = false;
-
+    Open open = Open.yes;
+    title.text = "";
+    usage.text = "";
     List<int> checkedTime = [];
     List<bool> timeButton = List.generate(24, (index) => false);
+
+    if (types == 3 || types == 4) {
+      reservationTime = DateTime.parse(reservation!.startDateTime);
+      startTime = int.parse(reservation.startDateTime.substring(11, 13));
+      endTime = int.parse(reservation.endDateTime.substring(11, 13));
+      for (var i = startTime; i < endTime; i++) {
+        checkedTime.add(i);
+        timeButton[i] = true;
+      }
+      title.text = reservation.title;
+      usage.text = reservation.usage;
+      isChecked = true;
+      if (!reservation.sharing) {
+        open = Open.no;
+      }
+    }
 
     bool checkTime(int newTime) {
       checkedTime.add(newTime);
@@ -662,7 +690,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             ? "예약하기"
                             : (types == 1)
                                 ? "예약 날짜"
-                                : "예약 시간",
+                                : (types == 2)
+                                    ? "예약 시간"
+                                    : (types == 3)
+                                        ? "예약 정보"
+                                        : "예약 수정",
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -676,46 +708,100 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Visibility(
-                        visible: types != 0,
+                        visible: !(types == 0 || types == 3 || types == 4),
                         replacement: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "신청 품목",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16),
+                            Visibility(
+                              visible: !(types == 0 || types == 4),
+                              replacement: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "예약 품목",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  ),
+                                  Text(
+                                    selectedValue!.name,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 15),
+                                  ),
+                                ],
+                              ),
+                              child: Visibility(
+                                visible: reservation?.clubMemberId ==
+                                    MemberController.to.clubMember().id,
+                                replacement: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "예약자",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16),
+                                    ),
+                                    Text(
+                                      types == 0 || types == 1 || types == 2
+                                          ? ""
+                                          : reservation!.clubMemberName,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 15),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  selectedValue!.name,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 15),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "예약 상태",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16),
+                                    ),
+                                    Text(
+                                      reservation?.status == "REQUEST"
+                                          ? "승인 대기중"
+                                          : reservation?.status == "CONFIRMED"
+                                              ? "승인 완료"
+                                              : "거절됨",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 15),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(
-                                  top: 32.0, bottom: 32.0),
+                                  top: 35.0, bottom: 35.0),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "신청 날짜",
+                                    "예약 날짜",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16),
                                   ),
                                   InkWell(
                                       onTap: () {
-                                        setState(() {
-                                          types = 1;
-                                        });
+                                        if (types == 3) {
+                                          null;
+                                        } else {
+                                          setState(() {
+                                            types = 1;
+                                          });
+                                        }
                                       },
                                       borderRadius: BorderRadius.circular(5),
                                       child: Text(
@@ -733,16 +819,20 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text(
-                                  "신청 시간",
+                                  "예약 시간",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 16),
                                 ),
                                 InkWell(
                                     onTap: () {
-                                      setState(() {
-                                        types = 2;
-                                      });
+                                      if (types == 3) {
+                                        null;
+                                      } else {
+                                        setState(() {
+                                          types = 2;
+                                        });
+                                      }
                                     },
                                     borderRadius: BorderRadius.circular(5),
                                     child: Visibility(
@@ -768,7 +858,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
-                                    "예약자",
+                                    "예약 제목(선택)",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16),
@@ -787,18 +877,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             isRight: true,
                                             noErrorSign: true,
                                             isWritten:
-                                                (types == 1) ? true : false,
+                                                (types == 3) ? true : false,
                                             fontSize: 15,
-                                            validator: (value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
-                                                snackBar(
-                                                    title: "작성이 끝나지 않았습니다",
-                                                    content: "예약 제목을 작성해주세요");
-                                                return '';
-                                              }
-                                              return null;
-                                            },
                                             onChanged: (value) {
                                               setState(() {
                                                 isFocused1 = value.isNotEmpty;
@@ -833,7 +913,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           isRight: true,
                                           noErrorSign: true,
                                           isWritten:
-                                              (types == 1) ? true : false,
+                                              (types == 3) ? true : false,
                                           fontSize: 15,
                                           onChanged: (value) {
                                             setState(() {
@@ -845,21 +925,22 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 ),
                               ],
                             ),
-                            const Padding(
-                              padding: EdgeInsets.only(top: 16.0, bottom: 32.0),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 16.0, bottom: 35.0),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "함께 사용하는 사람(선택)",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16),
                                   ),
                                   Text(
-                                    "선택하기",
-                                    style: TextStyle(
+                                    types == 0 ? "선택하기" : "내용 없음",
+                                    style: const TextStyle(
                                         color: AppColor.textColor2,
                                         fontWeight: FontWeight.w400,
                                         fontSize: 15),
@@ -884,11 +965,15 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 materialTapTargetSize:
                                     MaterialTapTargetSize.shrinkWrap,
                                 value: Open.yes,
-                                groupValue: _open,
+                                groupValue: open,
                                 onChanged: (Open? value) {
-                                  setState(() {
-                                    _open = value!;
-                                  });
+                                  if (types == 3) {
+                                    null;
+                                  } else {
+                                    setState(() {
+                                      open = value!;
+                                    });
+                                  }
                                 },
                                 contentPadding:
                                     const EdgeInsets.symmetric(vertical: -10.0),
@@ -906,11 +991,15 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 materialTapTargetSize:
                                     MaterialTapTargetSize.shrinkWrap,
                                 value: Open.no,
-                                groupValue: _open,
+                                groupValue: open,
                                 onChanged: (Open? value) {
-                                  setState(() {
-                                    _open = value!;
-                                  });
+                                  if (types == 3) {
+                                    null;
+                                  } else {
+                                    setState(() {
+                                      open = value!;
+                                    });
+                                  }
                                 },
                                 contentPadding:
                                     const EdgeInsets.symmetric(vertical: -30.0),
@@ -1117,11 +1206,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0, bottom: 40.0),
                   child: Visibility(
-                    visible: types != 0,
+                    visible: !(types == 0 && types == 4),
                     replacement: NextPageButton(
-                      text: const Text(
-                        "예약 신청하기",
-                        style: TextStyle(
+                      text: Text(
+                        types == 0 ? "예약 신청하기" : "예약 수정하기",
+                        style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: AppColor.backgroundColor),
@@ -1129,9 +1218,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       buttonColor:
                           isChecked ? AppColor.objectColor : AppColor.subColor3,
                       onPressed: () async {
-                        final formKeyState1 = formKey1.currentState!;
-                        if (formKeyState1.validate() &&
-                            checkedTime.isNotEmpty) {
+                        if (checkedTime.isNotEmpty || types == 4) {
                           try {
                             String startDateTime = (0 <= startTime &&
                                     startTime <= 9)
@@ -1152,7 +1239,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 resourceId: selectedValue!.id,
                                 title: title.text,
                                 usage: usage.text,
-                                sharing: (_open == Open.yes) ? true : false,
+                                sharing: (open == Open.yes) ? true : false,
                                 startDateTime: startDateTime,
                                 endDateTime: endDateTime,
                                 reservationInvitees: []);
@@ -1168,40 +1255,87 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         // });
                       },
                     ),
-                    child: NextPageButton(
-                      text: const Text(
-                        "선택 완료",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColor.backgroundColor),
+                    child: Visibility(
+                      visible: types != 3,
+                      replacement: Padding(
+                        padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: NextPageButton(
+                                text: const Text(
+                                  "예약 취소하기",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColor.backgroundColor),
+                                ),
+                                buttonColor: AppColor.markColor,
+                                onPressed: () {
+                                  checkDeleteReservation(
+                                      id: reservation!.reservationId);
+                                },
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Expanded(
+                              child: NextPageButton(
+                                text: const Text(
+                                  "예약 수정하기",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColor.backgroundColor),
+                                ),
+                                buttonColor: AppColor.objectColor,
+                                onPressed: () {
+                                  setState(() {
+                                    types = 4;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      buttonColor: types == 1
-                          ? AppColor.objectColor
-                          : isChecked2
-                              ? AppColor.objectColor
-                              : AppColor.subColor3,
-                      onPressed: () {
-                        if (types == 1) {
-                          setState(() {
-                            types = 0;
-                          });
-                        } else if (types == 2 && checkedTime.isNotEmpty) {
-                          setState(() {
-                            isChecked = true;
-                            types = 0;
-                            startTime = checkedTime[0];
-                            endTime = checkedTime[0] + 1;
-                            if (checkedTime.length > 1) {
-                              endTime = checkedTime[checkedTime.length - 1] + 1;
-                            }
-                          });
-                        } else {
-                          snackBar(
-                              title: "시간을 선택하지 않았습니다",
-                              content: "최소 한시간을 선택해주세요");
-                        }
-                      },
+                      child: NextPageButton(
+                        text: const Text(
+                          "선택 완료",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColor.backgroundColor),
+                        ),
+                        buttonColor: types == 1
+                            ? AppColor.objectColor
+                            : isChecked2
+                                ? AppColor.objectColor
+                                : AppColor.subColor3,
+                        onPressed: () {
+                          if (types == 1) {
+                            setState(() {
+                              types = 0;
+                            });
+                          } else if (types == 2 && checkedTime.isNotEmpty) {
+                            setState(() {
+                              isChecked = true;
+                              types = 0;
+                              startTime = checkedTime[0];
+                              endTime = checkedTime[0] + 1;
+                              if (checkedTime.length > 1) {
+                                endTime =
+                                    checkedTime[checkedTime.length - 1] + 1;
+                              }
+                            });
+                          } else {
+                            snackBar(
+                                title: "시간을 선택하지 않았습니다",
+                                content: "최소 한시간을 선택해주세요");
+                          }
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -1257,7 +1391,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               buttonColor: AppColor.objectColor,
               onPressed: () {
                 Get.back();
-                addReservation(types: 0);
+                addReservation(types: 0, reservation: null);
               },
             ),
           ),
@@ -1266,79 +1400,91 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     );
   }
 
-  void _reservationConfirmDialog(BuildContext context) async {
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: AppColor.backgroundColor,
-          title: const Center(
+  void checkDeleteReservation({required int id}) {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: AppColor.backgroundColor,
+        elevation: 0,
+        title: const Padding(
+          padding: EdgeInsets.only(top: 16.0),
+          child: Center(
             child: Text(
-              '신청완료',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+              "예약 취소",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             ),
           ),
-          content: const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '정상적으로 신청이 완료되었습니다.',
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-              ),
-              Text(
-                '관리자가 확인 후, 신청을 승인해드립니다.',
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-              ),
-              Text(
-                '승인이 되면 푸시 알림을 보내드릴까요?',
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-              ),
-            ],
-          ),
-          actions: [
-            Center(
-              child: Column(
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      backgroundColor: AppColor.objectColor,
-                      minimumSize: Size(
-                          SizeController.to.screenWidth * 0.5,
-                          SizeController.to.screenHeight *
-                              0.05), //width, height
-                    ),
-                    onPressed: () {
-                      Get.back();
-                    },
-                    child: const Text(
-                      '네, 보내주세요',
-                      style: TextStyle(
-                          color: AppColor.backgroundColor,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16),
-                    ),
-                  ),
-                  SizedBox(
-                    height: SizeController.to.screenHeight * 0.01,
-                  ),
-                  InkWell(
-                      onTap: () {
-                        Get.back();
-                      },
-                      borderRadius: BorderRadius.circular(5),
-                      child: const Text('아니오, 괜찮습니다.',
-                          style: TextStyle(
-                              color: AppColor.textColor2,
-                              fontWeight: FontWeight.w400,
-                              fontSize: 14))),
-                ],
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "한번 취소한 예약은",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              "되돌릴 수 없습니다",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 4.0),
+              child: Text(
+                "정말 취소할까요?",
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
               ),
             ),
           ],
-        );
-      },
+        ),
+        actions: [
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                child: NextPageButton(
+                  text: const Text(
+                    "취소하기",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.backgroundColor),
+                  ),
+                  buttonColor: AppColor.objectColor,
+                  onPressed: () async {
+                    try {
+                      await ReservationApiService.deleteReservation(
+                          reservationId: id);
+                      getReservations();
+                      Get.back();
+                      Get.back();
+                    } catch (e) {
+                      print(e.toString());
+                    }
+                  },
+                ),
+              ),
+              TextButton(
+                onPressed: Get.back,
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.resolveWith<Color>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.pressed)) {
+                        return Colors.transparent;
+                      }
+                      return Colors.transparent;
+                    },
+                  ),
+                ),
+                child: const Text(
+                  "닫기",
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.textColor2),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
