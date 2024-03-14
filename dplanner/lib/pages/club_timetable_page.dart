@@ -1,5 +1,6 @@
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/controllers/size.dart';
+import 'package:dplanner/models/reservation_model.dart';
 import 'package:dplanner/style.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,8 +23,6 @@ import '../widgets/snack_bar.dart';
 import '../widgets/underline_textform.dart';
 import 'error_page.dart';
 
-DateTime get _now => DateTime.now();
-
 enum Open { yes, no }
 
 class ClubTimetablePage extends StatefulWidget {
@@ -36,10 +35,10 @@ class ClubTimetablePage extends StatefulWidget {
 class _ClubTimetablePageState extends State<ClubTimetablePage> {
   final GlobalKey<WeekViewState> weekViewStateKey = GlobalKey<WeekViewState>();
   EventController eventController = EventController();
+  final List<CalendarEventData<Object?>> events = [];
 
   final itemController = Get.put((ItemController()));
-  String selectedValue = "";
-
+  ResourceModel? selectedValue;
   Open _open = Open.yes;
 
   final formKey1 = GlobalKey<FormState>();
@@ -50,6 +49,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   final TextEditingController usage = TextEditingController();
   bool isFocused2 = false;
 
+  DateTime get now => DateTime.now();
+  DateTime standardDay = DateTime.now();
+  DateTime startOfWeek = DateTime.now();
+  DateTime endOfWeek = DateTime.now();
+
   @override
   void dispose() {
     title.dispose();
@@ -57,15 +61,40 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     super.dispose();
   }
 
-  Future<List<ResourceModel>> getResources() async {
+  Future<List<ResourceModel>> getReservations() async {
     try {
       List<List<ResourceModel>> resources =
           await ResourceApiService.getResources();
       ClubController.to.resources.value = resources[0] + resources[1];
-      if (selectedValue == "") {
-        selectedValue = ClubController.to.resources[0].name;
+
+      selectedValue ??= ClubController.to.resources.first;
+
+      int weekday = standardDay.weekday;
+      startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
+      endOfWeek = standardDay.add(Duration(days: 7 - weekday));
+
+      List<ReservationModel> reservations =
+          await ReservationApiService.getReservations(
+              resourceId: selectedValue!.id,
+              startDateTime:
+                  DateFormat('yyyy-MM-dd 00:00:00').format(startOfWeek),
+              endDateTime: DateFormat('yyyy-MM-dd 00:00:00')
+                  .format(endOfWeek.add(const Duration(days: 1))),
+              status: "SCHEDULER");
+
+      for (var i in reservations) {
+        events.add(CalendarEventData(
+            date: DateTime.parse(i.startDateTime),
+            startTime: DateTime.parse(i.startDateTime),
+            endTime: DateTime.parse(i.endDateTime),
+            title: i.title,
+            description: i.usage,
+            color: AppColor.subColor3));
       }
-      return resources[0] + resources[1];
+
+      eventController.addAll(events);
+
+      return ClubController.to.resources;
     } catch (e) {
       print(e.toString());
     }
@@ -90,13 +119,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
           ),
         ),
         body: FutureBuilder(
-            future: getResources(),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
+            future: getReservations(),
+            builder: (BuildContext context,
+                AsyncSnapshot<List<ResourceModel>> snapshot) {
               if (snapshot.hasData == false) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return const ErrorPage();
-              } else if (snapshot.data.length == 0) {
+              } else if (snapshot.data!.isEmpty) {
                 return RefreshIndicator(
                   onRefresh: () async {
                     setState(() {});
@@ -202,8 +232,16 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       rightIconVisible: false,
                                       leftIcon: InkWell(
                                           onTap: () {
+                                            setState(() {
+                                              standardDay = now;
+                                              for (var i in events) {
+                                                eventController.remove(i);
+                                              }
+                                              events.clear();
+                                            });
+                                            getReservations();
                                             weekViewStateKey.currentState
-                                                ?.jumpToWeek(DateTime.now());
+                                                ?.jumpToWeek(now);
                                           },
                                           child: const Icon(
                                               SFSymbols.calendar_today,
@@ -270,6 +308,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 buttonColor:
                                                     AppColor.objectColor,
                                                 onPressed: () {
+                                                  setState(() {
+                                                    standardDay = selectedDate;
+                                                    for (var i in events) {
+                                                      eventController.remove(i);
+                                                    }
+                                                    events.clear();
+                                                  });
+                                                  getReservations();
                                                   weekViewStateKey.currentState
                                                       ?.jumpToWeek(
                                                           selectedDate);
@@ -297,12 +343,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           right: SizeController.to.screenWidth *
                                               0.05),
                                       child: DropdownButtonHideUnderline(
-                                        child: DropdownButton2<String>(
+                                        child: DropdownButton2<ResourceModel>(
                                           isExpanded: true,
                                           items: ClubController.to.resources
                                               .map((ResourceModel resource) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: resource.name,
+                                                  DropdownMenuItem<
+                                                      ResourceModel>(
+                                                    value: resource,
                                                     child: Align(
                                                       alignment:
                                                           Alignment.centerRight,
@@ -321,7 +368,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                   ))
                                               .toList(),
                                           value: selectedValue,
-                                          onChanged: (String? value) {
+                                          onChanged: (ResourceModel? value) {
                                             setState(() {
                                               selectedValue = value!;
                                             });
@@ -515,6 +562,17 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         eventArranger: const SideEventArranger(),
                         onEventTap: (events, date) => {},
                         onDateLongPress: (date) => {},
+                        onPageChange:
+                            (DateTime firstDayOfWeek, int daysInWeek) {
+                          setState(() {
+                            standardDay = firstDayOfWeek;
+                            for (var i in events) {
+                              eventController.remove(i);
+                            }
+                            events.clear();
+                          });
+                          getReservations();
+                        },
                       ),
                     ),
                   ],
@@ -522,7 +580,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               }
             }),
         floatingActionButton: FutureBuilder(
-            future: getResources(),
+            future: getReservations(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.hasData == false) {
                 return const SizedBox();
@@ -533,13 +591,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               } else {
                 return ElevatedButton(
                   onPressed: () {
-                    String notice = snapshot.data
-                        .firstWhere((r) => r.name == selectedValue)
-                        .notice;
-                    if (notice == "") {
+                    if (selectedValue!.notice == "") {
                       addReservation(types: 0);
                     } else {
-                      showNotice(notice: notice);
+                      showNotice(notice: selectedValue!.notice);
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -558,7 +613,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   }
 
   void addReservation({required int types}) async {
-    DateTime reservationTime = _now;
+    DateTime reservationTime = now;
     DateTime focusedDay = DateTime.now();
     DateTime selectedDay = DateTime.now();
 
@@ -636,7 +691,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       fontSize: 16),
                                 ),
                                 Text(
-                                  selectedValue,
+                                  selectedValue!.name,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 15),
@@ -1078,33 +1133,30 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         if (formKeyState1.validate() &&
                             checkedTime.isNotEmpty) {
                           try {
-                            int resourceId = ClubController.to.resources
-                                .firstWhere((r) => r.name == selectedValue)
-                                .id;
                             String startDateTime = (0 <= startTime &&
                                     startTime <= 9)
                                 ? DateFormat(
-                                        "yyyy-MM-dd 00:0$startTime:00", 'ko_KR')
+                                        "yyyy-MM-dd 0$startTime:00:00", 'ko_KR')
                                     .format(reservationTime)
                                 : DateFormat(
-                                        "yyyy-MM-dd 00:$startTime:00", 'ko_KR')
+                                        "yyyy-MM-dd $startTime:00:00", 'ko_KR')
                                     .format(reservationTime);
                             String endDateTime = (0 <= endTime && endTime <= 9)
                                 ? DateFormat(
-                                        "yyyy-MM-dd 00:0$endTime:00", 'ko_KR')
+                                        "yyyy-MM-dd 0$endTime:00:00", 'ko_KR')
                                     .format(reservationTime)
                                 : DateFormat(
-                                        "yyyy-MM-dd 00:$endTime:00", 'ko_KR')
+                                        "yyyy-MM-dd $endTime:00:00", 'ko_KR')
                                     .format(reservationTime);
                             await ReservationApiService.postReservation(
-                                resourceId: resourceId,
+                                resourceId: selectedValue!.id,
                                 title: title.text,
                                 usage: usage.text,
                                 sharing: (_open == Open.yes) ? true : false,
                                 startDateTime: startDateTime,
                                 endDateTime: endDateTime,
                                 reservationInvitees: []);
-                            getResources();
+                            getReservations();
                             Get.back();
                           } catch (e) {
                             print(e.toString());
@@ -1124,11 +1176,17 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             fontWeight: FontWeight.w700,
                             color: AppColor.backgroundColor),
                       ),
-                      buttonColor: isChecked2
+                      buttonColor: types == 1
                           ? AppColor.objectColor
-                          : AppColor.subColor3,
+                          : isChecked2
+                              ? AppColor.objectColor
+                              : AppColor.subColor3,
                       onPressed: () {
-                        if (types == 2 && checkedTime.isNotEmpty) {
+                        if (types == 1) {
+                          setState(() {
+                            types = 0;
+                          });
+                        } else if (types == 2 && checkedTime.isNotEmpty) {
                           setState(() {
                             isChecked = true;
                             types = 0;
@@ -1284,32 +1342,3 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     );
   }
 }
-
-List<CalendarEventData<Object?>> _events = [
-  CalendarEventData(
-      date: _now.add(const Duration(days: 1)),
-      title: "정찬영\nDP22",
-      startTime: DateTime(_now.year, _now.month, _now.day, 18, 30),
-      endTime: DateTime(_now.year, _now.month, _now.day, 22),
-      color: AppColor.subColor3),
-  CalendarEventData(
-      date: _now,
-      startTime: DateTime(_now.year, _now.month, _now.day),
-      endTime: DateTime(_now.year, _now.month, _now.day, 23, 59),
-      endDate: _now,
-      title: '',
-      color: AppColor.subColor4),
-  CalendarEventData(
-      date: _now.add(const Duration(days: 1)),
-      startTime: DateTime(_now.year, _now.month, _now.day, 0),
-      endTime: DateTime(_now.year, _now.month, _now.day, 2),
-      title: "강지인\nDP23",
-      description: "개인연습",
-      color: AppColor.subColor3),
-  CalendarEventData(
-      date: _now.add(const Duration(days: 1)),
-      startTime: DateTime(_now.year, _now.month, _now.day, 14),
-      endTime: DateTime(_now.year, _now.month, _now.day, 17),
-      title: "집행회의",
-      color: AppColor.subColor1)
-];

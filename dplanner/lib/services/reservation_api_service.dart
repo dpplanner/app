@@ -5,13 +5,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 import '../const.dart';
+import '../models/reservation_model.dart';
 import '../models/resource_model.dart';
 
 class ReservationApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
 
   /// POST: /reservations [예약하기] 예약하기
-  static Future<void> postReservation(
+  static Future<ReservationModel> postReservation(
       {required int resourceId,
       required String title,
       required String usage,
@@ -41,9 +42,9 @@ class ReservationApiService {
       }),
     );
 
-    if (response.statusCode == 204) {
-      print(response.statusCode);
-      return;
+    if (response.statusCode == 200) {
+      return ReservationModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes))['data']);
     }
 
     // 예외 처리; 메시지를 포함한 예외를 던짐
@@ -53,8 +54,13 @@ class ReservationApiService {
   }
 
   /// GET: /resources [클럽 자원 목록 가져오기] 클럽 전체 자원 목록 가져오기
-  static Future<List<List<ResourceModel>>> getResources() async {
-    final url = Uri.parse('$baseUrl/resources');
+  static Future<List<ReservationModel>> getReservations(
+      {required int resourceId,
+      required String startDateTime,
+      required String endDateTime,
+      required String status}) async {
+    final url = Uri.parse(
+        '$baseUrl/reservations?resourceId=$resourceId&start=$startDateTime&end=$endDateTime&status=$status');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
 
@@ -64,19 +70,14 @@ class ReservationApiService {
     });
 
     if (response.statusCode == 200) {
-      List<ResourceModel> resourceListPlace = [];
-      List<ResourceModel> resourceListThing = [];
+      List<ReservationModel> reservationList = [];
 
-      List<dynamic> resourceData =
+      List<dynamic> reservationData =
           jsonDecode(utf8.decode(response.bodyBytes))['data'];
-      for (var resource in resourceData) {
-        if (resource['resourceType'] == "PLACE") {
-          resourceListPlace.add(ResourceModel.fromJson(resource));
-        } else {
-          resourceListThing.add(ResourceModel.fromJson(resource));
-        }
+      for (var reservation in reservationData) {
+        reservationList.add(ReservationModel.fromJson(reservation));
       }
-      return [resourceListPlace, resourceListThing];
+      return reservationList;
     }
 
     // 예외 처리; 메시지를 포함한 예외를 던짐
