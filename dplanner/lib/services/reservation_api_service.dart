@@ -151,6 +151,35 @@ class ReservationApiService {
     throw ErrorDescription(errorMessage);
   }
 
+  /// PATCH: /reservations?confirm=(_.isConfirmed) [예약 Confirm하기] 클럽 예약 승인 & 거절하기
+  static Future<void> patchReservation(
+      {required List<int?> reservationIds, required bool isConfirmed}) async {
+    final url = Uri.parse('$baseUrl/reservations?confirm=$isConfirmed');
+    const storage = FlutterSecureStorage();
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    List<Map<String, int?>> reservations =
+        reservationIds.map((id) => {"reservationId": id}).toList();
+
+    final response = await http.patch(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode(reservations),
+    );
+
+    if (response.statusCode == 204) {
+      return;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
   /// PATCH: /reservations/(_.reservation_id)/cancel [예약 취소하기] 클럽 예약 취소하기
   static Future<void> cancelReservation({required int reservationId}) async {
     final url = Uri.parse('$baseUrl/reservations/$reservationId/cancel');

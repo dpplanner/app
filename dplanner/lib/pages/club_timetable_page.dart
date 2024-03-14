@@ -90,16 +90,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
             date: DateTime.parse(i.startDateTime),
             startTime: DateTime.parse(i.startDateTime),
             endTime: DateTime.parse(i.endDateTime),
-            title: i.status == "REQUEST" &&
-                    i.clubMemberId != MemberController.to.clubMember().id &&
-                    MemberController.to.clubMember().role != "ADMIN"
+            title: i.status == "REQUEST"
                 ? "${i.reservationId}"
                 : i.title == ""
                     ? "${i.reservationId} ${i.clubMemberName}"
                     : "${i.reservationId} ${i.title}",
-            description: i.status == "REQUEST" &&
-                    i.clubMemberId != MemberController.to.clubMember().id &&
-                    MemberController.to.clubMember().role != "ADMIN"
+            description: i.status == "REQUEST"
                 ? ""
                 : i.title == ""
                     ? i.usage
@@ -704,15 +700,17 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         ),
                       ),
                       Text(
-                        (types == 0)
-                            ? "예약하기"
-                            : (types == 1)
-                                ? "예약 날짜"
-                                : (types == 2)
-                                    ? "예약 시간"
-                                    : (types == 3)
-                                        ? "예약 정보"
-                                        : "예약 수정",
+                        reservation?.status == "REQUEST"
+                            ? "승인 대기중"
+                            : (types == 0)
+                                ? "예약하기"
+                                : (types == 1)
+                                    ? "예약 날짜"
+                                    : (types == 2)
+                                        ? "예약 시간"
+                                        : (types == 3)
+                                            ? "예약 정보"
+                                            : "예약 수정",
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -1298,19 +1296,69 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         replacement: Visibility(
                           visible:
                               MemberController.to.clubMember().role == "ADMIN",
-                          child: NextPageButton(
-                            text: const Text(
-                              "예약 삭제하기",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColor.backgroundColor),
+                          child: Visibility(
+                            visible: reservation?.status == "REQUEST",
+                            replacement: NextPageButton(
+                              text: const Text(
+                                "예약 삭제하기",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColor.backgroundColor),
+                              ),
+                              buttonColor: AppColor.markColor,
+                              onPressed: () {
+                                checkDeleteReservation(
+                                    id: reservation!.reservationId, types: 0);
+                              },
                             ),
-                            buttonColor: AppColor.markColor,
-                            onPressed: () {
-                              checkDeleteReservation(
-                                  id: reservation!.reservationId, types: 0);
-                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 24.0, right: 24.0),
+                              child: Column(
+                                children: [
+                                  NextPageButton(
+                                    text: const Text(
+                                      "예약 승인하기",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColor.backgroundColor),
+                                    ),
+                                    buttonColor: AppColor.markColor,
+                                    onPressed: () async {
+                                      await ReservationApiService
+                                          .patchReservation(reservationIds: [
+                                        reservation?.reservationId
+                                      ], isConfirmed: true);
+                                      getReservations();
+                                      Get.back();
+                                    },
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  NextPageButton(
+                                    text: const Text(
+                                      "예약 거절하기",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColor.backgroundColor),
+                                    ),
+                                    buttonColor: AppColor.objectColor,
+                                    onPressed: () async {
+                                      await ReservationApiService
+                                          .patchReservation(reservationIds: [
+                                        reservation?.reservationId
+                                      ], isConfirmed: false);
+                                      getReservations();
+                                      Get.back();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                         child: Padding(
