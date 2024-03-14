@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
@@ -47,6 +48,11 @@ class _ClubHomePageState extends State<ClubHomePage> {
   }
 
   Future<void> _fetchPosts() async {
+    String? fcmToken = await FirebaseMessaging.instance.getToken();
+    print("==========");
+    print(fcmToken);
+    print("==========");
+
     if (!_hasNextPage) return; // 다음 페이지가 없으면 요청을 중단합니다.
 
     final posts = await PostApiService.fetchPosts(
