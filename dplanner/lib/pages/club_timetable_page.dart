@@ -648,6 +648,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     title.text = "";
     usage.text = "";
     List<int> checkedTime = [];
+    List<int> unableTime = [];
     List<bool> timeButton = List.generate(24, (index) => false);
     int lastType = types;
 
@@ -845,10 +846,36 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       fontSize: 16),
                                 ),
                                 InkWell(
-                                    onTap: () {
+                                    onTap: () async {
                                       if (types == 3) {
                                         null;
                                       } else {
+                                        List<ReservationModel> reservations =
+                                            await ReservationApiService.getReservations(
+                                                resourceId: selectedValue!.id,
+                                                startDateTime: DateFormat(
+                                                        'yyyy-MM-dd 00:00:00')
+                                                    .format(reservationTime),
+                                                endDateTime: DateFormat(
+                                                        'yyyy-MM-dd 00:00:00')
+                                                    .format(reservationTime.add(
+                                                        const Duration(
+                                                            days: 1))),
+                                                status: "SCHEDULER");
+
+                                        for (var i in reservations) {
+                                          if (i.reservationId !=
+                                              reservation?.reservationId) {
+                                            int start = int.parse(i
+                                                .startDateTime
+                                                .substring(11, 13));
+                                            int end = int.parse(i.endDateTime
+                                                .substring(11, 13));
+                                            for (var j = start; j < end; j++) {
+                                              unableTime.add(j);
+                                            }
+                                          }
+                                        }
                                         setState(() {
                                           lastType = types == 0 ? 0 : 4;
                                           types = 2;
@@ -1156,34 +1183,41 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   children: List.generate(24, (index) {
                                     return GestureDetector(
                                       onTap: () {
-                                        setState(() {
-                                          if (checkedTime.contains(index)) {
-                                            timeButton[index] = false;
-                                            checkedTime.remove(index);
-                                            if (checkedTime.isEmpty) {
-                                              isChecked2 = false;
-                                            }
-                                          } else if (checkedTime.isEmpty) {
-                                            timeButton[index] = true;
-                                            checkedTime.add(index);
-                                            isChecked2 = true;
-                                          } else {
-                                            if (!checkTime(index)) {
-                                              snackBar(
-                                                  title: "연속된 시간을 선택해주세요",
-                                                  content: "연속된 시간만 신청 가능합니다");
-                                            } else {
+                                        if (unableTime.contains(index)) {
+                                          null;
+                                        } else {
+                                          setState(() {
+                                            if (checkedTime.contains(index)) {
+                                              timeButton[index] = false;
+                                              checkedTime.remove(index);
+                                              if (checkedTime.isEmpty) {
+                                                isChecked2 = false;
+                                              }
+                                            } else if (checkedTime.isEmpty) {
                                               timeButton[index] = true;
+                                              checkedTime.add(index);
+                                              isChecked2 = true;
+                                            } else {
+                                              if (!checkTime(index)) {
+                                                snackBar(
+                                                    title: "연속된 시간을 선택해주세요",
+                                                    content:
+                                                        "연속된 시간만 신청 가능합니다");
+                                              } else {
+                                                timeButton[index] = true;
+                                              }
                                             }
-                                          }
-                                        });
+                                          });
+                                        }
                                       },
                                       child: Container(
                                         margin: const EdgeInsets.all(2.0),
                                         decoration: BoxDecoration(
-                                          color: timeButton[index]
-                                              ? AppColor.objectColor
-                                              : AppColor.backgroundColor2,
+                                          color: unableTime.contains(index)
+                                              ? AppColor.markColor
+                                              : timeButton[index]
+                                                  ? AppColor.objectColor
+                                                  : AppColor.backgroundColor2,
                                           borderRadius:
                                               BorderRadius.circular(10.0),
                                         ),
