@@ -639,9 +639,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     usage.text = "";
     List<int> checkedTime = [];
     List<bool> timeButton = List.generate(24, (index) => false);
+    int lastType = types;
 
     if (types == 3 || types == 4) {
       reservationTime = DateTime.parse(reservation!.startDateTime);
+      focusedDay = reservationTime;
+      selectedDay = reservationTime;
       startTime = int.parse(reservation.startDateTime.substring(11, 13));
       endTime = int.parse(reservation.endDateTime.substring(11, 13));
       for (var i = startTime; i < endTime; i++) {
@@ -651,6 +654,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       title.text = reservation.title;
       usage.text = reservation.usage;
       isChecked = true;
+      isChecked2 = true;
       if (!reservation.sharing) {
         open = Open.no;
       }
@@ -800,6 +804,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                         } else {
                                           setState(() {
                                             types = 1;
+                                            lastType = types == 0 ? 0 : 4;
                                           });
                                         }
                                       },
@@ -831,6 +836,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       } else {
                                         setState(() {
                                           types = 2;
+                                          lastType = types == 0 ? 0 : 4;
                                         });
                                       }
                                     },
@@ -1206,7 +1212,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0, bottom: 40.0),
                   child: Visibility(
-                    visible: !(types == 0 && types == 4),
+                    visible: !(types == 0 || types == 4),
                     replacement: NextPageButton(
                       text: Text(
                         types == 0 ? "예약 신청하기" : "예약 수정하기",
@@ -1218,7 +1224,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       buttonColor:
                           isChecked ? AppColor.objectColor : AppColor.subColor3,
                       onPressed: () async {
-                        if (checkedTime.isNotEmpty || types == 4) {
+                        if (checkedTime.isNotEmpty) {
                           try {
                             String startDateTime = (0 <= startTime &&
                                     startTime <= 9)
@@ -1235,14 +1241,26 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 : DateFormat(
                                         "yyyy-MM-dd $endTime:00:00", 'ko_KR')
                                     .format(reservationTime);
-                            await ReservationApiService.postReservation(
-                                resourceId: selectedValue!.id,
-                                title: title.text,
-                                usage: usage.text,
-                                sharing: (open == Open.yes) ? true : false,
-                                startDateTime: startDateTime,
-                                endDateTime: endDateTime,
-                                reservationInvitees: []);
+                            if (types == 0) {
+                              await ReservationApiService.postReservation(
+                                  resourceId: selectedValue!.id,
+                                  title: title.text,
+                                  usage: usage.text,
+                                  sharing: (open == Open.yes) ? true : false,
+                                  startDateTime: startDateTime,
+                                  endDateTime: endDateTime,
+                                  reservationInvitees: []);
+                            } else {
+                              await ReservationApiService.putReservation(
+                                  reservationId: reservation!.reservationId,
+                                  resourceId: selectedValue!.id,
+                                  title: title.text,
+                                  usage: usage.text,
+                                  sharing: (open == Open.yes) ? true : false,
+                                  startDateTime: startDateTime,
+                                  endDateTime: endDateTime,
+                                  reservationInvitees: []);
+                            }
                             getReservations();
                             Get.back();
                           } catch (e) {
@@ -1316,12 +1334,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         onPressed: () {
                           if (types == 1) {
                             setState(() {
-                              types = 0;
+                              types = lastType;
                             });
                           } else if (types == 2 && checkedTime.isNotEmpty) {
                             setState(() {
                               isChecked = true;
-                              types = 0;
+                              types = lastType;
                               startTime = checkedTime[0];
                               endTime = checkedTime[0] + 1;
                               if (checkedTime.length > 1) {

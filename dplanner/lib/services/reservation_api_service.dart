@@ -109,15 +109,17 @@ class ReservationApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// PUT: /resources/(_.resource_id) [클럽 자원 정보 업데이트] 클럽 자원 수정하기
-  static Future<ResourceModel> putResource(
-      {required int id,
-      required String name,
-      required String info,
-      required bool returnMessageRequired,
-      required String notice,
-      required String resourceType}) async {
-    final url = Uri.parse('$baseUrl/resources/$id');
+  /// POST: /reservations/(_.reservation_id)/update [예약 수정 하기] 예약 수정 하기
+  static Future<ReservationModel> putReservation(
+      {required int reservationId,
+      required int resourceId,
+      required String title,
+      required String usage,
+      required bool sharing,
+      required String startDateTime,
+      required String endDateTime,
+      required List<dynamic> reservationInvitees}) async {
+    final url = Uri.parse('$baseUrl/reservations/$reservationId/update');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
 
@@ -128,17 +130,18 @@ class ReservationApiService {
         'Authorization': 'Bearer $accessToken',
       },
       body: jsonEncode({
-        "id": id,
-        "name": name,
-        "info": info,
-        "returnMessageRequired": returnMessageRequired,
-        "notice": notice,
-        "resourceType": resourceType,
+        "resourceId": resourceId,
+        "title": title,
+        "usage": usage,
+        "sharing": sharing,
+        "startDateTime": startDateTime,
+        "endDateTime": endDateTime,
+        "reservationInvitees": reservationInvitees
       }),
     );
 
     if (response.statusCode == 200) {
-      return ResourceModel.fromJson(
+      return ReservationModel.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes))['data']);
     }
 
