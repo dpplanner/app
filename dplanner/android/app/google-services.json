@@ -7,9 +7,36 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:440122903298:android:4b4aafa78fcc319002501b",
+        "android_client_info": {
+          "package_name": "com.dancepozz.dplanner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1gwADkJaqsJZDBvbXby8XjRyskWH-VGM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "440122903298-gc2oikv36m4srpou58td5je36d3cpumv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dancepozz.dplanner"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:440122903298:android:848cf4550e1ac2b402501b",
         "android_client_info": {
-          "package_name": "com.dp.dplanner"
+          "package_name": "com.dancepozz.dplanner"
         }
       },
       "oauth_client": [
@@ -17,7 +44,7 @@
           "client_id": "440122903298-2f2tq11inicd4vr72rs8gg8nuqa5ev6n.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.dp.dplanner",
+            "package_name": "com.dancepozz.dplanner",
             "certificate_hash": "56473f9b0fa1a6ea7aeda6138f01bb91f868749a"
           }
         }
@@ -29,7 +56,15 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "440122903298-gc2oikv36m4srpou58td5je36d3cpumv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dancepozz.dplanner"
+              }
+            }
+          ]
         }
       }
     }

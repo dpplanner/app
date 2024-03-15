@@ -1,4 +1,4 @@
-package com.dp.dplanner
+package com.dancepozz.dplanner
 
 import io.flutter.embedding.android.FlutterActivity
 

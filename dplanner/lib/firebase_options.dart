@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '440122903298',
     projectId: 'dplanner-c2b9a',
     storageBucket: 'dplanner-c2b9a.appspot.com',
-    iosBundleId: 'com.dp.dplanner',
+    iosBundleId: 'com.dancepozz.dplanner',
   );
 }

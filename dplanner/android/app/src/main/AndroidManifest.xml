@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.dp.dplanner">
+    package="com.dancepozz.dplanner">
     <application
         android:requestLegacyExternalStorage="true"
         android:label="dplanner"
