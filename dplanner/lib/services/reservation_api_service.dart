@@ -1,15 +1,44 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../const.dart';
 import '../models/reservation_model.dart';
-import '../models/resource_model.dart';
 
 class ReservationApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
+
+  static String basename(String filePath) {
+    return filePath.split('/').last;
+  }
+
+  Future<String> getTempDirectoryPath() async {
+    Directory tempDir = await getTemporaryDirectory();
+    return tempDir.path;
+  }
+
+  static Future<XFile?> compressImageFile(XFile file) async {
+    final tempDir = await getTemporaryDirectory();
+    final tempPath = tempDir.path;
+
+    // 압축된 파일의 새 경로를 지정합니다.
+    final outPath = "${tempPath}/${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+    final compressedFile = await FlutterImageCompress.compressAndGetFile(
+      file.path,
+      outPath,
+      quality: 1, // 값을 조정하여 압축률을 제어할 수 있습니다.
+    );
+
+    // 'XFile' 객체로 변환하여 반환합니다.
+    return compressedFile != null ? XFile(compressedFile.path) : null;
+  }
 
   /// POST: /reservations [예약하기] 예약하기
   static Future<ReservationModel> postReservation(
@@ -49,6 +78,62 @@ class ReservationApiService {
 
     // 예외 처리; 메시지를 포함한 예외를 던짐
     String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
+  /// POST: /reservations/(_.reservation_id)/return [예약 반납하기] 예약 반납하기
+  static Future<ReservationModel> postReturn(
+      {required int reservationId,
+      required String returnMessage,
+      required List<XFile> returnImage}) async {
+    final url = Uri.parse('$baseUrl/reservations/$reservationId/return');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    var request = http.MultipartRequest('POST', url);
+    request.headers.addAll({
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer $accessToken',
+    });
+    final jsonData = {
+      'reservationId': reservationId,
+      'returnMessage': returnMessage,
+    };
+    final jsonPart = http.MultipartFile.fromString(
+      'returnDto',
+      jsonEncode(jsonData),
+      contentType: MediaType('application', 'json'),
+    );
+
+    request.files.add(jsonPart);
+
+    for (var imageFile in returnImage) {
+      final compressedFile = await compressImageFile(imageFile); //이미지 압축~!
+      if (compressedFile != null) {
+        final stream = http.ByteStream(compressedFile.openRead());
+        stream.cast();
+        final length = await compressedFile.length();
+        final multipartFile = http.MultipartFile(
+          'files',
+          stream,
+          length,
+          filename: basename(compressedFile.path),
+        );
+        request.files.add(multipartFile);
+      }
+    }
+
+    var response = await http.Response.fromStream(await request.send());
+
+    if (response.statusCode == 200) {
+      return ReservationModel.fromJson(
+          jsonDecode(utf8.decode(response.bodyBytes))['data']);
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['detail'] ?? 'Error';
     print(errorMessage);
     throw ErrorDescription(errorMessage);
   }
@@ -109,7 +194,7 @@ class ReservationApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// POST: /reservations/(_.reservation_id)/update [예약 수정 하기] 예약 수정 하기
+  /// PUT: /reservations/(_.reservation_id)/update [예약 수정 하기] 예약 수정 하기
   static Future<ReservationModel> putReservation(
       {required int reservationId,
       required int resourceId,
