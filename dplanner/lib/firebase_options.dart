@@ -50,19 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB1gwADkJaqsJZDBvbXby8XjRyskWH-VGM',
-    appId: '1:440122903298:android:848cf4550e1ac2b402501b',
-    messagingSenderId: '440122903298',
-    projectId: 'dplanner-c2b9a',
-    storageBucket: 'dplanner-c2b9a.appspot.com',
+    apiKey: 'AIzaSyCpHSaMlQSwKgLQU7xpPF02NbhxW60Ayt8',
+    appId: '1:547095373091:android:5065a2c8ab97a6272d5896',
+    messagingSenderId: '547095373091',
+    projectId: 'dplanner-6a650',
+    storageBucket: 'dplanner-6a650.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCTrmvpPmfLncQCkYNdBOadJi6s4x1wDHg',
-    appId: '1:440122903298:ios:608144e53b7ac4a202501b',
-    messagingSenderId: '440122903298',
-    projectId: 'dplanner-c2b9a',
-    storageBucket: 'dplanner-c2b9a.appspot.com',
+    apiKey: 'AIzaSyC6Cse0ZTFvPpuHA9W2iCQx5C1Dl5fJoYw',
+    appId: '1:547095373091:ios:a13e6659d8804f172d5896',
+    messagingSenderId: '547095373091',
+    projectId: 'dplanner-6a650',
+    storageBucket: 'dplanner-6a650.appspot.com',
     iosBundleId: 'com.dancepozz.dplanner',
   );
 }

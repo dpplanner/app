@@ -48,11 +48,6 @@ class _ClubHomePageState extends State<ClubHomePage> {
   }
 
   Future<void> _fetchPosts() async {
-    String? fcmToken = await FirebaseMessaging.instance.getToken();
-    print("==========");
-    print(fcmToken);
-    print("==========");
-
     if (!_hasNextPage) return; // 다음 페이지가 없으면 요청을 중단합니다.
 
     final posts = await PostApiService.fetchPosts(
