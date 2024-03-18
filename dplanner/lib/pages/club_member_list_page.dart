@@ -955,8 +955,8 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                             );
                           },
                         ),
-                        child: Image.asset(
-                          'assets/images/jin_profile.png',
+                        child: SvgPicture.asset(
+                          'assets/images/base_image/base_member_image.svg',
                           height: SizeController.to.screenWidth * 0.1,
                           width: SizeController.to.screenWidth * 0.1,
                           fit: BoxFit.fill,

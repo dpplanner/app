@@ -81,7 +81,7 @@ class OutlineTextForm extends StatelessWidget {
       ),
       style: TextStyle(
         fontSize: fontSize,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w500,
         color: AppColor.textColor,
       ),
       validator: validator,

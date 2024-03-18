@@ -49,6 +49,7 @@ dependencies:
   flutter_naver_login: ^1.6.0
   flutter_secure_storage: ^9.0.0
   image_picker: ^1.0.7
+  table_calendar: ^3.0.9
   flutter_image_compress: ^2.1.0
   path_provider: ^2.1.2
   firebase_messaging: ^14.7.19

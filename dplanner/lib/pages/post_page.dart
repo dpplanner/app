@@ -1,6 +1,7 @@
 import 'package:dplanner/widgets/post_comment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
@@ -92,8 +93,8 @@ class _PostPageState extends State<PostPage> {
               child: Row(
                 children: [
                   ClipOval(
-                    child: Image.asset(
-                      'assets/images/jin_profile.png',
+                    child: SvgPicture.asset(
+                      'assets/images/base_image/base_member_image.svg',
                       height: SizeController.to.screenWidth * 0.1,
                       width: SizeController.to.screenWidth * 0.1,
                       fit: BoxFit.fill,
