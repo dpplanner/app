@@ -59,6 +59,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   DateTime endOfWeek = DateTime.now();
   DateTime selectedDate = DateTime.now();
 
+  bool checkAdminButton = false;
+
   @override
   void dispose() {
     title.dispose();
@@ -430,9 +432,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               padding: const EdgeInsets.fromLTRB(3, 0, 3, 42.0),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: DateTime.now().hour == date.hour
-                                      ? AppColor.subColor1
-                                      : Colors.transparent,
+                                  // color: DateTime.now().hour == date.hour
+                                  //     ? AppColor.subColor1
+                                  //     : Colors.transparent,
+
                                   borderRadius: BorderRadius.circular(7.0),
                                 ),
                                 child: Text(
@@ -440,10 +443,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       ? "0${date.hour}"
                                       : "${date.hour}",
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: DateTime.now().hour == date.hour
-                                        ? AppColor.textColor
-                                        : AppColor.textColor2,
+                                  style: const TextStyle(
+                                    // color: DateTime.now().hour == date.hour
+                                    //     ? AppColor.textColor
+                                    //     : AppColor.textColor2,
+                                    color: AppColor.textColor2,
                                     fontWeight: FontWeight.w300,
                                     fontSize: 14,
                                   ),
@@ -458,8 +462,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             height: 0.7,
                             color: AppColor.backgroundColor,
                             offset: 0),
-                        liveTimeIndicatorSettings: const HourIndicatorSettings(
-                            color: AppColor.subColor1, height: 0, offset: 5),
+                        liveTimeIndicatorSettings:
+                            const LiveTimeIndicatorSettings(
+                          color: AppColor.objectColor,
+                          height: 0,
+                          offset: 0,
+                        ),
                         eventTileBuilder: (date, events, boundry, start, end) {
                           if (events.isNotEmpty) {
                             return RoundedEventTile(
@@ -498,7 +506,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         pageTransitionDuration:
                             const Duration(milliseconds: 300),
                         pageTransitionCurve: Curves.linear,
-                        showLiveTimeLineInAllDays: false,
+                        showLiveTimeLineInAllDays: true,
                         backgroundColor: Colors.transparent,
                         minuteSlotSize: MinuteSlotSize.minutes60,
                         width: SizeController.to.screenWidth * 0.92,
@@ -544,22 +552,89 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               } else if (snapshot.data.length == 0) {
                 return const SizedBox();
               } else {
-                return ElevatedButton(
-                  onPressed: () {
-                    if (selectedValue!.notice == "") {
-                      addReservation(types: 0, reservation: null);
-                    } else {
-                      showNotice(notice: selectedValue!.notice);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.objectColor,
-                    shape: const CircleBorder(),
-                    padding: const EdgeInsets.all(15),
+                return Visibility(
+                  visible: MemberController.to.clubMember().role == "ADMIN",
+                  replacement: ElevatedButton(
+                    onPressed: () {
+                      if (selectedValue!.notice == "") {
+                        addReservation(types: 0, reservation: null);
+                      } else {
+                        showNotice(notice: selectedValue!.notice);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColor.objectColor,
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(20),
+                    ),
+                    child: const Icon(
+                      SFSymbols.plus,
+                      color: AppColor.backgroundColor,
+                    ),
                   ),
-                  child: const Icon(
-                    SFSymbols.plus,
-                    color: AppColor.backgroundColor,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (checkAdminButton)
+                        ElevatedButton(
+                          onPressed: () {
+                            //addReservation(types: 7, reservation: null);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColor.objectColor,
+                            shape: const CircleBorder(),
+                            padding: const EdgeInsets.all(12),
+                          ),
+                          child: const Icon(
+                            SFSymbols.lock,
+                            color: AppColor.backgroundColor,
+                          ),
+                        ),
+                      if (checkAdminButton)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12, bottom: 12),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (selectedValue!.notice == "") {
+                                addReservation(types: 0, reservation: null);
+                              } else {
+                                showNotice(notice: selectedValue!.notice);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColor.objectColor,
+                              shape: const CircleBorder(),
+                              padding: const EdgeInsets.all(12),
+                            ),
+                            child: const Icon(
+                              SFSymbols.plus,
+                              color: AppColor.backgroundColor,
+                            ),
+                          ),
+                        ),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            checkAdminButton = !checkAdminButton;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColor.objectColor,
+                          shape: const CircleBorder(),
+                          padding: const EdgeInsets.all(20),
+                        ),
+                        child: checkAdminButton
+                            ? const Icon(
+                                SFSymbols.chevron_down,
+                                color: AppColor.backgroundColor,
+                              )
+                            : const Icon(
+                                SFSymbols.chevron_up,
+                                color: AppColor.backgroundColor,
+                              ),
+                      ),
+                    ],
                   ),
                 );
               }
@@ -574,6 +649,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   /// types == 4 : 예약 수정
   /// types == 5 : 날짜 변경
   /// types == 6 : 반납하기
+  /// types == 7 : 예약 잠금
 
   Future<void> addReservation(
       {required int types,
@@ -666,7 +742,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         ),
                       ),
                       Text(
-                        reservation?.status == "REQUEST"
+                        reservation != null && reservation.status == "REQUEST"
                             ? "승인 대기중"
                             : (types == 0)
                                 ? "예약하기"
@@ -1241,12 +1317,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           fontWeight: FontWeight.w700,
                                           fontSize: 16),
                                     ),
-                                    Text(
-                                      reservation!.resourceName,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 15),
-                                    ),
+                                    if (reservation != null)
+                                      Text(
+                                        reservation.resourceName,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15),
+                                      ),
                                   ],
                                 ),
                                 const Padding(
@@ -1425,7 +1502,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   reservationInvitees: []);
                             } else {
                               await ReservationApiService.putReservation(
-                                  reservationId: reservation.reservationId,
+                                  reservationId: reservation!.reservationId,
                                   resourceId: selectedValue!.id,
                                   title: title.text,
                                   usage: usage.text,
@@ -1445,13 +1522,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                     child: Visibility(
                       visible: types != 3,
                       replacement: Visibility(
-                        visible: reservation.clubMemberId ==
+                        visible: reservation?.clubMemberId ==
                             MemberController.to.clubMember().id,
                         replacement: Visibility(
                           visible:
                               MemberController.to.clubMember().role == "ADMIN",
                           child: Visibility(
-                            visible: reservation.status == "REQUEST",
+                            visible: reservation?.status == "REQUEST",
                             replacement: NextPageButton(
                               text: const Text(
                                 "예약 삭제하기",
@@ -1463,7 +1540,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               buttonColor: AppColor.markColor,
                               onPressed: () {
                                 checkDeleteReservation(
-                                    id: reservation.reservationId, types: 0);
+                                    id: reservation!.reservationId, types: 0);
                               },
                             ),
                             child: Padding(
@@ -1483,7 +1560,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     onPressed: () async {
                                       await ReservationApiService
                                           .patchReservation(reservationIds: [
-                                        reservation.reservationId
+                                        reservation?.reservationId
                                       ], isConfirmed: true);
                                       getReservations();
                                       Get.back();
@@ -1504,7 +1581,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     onPressed: () async {
                                       await ReservationApiService
                                           .patchReservation(reservationIds: [
-                                        reservation.reservationId
+                                        reservation?.reservationId
                                       ], isConfirmed: false);
                                       getReservations();
                                       Get.back();
@@ -1516,8 +1593,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                           ),
                         ),
                         child: Visibility(
-                          visible: DateTime.parse(reservation.endDateTime)
-                              .isAfter(DateTime.now()),
+                          visible: reservation != null &&
+                              DateTime.parse(reservation!.endDateTime)
+                                  .isAfter(DateTime.now()),
                           replacement: NextPageButton(
                             text: const Text(
                               "반납하기",
@@ -1550,7 +1628,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     buttonColor: AppColor.markColor,
                                     onPressed: () {
                                       checkDeleteReservation(
-                                          id: reservation.reservationId,
+                                          id: reservation!.reservationId,
                                           types: 1);
                                     },
                                   ),
@@ -1595,7 +1673,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             try {
                               ReservationModel temp =
                                   await ReservationApiService.postReturn(
-                                      reservationId: reservation.reservationId,
+                                      reservationId: reservation!.reservationId,
                                       returnImage: selectedImages,
                                       returnMessage: message.text);
                               Get.back();
