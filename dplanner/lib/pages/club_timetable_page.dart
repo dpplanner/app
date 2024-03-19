@@ -55,6 +55,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   final TextEditingController message = TextEditingController();
   bool isFocused3 = false;
 
+  final formKey4 = GlobalKey<FormState>();
+  final TextEditingController lockMessage = TextEditingController();
+  bool isFocused4 = false;
+
   DateTime get now => DateTime.now();
   DateTime standardDay = DateTime.now();
   DateTime startOfWeek = DateTime.now();
@@ -653,11 +657,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   /// types == 6 : 반납하기
   /// types == 7 : 예약 잠금(시작 시간)
   /// types == 8 : 예약 잠금(종료 시간)
+  /// types == 9 : 예약 잠금 추가하기
+  /// types == 10 : 예약 잠금 수정하기
 
   Future<void> addReservation(
       {required int types,
       required ReservationModel? reservation,
-      DateTime? chooseDate}) async {
+      DateTime? chooseDate,
+      LockModel? lock}) async {
     DateTime reservationTime = chooseDate ?? now;
     DateTime focusedDay = chooseDate ?? now;
     DateTime selectedDay = chooseDate ?? now;
@@ -679,6 +686,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     DateTime lockEndDate = now;
     int lockStartTime = -1;
     int lockEndTime = -1;
+    int checkedLock = -1;
 
     if (types == 3 || types == 4) {
       reservationTime = DateTime.parse(reservation!.startDateTime);
@@ -793,7 +801,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                             ? "날짜 변경"
                                                             : (types == 6)
                                                                 ? "반납하기"
-                                                                : "예약 잠금",
+                                                                : (types == 7)
+                                                                    ? "예약 잠금"
+                                                                    : (types ==
+                                                                            9)
+                                                                        ? "예약 잠금 추가"
+                                                                        : "예약 잠금 정보",
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -1524,143 +1537,20 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       )),
                                 ],
                               ),
-                              child: FutureBuilder(
-                                  future: getLockList(setState),
-                                  builder: (BuildContext context,
-                                      AsyncSnapshot<List<LockModel>> snapshot) {
-                                    if (snapshot.hasData == false) {
-                                      return const SizedBox();
-                                    } else if (snapshot.hasError) {
-                                      return const ErrorPage();
-                                    } else if (snapshot.data!.isEmpty) {
-                                      return Center(
-                                        child: TextButton(
-                                          onPressed: () {},
-                                          style: ButtonStyle(
-                                            overlayColor: MaterialStateProperty
-                                                .resolveWith<Color>(
-                                              (Set<MaterialState> states) {
-                                                if (states.contains(
-                                                    MaterialState.pressed)) {
-                                                  return Colors.transparent;
-                                                }
-                                                return Colors.transparent;
-                                              },
-                                            ),
-                                          ),
-                                          child: const Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Icon(
-                                                SFSymbols.plus,
-                                                color: AppColor.objectColor,
-                                                size: 20,
-                                              ),
-                                              Text(
-                                                " 잠금 시간 추가하기",
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w700,
-                                                    color:
-                                                        AppColor.objectColor),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    } else {
-                                      return Column(
-                                        children: [
-                                          Column(
-                                              children: List.generate(
-                                                  snapshot.data!.length,
-                                                  (index) {
-                                            return Container(
-                                              color: AppColor.backgroundColor2,
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      const Text(
-                                                        "잠금 시간",
-                                                        style: TextStyle(
-                                                            fontSize: 16,
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                            color: AppColor
-                                                                .textColor),
-                                                      ),
-                                                      Column(
-                                                        children: [
-                                                          Text(
-                                                            snapshot
-                                                                .data![index]
-                                                                .startDateTime,
-                                                            style: const TextStyle(
-                                                                fontSize: 15,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                color: AppColor
-                                                                    .textColor),
-                                                          ),
-                                                          Text(
-                                                            snapshot
-                                                                .data![index]
-                                                                .endDateTime,
-                                                            style: const TextStyle(
-                                                                fontSize: 15,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                color: AppColor
-                                                                    .textColor),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      const Text(
-                                                        "잠금 사유 (선택)",
-                                                        style: TextStyle(
-                                                            fontSize: 16,
-                                                            fontWeight:
-                                                                FontWeight.w700,
-                                                            color: AppColor
-                                                                .textColor),
-                                                      ),
-                                                      Text(
-                                                        snapshot.data![index]
-                                                            .message,
-                                                        style: const TextStyle(
-                                                            fontSize: 15,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                            color: AppColor
-                                                                .textColor),
-                                                      ),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            );
-                                          })),
-                                          TextButton(
+                              child: Visibility(
+                                visible: types != 7,
+                                replacement: FutureBuilder(
+                                    future: getLockList(setState),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot<List<LockModel>>
+                                            snapshot) {
+                                      if (snapshot.hasData == false) {
+                                        return const SizedBox();
+                                      } else if (snapshot.hasError) {
+                                        return const ErrorPage();
+                                      } else if (snapshot.data!.isEmpty) {
+                                        return Center(
+                                          child: TextButton(
                                             onPressed: () {},
                                             style: ButtonStyle(
                                               overlayColor:
@@ -1696,10 +1586,242 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                               ],
                                             ),
                                           ),
-                                        ],
-                                      );
-                                    }
-                                  }),
+                                        );
+                                      } else {
+                                        return Column(
+                                          children: [
+                                            Column(
+                                                children: List.generate(
+                                                    snapshot.data!.length,
+                                                    (index) {
+                                              return InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    if (checkedLock == index) {
+                                                      checkedLock = -1;
+                                                    } else {
+                                                      checkedLock = index;
+                                                    }
+                                                  });
+                                                },
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        const Text(
+                                                          "잠금 시간",
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color: AppColor
+                                                                  .textColor),
+                                                        ),
+                                                        Column(
+                                                          children: [
+                                                            Text(
+                                                              snapshot
+                                                                  .data![index]
+                                                                  .startDateTime,
+                                                              style: const TextStyle(
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color: AppColor
+                                                                      .textColor),
+                                                            ),
+                                                            Text(
+                                                              snapshot
+                                                                  .data![index]
+                                                                  .endDateTime,
+                                                              style: const TextStyle(
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color: AppColor
+                                                                      .textColor),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 8,
+                                                              bottom: 8),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          const Text(
+                                                            "잠금 사유 (선택)",
+                                                            style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                color: AppColor
+                                                                    .textColor),
+                                                          ),
+                                                          Text(
+                                                            snapshot
+                                                                .data![index]
+                                                                .message,
+                                                            style: const TextStyle(
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color: AppColor
+                                                                    .textColor),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    if (checkedLock == index)
+                                                      Row(
+                                                        children: [
+                                                          Expanded(
+                                                            child:
+                                                                NextPageButton(
+                                                              text: const Text(
+                                                                "잠금 취소하기",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w700,
+                                                                    color: AppColor
+                                                                        .backgroundColor),
+                                                              ),
+                                                              buttonColor: AppColor
+                                                                  .markColor
+                                                                  .withOpacity(
+                                                                      0.8),
+                                                              onPressed: () {},
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 10,
+                                                          ),
+                                                          Expanded(
+                                                            child:
+                                                                NextPageButton(
+                                                              text: const Text(
+                                                                "잠금 수정하기",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w700,
+                                                                    color: AppColor
+                                                                        .backgroundColor),
+                                                              ),
+                                                              buttonColor: AppColor
+                                                                  .objectColor
+                                                                  .withOpacity(
+                                                                      0.8),
+                                                              onPressed: () {},
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                  ],
+                                                ),
+                                              );
+                                            })),
+                                          ],
+                                        );
+                                      }
+                                    }),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "잠금 시간",
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppColor.textColor),
+                                        ),
+                                        Column(
+                                          children: [
+                                            Text(
+                                              types == 9
+                                                  ? DateFormat(
+                                                          "yyyy-MM-dd $lockStartTime:00:00",
+                                                          'ko_KR')
+                                                      .format(lockStartDate)
+                                                  : lock?.startDateTime ?? "",
+                                              style: const TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: AppColor.textColor),
+                                            ),
+                                            Text(
+                                              types == 9
+                                                  ? DateFormat(
+                                                          "yyyy-MM-dd $lockEndTime:00:00",
+                                                          'ko_KR')
+                                                      .format(lockEndDate)
+                                                  : lock?.endDateTime ?? "",
+                                              style: const TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: AppColor.textColor),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const Padding(
+                                      padding:
+                                          EdgeInsets.only(top: 32, bottom: 16),
+                                      child: Text(
+                                        "잠금 사유 (선택)",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16),
+                                      ),
+                                    ),
+                                    Form(
+                                        key: formKey4,
+                                        child: OutlineTextForm(
+                                          hintText: '회원들에게 간략하게 설명해주세요',
+                                          controller: lockMessage,
+                                          isFocused: isFocused4,
+                                          fontSize: 16,
+                                          maxLines: 7,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              isFocused4 = value.isNotEmpty;
+                                            });
+                                          },
+                                        )),
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -1931,10 +2053,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                           },
                         ),
                         child: Visibility(
-                          visible: types != 7,
+                          visible: !(types == 7 || types == 9),
                           replacement: NextPageButton(
                             text: const Text(
-                              "잠금 설정하기",
+                              "잠금 시간 추가하기",
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -1942,10 +2064,47 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             ),
                             buttonColor: AppColor.objectColor,
                             onPressed: () async {
-                              setState(() {
-                                lastType = 7;
-                                types = 1;
-                              });
+                              if (types == 7) {
+                                setState(() {
+                                  lastType = 7;
+                                  types = 1;
+                                });
+                              } else {
+                                try {
+                                  String startDateTime = (0 <= startTime &&
+                                          startTime <= 9)
+                                      ? DateFormat(
+                                              "yyyy-MM-dd 0$lockStartTime:00:00",
+                                              'ko_KR')
+                                          .format(lockStartDate)
+                                      : DateFormat(
+                                              "yyyy-MM-dd $lockStartTime:00:00",
+                                              'ko_KR')
+                                          .format(lockStartDate);
+                                  String endDateTime = (0 <= endTime &&
+                                          endTime <= 9)
+                                      ? DateFormat(
+                                              "yyyy-MM-dd 0$lockEndTime:00:00",
+                                              'ko_KR')
+                                          .format(lockEndDate)
+                                      : DateFormat(
+                                              "yyyy-MM-dd $lockEndTime:00:00",
+                                              'ko_KR')
+                                          .format(lockEndDate);
+                                  LockModel temp =
+                                      await LockApiService.postLock(
+                                          resourceId: selectedValue!.id,
+                                          startDateTime: startDateTime,
+                                          endDateTime: endDateTime,
+                                          message: lockMessage.text);
+                                  getLockList(setState);
+                                  setState(() {
+                                    types = 7;
+                                  });
+                                } catch (e) {
+                                  print(e.toString());
+                                }
+                              }
                             },
                           ),
                           child: NextPageButton(
@@ -1966,9 +2125,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 if (lastType == 7 || lastType == 8) {
                                   setState(() {
                                     if (lastType == 7) {
-                                      lockStartDate = selectedDate;
+                                      lockStartDate = focusedDay;
                                     } else {
-                                      lockEndDate = selectedDate;
+                                      lockEndDate = focusedDay;
                                     }
                                     types = 2;
                                   });
@@ -1987,7 +2146,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 } else if (lastType == 8) {
                                   setState(() {
                                     lockEndTime = checkedTime[0] + 1;
-                                    types = 7;
+                                    print(lockEndTime);
+                                    types = 9;
                                   });
                                 } else {
                                   setState(() {
