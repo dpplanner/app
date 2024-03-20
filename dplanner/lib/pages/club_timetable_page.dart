@@ -72,6 +72,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     title.dispose();
     usage.dispose();
     message.dispose();
+    lockMessage.dispose();
     super.dispose();
   }
 
@@ -663,8 +664,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   Future<void> addReservation(
       {required int types,
       required ReservationModel? reservation,
-      DateTime? chooseDate,
-      LockModel? lock}) async {
+      DateTime? chooseDate}) async {
     DateTime reservationTime = chooseDate ?? now;
     DateTime focusedDay = chooseDate ?? now;
     DateTime selectedDay = chooseDate ?? now;
@@ -687,6 +687,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     int lockStartTime = -1;
     int lockEndTime = -1;
     int checkedLock = -1;
+    LockModel? lock;
 
     if (types == 3 || types == 4) {
       reservationTime = DateTime.parse(reservation!.startDateTime);
@@ -1594,54 +1595,122 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 children: List.generate(
                                                     snapshot.data!.length,
                                                     (index) {
-                                              return InkWell(
-                                                onTap: () {
-                                                  setState(() {
-                                                    if (checkedLock == index) {
-                                                      checkedLock = -1;
-                                                    } else {
-                                                      checkedLock = index;
-                                                    }
-                                                  });
-                                                },
-                                                child: Column(
-                                                  children: [
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        const Text(
-                                                          "잠금 시간",
-                                                          style: TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                              color: AppColor
-                                                                  .textColor),
-                                                        ),
-                                                        Column(
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 16.0),
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      if (checkedLock ==
+                                                          index) {
+                                                        checkedLock = -1;
+                                                      } else {
+                                                        checkedLock = index;
+                                                      }
+                                                    });
+                                                  },
+                                                  overlayColor:
+                                                      MaterialStateProperty
+                                                          .resolveWith<Color>(
+                                                    (Set<MaterialState>
+                                                        states) {
+                                                      if (states.contains(
+                                                          MaterialState
+                                                              .pressed)) {
+                                                        return Colors
+                                                            .transparent;
+                                                      }
+                                                      return Colors.transparent;
+                                                    },
+                                                  ),
+                                                  child: Column(
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          const Text(
+                                                            "잠금 시간",
+                                                            style: TextStyle(
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                color: AppColor
+                                                                    .textColor),
+                                                          ),
+                                                          Column(
+                                                            children: [
+                                                              Text(
+                                                                DateFormat(
+                                                                        "yy년 MM월 dd일 H:00 부터",
+                                                                        'ko_KR')
+                                                                    .format(DateTime.parse(snapshot
+                                                                        .data![
+                                                                            index]
+                                                                        .startDateTime)),
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        15,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    color: AppColor
+                                                                        .textColor),
+                                                              ),
+                                                              Text(
+                                                                DateFormat(
+                                                                        "yy년 MM월 dd일 H:00 까지",
+                                                                        'ko_KR')
+                                                                    .format(DateTime.parse(snapshot
+                                                                        .data![
+                                                                            index]
+                                                                        .endDateTime)),
+                                                                style: const TextStyle(
+                                                                    fontSize:
+                                                                        15,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    color: AppColor
+                                                                        .textColor),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                top: 8,
+                                                                bottom: 8),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
                                                           children: [
-                                                            Text(
-                                                              snapshot
-                                                                  .data![index]
-                                                                  .startDateTime,
-                                                              style: const TextStyle(
-                                                                  fontSize: 15,
+                                                            const Text(
+                                                              "잠금 사유 (선택)",
+                                                              style: TextStyle(
+                                                                  fontSize: 16,
                                                                   fontWeight:
                                                                       FontWeight
-                                                                          .w500,
+                                                                          .w700,
                                                                   color: AppColor
                                                                       .textColor),
                                                             ),
                                                             Text(
                                                               snapshot
                                                                   .data![index]
-                                                                  .endDateTime,
+                                                                  .message,
                                                               style: const TextStyle(
                                                                   fontSize: 15,
                                                                   fontWeight:
@@ -1652,97 +1721,84 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                             ),
                                                           ],
                                                         ),
-                                                      ],
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              top: 8,
-                                                              bottom: 8),
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          const Text(
-                                                            "잠금 사유 (선택)",
-                                                            style: TextStyle(
-                                                                fontSize: 16,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700,
-                                                                color: AppColor
-                                                                    .textColor),
-                                                          ),
-                                                          Text(
-                                                            snapshot
-                                                                .data![index]
-                                                                .message,
-                                                            style: const TextStyle(
-                                                                fontSize: 15,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w500,
-                                                                color: AppColor
-                                                                    .textColor),
-                                                          ),
-                                                        ],
                                                       ),
-                                                    ),
-                                                    if (checkedLock == index)
-                                                      Row(
-                                                        children: [
-                                                          Expanded(
-                                                            child:
-                                                                NextPageButton(
-                                                              text: const Text(
-                                                                "잠금 취소하기",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    color: AppColor
-                                                                        .backgroundColor),
+                                                      if (checkedLock == index)
+                                                        Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child:
+                                                                  NextPageButton(
+                                                                text:
+                                                                    const Text(
+                                                                  "잠금 취소하기",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w700,
+                                                                      color: AppColor
+                                                                          .backgroundColor),
+                                                                ),
+                                                                buttonColor: AppColor
+                                                                    .markColor
+                                                                    .withOpacity(
+                                                                        0.8),
+                                                                onPressed:
+                                                                    () {},
                                                               ),
-                                                              buttonColor: AppColor
-                                                                  .markColor
-                                                                  .withOpacity(
-                                                                      0.8),
-                                                              onPressed: () {},
                                                             ),
-                                                          ),
-                                                          const SizedBox(
-                                                            width: 10,
-                                                          ),
-                                                          Expanded(
-                                                            child:
-                                                                NextPageButton(
-                                                              text: const Text(
-                                                                "잠금 수정하기",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    color: AppColor
-                                                                        .backgroundColor),
+                                                            const SizedBox(
+                                                              width: 10,
+                                                            ),
+                                                            Expanded(
+                                                              child:
+                                                                  NextPageButton(
+                                                                text:
+                                                                    const Text(
+                                                                  "잠금 수정하기",
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w700,
+                                                                      color: AppColor
+                                                                          .backgroundColor),
+                                                                ),
+                                                                buttonColor: AppColor
+                                                                    .objectColor
+                                                                    .withOpacity(
+                                                                        0.8),
+                                                                onPressed: () {
+                                                                  setState(() {
+                                                                    lock = snapshot
+                                                                            .data![
+                                                                        index];
+                                                                    lockMessage
+                                                                            .text =
+                                                                        lock!
+                                                                            .message;
+                                                                    types = 10;
+                                                                  });
+                                                                },
                                                               ),
-                                                              buttonColor: AppColor
-                                                                  .objectColor
-                                                                  .withOpacity(
-                                                                      0.8),
-                                                              onPressed: () {},
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                  ],
+                                                          ],
+                                                        ),
+                                                      const Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                bottom: 8,
+                                                                top: 8),
+                                                        child: Divider(
+                                                          height: 2,
+                                                          color: AppColor
+                                                              .backgroundColor2,
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
                                               );
                                             })),
@@ -1757,6 +1813,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         const Text(
                                           "잠금 시간",
@@ -1765,33 +1823,68 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                               fontWeight: FontWeight.w700,
                                               color: AppColor.textColor),
                                         ),
-                                        Column(
-                                          children: [
-                                            Text(
-                                              types == 9
-                                                  ? DateFormat(
-                                                          "yyyy-MM-dd $lockStartTime:00:00",
-                                                          'ko_KR')
-                                                      .format(lockStartDate)
-                                                  : lock?.startDateTime ?? "",
-                                              style: const TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: AppColor.textColor),
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              lastType = 7;
+                                              types = 1;
+                                            });
+                                          },
+                                          style: ButtonStyle(
+                                            overlayColor: MaterialStateProperty
+                                                .resolveWith<Color>(
+                                              (Set<MaterialState> states) {
+                                                if (states.contains(
+                                                    MaterialState.pressed)) {
+                                                  return Colors.transparent;
+                                                }
+                                                return Colors.transparent;
+                                              },
                                             ),
-                                            Text(
-                                              types == 9
-                                                  ? DateFormat(
-                                                          "yyyy-MM-dd $lockEndTime:00:00",
-                                                          'ko_KR')
-                                                      .format(lockEndDate)
-                                                  : lock?.endDateTime ?? "",
-                                              style: const TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: AppColor.textColor),
-                                            ),
-                                          ],
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                types == 10 &&
+                                                        lock != null &&
+                                                        lastType != 8
+                                                    ? DateFormat(
+                                                            "yy년 MM월 dd일 H:00 부터",
+                                                            'ko_KR')
+                                                        .format(DateTime.parse(
+                                                            lock!
+                                                                .startDateTime))
+                                                    : DateFormat(
+                                                            "yy년 MM월 dd일 $lockStartTime:00 부터",
+                                                            'ko_KR')
+                                                        .format(lockStartDate),
+                                                style: const TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColor.textColor),
+                                              ),
+                                              Text(
+                                                types == 10 &&
+                                                        lock != null &&
+                                                        lastType != 8
+                                                    ? DateFormat(
+                                                            "yy년 MM월 dd일 H:00 까지",
+                                                            'ko_KR')
+                                                        .format(DateTime.parse(
+                                                            lock!.endDateTime))
+                                                    : DateFormat(
+                                                            "yy년 MM월 dd일 $lockEndTime:00 까지",
+                                                            'ko_KR')
+                                                        .format(lockEndDate),
+                                                style: const TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColor.textColor),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -2071,8 +2164,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 });
                               } else {
                                 try {
-                                  String startDateTime = (0 <= startTime &&
-                                          startTime <= 9)
+                                  String startDateTime = (0 <= lockStartTime &&
+                                          lockStartTime <= 9)
                                       ? DateFormat(
                                               "yyyy-MM-dd 0$lockStartTime:00:00",
                                               'ko_KR')
@@ -2081,8 +2174,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                               "yyyy-MM-dd $lockStartTime:00:00",
                                               'ko_KR')
                                           .format(lockStartDate);
-                                  String endDateTime = (0 <= endTime &&
-                                          endTime <= 9)
+                                  String endDateTime = (0 <= lockEndTime &&
+                                          lockEndTime <= 9)
                                       ? DateFormat(
                                               "yyyy-MM-dd 0$lockEndTime:00:00",
                                               'ko_KR')
@@ -2107,79 +2200,145 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               }
                             },
                           ),
-                          child: NextPageButton(
-                            text: const Text(
-                              "선택 완료",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColor.backgroundColor),
-                            ),
-                            buttonColor: types == 1
-                                ? AppColor.objectColor
-                                : isChecked2
-                                    ? AppColor.objectColor
-                                    : AppColor.subColor3,
-                            onPressed: () {
-                              if (types == 1) {
-                                if (lastType == 7 || lastType == 8) {
+                          child: Visibility(
+                            visible: types != 10,
+                            replacement: NextPageButton(
+                              text: const Text(
+                                "잠금 수정하기",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColor.backgroundColor),
+                              ),
+                              buttonColor: AppColor.objectColor,
+                              onPressed: () async {
+                                try {
+                                  String startDateTime = '';
+                                  String endDateTime = '';
+                                  if (types == 10 &&
+                                      lock != null &&
+                                      lastType != 8) {
+                                    startDateTime = lock!.startDateTime;
+                                    endDateTime = lock!.endDateTime;
+                                  } else {
+                                    startDateTime = (0 <= lockStartTime &&
+                                            lockStartTime <= 9)
+                                        ? DateFormat(
+                                                "yyyy-MM-dd 0$lockStartTime:00:00",
+                                                'ko_KR')
+                                            .format(lockStartDate)
+                                        : DateFormat(
+                                                "yyyy-MM-dd $lockStartTime:00:00",
+                                                'ko_KR')
+                                            .format(lockStartDate);
+                                    endDateTime = (0 <= lockEndTime &&
+                                            lockEndTime <= 9)
+                                        ? DateFormat(
+                                                "yyyy-MM-dd 0$lockEndTime:00:00",
+                                                'ko_KR')
+                                            .format(lockEndDate)
+                                        : DateFormat(
+                                                "yyyy-MM-dd $lockEndTime:00:00",
+                                                'ko_KR')
+                                            .format(lockEndDate);
+                                  }
+                                  print(startDateTime);
+                                  print(endDateTime);
+                                  LockModel temp = await LockApiService.putLock(
+                                      resourceId: selectedValue!.id,
+                                      startDateTime: startDateTime,
+                                      endDateTime: endDateTime,
+                                      message: lockMessage.text,
+                                      lockId: lock!.id);
+                                  getLockList(setState);
                                   setState(() {
-                                    if (lastType == 7) {
-                                      lockStartDate = focusedDay;
-                                    } else {
-                                      lockEndDate = focusedDay;
-                                    }
-                                    types = 2;
+                                    types = 7;
+                                    lastType = -1;
+                                    lock = null;
                                   });
-                                } else {
-                                  setState(() {
-                                    types = lastType;
-                                  });
+                                } catch (e) {
+                                  print(e.toString());
                                 }
-                              } else if (types == 2 && checkedTime.isNotEmpty) {
-                                if (lastType == 7) {
-                                  setState(() {
-                                    lockStartTime = checkedTime[0];
-                                    lastType = 8;
-                                    types = 1;
-                                  });
-                                } else if (lastType == 8) {
-                                  setState(() {
-                                    lockEndTime = checkedTime[0] + 1;
-                                    print(lockEndTime);
-                                    types = 9;
-                                  });
-                                } else {
-                                  setState(() {
+                              },
+                            ),
+                            child: NextPageButton(
+                              text: const Text(
+                                "선택 완료",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColor.backgroundColor),
+                              ),
+                              buttonColor: types == 1
+                                  ? AppColor.objectColor
+                                  : isChecked2
+                                      ? AppColor.objectColor
+                                      : AppColor.subColor3,
+                              onPressed: () {
+                                if (types == 1) {
+                                  if (lastType == 7 || lastType == 8) {
                                     setState(() {
-                                      isChecked = true;
+                                      if (lastType == 7) {
+                                        lockStartDate = focusedDay;
+                                      } else {
+                                        lockEndDate = focusedDay;
+                                      }
+                                      types = 2;
+                                    });
+                                  } else {
+                                    setState(() {
                                       types = lastType;
-                                      startTime = checkedTime[0];
-                                      endTime = checkedTime[0] + 1;
-                                      if (checkedTime.length > 1) {
-                                        endTime = checkedTime[
-                                                checkedTime.length - 1] +
-                                            1;
+                                    });
+                                  }
+                                } else if (types == 2 &&
+                                    checkedTime.isNotEmpty) {
+                                  if (lastType == 7) {
+                                    setState(() {
+                                      lockStartTime = checkedTime[0];
+                                      lastType = 8;
+                                      types = 1;
+                                    });
+                                  } else if (lastType == 8) {
+                                    setState(() {
+                                      lockEndTime = checkedTime[0] + 1;
+                                      if (lock != null) {
+                                        types = 10;
+                                      } else {
+                                        types = 9;
                                       }
                                     });
+                                  } else {
+                                    setState(() {
+                                      setState(() {
+                                        isChecked = true;
+                                        types = lastType;
+                                        startTime = checkedTime[0];
+                                        endTime = checkedTime[0] + 1;
+                                        if (checkedTime.length > 1) {
+                                          endTime = checkedTime[
+                                                  checkedTime.length - 1] +
+                                              1;
+                                        }
+                                      });
+                                    });
+                                  }
+                                } else if (types == 5) {
+                                  setState(() {
+                                    selectedDate = selectedDay;
+                                    standardDay = selectedDate;
                                   });
-                                }
-                              } else if (types == 5) {
-                                setState(() {
-                                  selectedDate = selectedDay;
-                                  standardDay = selectedDate;
-                                });
-                                getReservations();
-                                weekViewStateKey.currentState
-                                    ?.jumpToWeek(selectedDate);
+                                  getReservations();
+                                  weekViewStateKey.currentState
+                                      ?.jumpToWeek(selectedDate);
 
-                                Get.back();
-                              } else {
-                                snackBar(
-                                    title: "시간을 선택하지 않았습니다",
-                                    content: "최소 한시간을 선택해주세요");
-                              }
-                            },
+                                  Get.back();
+                                } else {
+                                  snackBar(
+                                      title: "시간을 선택하지 않았습니다",
+                                      content: "최소 한시간을 선택해주세요");
+                                }
+                              },
+                            ),
                           ),
                         ),
                       ),

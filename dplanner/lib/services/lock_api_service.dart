@@ -78,15 +78,14 @@ class LockApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// PUT: /resources/(_.resource_id) [클럽 자원 정보 업데이트] 클럽 자원 수정하기
-  static Future<ResourceModel> putResource(
-      {required int id,
-      required String name,
-      required String info,
-      required bool returnMessageRequired,
-      required String notice,
-      required String resourceType}) async {
-    final url = Uri.parse('$baseUrl/resources/$id');
+  /// PUT: /locks/(_.lock_id) [락 수정하기] 예약 락 수정하기
+  static Future<LockModel> putLock(
+      {required int lockId,
+      required int resourceId,
+      required String startDateTime,
+      required String endDateTime,
+      required String message}) async {
+    final url = Uri.parse('$baseUrl/locks/$lockId');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
 
@@ -97,17 +96,15 @@ class LockApiService {
         'Authorization': 'Bearer $accessToken',
       },
       body: jsonEncode({
-        "id": id,
-        "name": name,
-        "info": info,
-        "returnMessageRequired": returnMessageRequired,
-        "notice": notice,
-        "resourceType": resourceType,
+        "resourceId": resourceId,
+        "startDateTime": startDateTime,
+        "endDateTime": endDateTime,
+        "message": message
       }),
     );
 
     if (response.statusCode == 200) {
-      return ResourceModel.fromJson(
+      return LockModel.fromJson(
           jsonDecode(utf8.decode(response.bodyBytes))['data']);
     }
 
