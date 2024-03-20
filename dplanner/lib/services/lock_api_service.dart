@@ -114,9 +114,9 @@ class LockApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// DELETE: /resources/(_.resource_id) [클럽 자원 삭제] 클럽 자원 삭제하기
-  static Future<void> deleteResource({required int resourceId}) async {
-    final url = Uri.parse('$baseUrl/resources/$resourceId');
+  /// DELETE: /locks/(_.lock_id) [락 삭제하기] 예약 락 삭제하기
+  static Future<void> deleteLock({required int lockId}) async {
+    final url = Uri.parse('$baseUrl/locks/$lockId');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
 

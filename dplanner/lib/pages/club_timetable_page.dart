@@ -1744,8 +1744,22 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                                     .markColor
                                                                     .withOpacity(
                                                                         0.8),
-                                                                onPressed:
-                                                                    () {},
+                                                                onPressed: () {
+                                                                  setState(() {
+                                                                    lock = snapshot
+                                                                            .data![
+                                                                        index];
+                                                                  });
+                                                                  checkDeleteReservation(
+                                                                      types: 2,
+                                                                      id: lock!
+                                                                          .id);
+                                                                  getLockList(
+                                                                      setState);
+                                                                  setState(() {
+                                                                    lock = null;
+                                                                  });
+                                                                },
                                                               ),
                                                             ),
                                                             const SizedBox(
@@ -2193,6 +2207,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   getLockList(setState);
                                   setState(() {
                                     types = 7;
+                                    lockMessage.clear();
                                   });
                                 } catch (e) {
                                   print(e.toString());
@@ -2255,6 +2270,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     types = 7;
                                     lastType = -1;
                                     lock = null;
+                                    lockMessage.clear();
                                   });
                                 } catch (e) {
                                   print(e.toString());
@@ -2408,6 +2424,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
 
   /// types == 0 : 삭제
   /// types == 1 : 취소
+  /// types == 2 : 잠금 삭제
   void checkDeleteReservation({required int types, required int id}) {
     Get.dialog(
       AlertDialog(
@@ -2417,7 +2434,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
           padding: const EdgeInsets.only(top: 16.0),
           child: Center(
             child: Text(
-              types == 0 ? "예약 삭제" : "예약 취소",
+              types == 0
+                  ? "예약 삭제"
+                  : types == 1
+                      ? "예약 취소"
+                      : "잠금 삭제",
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             ),
           ),
@@ -2426,7 +2447,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              types == 0 ? "한번 삭제한 예약은" : "한번 취소한 예약은",
+              types == 0
+                  ? "한번 삭제한 예약은"
+                  : types == 1
+                      ? "한번 취소한 예약은"
+                      : "한번 취소한 잠금은",
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
             Text(
@@ -2462,13 +2487,20 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       if (types == 0) {
                         await ReservationApiService.deleteReservation(
                             reservationId: id);
-                      } else {
+                        getReservations();
+                        Get.back();
+                        Get.back();
+                      } else if (types == 1) {
                         await ReservationApiService.cancelReservation(
                             reservationId: id);
+                        getReservations();
+                        Get.back();
+                        Get.back();
+                      } else {
+                        await LockApiService.deleteLock(lockId: id);
+                        getReservations();
+                        Get.back();
                       }
-                      getReservations();
-                      Get.back();
-                      Get.back();
                     } catch (e) {
                       print(e.toString());
                     }
