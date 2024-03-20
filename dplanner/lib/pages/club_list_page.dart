@@ -19,6 +19,10 @@ import '../services/token_api_service.dart';
 import '../widgets/snack_bar.dart';
 import 'error_page.dart';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:dplanner/services/club_alert_api_service.dart';
+
 class ClubListPage extends StatefulWidget {
   const ClubListPage({super.key});
 
@@ -34,12 +38,28 @@ class _ClubListPageState extends State<ClubListPage> {
   void initState() {
     super.initState();
     getClubList();
+    sendFCMtoken();
   }
 
   @override
   void dispose() {
     streamController.close();
     super.dispose();
+  }
+
+  void sendFCMtoken() async {
+    final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+    await firebaseMessaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    final fcmToken = await firebaseMessaging.getToken();
+    ClubAlertApiService.refreshFCMToken(fcmToken);
   }
 
   // 클럽 목록 불러오기

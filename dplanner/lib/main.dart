@@ -23,20 +23,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-  await firebaseMessaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-  final fcmToken = await firebaseMessaging.getToken();
-// 포그라운드 상태에서 알림 수신 처리
 
-  ClubAlertApiService.refreshFCMToken(fcmToken);
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print("Got a message whilst in the foreground!");
     print("Message data: ${message.data}");
