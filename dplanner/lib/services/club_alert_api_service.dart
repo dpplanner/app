@@ -13,7 +13,7 @@ class ClubAlertApiService {
     final accessToken = await storage.read(key: accessTokenKey);
     String memberID = decodeToken(accessToken!)['sub'];
 
-    final url = Uri.parse('$baseUrl/members/$memberID/refreshFcmToken');
+    final url = Uri.parse('$baseUrl/members/$memberID/refresh-fcmtoken');
     final headers = {
       'Authorization': 'Bearer $accessToken',
       'Content-Type': 'application/json'
@@ -23,9 +23,7 @@ class ClubAlertApiService {
 
     try {
       final response = await http.patch(url, headers: headers, body: body);
-      if (response.statusCode == 200) {
-        print("yesssssssssss");
-      }
+      if (response.statusCode == 200) {}
     } catch (e) {
       throw Exception("faillll");
     }
