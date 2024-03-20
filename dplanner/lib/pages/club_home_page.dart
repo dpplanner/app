@@ -83,10 +83,11 @@ class _ClubHomePageState extends State<ClubHomePage> {
             scrolledUnderElevation: 0,
             leadingWidth: SizeController.to.screenWidth * 0.2,
             leading: IconButton(
-                onPressed: () {
-                  Get.offAllNamed('/club_list');
-                },
-                icon: const Icon(SFSymbols.menu)),
+              onPressed: () {
+                Get.offAllNamed('/club_list');
+              },
+              icon: const Icon(SFSymbols.menu),
+            ),
             title: Text(
               ClubController.to.club().clubName,
               style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 20),

@@ -34,8 +34,6 @@ Future<void> main() async {
     sound: true,
   );
   final fcmToken = await firebaseMessaging.getToken();
-  print("fcmtoken");
-  print("$fcmToken"); //왜 여긴 출력 안됨?
 // 포그라운드 상태에서 알림 수신 처리
 
   ClubAlertApiService.refreshFCMToken(fcmToken);
