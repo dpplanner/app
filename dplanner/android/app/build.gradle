@@ -75,8 +75,12 @@ flutter {
     source '../..'
 }
 
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services' // Google Services plugin 적용
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10"
+    implementation 'com.google.firebase:firebase-messaging:23.0.0'
     //implementation platform('com.google.firebase:firebase-bom:29.0.0')
     //implementation 'com.google.firebase:firebase-analytics'
 }

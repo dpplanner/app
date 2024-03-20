@@ -16,3 +16,14 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+  dependencies {
+    // Google Services plugin
+    classpath 'com.google.gms:google-services:4.4.1' // 버전은 최신으로 확인
+  }
+}
