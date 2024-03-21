@@ -183,7 +183,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
                   ),
                 ),
                 selectButton("내 예약 목록", () {
-                  Get.to(const ReservationListPage());
+                  Get.toNamed('/reservation_list');
                 }, true),
                 const Padding(
                   padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
@@ -221,21 +221,21 @@ class _ClubMyPageState extends State<ClubMyPage> {
                   ),
                 ),
                 selectButton("내 활동 보기", () {
-                  Get.to(const MyActivityCheckPage());
+                  Get.toNamed('/my_activity');
                 }, true),
                 selectButton("클럽 정보", () {
-                  Get.to(const ClubInfoPage(), arguments: 2);
+                  Get.toNamed('/club_info', arguments: 2);
                 }, false),
                 if (MemberController.to.clubMember().role == "ADMIN")
                   selectButton("클럽 관리", () {
-                    Get.to(const ClubManagementPage());
+                    Get.toNamed('/club_manage');
                   }, false),
                 Container(
                   height: SizeController.to.screenHeight * 0.01,
                   color: AppColor.backgroundColor2,
                 ),
                 selectButton("앱 설정", () {
-                  Get.to(const AppSettingPage());
+                  Get.toNamed('/app_setting');
                 }, false),
                 selectButton("로그아웃", () {
                   signOut();
