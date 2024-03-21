@@ -99,7 +99,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
             actions: [
               IconButton(
                 onPressed: () {
-                  Get.to(const NotificationPage(), arguments: 1);
+                  Get.toNamed('/notification', arguments: 1);
                 },
                 icon: const Icon(
                   SFSymbols.bell,

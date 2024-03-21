@@ -145,7 +145,7 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                         }),
                         InkWell(
                           onTap: () {
-                            Get.to(const ClubMemberListPage());
+                            Get.toNamed('/club_member_list');
                           },
                           borderRadius: BorderRadius.circular(16),
                           child: const Padding(
@@ -212,7 +212,7 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                             }),
                         InkWell(
                           onTap: () {
-                            Get.to(const ClubResourceListPage());
+                            Get.toNamed('/reservation_list');
                           },
                           borderRadius: BorderRadius.circular(16),
                           child: const Padding(
