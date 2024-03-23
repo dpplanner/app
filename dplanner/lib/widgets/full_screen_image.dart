@@ -22,7 +22,6 @@ class FullScreenImage extends StatelessWidget {
               child: IconButton(
                   icon: Icon(Icons.close, color: Colors.white),
                   onPressed: () {
-                    print("heyyyy");
                     Get.back();
                   }),
             ),

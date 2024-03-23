@@ -123,6 +123,8 @@ class PostApiService {
       final List<dynamic> content = responseData['data']['content'];
       return content.map((data) => Post.fromJson(data)).toList();
     } else {
+      print(response.body);
+      print(response.statusCode);
       throw Exception('Failed to load posts');
     }
   }

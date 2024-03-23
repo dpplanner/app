@@ -23,8 +23,8 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.dp.dplanner"
-    compileSdkVersion 34
+    namespace "com.dancepozz.dplanner"
+    compileSdkVersion 33
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -42,7 +42,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.dp.dplanner"
+        applicationId "com.dancepozz.dplanner"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 21
@@ -75,6 +75,12 @@ flutter {
     source '../..'
 }
 
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services' // Google Services plugin 적용
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10"
+    implementation 'com.google.firebase:firebase-messaging:23.0.0'
+    //implementation platform('com.google.firebase:firebase-bom:29.0.0')
+    //implementation 'com.google.firebase:firebase-analytics'
 }

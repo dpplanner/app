@@ -48,11 +48,6 @@ class _ClubHomePageState extends State<ClubHomePage> {
   }
 
   Future<void> _fetchPosts() async {
-    String? fcmToken = await FirebaseMessaging.instance.getToken();
-    print("==========");
-    print(fcmToken);
-    print("==========");
-
     if (!_hasNextPage) return; // 다음 페이지가 없으면 요청을 중단합니다.
 
     final posts = await PostApiService.fetchPosts(
@@ -88,10 +83,11 @@ class _ClubHomePageState extends State<ClubHomePage> {
             scrolledUnderElevation: 0,
             leadingWidth: SizeController.to.screenWidth * 0.2,
             leading: IconButton(
-                onPressed: () {
-                  Get.offAllNamed('/club_list');
-                },
-                icon: const Icon(SFSymbols.menu)),
+              onPressed: () {
+                Get.offAllNamed('/club_list');
+              },
+              icon: const Icon(SFSymbols.menu),
+            ),
             title: Text(
               ClubController.to.club().clubName,
               style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 20),

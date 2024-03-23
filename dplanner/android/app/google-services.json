@@ -1,30 +1,30 @@
 {
   "project_info": {
-    "project_number": "440122903298",
-    "project_id": "dplanner-c2b9a",
-    "storage_bucket": "dplanner-c2b9a.appspot.com"
+    "project_number": "547095373091",
+    "project_id": "dplanner-6a650",
+    "storage_bucket": "dplanner-6a650.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:440122903298:android:848cf4550e1ac2b402501b",
+        "mobilesdk_app_id": "1:547095373091:android:5065a2c8ab97a6272d5896",
         "android_client_info": {
-          "package_name": "com.dp.dplanner"
+          "package_name": "com.dancepozz.dplanner"
         }
       },
       "oauth_client": [
         {
-          "client_id": "440122903298-2f2tq11inicd4vr72rs8gg8nuqa5ev6n.apps.googleusercontent.com",
+          "client_id": "547095373091-9joo0hatfvlv44p58mmn6u6fmn68phrn.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.dp.dplanner",
+            "package_name": "com.dancepozz.dplanner",
             "certificate_hash": "56473f9b0fa1a6ea7aeda6138f01bb91f868749a"
           }
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB1gwADkJaqsJZDBvbXby8XjRyskWH-VGM"
+          "current_key": "AIzaSyCpHSaMlQSwKgLQU7xpPF02NbhxW60Ayt8"
         }
       ],
       "services": {
