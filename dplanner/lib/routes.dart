@@ -12,6 +12,7 @@ import 'package:dplanner/pages/club_management_page.dart';
 import 'package:dplanner/pages/club_manager_list_page.dart';
 import 'package:dplanner/pages/club_member_list_page.dart';
 import 'package:dplanner/pages/club_my_page.dart';
+import 'package:dplanner/pages/club_reservation_list_page.dart';
 import 'package:dplanner/pages/club_setting_page.dart';
 import 'package:dplanner/pages/club_timetable_page.dart';
 import 'package:dplanner/pages/error_page.dart';
@@ -63,6 +64,8 @@ final page = [
   GetPage(name: '/my_activity', page: () => const MyActivityCheckPage()),
   GetPage(name: '/club_info', page: () => const ClubInfoPage()),
   GetPage(name: '/club_member_list', page: () => const ClubMemberListPage()),
+  GetPage(
+      name: '/reservation_list', page: () => const ClubReservationListPage()),
   GetPage(name: '/resource_list', page: () => const ClubResourceListPage()),
   GetPage(name: '/app_setting', page: () => const AppSettingPage()),
   GetPage(name: '/club_manage', page: () => const ClubManagementPage()),

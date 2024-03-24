@@ -1,8 +1,4 @@
 import 'package:dplanner/controllers/member.dart';
-import 'package:dplanner/pages/app_setting_page.dart';
-import 'package:dplanner/pages/club_info_page.dart';
-import 'package:dplanner/pages/my_activity_check_page.dart';
-import 'package:dplanner/pages/my_reservation_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -17,7 +13,6 @@ import '../controllers/size.dart';
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/reservation_mini_card.dart';
-import 'club_management_page.dart';
 
 class ClubMyPage extends StatefulWidget {
   const ClubMyPage({super.key});
