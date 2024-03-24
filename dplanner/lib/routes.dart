@@ -21,7 +21,7 @@ import 'package:dplanner/pages/my_profile_modification_page.dart';
 
 import 'package:dplanner/pages/club_resource_list_page.dart';
 import 'package:dplanner/pages/notification_page.dart';
-import 'package:dplanner/pages/reservation_list_page.dart';
+import 'package:dplanner/pages/my_reservation_page.dart';
 
 import 'package:get/get.dart';
 
@@ -59,7 +59,7 @@ final page = [
       page: () => const ClubMyPage(),
       transition: Transition.noTransition),
   GetPage(name: '/my_profile', page: () => const MyProfileModificationPage()),
-  GetPage(name: '/reservation_list', page: () => const ReservationListPage()),
+  GetPage(name: '/my_reservation', page: () => const MyReservationPage()),
   GetPage(name: '/my_activity', page: () => const MyActivityCheckPage()),
   GetPage(name: '/club_info', page: () => const ClubInfoPage()),
   GetPage(name: '/club_member_list', page: () => const ClubMemberListPage()),
