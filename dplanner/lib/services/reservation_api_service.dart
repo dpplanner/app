@@ -194,6 +194,65 @@ class ReservationApiService {
     throw ErrorDescription(errorMessage);
   }
 
+  /// GET: /reservations?status=(_.status) [관리자 예약 목록 확인하기] 관리자용 예약 목록 가져오기
+  static Future<List<ReservationModel>> getStatusReservations(
+      {required String status}) async {
+    final url = Uri.parse('$baseUrl/reservations?status=$status');
+    const storage = FlutterSecureStorage();
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    });
+
+    if (response.statusCode == 200) {
+      List<ReservationModel> reservationList = [];
+
+      List<dynamic> reservationData =
+          jsonDecode(utf8.decode(response.bodyBytes))['data'];
+      for (var reservation in reservationData) {
+        reservationList.add(ReservationModel.fromJson(reservation));
+      }
+      return reservationList;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
+  /// GET: /reservations/my-reservations?status=(_.status)&page=(_.page) [내 예약 목록 가져오기] 내 예약 목록 가져오기
+  static Future<List<ReservationModel>> getMyReservations(
+      {required int page, required String status}) async {
+    final url = Uri.parse(
+        '$baseUrl/reservations/my-reservations?status=$status&page=$page');
+    const storage = FlutterSecureStorage();
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.get(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    });
+
+    if (response.statusCode == 200) {
+      List<ReservationModel> reservationList = [];
+
+      List<dynamic> reservationData =
+          jsonDecode(utf8.decode(response.bodyBytes))['data']['content'];
+      for (var reservation in reservationData) {
+        reservationList.add(ReservationModel.fromJson(reservation));
+      }
+      return reservationList;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
   /// PUT: /reservations/(_.reservation_id)/update [예약 수정 하기] 예약 수정 하기
   static Future<ReservationModel> putReservation(
       {required int reservationId,
