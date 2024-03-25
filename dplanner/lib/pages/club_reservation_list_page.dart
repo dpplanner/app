@@ -37,12 +37,12 @@ class _ClubReservationListPageState extends State<ClubReservationListPage> {
   }
 
   void loadInitialData() {
-    requestReservations =
-        ReservationApiService.getStatusReservations(status: 'REQUEST');
-    confirmedReservations =
-        ReservationApiService.getStatusReservations(status: 'CONFIRMED');
-    rejectedReservations =
-        ReservationApiService.getStatusReservations(status: 'REJECTED');
+    // requestReservations =
+    //     ReservationApiService.getStatusReservations(status: 'REQUEST');
+    // confirmedReservations =
+    //     ReservationApiService.getStatusReservations(status: 'CONFIRMED');
+    // rejectedReservations =
+    //     ReservationApiService.getStatusReservations(status: 'REJECTED');
   }
 
   @override
@@ -94,8 +94,8 @@ class _ClubReservationListPageState extends State<ClubReservationListPage> {
           SafeArea(
               child: RefreshIndicator(onRefresh: () async {
             setState(() {
-              requestReservations = ReservationApiService.getStatusReservations(
-                  status: 'REQUEST');
+              // requestReservations = ReservationApiService.getStatusReservations(
+              //     status: 'REQUEST');
             });
             ;
           }, child: LayoutBuilder(builder: (context, constraints) {
@@ -183,9 +183,9 @@ class _ClubReservationListPageState extends State<ClubReservationListPage> {
           SafeArea(
               child: RefreshIndicator(onRefresh: () async {
             setState(() {
-              confirmedReservations =
-                  ReservationApiService.getStatusReservations(
-                      status: 'CONFIRMED');
+              // confirmedReservations =
+              //     ReservationApiService.getStatusReservations(
+              //         status: 'CONFIRMED');
             });
             ;
           }, child: LayoutBuilder(builder: (context, constraints) {
@@ -273,9 +273,9 @@ class _ClubReservationListPageState extends State<ClubReservationListPage> {
           SafeArea(
               child: RefreshIndicator(onRefresh: () async {
             setState(() {
-              rejectedReservations =
-                  ReservationApiService.getStatusReservations(
-                      status: 'REJECTED');
+              // rejectedReservations =
+              //     ReservationApiService.getStatusReservations(
+              //         status: 'REJECTED');
             });
           }, child: LayoutBuilder(builder: (context, constraints) {
             return SingleChildScrollView(

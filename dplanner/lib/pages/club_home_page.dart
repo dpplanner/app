@@ -26,7 +26,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController searchPost = TextEditingController();
   bool _isFocused = false;
-  List<Post> _posts = [];
+  final List<Post> _posts = [];
   String temp = '';
   int _currentPage = 0;
   bool _hasNextPage = true;
@@ -146,7 +146,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
                     stream: _postsController.stream,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return Container(
+                        return SizedBox(
                           height: MediaQuery.of(context).size.height,
                           child: ListView.separated(
                             itemCount: snapshot.data!.length,
