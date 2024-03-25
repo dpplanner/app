@@ -5,6 +5,7 @@ class Post {
   final bool isFixed;
   final int clubId;
   final String clubMemberName;
+  final String? profileUrl;
   final String clubRole;
   final int likeCount;
   final int commentCount;
@@ -20,6 +21,7 @@ class Post {
     required this.isFixed,
     required this.clubId,
     required this.clubMemberName,
+    this.profileUrl,
     required this.clubRole,
     required this.likeCount,
     required this.commentCount,
@@ -37,6 +39,7 @@ class Post {
       isFixed: json['isFixed'],
       clubId: json['clubId'],
       clubMemberName: json['clubMemberName'],
+      profileUrl: json['profileUrl'],
       clubRole: json['clubRole'],
       likeCount: json['likeCount'],
       commentCount: json['commentCount'],
