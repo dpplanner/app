@@ -55,7 +55,7 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
     }
   }
 
-  void _onScrollNotification(ScrollNotification scrollInfo, int tab) {
+  void _onScrollNotification(ScrollNotification scrollInfo) {
     if (scrollInfo is ScrollEndNotification &&
         scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
       _fetchUpcomingReservations(); // 스크롤이 끝에 도달하면 다음 페이지의 포스트를 로드
@@ -77,7 +77,7 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: NotificationListener<ScrollNotification>(
                   onNotification: (ScrollNotification scrollInfo) {
-                    _onScrollNotification(scrollInfo, 0);
+                    _onScrollNotification(scrollInfo);
                     return true;
                   },
                   child: StreamBuilder<List<ReservationModel>>(
