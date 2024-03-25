@@ -98,8 +98,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               startDateTime:
                   DateFormat('yyyy-MM-dd 00:00:00').format(startOfWeek),
               endDateTime: DateFormat('yyyy-MM-dd 00:00:00')
-                  .format(endOfWeek.add(const Duration(days: 1))),
-              status: "SCHEDULER");
+                  .format(endOfWeek.add(const Duration(days: 1))));
 
       for (var i in reservations) {
         events.add(CalendarEventData(
@@ -956,8 +955,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                         'yyyy-MM-dd 00:00:00')
                                                     .format(reservationTime.add(
                                                         const Duration(
-                                                            days: 1))),
-                                                status: "SCHEDULER");
+                                                            days: 1))));
 
                                         for (var i in reservations) {
                                           if (i.reservationId !=

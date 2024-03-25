@@ -154,7 +154,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
                         ),
                         InkWell(
                           onTap: () {
-                            Get.toNamed('/profile');
+                            Get.toNamed('/my_profile');
                           },
                           borderRadius: BorderRadius.circular(5),
                           child: const Row(

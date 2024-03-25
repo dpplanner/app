@@ -161,14 +161,13 @@ class ReservationApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// GET: /reservations?resourceId=(_.resource_id)&start=(_.start_datetime)&end=(_.end_datetime)&status=(_.status) [예약 목록 확인하기] 클럽 예약 목록 가져오기
+  /// GET: /reservations/scheduler?resourceId=(_.resource_id)&start=(_.start_datetime)&end=(_.end_datetime) [스케줄러용: 예약 목록] 클럽 예약 목록 가져오기
   static Future<List<ReservationModel>> getReservations(
       {required int resourceId,
       required String startDateTime,
-      required String endDateTime,
-      required String status}) async {
+      required String endDateTime}) async {
     final url = Uri.parse(
-        '$baseUrl/reservations?resourceId=$resourceId&start=$startDateTime&end=$endDateTime&status=$status');
+        '$baseUrl/reservations/scheduler?resourceId=$resourceId&start=$startDateTime&end=$endDateTime');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
 
