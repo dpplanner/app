@@ -104,12 +104,19 @@ class _PostContentState extends State<PostContent> {
                 Row(
                   children: [
                     ClipOval(
-                      child: SvgPicture.asset(
-                        'assets/images/base_image/base_member_image.svg',
-                        height: SizeController.to.screenWidth * 0.1,
-                        width: SizeController.to.screenWidth * 0.1,
-                        fit: BoxFit.fill,
-                      ),
+                      child: widget.post.profileUrl != null
+                          ? Image.network(
+                              widget.post.profileUrl!,
+                              height: SizeController.to.screenWidth * 0.1,
+                              width: SizeController.to.screenWidth * 0.1,
+                              fit: BoxFit.cover,
+                            )
+                          : SvgPicture.asset(
+                              'assets/images/base_image/base_member_image.svg',
+                              height: SizeController.to.screenWidth * 0.1,
+                              width: SizeController.to.screenWidth * 0.1,
+                              fit: BoxFit.fill,
+                            ),
                     ),
                     SizedBox(width: SizeController.to.screenWidth * 0.03),
                     Column(

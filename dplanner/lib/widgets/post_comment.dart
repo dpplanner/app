@@ -89,21 +89,19 @@ class _PostCommentState extends State<PostComment> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipOval(
-                child:
-                    //comment.profileUrl != null
-                    //    ? Image.network(
-                    //        comment.profileUrl!,
-                    //        height: SizeController.to.screenWidth * 0.09,
-                    //        width: SizeController.to.screenWidth * 0.09,
-                    //        fit: BoxFit.fill,
-                    //      )
-                    //    :
-                    SvgPicture.asset(
-              'assets/images/base_image/base_member_image.svg',
-              height: SizeController.to.screenWidth * 0.09,
-              width: SizeController.to.screenWidth * 0.09,
-              fit: BoxFit.fill,
-            )),
+                child: comment.profileUrl != null
+                    ? Image.network(
+                        comment.profileUrl!,
+                        height: SizeController.to.screenWidth * 0.09,
+                        width: SizeController.to.screenWidth * 0.09,
+                        fit: BoxFit.fill,
+                      )
+                    : SvgPicture.asset(
+                        'assets/images/base_image/base_member_image.svg',
+                        height: SizeController.to.screenWidth * 0.09,
+                        width: SizeController.to.screenWidth * 0.09,
+                        fit: BoxFit.fill,
+                      )),
             SizedBox(width: SizeController.to.screenWidth * 0.03),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -22,18 +22,6 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
-  String modifyImageUrl(String url) {
-    // "file:///"을 삭제하고 URL 가져오기
-    if (url.startsWith("file:///")) {
-      url = url.replaceFirst("file:///", "");
-    }
-    // 이미 "https://"로 시작하는지 확인하고 아닌 경우에만 "https://"를 추가
-    if (!url.startsWith("https://")) {
-      url = "https://" + url;
-    }
-    return url;
-  }
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -64,10 +52,10 @@ class _PostCardState extends State<PostCard> {
                         ClipOval(
                           child: widget.post.profileUrl != null
                               ? Image.network(
-                                  modifyImageUrl(widget.post.profileUrl!),
+                                  widget.post.profileUrl!,
                                   height: SizeController.to.screenWidth * 0.1,
                                   width: SizeController.to.screenWidth * 0.1,
-                                  fit: BoxFit.fill,
+                                  fit: BoxFit.cover,
                                 )
                               : SvgPicture.asset(
                                   'assets/images/base_image/base_member_image.svg',
