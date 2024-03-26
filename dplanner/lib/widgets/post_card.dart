@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/pages/post_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -51,12 +52,16 @@ class _PostCardState extends State<PostCard> {
                       children: [
                         ClipOval(
                           child: widget.post.profileUrl != null
-                              ? Image.network(
-                                  widget.post.profileUrl!,
+                              ? CachedNetworkImage(
+                                  placeholder: (context, url) => Container(),
+                                  imageUrl: widget.post.profileUrl!,
+                                  errorWidget: (context, url, error) =>
+                                      SvgPicture.asset(
+                                        'assets/images/base_image/base_member_image.svg',
+                                      ),
                                   height: SizeController.to.screenWidth * 0.1,
                                   width: SizeController.to.screenWidth * 0.1,
-                                  fit: BoxFit.cover,
-                                )
+                                  fit: BoxFit.cover)
                               : SvgPicture.asset(
                                   'assets/images/base_image/base_member_image.svg',
                                   height: SizeController.to.screenWidth * 0.1,

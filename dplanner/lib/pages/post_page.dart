@@ -33,6 +33,21 @@ class _PostPageState extends State<PostPage> {
   bool _isFocused = false;
   bool _isReplying = false; //답글을 다는 중인지 체크
   int? _replyingCommentId; //답글을 달려고 클릭한 댓글의 ID
+  late Post post; // 상태 변수로 'post' 선언
+
+  @override
+  void initState() {
+    super.initState();
+    post = widget.post; // 초기화에서 widget의 post를 사용하여 상태 변수 초기화
+  }
+
+  Future<void> refreshPost() async {
+    final updatedPost =
+        await PostApiService.fetchPost(postID: post.id); // post를 새로 로드
+    setState(() {
+      post = updatedPost; // 상태 업데이트
+    });
+  }
 
   void startReplying(int commentId) {
     setState(() {
@@ -73,29 +88,33 @@ class _PostPageState extends State<PostPage> {
             child: Column(
           children: [
             Expanded(
+                child: RefreshIndicator(
+              onRefresh: () async {
+                refreshPost();
+              },
               child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 child: Column(
                   children: [
-                    PostContent(post: widget.post),
+                    PostContent(post: post),
                     Container(
                       color: AppColor.backgroundColor2,
                       height: SizeController.to.screenHeight * 0.01,
                     ),
                     PostComment(
-                        post: widget.post,
-                        onCommentSelected: _handleCommentSelected),
+                        post: post, onCommentSelected: _handleCommentSelected),
                   ],
                 ),
               ),
-            ),
+            )),
             Padding(
               padding: const EdgeInsets.all(18.0),
               child: Row(
                 children: [
                   ClipOval(
-                    child: widget.post.profileUrl != null
+                    child: post.profileUrl != null
                         ? Image.network(
-                            widget.post.profileUrl!,
+                            post.profileUrl!,
                             height: SizeController.to.screenWidth * 0.1,
                             width: SizeController.to.screenWidth * 0.1,
                             fit: BoxFit.cover,
@@ -127,7 +146,7 @@ class _PostPageState extends State<PostPage> {
                                 // 폼이 유효한 경우 댓글을 서버에 게시
                                 print("==parentID: ${_replyingCommentId}");
                                 await PostCommentApiService.postComment(
-                                    postId: widget.post.id,
+                                    postId: post.id,
                                     content: addComment.text,
                                     parentId: _replyingCommentId);
                                 // 댓글 입력 필드 초기화

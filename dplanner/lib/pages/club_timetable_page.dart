@@ -304,7 +304,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   child: Padding(
                                       padding: EdgeInsets.only(
                                           right: SizeController.to.screenWidth *
-                                              0.05),
+                                              0.02),
                                       child: DropdownButtonHideUnderline(
                                         child: DropdownButton2<ResourceModel>(
                                           isExpanded: true,
@@ -445,10 +445,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               padding: const EdgeInsets.fromLTRB(3, 0, 3, 42.0),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  // color: DateTime.now().hour == date.hour
-                                  //     ? AppColor.subColor1
-                                  //     : Colors.transparent,
-
+                                  color: DateTime.now().hour == date.hour
+                                      ? AppColor.subColor1
+                                      : Colors.transparent,
                                   borderRadius: BorderRadius.circular(7.0),
                                 ),
                                 child: Text(
@@ -456,11 +455,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       ? "0${date.hour}"
                                       : "${date.hour}",
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    // color: DateTime.now().hour == date.hour
-                                    //     ? AppColor.textColor
-                                    //     : AppColor.textColor2,
-                                    color: AppColor.textColor2,
+                                  style: TextStyle(
+                                    color: DateTime.now().hour == date.hour
+                                        ? AppColor.textColor
+                                        : AppColor.textColor2,
+                                    //color: AppColor.textColor2,
                                     fontWeight: FontWeight.w300,
                                     fontSize: 14,
                                   ),

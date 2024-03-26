@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/size.dart';
 import 'package:dplanner/models/reservation_model.dart';
 import 'package:flutter/material.dart';
@@ -191,7 +192,15 @@ class ReservationReturnCard extends StatelessWidget {
                                           child: ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(10),
-                                              child: Image.network(formattedUrl,
+                                              child: CachedNetworkImage(
+                                                  placeholder: (context, url) =>
+                                                      Container(),
+                                                  imageUrl: formattedUrl,
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          SvgPicture.asset(
+                                                            'assets/images/base_image/base_post_image.svg',
+                                                          ),
                                                   fit: BoxFit.cover)),
                                         ),
                                         Positioned.fill(

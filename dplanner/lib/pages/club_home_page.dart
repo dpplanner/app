@@ -1,13 +1,10 @@
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/size.dart';
-import 'package:dplanner/pages/notification_page.dart';
 import 'package:dplanner/pages/post_add_page.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 import 'dart:async';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
@@ -203,23 +200,6 @@ class _ClubHomePageState extends State<ClubHomePage> {
                                                 bottom: 12.0),
                                             child: PostCard(
                                                 post: snapshot.data![index])),
-                                      ),
-                                    );
-                                    return SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height,
-                                      child: ListView.separated(
-                                        itemCount: snapshot.data!.length,
-                                        itemBuilder: (context, index) {
-                                          final post = snapshot.data![index];
-                                          return PostCard(
-                                              post: snapshot.data![index]);
-                                        },
-                                        separatorBuilder:
-                                            (BuildContext context, int index) =>
-                                                const Divider(
-                                                    height: 10,
-                                                    color: Colors.transparent),
                                       ),
                                     );
                                   }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/club_manager_model.dart';
@@ -211,51 +212,23 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                         Padding(
                           padding: const EdgeInsets.only(right: 12.0),
                           child: ClipOval(
-                            child: Visibility(
-                              visible: (member.url == null),
-                              replacement: Image.network(
-                                "https://${member.url}",
-                                height: SizeController.to.screenWidth * 0.1,
-                                width: SizeController.to.screenWidth * 0.1,
-                                fit: BoxFit.fill,
-                                errorBuilder: (BuildContext context,
-                                    Object error, StackTrace? stackTrace) {
-                                  return Container(
-                                    color: AppColor.backgroundColor,
+                            child: member.url != null
+                                ? CachedNetworkImage(
+                                    placeholder: (context, url) => Container(),
+                                    imageUrl: "http://${member.url!}",
+                                    errorWidget: (context, url, error) =>
+                                        SvgPicture.asset(
+                                          'assets/images/base_image/base_member_image.svg',
+                                        ),
                                     height: SizeController.to.screenWidth * 0.1,
                                     width: SizeController.to.screenWidth * 0.1,
-                                    child: const Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Image',
-                                          style: TextStyle(
-                                            color: AppColor.textColor,
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Failed',
-                                          style: TextStyle(
-                                            color: AppColor.textColor,
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                              child: SvgPicture.asset(
-                                'assets/images/base_image/base_member_image.svg',
-                                height: SizeController.to.screenWidth * 0.1,
-                                width: SizeController.to.screenWidth * 0.1,
-                                fit: BoxFit.fill,
-                              ),
-                            ),
+                                    fit: BoxFit.fill)
+                                : SvgPicture.asset(
+                                    'assets/images/base_image/base_member_image.svg',
+                                    height: SizeController.to.screenWidth * 0.1,
+                                    width: SizeController.to.screenWidth * 0.1,
+                                    fit: BoxFit.fill,
+                                  ),
                           ),
                         ),
                         Padding(

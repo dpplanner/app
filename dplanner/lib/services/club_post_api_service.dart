@@ -148,6 +148,24 @@ class PostApiService {
     }
   }
 
+  static Future<Post> fetchPost({required int postID}) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/posts/$postID'),
+      headers: <String, String>{'Authorization': 'Bearer $accessToken'},
+    );
+
+    if (response.statusCode == 200) {
+      return Post.fromJson(jsonDecode(utf8.decode(response.bodyBytes))['data']);
+    } else {
+      print(response.body);
+      print(response.statusCode);
+      throw Exception('Failed to load posts');
+    }
+  }
+
   static Future<void> editPost(
       {required int postID,
       required String title,

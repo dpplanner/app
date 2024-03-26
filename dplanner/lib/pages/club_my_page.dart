@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
@@ -80,57 +81,30 @@ class _ClubMyPageState extends State<ClubMyPage> {
                             Padding(
                               padding: const EdgeInsets.only(right: 16.0),
                               child: ClipOval(
-                                child: Visibility(
-                                  visible:
-                                      (MemberController.to.clubMember().url ==
-                                          null),
-                                  replacement: Image.network(
-                                    "https://${MemberController.to.clubMember().url}",
-                                    height:
-                                        SizeController.to.screenWidth * 0.25,
-                                    width: SizeController.to.screenWidth * 0.25,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (BuildContext context,
-                                        Object error, StackTrace? stackTrace) {
-                                      return Container(
-                                        color: AppColor.backgroundColor,
+                                child: MemberController.to.clubMember().url !=
+                                        null
+                                    ? CachedNetworkImage(
+                                        placeholder: (context, url) =>
+                                            Container(),
+                                        imageUrl:
+                                            "http://${MemberController.to.clubMember().url!}",
+                                        errorWidget: (context, url, error) =>
+                                            SvgPicture.asset(
+                                              'assets/images/base_image/base_member_image.svg',
+                                            ),
                                         height: SizeController.to.screenWidth *
                                             0.25,
                                         width: SizeController.to.screenWidth *
                                             0.25,
-                                        child: const Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Image',
-                                              style: TextStyle(
-                                                color: AppColor.textColor,
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                            Text(
-                                              'Failed',
-                                              style: TextStyle(
-                                                color: AppColor.textColor,
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  child: SvgPicture.asset(
-                                    'assets/images/base_image/base_member_image.svg',
-                                    height:
-                                        SizeController.to.screenWidth * 0.25,
-                                    width: SizeController.to.screenWidth * 0.25,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                                        fit: BoxFit.cover)
+                                    : SvgPicture.asset(
+                                        'assets/images/base_image/base_member_image.svg',
+                                        height: SizeController.to.screenWidth *
+                                            0.25,
+                                        width: SizeController.to.screenWidth *
+                                            0.25,
+                                        fit: BoxFit.cover,
+                                      ),
                               ),
                             ),
                             Column(
