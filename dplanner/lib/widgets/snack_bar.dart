@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../style.dart';
@@ -9,9 +10,11 @@ void snackBar({required String title, required String content}) {
   }
 
   Get.snackbar(title, content,
-      colorText: AppColor.textColor,
-      backgroundColor: AppColor.backgroundColor,
-      snackPosition: SnackPosition.BOTTOM,
+      borderRadius: 24,
+      padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+      colorText: AppColor.backgroundColor,
+      backgroundColor: AppColor.subColor1,
+      snackPosition: SnackPosition.TOP,
       animationDuration: const Duration(milliseconds: 200),
       isDismissible: true);
 }

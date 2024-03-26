@@ -14,6 +14,7 @@ import '../style.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/underline_textform.dart';
 import 'error_page.dart';
+import 'loading_page.dart';
 
 class ClubManagerListPage extends StatefulWidget {
   const ClubManagerListPage({super.key});
@@ -84,20 +85,21 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
             child: Column(
               children: [
                 Expanded(
-                  child: RefreshIndicator(
-                      onRefresh: getClubManagerList,
-                      child: LayoutBuilder(builder: (context, constraints) {
-                        return SingleChildScrollView(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) => RefreshIndicator(
+                        onRefresh: getClubManagerList,
+                        child: SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: StreamBuilder(
                               stream: _streamController.stream,
                               builder: (BuildContext context,
                                   AsyncSnapshot snapshot) {
-                                if (snapshot.hasData == false) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
+                                if (snapshot.connectionState ==
+                                        ConnectionState.waiting ||
+                                    snapshot.hasData == false) {
+                                  return LoadingPage(constraints: constraints);
                                 } else if (snapshot.hasError) {
-                                  return const ErrorPage();
+                                  return ErrorPage(constraints: constraints);
                                 } else if (snapshot.data.length == 0) {
                                   return SizedBox(
                                     width: SizeController.to.screenWidth,
@@ -118,8 +120,8 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                                   }));
                                 }
                               }),
-                        );
-                      })),
+                        )),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),

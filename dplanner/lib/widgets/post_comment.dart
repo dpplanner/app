@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -89,19 +90,23 @@ class _PostCommentState extends State<PostComment> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipOval(
-                child: comment.profileUrl != null
-                    ? Image.network(
-                        comment.profileUrl!,
-                        height: SizeController.to.screenWidth * 0.09,
-                        width: SizeController.to.screenWidth * 0.09,
-                        fit: BoxFit.fill,
-                      )
-                    : SvgPicture.asset(
-                        'assets/images/base_image/base_member_image.svg',
-                        height: SizeController.to.screenWidth * 0.09,
-                        width: SizeController.to.screenWidth * 0.09,
-                        fit: BoxFit.fill,
-                      )),
+              child: comment.profileUrl != null
+                  ? CachedNetworkImage(
+                      placeholder: (context, url) => Container(),
+                      imageUrl: comment.profileUrl!,
+                      errorWidget: (context, url, error) => SvgPicture.asset(
+                            'assets/images/base_image/base_member_image.svg',
+                          ),
+                      height: SizeController.to.screenWidth * 0.09,
+                      width: SizeController.to.screenWidth * 0.09,
+                      fit: BoxFit.fill)
+                  : SvgPicture.asset(
+                      'assets/images/base_image/base_member_image.svg',
+                      height: SizeController.to.screenWidth * 0.1,
+                      width: SizeController.to.screenWidth * 0.1,
+                      fit: BoxFit.fill,
+                    ),
+            ),
             SizedBox(width: SizeController.to.screenWidth * 0.03),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -111,7 +116,7 @@ class _PostCommentState extends State<PostComment> {
                   children: [
                     Text(
                       comment.clubMemberName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColor.textColor,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/widgets/mini_text_button.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/snack_bar.dart';
 import 'error_page.dart';
+import 'loading_page.dart';
 
 class ClubSettingPage extends StatefulWidget {
   const ClubSettingPage({super.key});
@@ -99,78 +101,43 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                                 return const ErrorPage();
                               } else {
                                 return Padding(
-                                  padding: const EdgeInsets.only(top: 16.0),
-                                  child: (file != null)
-                                      ? Image.file(
-                                          File(file!.path),
-                                          height:
-                                              SizeController.to.screenHeight *
-                                                  0.28,
-                                          width: SizeController.to.screenWidth,
-                                          fit: BoxFit.fitWidth,
-                                        )
-                                      : Visibility(
-                                          visible:
-                                              (ClubController.to.club().url ==
-                                                  null),
-                                          replacement: Image.network(
-                                            "https://${ClubController.to.club().url}",
+                                    padding: const EdgeInsets.only(top: 16.0),
+                                    child: (file != null)
+                                        ? Image.file(
+                                            File(file!.path),
                                             height:
                                                 SizeController.to.screenHeight *
                                                     0.28,
                                             width:
                                                 SizeController.to.screenWidth,
                                             fit: BoxFit.fitWidth,
-                                            errorBuilder: (BuildContext context,
-                                                Object error,
-                                                StackTrace? stackTrace) {
-                                              return Container(
-                                                color: AppColor.backgroundColor,
+                                          )
+                                        : ClubController.to.club().url != null
+                                            ? CachedNetworkImage(
+                                                placeholder: (context, url) =>
+                                                    Container(),
+                                                imageUrl:
+                                                    "https://${ClubController.to.club().url}",
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        SvgPicture.asset(
+                                                          'assets/images/base_image/base_club_big_image.svg',
+                                                        ),
                                                 height: SizeController
                                                         .to.screenHeight *
                                                     0.28,
                                                 width: SizeController
                                                     .to.screenWidth,
-                                                child: const Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      'Image',
-                                                      style: TextStyle(
-                                                        color:
-                                                            AppColor.textColor,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      'Failed',
-                                                      style: TextStyle(
-                                                        color:
-                                                            AppColor.textColor,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                          child: SvgPicture.asset(
-                                            'assets/images/base_image/base_club_big_image.svg',
-                                            height:
-                                                SizeController.to.screenHeight *
+                                                fit: BoxFit.fitWidth)
+                                            : SvgPicture.asset(
+                                                'assets/images/base_image/base_club_big_image.svg',
+                                                height: SizeController
+                                                        .to.screenHeight *
                                                     0.28,
-                                            width:
-                                                SizeController.to.screenWidth,
-                                            fit: BoxFit.fitWidth,
-                                          ),
-                                        ),
-                                );
+                                                width: SizeController
+                                                    .to.screenWidth,
+                                                fit: BoxFit.fitWidth,
+                                              ));
                               }
                             }),
                         Positioned(

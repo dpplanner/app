@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/controllers/size.dart';
 import 'package:dplanner/models/reservation_model.dart';
+import 'package:dplanner/pages/loading_page.dart';
 import 'package:dplanner/services/lock_api_service.dart';
 import 'package:dplanner/style.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +66,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   DateTime endOfWeek = DateTime.now();
   DateTime selectedDate = DateTime.now();
 
-  bool checkAdminButton = false;
+  @override
+  void initState() {
+    super.initState();
+    if (SizeController.to.checkAdminButton) {
+      SizeController.to.clickedButton();
+    }
+  }
 
   @override
   void dispose() {
@@ -98,8 +105,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               startDateTime:
                   DateFormat('yyyy-MM-dd 00:00:00').format(startOfWeek),
               endDateTime: DateFormat('yyyy-MM-dd 00:00:00')
-                  .format(endOfWeek.add(const Duration(days: 1))),
-              status: "SCHEDULER");
+                  .format(endOfWeek.add(const Duration(days: 1))));
 
       for (var i in reservations) {
         events.add(CalendarEventData(
@@ -155,7 +161,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
             builder: (BuildContext context,
                 AsyncSnapshot<List<ResourceModel>> snapshot) {
               if (snapshot.hasData == false) {
-                return const Center(child: CircularProgressIndicator());
+                return const LoadingPage();
               } else if (snapshot.hasError) {
                 return const ErrorPage();
               } else if (snapshot.data!.isEmpty) {
@@ -298,7 +304,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   child: Padding(
                                       padding: EdgeInsets.only(
                                           right: SizeController.to.screenWidth *
-                                              0.05),
+                                              0.02),
                                       child: DropdownButtonHideUnderline(
                                         child: DropdownButton2<ResourceModel>(
                                           isExpanded: true,
@@ -433,44 +439,41 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                           );
                         },
                         timeLineBuilder: (DateTime date) {
-                          return Transform.translate(
-                            offset: const Offset(0, -10),
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(3, 0, 3, 42.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  // color: DateTime.now().hour == date.hour
-                                  //     ? AppColor.subColor1
-                                  //     : Colors.transparent,
-
-                                  borderRadius: BorderRadius.circular(7.0),
-                                ),
-                                child: Text(
-                                  date.hour < 10
-                                      ? "0${date.hour}"
-                                      : "${date.hour}",
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    // color: DateTime.now().hour == date.hour
-                                    //     ? AppColor.textColor
-                                    //     : AppColor.textColor2,
-                                    color: AppColor.textColor2,
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 14,
-                                  ),
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(3, 0, 3, 42.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: DateTime.now().hour == date.hour
+                                    ? AppColor.subColor1
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(7.0),
+                              ),
+                              child: Text(
+                                date.hour < 10
+                                    ? "0${date.hour}"
+                                    : "${date.hour}",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: DateTime.now().hour == date.hour
+                                      ? AppColor.textColor
+                                      : AppColor.textColor2,
+                                  //color: AppColor.textColor2,
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 14,
                                 ),
                               ),
                             ),
                           );
                         },
                         timeLineWidth: SizeController.to.screenWidth * 0.07,
-                        timeLineOffset: 0,
+                        timeLineOffset: 10,
                         hourIndicatorSettings: const HourIndicatorSettings(
                             height: 0.7,
                             color: AppColor.backgroundColor,
                             offset: 0),
                         liveTimeIndicatorSettings:
                             const LiveTimeIndicatorSettings(
+                          showTime: true,
                           color: AppColor.objectColor,
                           height: 0,
                           offset: 0,
@@ -552,12 +555,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
         floatingActionButton: FutureBuilder(
             future: getReservations(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData == false) {
+              if (snapshot.hasData == false || snapshot.data.length == 0) {
                 return const SizedBox();
               } else if (snapshot.hasError) {
                 return const ErrorPage();
-              } else if (snapshot.data.length == 0) {
-                return const SizedBox();
               } else {
                 return Visibility(
                   visible: MemberController.to.clubMember().role == "ADMIN",
@@ -579,69 +580,67 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       color: AppColor.backgroundColor,
                     ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      if (checkAdminButton)
-                        ElevatedButton(
-                          onPressed: () {
-                            addReservation(types: 7, reservation: null);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColor.objectColor,
-                            shape: const CircleBorder(),
-                            padding: const EdgeInsets.all(12),
-                          ),
-                          child: const Icon(
-                            SFSymbols.lock,
-                            color: AppColor.backgroundColor,
-                          ),
-                        ),
-                      if (checkAdminButton)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12, bottom: 12),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (selectedValue!.notice == "") {
-                                addReservation(types: 0, reservation: null);
-                              } else {
-                                showNotice(notice: selectedValue!.notice);
-                              }
-                            },
+                  child: GetBuilder<SizeController>(
+                    builder: (controller) => Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (SizeController.to.checkAdminButton)
+                            ElevatedButton(
+                              onPressed: () {
+                                addReservation(types: 7, reservation: null);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColor.objectColor,
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(12),
+                              ),
+                              child: const Icon(
+                                SFSymbols.lock,
+                                color: AppColor.backgroundColor,
+                              ),
+                            ),
+                          if (SizeController.to.checkAdminButton)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 12, bottom: 12),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (selectedValue!.notice == "") {
+                                    addReservation(types: 0, reservation: null);
+                                  } else {
+                                    showNotice(notice: selectedValue!.notice);
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColor.objectColor,
+                                  shape: const CircleBorder(),
+                                  padding: const EdgeInsets.all(12),
+                                ),
+                                child: const Icon(
+                                  SFSymbols.plus,
+                                  color: AppColor.backgroundColor,
+                                ),
+                              ),
+                            ),
+                          ElevatedButton(
+                            onPressed: () => controller.clickedButton(),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColor.objectColor,
                               shape: const CircleBorder(),
-                              padding: const EdgeInsets.all(12),
+                              padding: const EdgeInsets.all(20),
                             ),
-                            child: const Icon(
-                              SFSymbols.plus,
-                              color: AppColor.backgroundColor,
-                            ),
+                            child: controller.checkAdminButton
+                                ? const Icon(
+                                    SFSymbols.chevron_down,
+                                    color: AppColor.backgroundColor,
+                                  )
+                                : const Icon(
+                                    SFSymbols.chevron_up,
+                                    color: AppColor.backgroundColor,
+                                  ),
                           ),
-                        ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            checkAdminButton = !checkAdminButton;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColor.objectColor,
-                          shape: const CircleBorder(),
-                          padding: const EdgeInsets.all(20),
-                        ),
-                        child: checkAdminButton
-                            ? const Icon(
-                                SFSymbols.chevron_down,
-                                color: AppColor.backgroundColor,
-                              )
-                            : const Icon(
-                                SFSymbols.chevron_up,
-                                color: AppColor.backgroundColor,
-                              ),
-                      ),
-                    ],
+                        ]),
                   ),
                 );
               }
@@ -956,8 +955,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                         'yyyy-MM-dd 00:00:00')
                                                     .format(reservationTime.add(
                                                         const Duration(
-                                                            days: 1))),
-                                                status: "SCHEDULER");
+                                                            days: 1))));
 
                                         for (var i in reservations) {
                                           if (i.reservationId !=

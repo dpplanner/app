@@ -33,7 +33,7 @@ class ReservationApiService {
     final compressedFile = await FlutterImageCompress.compressAndGetFile(
       file.path,
       outPath,
-      quality: 1, // 값을 조정하여 압축률을 제어할 수 있습니다.
+      quality: 80, // 값을 조정하여 압축률을 제어할 수 있습니다.
     );
 
     // 'XFile' 객체로 변환하여 반환합니다.
@@ -161,14 +161,13 @@ class ReservationApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// GET: /reservations?resourceId=(_.resource_id)&start=(_.start_datetime)&end=(_.end_datetime)&status=(_.status) [예약 목록 확인하기] 클럽 예약 목록 가져오기
+  /// GET: /reservations/scheduler?resourceId=(_.resource_id)&start=(_.start_datetime)&end=(_.end_datetime) [스케줄러용 : 예약 목록] 클럽 예약 목록 가져오기
   static Future<List<ReservationModel>> getReservations(
       {required int resourceId,
       required String startDateTime,
-      required String endDateTime,
-      required String status}) async {
+      required String endDateTime}) async {
     final url = Uri.parse(
-        '$baseUrl/reservations?resourceId=$resourceId&start=$startDateTime&end=$endDateTime&status=$status');
+        '$baseUrl/reservations/scheduler?resourceId=$resourceId&start=$startDateTime&end=$endDateTime');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
 
@@ -194,10 +193,11 @@ class ReservationApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// GET: /reservations?status=(_.status) [관리자 예약 목록 확인하기] 관리자용 예약 목록 가져오기
-  static Future<List<ReservationModel>> getStatusReservations(
-      {required String status}) async {
-    final url = Uri.parse('$baseUrl/reservations?status=$status');
+  /// GET: /reservations/admin?clubId=(_.club_id)&status=(_.status)&page=(_.page) [관리자용 : 예약 목록] 관리자용 예약 목록 가져오기
+  static Future<List<ReservationModel>> getAdminReservations(
+      {required int clubId, required int page, required String status}) async {
+    final url = Uri.parse(
+        '$baseUrl/reservations/admin?clubId=$clubId&status=$status&page=$page');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
 
@@ -210,7 +210,7 @@ class ReservationApiService {
       List<ReservationModel> reservationList = [];
 
       List<dynamic> reservationData =
-          jsonDecode(utf8.decode(response.bodyBytes))['data'];
+          jsonDecode(utf8.decode(response.bodyBytes))['data']['content'];
       for (var reservation in reservationData) {
         reservationList.add(ReservationModel.fromJson(reservation));
       }

@@ -1,12 +1,10 @@
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/size.dart';
-import 'package:dplanner/pages/notification_page.dart';
 import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 import 'dart:async';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
@@ -14,6 +12,9 @@ import '../widgets/outline_textform.dart';
 import '../widgets/post_card.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'package:dplanner/services/club_post_api_service.dart';
+
+import 'error_page.dart';
+import 'loading_page.dart';
 
 class ClubHomePage extends StatefulWidget {
   const ClubHomePage({super.key});
@@ -26,10 +27,11 @@ class _ClubHomePageState extends State<ClubHomePage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController searchPost = TextEditingController();
   bool _isFocused = false;
-  List<Post> _posts = [];
+  final List<Post> _posts = [];
   String temp = '';
   int _currentPage = 0;
   bool _hasNextPage = true;
+  bool _isLoading = false;
 
   final StreamController<List<Post>> _postsController =
       StreamController<List<Post>>();
@@ -49,11 +51,18 @@ class _ClubHomePageState extends State<ClubHomePage> {
 
   Future<void> _fetchPosts() async {
     if (!_hasNextPage) return; // 다음 페이지가 없으면 요청을 중단합니다.
+    setState(() {
+      _isLoading = true; // 데이터를 불러오는 중임을 표시합니다.
+    });
+    if (_currentPage == 0) _posts.clear();
 
     final posts = await PostApiService.fetchPosts(
       clubID: ClubController.to.club().id,
       page: _currentPage++,
     );
+    setState(() {
+      _isLoading = false; // 데이터 불러오기가 완료되었음을 표시합니다.
+    });
 
     if (posts.isNotEmpty) {
       setState(() {
@@ -109,67 +118,96 @@ class _ClubHomePageState extends State<ClubHomePage> {
           ),
         ),
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  color: AppColor.backgroundColor,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 0, 18, 0),
-                    child: Form(
-                        key: _formKey,
-                        child: OutlineTextForm(
-                          hintText: '게시글 제목, 내용, 작성자를 검색해보세요',
-                          controller: searchPost,
-                          isColored: true,
-                          icon: Icon(
-                            SFSymbols.search,
-                            color: _isFocused
-                                ? AppColor.objectColor
-                                : AppColor.textColor2,
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              _isFocused = value.isNotEmpty;
-                            });
-                          },
-                        )),
-                  ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                color: AppColor.backgroundColor,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 0),
+                  child: Form(
+                      key: _formKey,
+                      child: OutlineTextForm(
+                        hintText: '게시글 제목, 내용, 작성자를 검색해보세요',
+                        controller: searchPost,
+                        isColored: true,
+                        icon: Icon(
+                          SFSymbols.search,
+                          color: _isFocused
+                              ? AppColor.objectColor
+                              : AppColor.textColor2,
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            _isFocused = value.isNotEmpty;
+                          });
+                        },
+                      )),
                 ),
-                NotificationListener<ScrollNotification>(
-                  onNotification: (ScrollNotification scrollInfo) {
-                    _onScrollNotification(scrollInfo);
-                    return true;
-                  },
-                  child: StreamBuilder<List<Post>>(
-                    stream: _postsController.stream,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return Container(
-                          height: MediaQuery.of(context).size.height,
-                          child: ListView.separated(
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              final post = snapshot.data![index];
-                              return PostCard(post: post);
-                            },
-                            separatorBuilder:
-                                (BuildContext context, int index) =>
-                                    const Divider(
-                                        height: 10, color: Colors.transparent),
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    },
-                  ),
-                )
-              ],
-            ),
+              ),
+              Expanded(
+                child: LayoutBuilder(
+                    builder: (context, constraints) => RefreshIndicator(
+                        onRefresh: () async {
+                          setState(() {
+                            _currentPage = 0;
+                          });
+                          _fetchPosts();
+                        },
+                        child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            child: NotificationListener<ScrollNotification>(
+                              onNotification: (ScrollNotification scrollInfo) {
+                                _onScrollNotification(scrollInfo);
+                                return true;
+                              },
+                              child: StreamBuilder<List<Post>>(
+                                stream: _postsController.stream,
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<List<Post>> snapshot) {
+                                  if (snapshot.connectionState ==
+                                          ConnectionState.waiting ||
+                                      snapshot.hasData == false) {
+                                    return LoadingPage(
+                                        constraints: constraints);
+                                  } else if (snapshot.hasError) {
+                                    return ErrorPage(constraints: constraints);
+                                  } else if (snapshot.data!.isEmpty &&
+                                      !_isLoading) {
+                                    return Column(
+                                      children: [
+                                        SizedBox(
+                                          height:
+                                              SizeController.to.screenHeight *
+                                                  0.4,
+                                        ),
+                                        const Center(
+                                          child: Text(
+                                            "승인 대기중인 예약이 없어요",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  } else {
+                                    return Column(
+                                      children: List.generate(
+                                        snapshot.data!.length,
+                                        (index) => Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 12.0),
+                                            child: PostCard(
+                                                post: snapshot.data![index])),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            )))),
+              )
+            ],
           ),
         ),
         floatingActionButton: ElevatedButton(
@@ -179,7 +217,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColor.objectColor,
             shape: const CircleBorder(),
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(20),
           ),
           child: const Icon(
             SFSymbols.pencil,

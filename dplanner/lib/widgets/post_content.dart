@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -105,12 +106,16 @@ class _PostContentState extends State<PostContent> {
                   children: [
                     ClipOval(
                       child: widget.post.profileUrl != null
-                          ? Image.network(
-                              widget.post.profileUrl!,
+                          ? CachedNetworkImage(
+                              placeholder: (context, url) => Container(),
+                              imageUrl: widget.post.profileUrl!,
+                              errorWidget: (context, url, error) =>
+                                  SvgPicture.asset(
+                                    'assets/images/base_image/base_member_image.svg',
+                                  ),
                               height: SizeController.to.screenWidth * 0.1,
                               width: SizeController.to.screenWidth * 0.1,
-                              fit: BoxFit.cover,
-                            )
+                              fit: BoxFit.cover)
                           : SvgPicture.asset(
                               'assets/images/base_image/base_member_image.svg',
                               height: SizeController.to.screenWidth * 0.1,
@@ -211,20 +216,24 @@ class _PostContentState extends State<PostContent> {
                           ? imageUrl
                           : 'https://$imageUrl';
                       return GestureDetector(
-                        onTap: () {
-                          // Getx의 Get.to()를 사용하여 전체 화면 이미지 페이지로 이동
-                          Get.to(() => FullScreenImage(imageUrl: formattedUrl));
-                        },
-                        child: Container(
-                          height: 100,
-                          width: 100,
+                          onTap: () {
+                            // Getx의 Get.to()를 사용하여 전체 화면 이미지 페이지로 이동
+                            Get.to(
+                                () => FullScreenImage(imageUrl: formattedUrl));
+                          },
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
-                            child:
-                                Image.network(formattedUrl, fit: BoxFit.cover),
-                          ),
-                        ),
-                      );
+                            child: CachedNetworkImage(
+                                placeholder: (context, url) => Container(),
+                                imageUrl: formattedUrl,
+                                errorWidget: (context, url, error) =>
+                                    SvgPicture.asset(
+                                      'assets/images/base_image/base_post_image.svg',
+                                    ),
+                                height: 100,
+                                width: 100,
+                                fit: BoxFit.cover),
+                          ));
                     }).toList(),
                   ),
                 ),

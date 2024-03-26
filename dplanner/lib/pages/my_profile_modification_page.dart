@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/services/club_member_api_service.dart';
@@ -108,67 +109,35 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                                             0.35,
                                         fit: BoxFit.cover,
                                       )
-                                    : Visibility(
-                                        visible: (MemberController.to
-                                                .clubMember()
-                                                .url ==
-                                            null),
-                                        replacement: Image.network(
-                                          "https://${MemberController.to.clubMember().url}",
-                                          height:
-                                              SizeController.to.screenWidth *
-                                                  0.35,
-                                          width: SizeController.to.screenWidth *
-                                              0.35,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (BuildContext context,
-                                              Object error,
-                                              StackTrace? stackTrace) {
-                                            return Container(
-                                              color: AppColor.backgroundColor,
-                                              height: SizeController
-                                                      .to.screenWidth *
-                                                  0.35,
-                                              width: SizeController
-                                                      .to.screenWidth *
-                                                  0.35,
-                                              child: const Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    'Image',
-                                                    style: TextStyle(
-                                                      color: AppColor.textColor,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      fontSize: 12,
+                                    : MemberController.to.clubMember().url !=
+                                            null
+                                        ? CachedNetworkImage(
+                                            placeholder: (context, url) =>
+                                                Container(),
+                                            imageUrl:
+                                                "http://${MemberController.to.clubMember().url!}",
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    SvgPicture.asset(
+                                                      'assets/images/base_image/base_member_image.svg',
                                                     ),
-                                                  ),
-                                                  Text(
-                                                    'Failed',
-                                                    style: TextStyle(
-                                                      color: AppColor.textColor,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                        child: SvgPicture.asset(
-                                          'assets/images/base_image/base_member_image.svg',
-                                          height:
-                                              SizeController.to.screenWidth *
-                                                  0.35,
-                                          width: SizeController.to.screenWidth *
-                                              0.35,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
+                                            height:
+                                                SizeController.to.screenWidth *
+                                                    0.35,
+                                            width:
+                                                SizeController.to.screenWidth *
+                                                    0.35,
+                                            fit: BoxFit.cover)
+                                        : SvgPicture.asset(
+                                            'assets/images/base_image/base_member_image.svg',
+                                            height:
+                                                SizeController.to.screenWidth *
+                                                    0.35,
+                                            width:
+                                                SizeController.to.screenWidth *
+                                                    0.35,
+                                            fit: BoxFit.cover,
+                                          ),
                               ),
                               Positioned(
                                 bottom: -5,

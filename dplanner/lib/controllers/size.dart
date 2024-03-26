@@ -5,4 +5,10 @@ class SizeController extends GetxController {
 
   double screenWidth = 0;
   double screenHeight = 0;
+  bool checkAdminButton = false;
+
+  void clickedButton() {
+    checkAdminButton = !checkAdminButton;
+    update();
+  }
 }

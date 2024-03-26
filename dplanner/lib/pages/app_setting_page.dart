@@ -18,10 +18,22 @@ class AppSettingPage extends StatefulWidget {
 
 class _AppSettingPageState extends State<AppSettingPage> {
   static const storage = FlutterSecureStorage();
-  String? userInfo = ". . .";
 
   Future<String?> findLoginInfo() async {
-    return await storage.read(key: loginInfo);
+    return await storage.read(key: loginInfo) ?? ". . none";
+  }
+
+  String findLoginPlatform(String login) {
+    switch (login.split(" ")[2]) {
+      case "kakao":
+        return 'assets/images/login/icon_kakao.svg';
+      case "naver":
+        return 'assets/images/login/icon_naver.svg';
+      case "google":
+        return 'assets/images/login/icon_google.svg';
+      default:
+        return 'assets/images/login/icon_kakao.svg';
+    }
   }
 
   @override
@@ -53,9 +65,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
             FutureBuilder(
                 future: findLoginInfo(),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  if (snapshot.hasData == false) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
+                  if (snapshot.hasError) {
                     return const ErrorPage();
                   } else {
                     return Padding(
@@ -65,9 +75,8 @@ class _AppSettingPageState extends State<AppSettingPage> {
                         children: [
                           Row(
                             children: [
-                              ///TODO: 이미지 바꾸기
                               SvgPicture.asset(
-                                'assets/images/login/icon_naver.svg',
+                                findLoginPlatform(snapshot.data.toString()),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 12),
