@@ -71,7 +71,4 @@ final page = [
   GetPage(name: '/club_manage', page: () => const ClubManagementPage()),
   GetPage(name: '/club_setting', page: () => const ClubSettingPage()),
   GetPage(name: '/club_manager_list', page: () => const ClubManagerListPage()),
-
-  /// 기타
-  GetPage(name: '/error', page: () => const ErrorPage()),
 ];

@@ -16,6 +16,7 @@ import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/underline_textform.dart';
 import 'error_page.dart';
+import 'loading_page.dart';
 
 List<String> type = ['공간', '물품'];
 List<String> method = ['예약 신청 후 클럽 관리자 승인'];
@@ -120,9 +121,10 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                             stream: _streamController.stream,
                             builder:
                                 (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.hasData == false) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
+                              if (snapshot.connectionState ==
+                                      ConnectionState.waiting ||
+                                  snapshot.hasData == false) {
+                                return const LoadingPage();
                               } else if (snapshot.hasError) {
                                 return const ErrorPage();
                               } else if (snapshot.data[0].length == 0) {
@@ -160,9 +162,10 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                             stream: _streamController.stream,
                             builder:
                                 (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.hasData == false) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
+                              if (snapshot.connectionState ==
+                                      ConnectionState.waiting ||
+                                  snapshot.hasData == false) {
+                                return const LoadingPage();
                               } else if (snapshot.hasError) {
                                 return const ErrorPage();
                               } else if (snapshot.data[1].length == 0) {

@@ -1,6 +1,8 @@
 // 클럽 목록에서 보이는 클럽 카드
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/models/club_model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../controllers/size.dart';
@@ -36,50 +38,19 @@ class ClubCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Visibility(
-                visible: (thisClub.url == null),
-                replacement: Image.network(
-                  "https://${thisClub.url}",
-                  height: SizeController.to.screenWidth * 0.2,
-                  width: SizeController.to.screenWidth * 0.2,
-                  fit: BoxFit.fill,
-                  errorBuilder: (BuildContext context, Object error,
-                      StackTrace? stackTrace) {
-                    return Container(
-                      color: AppColor.backgroundColor,
+              thisClub.url == null
+                  ? SvgPicture.asset(
+                      'assets/images/base_image/base_club_image.svg',
+                      fit: BoxFit.fill)
+                  : CachedNetworkImage(
+                      placeholder: (context, url) => Container(),
+                      imageUrl: "https://${thisClub.url}",
+                      errorWidget: (context, url, error) => SvgPicture.asset(
+                            'assets/images/base_image/base_club_image.svg',
+                          ),
                       height: SizeController.to.screenWidth * 0.2,
                       width: SizeController.to.screenWidth * 0.2,
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Image',
-                            style: TextStyle(
-                              color: AppColor.textColor,
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                            ),
-                          ),
-                          Text(
-                            'Failed',
-                            style: TextStyle(
-                              color: AppColor.textColor,
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                child: SvgPicture.asset(
-                  'assets/images/base_image/base_club_image.svg',
-                  height: SizeController.to.screenWidth * 0.2,
-                  width: SizeController.to.screenWidth * 0.2,
-                  fit: BoxFit.fill,
-                ),
-              ),
+                      fit: BoxFit.fill),
               const SizedBox(width: 15),
               SizedBox(
                 width: SizeController.to.screenWidth * 0.55,

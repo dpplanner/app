@@ -23,6 +23,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:dplanner/services/club_alert_api_service.dart';
 
+import 'loading_page.dart';
+
 class ClubListPage extends StatefulWidget {
   const ClubListPage({super.key});
 
@@ -93,20 +95,21 @@ class _ClubListPageState extends State<ClubListPage> {
           ),
         ),
         body: SafeArea(
-          child: RefreshIndicator(
-              onRefresh: getClubList,
-              child: LayoutBuilder(builder: (context, constraints) {
-                return SingleChildScrollView(
+          child: LayoutBuilder(
+            builder: (context, constraints) => RefreshIndicator(
+                onRefresh: getClubList,
+                child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: StreamBuilder<List<ClubModel>>(
                       stream: streamController.stream,
                       builder: (BuildContext context,
                           AsyncSnapshot<List<ClubModel>> snapshot) {
-                        if (snapshot.hasData == false) {
-                          return const Center(
-                              child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                                ConnectionState.waiting ||
+                            snapshot.hasData == false) {
+                          return LoadingPage(constraints: constraints);
                         } else if (snapshot.hasError) {
-                          return const ErrorPage();
+                          return ErrorPage(constraints: constraints);
                         } else {
                           return Column(
                             children: [
@@ -259,8 +262,8 @@ class _ClubListPageState extends State<ClubListPage> {
                           );
                         }
                       }),
-                );
-              })),
+                )),
+          ),
         ));
   }
 }

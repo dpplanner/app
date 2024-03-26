@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../models/reservation_model.dart';
 import '../style.dart';
 import 'error_page.dart';
+import 'loading_page.dart';
 
 class MyReservationTab1Page extends StatefulWidget {
   const MyReservationTab1Page({super.key});
@@ -65,100 +66,108 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: RefreshIndicator(
-            onRefresh: () async {
-              setState(() {
-                _currentPage = 0;
-                lastDay = '';
-              });
-              _fetchUpcomingReservations();
-            },
-            child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (ScrollNotification scrollInfo) {
-                    _onScrollNotification(scrollInfo);
-                    return true;
-                  },
-                  child: StreamBuilder<List<ReservationModel>>(
-                      stream: _upcomingRController.stream,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<List<ReservationModel>> snapshot) {
-                        if (snapshot.hasData == false) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return const ErrorPage();
-                        } else {
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(18, 24, 24, 24),
-                            child: Column(
-                              children:
-                                  List.generate(snapshot.data!.length, (index) {
-                                final startDate = DateTime.parse(
-                                    snapshot.data![index].startDateTime);
-                                final now = DateTime.now();
-                                final today =
-                                    DateTime(now.year, now.month, now.day);
-                                final reservationDate = DateTime(startDate.year,
-                                    startDate.month, startDate.day);
-                                final difference =
-                                    reservationDate.difference(today).inDays;
+        child: LayoutBuilder(
+            builder: (context, constraints) => RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    _currentPage = 0;
+                    lastDay = '';
+                  });
+                  _fetchUpcomingReservations();
+                },
+                child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (ScrollNotification scrollInfo) {
+                        _onScrollNotification(scrollInfo);
+                        return true;
+                      },
+                      child: StreamBuilder<List<ReservationModel>>(
+                          stream: _upcomingRController.stream,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List<ReservationModel>> snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.waiting ||
+                                snapshot.hasData == false) {
+                              return LoadingPage(constraints: constraints);
+                            } else if (snapshot.hasError) {
+                              return ErrorPage(constraints: constraints);
+                            } else {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(18, 24, 24, 24),
+                                child: Column(
+                                  children: List.generate(snapshot.data!.length,
+                                      (index) {
+                                    final startDate = DateTime.parse(
+                                        snapshot.data![index].startDateTime);
+                                    final now = DateTime.now();
+                                    final today =
+                                        DateTime(now.year, now.month, now.day);
+                                    final reservationDate = DateTime(
+                                        startDate.year,
+                                        startDate.month,
+                                        startDate.day);
+                                    final difference = reservationDate
+                                        .difference(today)
+                                        .inDays;
 
-                                String dateText;
-                                bool isWritten = false;
-                                if (difference == 0) {
-                                  dateText = "오늘";
-                                } else if (difference == 1) {
-                                  dateText = "내일";
-                                } else if (difference == -1) {
-                                  dateText = "어제";
-                                } else {
-                                  dateText = "그외";
-                                }
+                                    String dateText;
+                                    bool isWritten = false;
+                                    if (difference == 0) {
+                                      dateText = "오늘";
+                                    } else if (difference == 1) {
+                                      dateText = "내일";
+                                    } else if (difference == -1) {
+                                      dateText = "어제";
+                                    } else {
+                                      dateText = "그외";
+                                    }
 
-                                if (lastDay == dateText) {
-                                  isWritten = true;
-                                }
-                                lastDay = dateText;
+                                    if (lastDay == dateText) {
+                                      isWritten = true;
+                                    }
+                                    lastDay = dateText;
 
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12.0),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            0, 5, 18, 0),
-                                        child: Text(
-                                          dateText,
-                                          style: TextStyle(
-                                              color: isWritten
-                                                  ? AppColor.backgroundColor2
-                                                  : AppColor.textColor,
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 16),
-                                        ),
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 12.0),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 5, 18, 0),
+                                            child: Text(
+                                              dateText,
+                                              style: TextStyle(
+                                                  color: isWritten
+                                                      ? AppColor
+                                                          .backgroundColor2
+                                                      : AppColor.textColor,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 16),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: ReservationBigCard(
+                                                time:
+                                                    "${DateFormat("yyyy년 MM월 dd일 hh:00 -", 'ko_KR').format(DateTime.parse(snapshot.data![index].startDateTime))} ${snapshot.data![index].endDateTime.substring(11, 16)}",
+                                                resource: snapshot
+                                                    .data![index].resourceName,
+                                                name:
+                                                    "${snapshot.data![index].clubMemberName}의 예약",
+                                                isRecent: index == 0),
+                                          ),
+                                        ],
                                       ),
-                                      Expanded(
-                                        child: ReservationBigCard(
-                                            time:
-                                                "${DateFormat("yyyy년 MM월 dd일 hh:00 -", 'ko_KR').format(DateTime.parse(snapshot.data![index].startDateTime))} ${snapshot.data![index].endDateTime.substring(11, 16)}",
-                                            resource: snapshot
-                                                .data![index].resourceName,
-                                            name:
-                                                "${snapshot.data![index].clubMemberName}의 예약",
-                                            isRecent: index == 0),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
-                            ),
-                          );
-                        }
-                      }),
-                ))));
+                                    );
+                                  }),
+                                ),
+                              );
+                            }
+                          }),
+                    )))));
   }
 }

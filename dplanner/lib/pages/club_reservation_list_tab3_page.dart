@@ -8,6 +8,7 @@ import '../controllers/size.dart';
 import '../models/reservation_model.dart';
 import '../widgets/reservation_admin_card.dart';
 import 'error_page.dart';
+import 'loading_page.dart';
 
 class ClubReservationListTab3Page extends StatefulWidget {
   const ClubReservationListTab3Page({super.key});
@@ -75,62 +76,67 @@ class _ClubReservationListTab3PageState
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: RefreshIndicator(
-            onRefresh: () async {
-              setState(() {
-                _currentPage = 0;
-              });
-              _fetchRejectedReservations();
-            },
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification scrollInfo) {
-                  _onScrollNotification(scrollInfo);
-                  return true;
+        child: LayoutBuilder(
+            builder: (context, constraints) => RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {
+                    _currentPage = 0;
+                  });
+                  _fetchRejectedReservations();
                 },
-                child: StreamBuilder<List<ReservationModel>>(
-                    stream: _rejectedRController.stream,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<ReservationModel>> snapshot) {
-                      if (snapshot.hasData == false) {
-                        return const Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return const ErrorPage();
-                      } else if (snapshot.data!.isEmpty && !_isLoading) {
-                        return Column(
-                          children: [
-                            SizedBox(
-                              height: SizeController.to.screenHeight * 0.4,
-                            ),
-                            const Center(
-                              child: Text(
-                                "거절한 예약이 없어요",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 16),
-                              ),
-                            ),
-                          ],
-                        );
-                      } else {
-                        return Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            children: List.generate(
-                              snapshot.data!.length,
-                              (index) => Padding(
-                                padding: const EdgeInsets.only(bottom: 12.0),
-                                child: ReservationAdminCard(
-                                  type: 3,
-                                  reservation: snapshot.data![index],
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (ScrollNotification scrollInfo) {
+                      _onScrollNotification(scrollInfo);
+                      return true;
+                    },
+                    child: StreamBuilder<List<ReservationModel>>(
+                        stream: _rejectedRController.stream,
+                        builder: (BuildContext context,
+                            AsyncSnapshot<List<ReservationModel>> snapshot) {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.waiting ||
+                              snapshot.hasData == false) {
+                            return LoadingPage(constraints: constraints);
+                          } else if (snapshot.hasError) {
+                            return ErrorPage(constraints: constraints);
+                          } else if (snapshot.data!.isEmpty && !_isLoading) {
+                            return Column(
+                              children: [
+                                SizedBox(
+                                  height: SizeController.to.screenHeight * 0.4,
+                                ),
+                                const Center(
+                                  child: Text(
+                                    "거절한 예약이 없어요",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16),
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                children: List.generate(
+                                  snapshot.data!.length,
+                                  (index) => Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 12.0),
+                                    child: ReservationAdminCard(
+                                      type: 3,
+                                      reservation: snapshot.data![index],
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        );
-                      }
-                    }),
-              ),
-            )));
+                            );
+                          }
+                        }),
+                  ),
+                ))));
   }
 }

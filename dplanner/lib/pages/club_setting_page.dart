@@ -16,6 +16,7 @@ import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/snack_bar.dart';
 import 'error_page.dart';
+import 'loading_page.dart';
 
 class ClubSettingPage extends StatefulWidget {
   const ClubSettingPage({super.key});

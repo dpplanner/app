@@ -164,62 +164,60 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColor.backgroundColor,
-      body: FutureBuilder(
-          future: checkUserLogin(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return const ErrorPage();
-            } else {
-              return SafeArea(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(top: 128.0, bottom: 256.0),
-                        child: SvgPicture.asset(
-                          'assets/images/login/dplanner_logo_login.svg',
+        backgroundColor: AppColor.backgroundColor,
+        body: FutureBuilder(
+            future: checkUserLogin(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return const ErrorPage();
+              } else {
+                return SafeArea(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(top: 128.0, bottom: 256.0),
+                          child: SvgPicture.asset(
+                            'assets/images/login/dplanner_logo_login.svg',
+                          ),
                         ),
-                      ),
 
-                      ///TODO: 이미지 변경 필요
-                      //카카오 로그인 버튼
-                      Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: ImageButton(
-                            image: 'assets/images/login/kakao_login.svg',
-                            onTap: () async {
-                              await signInWithKakao();
-                            }),
-                      ),
+                        //카카오 로그인 버튼
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: ImageButton(
+                              image: 'assets/images/login/login_kakao.svg',
+                              onTap: () async {
+                                await signInWithKakao();
+                              }),
+                        ),
 
-                      //네이버 로그인 버튼
-                      Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: ImageButton(
-                            image: 'assets/images/login/naver_login.svg',
-                            onTap: () async {
-                              await signInWithNaver();
-                            }),
-                      ),
+                        //네이버 로그인 버튼
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: ImageButton(
+                              image: 'assets/images/login/login_naver.svg',
+                              onTap: () async {
+                                await signInWithNaver();
+                              }),
+                        ),
 
-                      //구글 로그인 버튼
-                      Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: ImageButton(
-                            image: 'assets/images/login/facebook_login.svg',
-                            onTap: () async {
-                              await signInWithGoogle();
-                            }),
-                      ),
-                    ],
+                        //구글 로그인 버튼
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: ImageButton(
+                              image: 'assets/images/login/login_google.svg',
+                              onTap: () async {
+                                await signInWithGoogle();
+                              }),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            }
-          }),
-    );
+                );
+              }
+            }));
   }
 }

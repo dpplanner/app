@@ -18,6 +18,7 @@ import '../style.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import 'error_page.dart';
+import 'loading_page.dart';
 
 class ClubMemberListPage extends StatefulWidget {
   const ClubMemberListPage({super.key});
@@ -112,79 +113,77 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
               ),
             ),
             Flexible(
-              child: RefreshIndicator(
+                child: LayoutBuilder(
+              builder: (context, constraints) => RefreshIndicator(
                 onRefresh: getClubMemberList,
-                child: LayoutBuilder(builder: (context, constraints) {
-                  return SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      child: Column(
-                        children: [
-                          if (MemberController.to.clubMember().role == "ADMIN")
-                            StreamBuilder<List<ClubMemberModel>>(
-                                stream: streamController2.stream,
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<List<ClubMemberModel>>
-                                        snapshot) {
-                                  if (snapshot.hasData == false) {
-                                    return const Center(
-                                        child: CircularProgressIndicator());
-                                  } else if (snapshot.hasError) {
-                                    return const ErrorPage();
-                                  } else if (snapshot.data!.isEmpty) {
-                                    return const SizedBox();
-                                  } else {
-                                    return Column(
-                                      children: [
-                                        Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 8.0),
-                                            child: Column(
-                                              children: List.generate(
-                                                  snapshot.data!.length,
-                                                  (index) {
-                                                return clubMemberCard(
-                                                  member: snapshot.data![index],
-                                                );
-                                              }),
-                                            )),
-                                        Container(
-                                          height:
-                                              SizeController.to.screenHeight *
-                                                  0.005,
-                                          color: AppColor.backgroundColor2,
-                                        ),
-                                      ],
-                                    );
-                                  }
-                                }),
+                child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        if (MemberController.to.clubMember().role == "ADMIN")
                           StreamBuilder<List<ClubMemberModel>>(
-                              stream: streamController.stream,
+                              stream: streamController2.stream,
                               builder: (BuildContext context,
                                   AsyncSnapshot<List<ClubMemberModel>>
                                       snapshot) {
-                                if (snapshot.hasData == false) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
+                                if (snapshot.connectionState ==
+                                        ConnectionState.waiting ||
+                                    snapshot.hasData == false) {
+                                  return LoadingPage(constraints: constraints);
                                 } else if (snapshot.hasError) {
-                                  return const ErrorPage();
+                                  return ErrorPage(constraints: constraints);
+                                } else if (snapshot.data!.isEmpty) {
+                                  return const SizedBox();
                                 } else {
-                                  return Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Column(
-                                        children: List.generate(
-                                            snapshot.data!.length, (index) {
-                                          return clubMemberCard(
-                                            member: snapshot.data![index],
-                                          );
-                                        }),
-                                      ));
+                                  return Column(
+                                    children: [
+                                      Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 8.0),
+                                          child: Column(
+                                            children: List.generate(
+                                                snapshot.data!.length, (index) {
+                                              return clubMemberCard(
+                                                member: snapshot.data![index],
+                                              );
+                                            }),
+                                          )),
+                                      Container(
+                                        height: SizeController.to.screenHeight *
+                                            0.005,
+                                        color: AppColor.backgroundColor2,
+                                      ),
+                                    ],
+                                  );
                                 }
                               }),
-                        ],
-                      ));
-                }),
+                        StreamBuilder<List<ClubMemberModel>>(
+                            stream: streamController.stream,
+                            builder: (BuildContext context,
+                                AsyncSnapshot<List<ClubMemberModel>> snapshot) {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.waiting ||
+                                  snapshot.hasData == false) {
+                                return LoadingPage(constraints: constraints);
+                              } else if (snapshot.hasError) {
+                                return ErrorPage(constraints: constraints);
+                              } else {
+                                return Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Column(
+                                      children: List.generate(
+                                          snapshot.data!.length, (index) {
+                                        return clubMemberCard(
+                                          member: snapshot.data![index],
+                                        );
+                                      }),
+                                    ));
+                              }
+                            }),
+                      ],
+                    )),
               ),
-            )
+            ))
           ],
         ),
       ),
