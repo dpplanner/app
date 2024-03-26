@@ -5,6 +5,7 @@ class Post {
   final bool isFixed;
   final int clubId;
   final String clubMemberName;
+  final String? profileUrl;
   final String clubRole;
   final int likeCount;
   final int commentCount;
@@ -20,6 +21,7 @@ class Post {
     required this.isFixed,
     required this.clubId,
     required this.clubMemberName,
+    this.profileUrl,
     required this.clubRole,
     required this.likeCount,
     required this.commentCount,
@@ -30,6 +32,14 @@ class Post {
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
+    String? profileUrl = json['profileUrl'];
+    if (profileUrl != null && profileUrl.startsWith("file:///")) {
+      profileUrl = profileUrl.replaceFirst("file:///", "");
+    }
+    if (profileUrl != null && !profileUrl.startsWith("https://")) {
+      profileUrl = "https://" + profileUrl;
+    }
+
     return Post(
       id: json['id'],
       title: json['title'] != null ? json['title'] : null,
@@ -37,6 +47,7 @@ class Post {
       isFixed: json['isFixed'],
       clubId: json['clubId'],
       clubMemberName: json['clubMemberName'],
+      profileUrl: profileUrl,
       clubRole: json['clubRole'],
       likeCount: json['likeCount'],
       commentCount: json['commentCount'],

@@ -50,12 +50,19 @@ class _PostCardState extends State<PostCard> {
                     Row(
                       children: [
                         ClipOval(
-                          child: SvgPicture.asset(
-                            'assets/images/base_image/base_member_image.svg',
-                            height: SizeController.to.screenWidth * 0.1,
-                            width: SizeController.to.screenWidth * 0.1,
-                            fit: BoxFit.fill,
-                          ),
+                          child: widget.post.profileUrl != null
+                              ? Image.network(
+                                  widget.post.profileUrl!,
+                                  height: SizeController.to.screenWidth * 0.1,
+                                  width: SizeController.to.screenWidth * 0.1,
+                                  fit: BoxFit.cover,
+                                )
+                              : SvgPicture.asset(
+                                  'assets/images/base_image/base_member_image.svg',
+                                  height: SizeController.to.screenWidth * 0.1,
+                                  width: SizeController.to.screenWidth * 0.1,
+                                  fit: BoxFit.fill,
+                                ),
                         ),
                         SizedBox(width: SizeController.to.screenWidth * 0.03),
                         Column(
@@ -111,7 +118,7 @@ class _PostCardState extends State<PostCard> {
                       child: Text(
                         widget.post.title != null
                             ? widget.post.title!
-                            : "공지", //제목 생기면 그때 수정할 것
+                            : "제목 없음", //제목 생기면 그때 수정할 것
                         style: const TextStyle(
                           color: AppColor.textColor,
                           fontWeight: FontWeight.w800,
