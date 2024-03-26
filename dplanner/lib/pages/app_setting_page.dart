@@ -19,20 +19,20 @@ class AppSettingPage extends StatefulWidget {
 class _AppSettingPageState extends State<AppSettingPage> {
   static const storage = FlutterSecureStorage();
 
-  Future<String?> findLoginInfo() async {
+  Future<String> findLoginInfo() async {
     return await storage.read(key: loginInfo) ?? ". . none";
   }
 
   String findLoginPlatform(String login) {
-    switch (login.split(" ")[2]) {
+    switch (login) {
       case "kakao":
-        return 'assets/images/login/icon_kakao.svg';
+        return 'assets/images/login/icon_kakao.png';
       case "naver":
-        return 'assets/images/login/icon_naver.svg';
+        return 'assets/images/login/icon_naver.png';
       case "google":
-        return 'assets/images/login/icon_google.svg';
+        return 'assets/images/login/icon_google.png';
       default:
-        return 'assets/images/login/icon_kakao.svg';
+        return 'assets/images/login/icon_kakao.png';
     }
   }
 
@@ -62,11 +62,12 @@ class _AppSettingPageState extends State<AppSettingPage> {
         child: Column(
           children: [
             selectButton("가입 정보", () {}, false),
-            FutureBuilder(
+            FutureBuilder<String>(
                 future: findLoginInfo(),
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                builder:
+                    (BuildContext context, AsyncSnapshot<String> snapshot) {
                   if (snapshot.hasError) {
-                    return const ErrorPage();
+                    return const ErrorPage(constraints: BoxConstraints());
                   } else {
                     return Padding(
                       padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
@@ -75,13 +76,16 @@ class _AppSettingPageState extends State<AppSettingPage> {
                         children: [
                           Row(
                             children: [
-                              SvgPicture.asset(
-                                findLoginPlatform(snapshot.data.toString()),
+                              Image.asset(
+                                height: 30,
+                                width: 30,
+                                findLoginPlatform(
+                                    snapshot.data?.split(" ")[2] ?? ""),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 12),
                                 child: Text(
-                                  snapshot.data.toString().split(" ")[0],
+                                  snapshot.data?.split(" ")[0] ?? "",
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 16),

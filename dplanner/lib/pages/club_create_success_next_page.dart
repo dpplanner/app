@@ -1,5 +1,6 @@
 import 'package:dplanner/controllers/club.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
@@ -60,16 +61,17 @@ class _ClubCreateSuccessNextPageState extends State<ClubCreateSuccessNextPage> {
               children: [
                 Column(
                   children: [
-                    ImageButton(
-                        image: 'assets/images/club_create/club_invitecode.svg',
-                        onTap: () async {
-                          try {
-                            print(await ClubApiService.postClubCode(
-                                clubId: ClubController.to.club().id));
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        }),
+                    IconButton(
+                      onPressed: () async {
+                        try {
+                          print(await ClubApiService.postClubCode(
+                              clubId: ClubController.to.club().id));
+                        } catch (e) {
+                          print(e.toString());
+                        }
+                      },
+                      icon: const Icon(SFSymbols.link),
+                    ),
                     SizedBox(
                       height: SizeController.to.screenHeight * 0.01,
                     ),
@@ -82,9 +84,10 @@ class _ClubCreateSuccessNextPageState extends State<ClubCreateSuccessNextPage> {
                 ),
                 Column(
                   children: [
-                    ImageButton(
-                        image: 'assets/images/club_create/club_qrcode.svg',
-                        onTap: () {}),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(SFSymbols.qrcode),
+                    ),
                     SizedBox(
                       height: SizeController.to.screenHeight * 0.01,
                     ),

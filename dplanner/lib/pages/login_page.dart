@@ -186,9 +186,9 @@ class _LoginPageState extends State<LoginPage> {
 
                         //카카오 로그인 버튼
                         Padding(
-                          padding: const EdgeInsets.all(4.0),
+                          padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
                           child: ImageButton(
-                              image: 'assets/images/login/login_kakao.svg',
+                              image: 'assets/images/login/login_kakao.png',
                               onTap: () async {
                                 await signInWithKakao();
                               }),
@@ -196,9 +196,9 @@ class _LoginPageState extends State<LoginPage> {
 
                         //네이버 로그인 버튼
                         Padding(
-                          padding: const EdgeInsets.all(4.0),
+                          padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
                           child: ImageButton(
-                              image: 'assets/images/login/login_naver.svg',
+                              image: 'assets/images/login/login_naver.png',
                               onTap: () async {
                                 await signInWithNaver();
                               }),
@@ -206,9 +206,9 @@ class _LoginPageState extends State<LoginPage> {
 
                         //구글 로그인 버튼
                         Padding(
-                          padding: const EdgeInsets.all(4.0),
+                          padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
                           child: ImageButton(
-                              image: 'assets/images/login/login_google.svg',
+                              image: 'assets/images/login/login_google.png',
                               onTap: () async {
                                 await signInWithGoogle();
                               }),
