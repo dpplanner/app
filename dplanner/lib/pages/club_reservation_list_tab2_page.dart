@@ -2,10 +2,14 @@ import 'dart:async';
 
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/services/reservation_api_service.dart';
+import 'package:dplanner/widgets/reservation_return_card.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 import '../controllers/size.dart';
 import '../models/reservation_model.dart';
+import '../style.dart';
 import '../widgets/reservation_admin_card.dart';
 import 'error_page.dart';
 
@@ -118,12 +122,36 @@ class _ClubReservationListTab2PageState
                           child: Column(
                             children: List.generate(
                               snapshot.data!.length,
-                              (index) => Padding(
-                                padding: const EdgeInsets.only(bottom: 12.0),
-                                child: ReservationAdminCard(
-                                  type: 2,
-                                  reservation: snapshot.data![index],
-                                ),
+                              (index) => Column(
+                                children: [
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 12.0),
+                                    child: ReservationAdminCard(
+                                      type: 2,
+                                      reservation: snapshot.data![index],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 12.0),
+                                    child: Row(
+                                      children: [
+                                        const Padding(
+                                          padding: EdgeInsets.only(
+                                              left: 5, right: 5),
+                                          child: Icon(
+                                              SFSymbols.arrow_turn_down_right,
+                                              color: AppColor.subColor3),
+                                        ),
+                                        Expanded(
+                                            child: ReservationReturnCard(
+                                                reservation:
+                                                    snapshot.data![index]))
+                                      ],
+                                    ),
+                                  )
+                                ],
                               ),
                             ),
                           ),

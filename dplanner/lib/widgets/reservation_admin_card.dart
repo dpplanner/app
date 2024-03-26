@@ -89,7 +89,7 @@ class ReservationAdminCard extends StatelessWidget {
                           fontSize: 15),
                     ),
                     Text(
-                      "${DateFormat("yy.MM.dd hh:00 -", 'ko_KR').format(DateTime.parse(reservation.startDateTime))} ${reservation.endDateTime.substring(11, 16)}",
+                      "${DateFormat("yy.MM.dd  hh:00-", 'ko_KR').format(DateTime.parse(reservation.startDateTime))}${reservation.endDateTime.substring(11, 16)}",
                       style: const TextStyle(
                           color: AppColor.textColor,
                           fontWeight: FontWeight.w700,
