@@ -9,7 +9,9 @@ import 'package:get/get.dart';
 import '../controllers/size.dart';
 import '../style.dart';
 import 'package:dplanner/models/post_model.dart';
+import 'package:dplanner/models/post_comment_model.dart';
 import 'package:dplanner/controllers/member.dart';
+import 'package:dplanner/widgets/comment_mini_card.dart';
 
 class MyActivityCheckPage extends StatefulWidget {
   const MyActivityCheckPage({super.key});
@@ -20,6 +22,7 @@ class MyActivityCheckPage extends StatefulWidget {
 
 class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
   List<Post> _myPosts = [];
+  List<Comment> _postComments = [];
   int _currentPage = 0;
   bool _isLoading = false;
   ScrollController _scrollController = ScrollController();
@@ -29,6 +32,7 @@ class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
     super.initState();
     _scrollController.addListener(_scrollListener);
     _fetchMyPosts();
+    _fetchMyComments(1043);
   }
 
   @override
@@ -65,6 +69,30 @@ class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
         _isLoading = false;
       });
       print('Error fetching posts: $e');
+    }
+  }
+
+  Future<void> _fetchMyComments(int postId) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      List<Comment>? comments =
+          await PostCommentApiService.fetchMyComments(postId);
+      if (comments != null) {
+        setState(() {
+          _postComments = comments;
+        });
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error fetching comments: $e');
     }
   }
 
@@ -139,9 +167,27 @@ class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
               ),
             ),
           ),
-          Container(
-            color: AppColor.backgroundColor2,
-          ),
+          _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : _postComments.isEmpty
+                  ? Center(child: Text('댓글이 없습니다.'))
+                  : Container(
+                      color: AppColor.backgroundColor2,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(18, 24, 24, 24),
+                        child: ListView.builder(
+                          itemCount: _postComments.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12.0),
+                              child: CommentCard(
+                                comment: _postComments[index],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
           Container(
             color: AppColor.backgroundColor2,
           ),
