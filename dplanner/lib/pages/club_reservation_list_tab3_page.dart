@@ -129,6 +129,7 @@ class _ClubReservationListTab3PageState
                                     child: ReservationAdminCard(
                                       type: 3,
                                       reservation: snapshot.data![index],
+                                      onTap: () {},
                                     ),
                                   ),
                                 ),

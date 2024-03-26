@@ -135,6 +135,7 @@ class _ClubReservationListTab2PageState
                                         child: ReservationAdminCard(
                                           type: 2,
                                           reservation: snapshot.data![index],
+                                          onTap: () {},
                                         ),
                                       ),
                                       Padding(
