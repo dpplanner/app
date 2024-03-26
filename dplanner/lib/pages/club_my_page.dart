@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/member.dart';
+import 'package:dplanner/models/reservation_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -7,13 +8,17 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:intl/intl.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import '../const.dart';
 import '../controllers/size.dart';
+import '../services/reservation_api_service.dart';
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/reservation_mini_card.dart';
+import 'error_page.dart';
+import 'loading_page.dart';
 
 class ClubMyPage extends StatefulWidget {
   const ClubMyPage({super.key});
@@ -43,6 +48,16 @@ class _ClubMyPageState extends State<ClubMyPage> {
     }
     await storage.deleteAll();
     Get.offAllNamed('/');
+  }
+
+  Future<List<ReservationModel>> getMyReservation() async {
+    try {
+      return await ReservationApiService.getMyReservations(
+          page: 0, status: 'upcoming');
+    } catch (e) {
+      print(e.toString());
+    }
+    return [];
   }
 
   @override
@@ -154,41 +169,53 @@ class _ClubMyPageState extends State<ClubMyPage> {
                 selectButton("내 예약 목록", () {
                   Get.toNamed('/my_reservation');
                 }, true),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(right: 8.0),
-                          child: ReservationMiniCard(
-                            title: "11/16 동방",
-                            isAccepted: true,
-                            name: "DP23 강지인",
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 8.0),
-                          child: ReservationMiniCard(
-                            title: "11/18 동방",
-                            isAccepted: false,
-                            name: "DP22 정찬영",
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 8.0),
-                          child: ReservationMiniCard(
-                            title: "11/22 동방",
-                            isAccepted: true,
-                            name: "DP22 임동현",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                FutureBuilder<List<ReservationModel>>(
+                    future: getMyReservation(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<ReservationModel>> snapshot) {
+                      if (snapshot.hasError) {
+                        return const ErrorPage();
+                      } else {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                          child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: List.generate(
+                                    snapshot.data?.length ?? 0,
+                                    (index) {
+                                      final startDate = DateTime.parse(
+                                          snapshot.data![index].startDateTime);
+                                      final now = DateTime.now();
+                                      final today = DateTime(
+                                          now.year, now.month, now.day);
+                                      final reservationDate = DateTime(
+                                          startDate.year,
+                                          startDate.month,
+                                          startDate.day);
+                                      final difference = reservationDate
+                                          .difference(today)
+                                          .inDays;
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: ReservationMiniCard(
+                                          title:
+                                              "${DateFormat("MM/dd hh-", 'ko_KR').format(DateTime.parse(snapshot.data![index].startDateTime))}${snapshot.data![index].endDateTime.substring(11, 13)} (${snapshot.data![index].resourceName})",
+                                          isToday: difference == 0,
+                                          isAccepted:
+                                              snapshot.data![index].status ==
+                                                  "CONFIRMED",
+                                          name: snapshot
+                                              .data![index].clubMemberName,
+                                        ),
+                                      );
+                                    },
+                                  ))),
+                        );
+                      }
+                    }),
                 selectButton("내 활동 보기", () {
                   Get.toNamed('/my_activity');
                 }, true),

@@ -123,8 +123,7 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                                     } else {
                                       dateText = "그외";
                                     }
-
-                                    if (lastDay == dateText) {
+                                    if (index != 0 && lastDay == dateText) {
                                       isWritten = true;
                                     }
                                     lastDay = dateText;
@@ -157,8 +156,8 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                                                 resource: snapshot
                                                     .data![index].resourceName,
                                                 name:
-                                                    "${snapshot.data![index].clubMemberName}의 예약",
-                                                isRecent: index == 0),
+                                                    "${snapshot.data![index].clubMemberName}의 예약${(snapshot.data![index].status == "CONFIRMED") ? "" : " - 승인 대기중"}",
+                                                isRecent: dateText == "오늘"),
                                           ),
                                         ],
                                       ),

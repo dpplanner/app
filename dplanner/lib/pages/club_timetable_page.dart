@@ -439,43 +439,41 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                           );
                         },
                         timeLineBuilder: (DateTime date) {
-                          return Transform.translate(
-                            offset: const Offset(0, -10),
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(3, 0, 3, 42.0),
-                              child: Container(
-                                decoration: BoxDecoration(
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(3, 0, 3, 42.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: DateTime.now().hour == date.hour
+                                    ? AppColor.subColor1
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(7.0),
+                              ),
+                              child: Text(
+                                date.hour < 10
+                                    ? "0${date.hour}"
+                                    : "${date.hour}",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
                                   color: DateTime.now().hour == date.hour
-                                      ? AppColor.subColor1
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(7.0),
-                                ),
-                                child: Text(
-                                  date.hour < 10
-                                      ? "0${date.hour}"
-                                      : "${date.hour}",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: DateTime.now().hour == date.hour
-                                        ? AppColor.textColor
-                                        : AppColor.textColor2,
-                                    //color: AppColor.textColor2,
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 14,
-                                  ),
+                                      ? AppColor.textColor
+                                      : AppColor.textColor2,
+                                  //color: AppColor.textColor2,
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 14,
                                 ),
                               ),
                             ),
                           );
                         },
                         timeLineWidth: SizeController.to.screenWidth * 0.07,
-                        timeLineOffset: 0,
+                        timeLineOffset: 10,
                         hourIndicatorSettings: const HourIndicatorSettings(
                             height: 0.7,
                             color: AppColor.backgroundColor,
                             offset: 0),
                         liveTimeIndicatorSettings:
                             const LiveTimeIndicatorSettings(
+                          showTime: true,
                           color: AppColor.objectColor,
                           height: 0,
                           offset: 0,

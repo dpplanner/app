@@ -124,7 +124,7 @@ class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
                                       dateText = "그외";
                                     }
 
-                                    if (lastDay == dateText) {
+                                    if (index != 0 && lastDay == dateText) {
                                       isWritten = true;
                                     }
                                     lastDay = dateText;
