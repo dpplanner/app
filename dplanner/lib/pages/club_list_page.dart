@@ -180,7 +180,7 @@ class _ClubListPageState extends State<ClubListPage> {
                                       AppColor.subColor2.withOpacity(0.5),
                                   borderRadius: BorderRadius.circular(16),
                                   onTap: () {
-                                    Get.toNamed('/club_join');
+                                    Get.toNamed('/club_join1');
                                   },
                                   child: Ink(
                                     decoration: BoxDecoration(
@@ -237,7 +237,7 @@ class _ClubListPageState extends State<ClubListPage> {
                                     ),
                                     InkWell(
                                       onTap: () {
-                                        Get.toNamed('/club_create');
+                                        Get.toNamed('/club_create1');
                                       },
                                       borderRadius: BorderRadius.circular(5),
                                       child: const Text(
