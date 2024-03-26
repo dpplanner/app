@@ -30,13 +30,20 @@ class Comment {
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
+    String? profileUrl = json['profileUrl'];
+    if (profileUrl != null && profileUrl.startsWith("file:///")) {
+      profileUrl = profileUrl.replaceFirst("file:///", "");
+    }
+    if (profileUrl != null && !profileUrl.startsWith("https://")) {
+      profileUrl = "https://" + profileUrl;
+    }
     return Comment(
       id: json['id'] as int,
       parentId: json['parentId'] as int?,
       postId: json['postId'] as int,
       clubMemberId: json['clubMemberId'] as int,
       clubMemberName: json['clubMemberName'] as String,
-      profileUrl: json['profileUrl'] != null ? json['profileUrl'] : null,
+      profileUrl: profileUrl,
       likeCount: json['likeCount'] as int,
       content: json['content'] as String,
       isDeleted: json['isDeleted'] as bool,
