@@ -33,7 +33,7 @@ class ReservationApiService {
     final compressedFile = await FlutterImageCompress.compressAndGetFile(
       file.path,
       outPath,
-      quality: 1, // 값을 조정하여 압축률을 제어할 수 있습니다.
+      quality: 80, // 값을 조정하여 압축률을 제어할 수 있습니다.
     );
 
     // 'XFile' 객체로 변환하여 반환합니다.

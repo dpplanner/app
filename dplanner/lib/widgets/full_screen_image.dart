@@ -54,7 +54,7 @@ class FullScreenImage extends StatelessWidget {
                           options: Options(responseType: ResponseType.bytes));
                       ImageGallerySaver.saveImage(
                           Uint8List.fromList(response.data),
-                          quality: 60,
+                          quality: 100,
                           name: imageUrl);
                       Get.back();
                       snackBar(title: "사진 저장 성공", content: "사진이 저장되었어요");
