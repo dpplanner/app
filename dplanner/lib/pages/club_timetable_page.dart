@@ -85,16 +85,19 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
 
   Future<List<ResourceModel>> getReservations() async {
     try {
+      // 클럽 자원 불러오기
       List<List<ResourceModel>> resources =
           await ResourceApiService.getResources();
       ClubController.to.resources.value = resources[0] + resources[1];
       selectedValue ??= ClubController.to.resources.first;
 
+      // 이벤트 초기화
       for (var i in events) {
         eventController.remove(i);
       }
       events.clear();
 
+      // 지금 페이지 이벤트 불러오기
       int weekday = standardDay.weekday;
       startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
       endOfWeek = standardDay.add(Duration(days: 7 - weekday));
@@ -106,6 +109,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                   DateFormat('yyyy-MM-dd 00:00:00').format(startOfWeek),
               endDateTime: DateFormat('yyyy-MM-dd 00:00:00')
                   .format(endOfWeek.add(const Duration(days: 1))));
+
+      List<LockModel> locks = await LockApiService.getLocks(
+          resourceId: selectedValue!.id,
+          startDateTime: DateFormat('yyyy-MM-dd 00:00:00').format(startOfWeek),
+          endDateTime: DateFormat('yyyy-MM-dd 00:00:00')
+              .format(endOfWeek.add(const Duration(days: 1))));
 
       for (var i in reservations) {
         events.add(CalendarEventData(
@@ -128,6 +137,17 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 : i.title != ""
                     ? AppColor.subColor1
                     : AppColor.subColor3));
+      }
+
+      for (var i in locks) {
+        events.add(CalendarEventData(
+            date: DateTime.parse(i.startDateTime),
+            startTime: DateTime.parse(i.startDateTime),
+            endTime: DateTime.parse(i.endDateTime)
+                .subtract(const Duration(microseconds: 1)),
+            title: "",
+            description: "",
+            color: AppColor.subColor2));
       }
 
       eventController.addAll(events);
@@ -489,13 +509,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   .sublist(1)
                                   .join(" "),
                               titleStyle: const TextStyle(
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 color: AppColor.backgroundColor,
                                 fontSize: 12,
                               ),
                               description: events[0].description,
                               descriptionStyle: const TextStyle(
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 color: AppColor.backgroundColor,
                                 fontSize: 12,
                               ),
@@ -529,14 +549,17 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             SizeController.to.screenHeight * 0.0012,
                         eventArranger: const SideEventArranger(),
                         onEventTap: (events, date) async {
-                          try {
-                            ReservationModel reservation =
-                                await ReservationApiService.getReservation(
-                                    reservationId: int.parse(
-                                        events[0].title.split(" ")[0]));
-                            addReservation(types: 3, reservation: reservation);
-                          } catch (e) {
-                            print(e.toString());
+                          if (events[0].title != "") {
+                            try {
+                              ReservationModel reservation =
+                                  await ReservationApiService.getReservation(
+                                      reservationId: int.parse(
+                                          events[0].title.split(" ")[0]));
+                              addReservation(
+                                  types: 3, reservation: reservation);
+                            } catch (e) {
+                              print(e.toString());
+                            }
                           }
                         },
                         onDateLongPress: (date) => {},
