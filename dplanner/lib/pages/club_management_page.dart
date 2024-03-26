@@ -51,7 +51,7 @@ class _ClubManagementPageState extends State<ClubManagementPage> {
               Get.toNamed('/resource_list');
             }, true),
             selectButton("클럽 매니저 관리", () {
-              Get.toNamed('/manager_list');
+              Get.toNamed('/club_manager_list');
             }, true),
             selectButton("게시판 신고 관리", () {}, true),
           ],
