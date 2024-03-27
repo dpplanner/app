@@ -365,10 +365,8 @@ class _PostContentState extends State<PostContent> {
                         text: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              SFSymbols.pencil_outline,
-                              color: AppColor.textColor,
-                            ),
+                            Icon(SFSymbols.pencil_outline,
+                                color: AppColor.textColor, size: 18),
                             Text(
                               " 수정하기",
                               style: TextStyle(
@@ -421,10 +419,8 @@ class _PostContentState extends State<PostContent> {
                         text: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              SFSymbols.trash,
-                              color: AppColor.markColor,
-                            ),
+                            Icon(SFSymbols.trash,
+                                color: AppColor.markColor, size: 18),
                             Text(
                               " 삭제하기",
                               style: TextStyle(
@@ -449,16 +445,14 @@ class _PostContentState extends State<PostContent> {
                         text: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              SFSymbols.trash,
-                              color: AppColor.markColor,
-                            ),
+                            Icon(SFSymbols.pin_fill,
+                                color: AppColor.textColor, size: 18),
                             Text(
-                              "이 게시글 고정하기", //TODO 고정 되어있으면 풀리게
+                              " 이 게시글 고정하기", //TODO 고정 되어있으면 풀리게
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
-                                  color: AppColor.markColor),
+                                  color: AppColor.textColor),
                             ),
                           ],
                         ),

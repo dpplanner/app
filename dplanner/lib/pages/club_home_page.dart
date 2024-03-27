@@ -208,6 +208,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
                             )))),
               )
             ],
+
           ),
         ),
         floatingActionButton: ElevatedButton(
