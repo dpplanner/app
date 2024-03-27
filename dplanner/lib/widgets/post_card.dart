@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -83,7 +84,9 @@ class _PostCardState extends State<PostCard> {
                               ),
                             ),
                             Text(
-                              '${widget.post.createdTime}',
+                              DateFormat('M월 dd일')
+                                  .add_jm()
+                                  .format(widget.post.createdTime),
                               style: const TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.w500,
