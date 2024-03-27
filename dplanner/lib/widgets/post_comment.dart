@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -133,9 +134,7 @@ class _PostCommentState extends State<PostComment> {
                 Row(
                   children: [
                     Text(
-                      comment.createdTime != null
-                          ? '${comment.createdTime}'
-                          : "2023.11.11 16:28", //TODO: nullable아님
+                      DateFormat('M월 dd일').add_jm().format(comment.createdTime),
                       style: TextStyle(
                         color: AppColor.textColor2,
                         fontWeight: FontWeight.w500,

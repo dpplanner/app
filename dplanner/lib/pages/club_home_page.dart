@@ -113,30 +113,30 @@ class _ClubHomePageState extends State<ClubHomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  color: AppColor.backgroundColor,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 0, 18, 0),
-                    child: Form(
-                        key: _formKey,
-                        child: OutlineTextForm(
-                          hintText: '게시글 제목, 내용, 작성자를 검색해보세요',
-                          controller: searchPost,
-                          isColored: true,
-                          icon: Icon(
-                            SFSymbols.search,
-                            color: _isFocused
-                                ? AppColor.objectColor
-                                : AppColor.textColor2,
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              _isFocused = value.isNotEmpty;
-                            });
-                          },
-                        )),
-                  ),
-                ),
+                //Container(
+                //  color: AppColor.backgroundColor,
+                //  child: Padding(
+                //    padding: const EdgeInsets.fromLTRB(18, 0, 18, 0),
+                //    child: Form(
+                //        key: _formKey,
+                //        child: OutlineTextForm(
+                //          hintText: '게시글 제목, 내용, 작성자를 검색해보세요',
+                //          controller: searchPost,
+                //          isColored: true,
+                //          icon: Icon(
+                //            SFSymbols.search,
+                //            color: _isFocused
+                //                ? AppColor.objectColor
+                //                : AppColor.textColor2,
+                //          ),
+                //          onChanged: (value) {
+                //            setState(() {
+                //              _isFocused = value.isNotEmpty;
+                //            });
+                //          },
+                //        )),
+                //  ),
+                //),
                 NotificationListener<ScrollNotification>(
                   onNotification: (ScrollNotification scrollInfo) {
                     _onScrollNotification(scrollInfo);

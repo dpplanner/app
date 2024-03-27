@@ -11,6 +11,7 @@ import '../widgets/outline_textform.dart';
 import '../widgets/post_content.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'package:dplanner/services/club_post_api_service.dart';
+import 'package:dplanner/controllers/member.dart';
 
 ///
 ///
@@ -93,9 +94,9 @@ class _PostPageState extends State<PostPage> {
               child: Row(
                 children: [
                   ClipOval(
-                    child: widget.post.profileUrl != null
+                    child: MemberController.to.clubMember().url != null
                         ? Image.network(
-                            widget.post.profileUrl!,
+                            "https://${MemberController.to.clubMember().url}",
                             height: SizeController.to.screenWidth * 0.1,
                             width: SizeController.to.screenWidth * 0.1,
                             fit: BoxFit.cover,
@@ -134,6 +135,8 @@ class _PostPageState extends State<PostPage> {
                                 addComment.clear();
                                 _isReplying = false;
                                 _replyingCommentId = null;
+                                FocusScope.of(context).requestFocus(
+                                    FocusNode()); //TODO: 체크해라 dismiss 되는지
                               }
                             },
                             child: _isFocused
