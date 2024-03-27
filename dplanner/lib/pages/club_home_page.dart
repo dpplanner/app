@@ -162,6 +162,8 @@ class _ClubHomePageState extends State<ClubHomePage> {
                         );
                       } else if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
+                      } else if (_hasNextPage == false) {
+                        return const Text("게시글이 없습니다");
                       } else {
                         return const Center(child: CircularProgressIndicator());
                       }
