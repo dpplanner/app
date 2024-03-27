@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -442,13 +443,15 @@ class _PostContentState extends State<PostContent> {
                       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
                       child: NextPageButton(
                         buttonColor: AppColor.backgroundColor2,
-                        text: const Row(
+                        text: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(SFSymbols.pin_fill,
                                 color: AppColor.textColor, size: 18),
                             Text(
-                              " 이 게시글 고정하기", //TODO 고정 되어있으면 풀리게
+                              widget.post.isFixed
+                                  ? " 게시글 고정 해제하기"
+                                  : " 게시글 고정하기", //TODO 고정 되어있으면 풀리게
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
