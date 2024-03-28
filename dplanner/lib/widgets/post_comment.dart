@@ -84,146 +84,153 @@ class _PostCommentState extends State<PostComment> {
 
   Widget commentBlock(Comment comment) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipOval(
-              child: comment.profileUrl != null
-                  ? CachedNetworkImage(
-                      placeholder: (context, url) => Container(),
-                      imageUrl: comment.profileUrl!,
-                      errorWidget: (context, url, error) => SvgPicture.asset(
-                            'assets/images/base_image/base_member_image.svg',
-                          ),
-                      height: SizeController.to.screenWidth * 0.09,
-                      width: SizeController.to.screenWidth * 0.09,
-                      fit: BoxFit.fill)
-                  : SvgPicture.asset(
-                      'assets/images/base_image/base_member_image.svg',
-                      height: SizeController.to.screenWidth * 0.1,
-                      width: SizeController.to.screenWidth * 0.1,
-                      fit: BoxFit.fill,
-                    ),
-            ),
-            SizedBox(width: SizeController.to.screenWidth * 0.03),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      comment.clubMemberName,
-                      style: const TextStyle(
-                        color: AppColor.textColor,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                    SizedBox(
-                      width: SizeController.to.screenWidth * 0.05,
-                    ),
-                  ],
-                ),
-                Text(
-                  comment.content,
-                  style: TextStyle(
-                    color: AppColor.textColor,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
-                ),
-                Row(
-                  children: [
-                    Text(
-                      DateFormat('M월 dd일').add_jm().format(comment.createdTime),
-                      style: TextStyle(
-                        color: AppColor.textColor2,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                      ),
-                    ),
-                    if (comment.parentId == null)
-                      SizedBox(
-                        width: SizeController.to.screenWidth * 0.03,
-                      ),
-                    if (comment.parentId == null)
-                      InkWell(
-                        onTap: () {
-                          _onReplyButtonTapped(comment.id); //답글이 달리는 댓글의 아이디
-                        },
-                        borderRadius: BorderRadius.circular(5),
-                        child: const Text(
-                          "답글 달기",
-                          style: TextStyle(
-                            color: AppColor.textColor2,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                          ),
+        ClipOval(
+            child: comment.profileUrl != null
+                ? CachedNetworkImage(
+                    placeholder: (context, url) => Container(),
+                    imageUrl: comment.profileUrl!,
+                    errorWidget: (context, url, error) => SvgPicture.asset(
+                          'assets/images/base_image/base_member_image.svg',
                         ),
-                      ),
-                  ],
-                ),
-                comment.children.isNotEmpty
-                    ? Column(
+                    height: SizeController.to.screenWidth * 0.09,
+                    width: SizeController.to.screenWidth * 0.09,
+                    fit: BoxFit.fill)
+                : SvgPicture.asset(
+                    'assets/images/base_image/base_member_image.svg',
+                    height: SizeController.to.screenWidth * 0.09,
+                    width: SizeController.to.screenWidth * 0.09,
+                    fit: BoxFit.fill,
+                  )),
+        SizedBox(width: SizeController.to.screenWidth * 0.03),
+        Expanded(
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          if (showRepliesMap?[comment.id] ?? false) ...[
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: comment.children.map((child) {
-                                // 답글 블록 생성
-                                return commentBlock(child);
-                              }).toList(),
+                          Text(
+                            comment.clubMemberName,
+                            style: TextStyle(
+                              color: AppColor.textColor,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
                             ),
-                          ],
-                          Row(
-                            children: [
-                              SvgPicture.asset(
-                                'assets/images/extra/comment_line.svg',
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    if (showRepliesMap != null) {
-                                      showRepliesMap![comment.id] =
-                                          !(showRepliesMap![comment.id] ??
-                                              false);
-                                    }
-                                  });
-                                },
-                                borderRadius: BorderRadius.circular(5),
-                                child: Text(
-                                  (showRepliesMap?[comment.id] ?? false)
-                                      ? "답글 숨기기"
-                                      : "  답글 ${comment.children.length}개 더 보기",
-                                  style: TextStyle(
-                                    color: AppColor.textColor2,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ],
+                          ),
+                          SizedBox(
+                            width: SizeController.to.screenWidth * 0.05,
                           ),
                         ],
-                      )
-                    : Container(),
-              ],
-            ),
-          ],
-        ),
-        IconButton(
-          onPressed: () {
-            _commentMore(context, comment);
-          },
-          icon: const Icon(
-            SFSymbols.ellipsis,
-            color: AppColor.textColor,
+                      ),
+                      Text(
+                        comment.content,
+                        style: TextStyle(
+                          color: AppColor.textColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            DateFormat('M월 dd일')
+                                .add_jm()
+                                .format(comment.createdTime),
+                            style: TextStyle(
+                              color: AppColor.textColor2,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                            ),
+                          ),
+                          if (comment.parentId == null)
+                            SizedBox(
+                              width: SizeController.to.screenWidth * 0.03,
+                            ),
+                          if (comment.parentId == null)
+                            InkWell(
+                              onTap: () {
+                                _onReplyButtonTapped(
+                                    comment.id); //답글이 달리는 댓글의 아이디
+                              },
+                              borderRadius: BorderRadius.circular(5),
+                              child: const Text(
+                                "답글 달기",
+                                style: TextStyle(
+                                  color: AppColor.textColor2,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      _commentMore(context, comment);
+                    },
+                    icon: const Icon(
+                      SFSymbols.ellipsis,
+                      color: AppColor.textColor,
+                    ),
+                  )
+                ],
+              ),
+              comment.children.isNotEmpty
+                  ? Column(
+                      children: [
+                        if (showRepliesMap?[comment.id] ?? false) ...[
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: comment.children.map((child) {
+                              // 답글 블록 생성
+                              return commentBlock(child);
+                            }).toList(),
+                          ),
+                        ],
+                        Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/images/extra/comment_line.svg',
+                            ),
+                            InkWell(
+                              onTap: () {
+                                setState(() {
+                                  if (showRepliesMap != null) {
+                                    showRepliesMap![comment.id] =
+                                        !(showRepliesMap![comment.id] ?? false);
+                                  }
+                                });
+                              },
+                              borderRadius: BorderRadius.circular(5),
+                              child: Text(
+                                (showRepliesMap?[comment.id] ?? false)
+                                    ? "답글 숨기기"
+                                    : "  답글 ${comment.children.length}개 더 보기",
+                                style: TextStyle(
+                                  color: AppColor.textColor2,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
+                  : Container(),
+            ],
           ),
-        )
+        ),
       ],
     );
   }
