@@ -175,6 +175,27 @@ class _ClubMyPageState extends State<ClubMyPage> {
                         AsyncSnapshot<List<ReservationModel>> snapshot) {
                       if (snapshot.hasError) {
                         return const ErrorPage();
+                      } else if (snapshot.data?.isEmpty ?? false) {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 16, right: 16),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: AppColor.subColor2,
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Center(
+                                child: Text(
+                                  "최근 예약이 없습니다",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
                       } else {
                         return Padding(
                           padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),

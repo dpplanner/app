@@ -491,14 +491,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             height: 0.7,
                             color: AppColor.backgroundColor,
                             offset: 0),
-
-                        //liveTimeIndicatorSettings:
-                        //    const LiveTimeIndicatorSettings(
-                        //  color: AppColor.objectColor,
-                        //  height: 0,
-                        //  offset: 0,
-                        //),
-
+                        liveTimeIndicatorSettings:
+                            const LiveTimeIndicatorSettings(
+                          color: AppColor.objectColor,
+                          height: 0,
+                          offset: 0,
+                        ),
                         eventTileBuilder: (date, events, boundry, start, end) {
                           if (events.isNotEmpty) {
                             return RoundedEventTile(
@@ -527,6 +525,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             return Container();
                           }
                         },
+                        liveTimeIndicatorSettings:
+                            const LiveTimeIndicatorSettings(
+                          color: AppColor.objectColor,
+                          height: 0,
+                          offset: 0,
+                        ),
                         fullDayEventBuilder: (events, date) {
                           return FullDayEventView(
                             events: events,
