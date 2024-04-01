@@ -292,6 +292,15 @@ class PostApiService {
       final response = await http.put(url, headers: headers);
 
       if (response.statusCode == 200) {
+        Post result =
+            Post.fromJson(jsonDecode(utf8.decode(response.bodyBytes))['data']);
+        if (result.isFixed == true) {
+          Get.back();
+          Get.snackbar('알림', '이 게시글을 고정했습니다');
+        } else {
+          Get.back();
+          Get.snackbar('알림', '이 게시글을 고정해제했습니다');
+        }
         return; // 성공적으로 업데이트
       }
       throw Exception('Failed to toggle like');

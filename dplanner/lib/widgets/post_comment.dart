@@ -96,7 +96,7 @@ class _PostCommentState extends State<PostComment> {
                         ),
                     height: SizeController.to.screenWidth * 0.09,
                     width: SizeController.to.screenWidth * 0.09,
-                    fit: BoxFit.fill)
+                    fit: BoxFit.fitHeight)
                 : SvgPicture.asset(
                     'assets/images/base_image/base_member_image.svg',
                     height: SizeController.to.screenWidth * 0.09,
