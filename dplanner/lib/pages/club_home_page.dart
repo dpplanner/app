@@ -183,7 +183,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
                                         ),
                                         const Center(
                                           child: Text(
-                                            "승인 대기중인 예약이 없어요",
+                                            "게시글이 없어요",
                                             style: TextStyle(
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 16),
@@ -195,17 +195,16 @@ class _ClubHomePageState extends State<ClubHomePage> {
                                     return Column(
                                       children: List.generate(
                                         snapshot.data!.length,
-                                        (index) => Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 12.0),
-                                            child: PostCard(
-                                                post: snapshot.data![index])),
+                                        (index) => Column(children: [
+                                          Container(width: SizeController.to.screenWidth, height: 10, color: AppColor.backgroundColor2 ),
+                                            PostCard(
+                                                post: snapshot.data![index]),])
                                       ),
                                     );
                                   }
                                 },
                               ),
-                            )))),
+                            ),),),),
               )
             ],
           ),
