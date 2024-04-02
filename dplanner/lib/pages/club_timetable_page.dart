@@ -140,14 +140,30 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       }
 
       for (var i in locks) {
-        events.add(CalendarEventData(
-            date: DateTime.parse(i.startDateTime),
-            startTime: DateTime.parse(i.startDateTime),
-            endTime: DateTime.parse(i.endDateTime)
-                .subtract(const Duration(microseconds: 1)),
-            title: "",
-            description: "",
-            color: AppColor.subColor2));
+        DateTime startDate = DateTime.parse(i.startDateTime);
+        DateTime endDate = DateTime.parse(i.endDateTime);
+
+        for (DateTime j = startDate;
+            j.isBefore(endDate);
+            j = j.add(const Duration(days: 1))) {
+          DateTime startTime = (j.year == startDate.year &&
+                  j.month == startDate.month &&
+                  j.day == startDate.day)
+              ? startDate
+              : DateTime(startDate.year, startDate.month, startDate.day);
+          DateTime endTime = (j.year == endDate.year &&
+                  j.month == endDate.month &&
+                  j.day == endDate.day)
+              ? endDate
+              : DateTime(endDate.year, endDate.month, endDate.day);
+          events.add(CalendarEventData(
+              date: j,
+              startTime: startTime,
+              endTime: endTime.subtract(const Duration(microseconds: 1)),
+              title: "",
+              description: "",
+              color: AppColor.subColor2));
+        }
       }
 
       eventController.addAll(events);
@@ -1576,42 +1592,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       } else if (snapshot.hasError) {
                                         return const ErrorPage();
                                       } else if (snapshot.data!.isEmpty) {
-                                        return Center(
-                                          child: TextButton(
-                                            onPressed: () {},
-                                            style: ButtonStyle(
-                                              overlayColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith<Color>(
-                                                (Set<MaterialState> states) {
-                                                  if (states.contains(
-                                                      MaterialState.pressed)) {
-                                                    return Colors.transparent;
-                                                  }
-                                                  return Colors.transparent;
-                                                },
-                                              ),
-                                            ),
-                                            child: const Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  SFSymbols.plus,
-                                                  color: AppColor.objectColor,
-                                                  size: 20,
-                                                ),
-                                                Text(
-                                                  " 잠금 시간 추가하기",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color:
-                                                          AppColor.objectColor),
-                                                ),
-                                              ],
-                                            ),
+                                        return const Center(
+                                          child: Text(
+                                            " 잠금된 시간이 없습니다",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColor.textColor),
                                           ),
                                         );
                                       } else {
@@ -2231,6 +2218,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           endDateTime: endDateTime,
                                           message: lockMessage.text);
                                   getLockList(setState);
+                                  getReservations();
                                   setState(() {
                                     types = 7;
                                     lockMessage.clear();
@@ -2292,6 +2280,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       message: lockMessage.text,
                                       lockId: lock!.id);
                                   getLockList(setState);
+                                  getReservations();
                                   setState(() {
                                     types = 7;
                                     lastType = -1;
