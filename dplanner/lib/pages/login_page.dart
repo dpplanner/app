@@ -98,8 +98,17 @@ class _LoginPageState extends State<LoginPage> {
         ],
       );
 
+      List<String> jwt = credential.identityToken?.split('.') ?? [];
+      String payload = jwt[1];
+      payload = base64.normalize(payload);
+
+      final List<int> jsonData = base64.decode(payload);
+      final userInfo = jsonDecode(utf8.decode(jsonData));
+      print(userInfo);
+      String tokenEmail = userInfo['email'];
+
       // 서버에 사용자 정보를 전송하고 애플 로그인 처리
-      String email = credential.email ?? ".";
+      String email = credential.email ?? tokenEmail;
       String name =
           "${credential.givenName ?? "."} ${credential.familyName ?? "."}";
 
