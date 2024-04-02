@@ -130,7 +130,9 @@ class PostApiService {
   }
 
   static Future<List<Post>> fetchMyPosts(
-      {required int clubMemberID, required int page}) async {
+      //TODO: 포스트 없을때
+      {required int clubMemberID,
+      required int page}) async {
     final storage = FlutterSecureStorage();
     final accessToken = await storage.read(key: accessTokenKey);
 
@@ -276,6 +278,36 @@ class PostApiService {
       throw Exception('Failed to toggle like: $e');
     }
   }
+
+  static Future<void> fixPost(int postId) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final url = Uri.parse('$baseUrl/posts/$postId/fix');
+    final headers = {
+      'Authorization': 'Bearer $accessToken',
+    };
+
+    try {
+      final response = await http.put(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        Post result =
+            Post.fromJson(jsonDecode(utf8.decode(response.bodyBytes))['data']);
+        if (result.isFixed == true) {
+          Get.back();
+          Get.snackbar('알림', '이 게시글을 고정했습니다');
+        } else {
+          Get.back();
+          Get.snackbar('알림', '이 게시글을 고정해제했습니다');
+        }
+        return; // 성공적으로 업데이트
+      }
+      throw Exception('Failed to toggle like');
+    } catch (e) {
+      throw Exception('Failed to toggle like: $e');
+    }
+  }
 }
 
 class PostCommentApiService {
@@ -326,6 +358,35 @@ class PostCommentApiService {
 
     final response = await http.get(
       Uri.parse('$baseUrl/posts/$postId/comments'),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData =
+          jsonDecode(utf8.decode(response.bodyBytes));
+      final List<dynamic> content = responseData['data'];
+
+      if (content.isEmpty) {
+        // 댓글이 없을 경우 null 반환
+        return null;
+      }
+
+      // 댓글이 있으면 리스트로 변환하여 반환
+      return content.map((data) => Comment.fromJson(data)).toList();
+    } else {
+      // HTTP 오류 발생 시 예외 처리
+      throw Exception('Failed to load comments');
+    }
+  }
+
+  static Future<List<Comment>?> fetchMyComments(int clubMemberId) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/clubMembers/$clubMemberId/comments'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
