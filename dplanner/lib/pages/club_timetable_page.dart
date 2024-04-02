@@ -1751,21 +1751,25 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                                     .markColor
                                                                     .withOpacity(
                                                                         0.8),
-                                                                onPressed: () {
+                                                                onPressed:
+                                                                    () async {
                                                                   setState(() {
                                                                     lock = snapshot
                                                                             .data![
                                                                         index];
                                                                   });
-                                                                  checkDeleteReservation(
+                                                                  await checkDeleteReservation(
                                                                       types: 2,
                                                                       id: lock!
                                                                           .id);
-                                                                  getLockList(
-                                                                      setState);
+                                                                  print(
+                                                                      "ddddddddddddddddddddddddddddd");
+
                                                                   setState(() {
                                                                     lock = null;
                                                                   });
+                                                                  getLockList(
+                                                                      setState);
                                                                 },
                                                               ),
                                                             ),
@@ -2022,8 +2026,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     color: AppColor.backgroundColor),
                               ),
                               buttonColor: AppColor.markColor,
-                              onPressed: () {
-                                checkDeleteReservation(
+                              onPressed: () async {
+                                await checkDeleteReservation(
                                     id: reservation!.reservationId, types: 0);
                               },
                             ),
@@ -2110,8 +2114,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           color: AppColor.backgroundColor),
                                     ),
                                     buttonColor: AppColor.markColor,
-                                    onPressed: () {
-                                      checkDeleteReservation(
+                                    onPressed: () async {
+                                      await checkDeleteReservation(
                                           id: reservation!.reservationId,
                                           types: 1);
                                     },
@@ -2434,8 +2438,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   /// types == 0 : 삭제
   /// types == 1 : 취소
   /// types == 2 : 잠금 삭제
-  void checkDeleteReservation({required int types, required int id}) {
-    Get.dialog(
+  Future<void> checkDeleteReservation(
+      {required int types, required int id}) async {
+    final result = await Get.dialog<bool>(
       AlertDialog(
         backgroundColor: AppColor.backgroundColor,
         elevation: 0,
@@ -2497,18 +2502,18 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         await ReservationApiService.deleteReservation(
                             reservationId: id);
                         getReservations();
-                        Get.back();
+                        Get.back(result: true);
                         Get.back();
                       } else if (types == 1) {
                         await ReservationApiService.cancelReservation(
                             reservationId: id);
                         getReservations();
-                        Get.back();
+                        Get.back(result: true);
                         Get.back();
                       } else {
                         await LockApiService.deleteLock(lockId: id);
                         getReservations();
-                        Get.back();
+                        Get.back(result: true);
                       }
                     } catch (e) {
                       print(e.toString());
