@@ -31,6 +31,8 @@ class _AppSettingPageState extends State<AppSettingPage> {
         return 'assets/images/login/icon_naver.png';
       case "google":
         return 'assets/images/login/icon_google.png';
+      case "apple":
+        return 'assets/images/login/icon_apple.png';
       default:
         return 'assets/images/login/icon_apple.png';
     }
