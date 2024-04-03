@@ -10,7 +10,7 @@ class Comment {
   final bool isDeleted;
   final bool likeStatus;
   final List<Comment> children;
-  final DateTime? createdTime;
+  final DateTime createdTime;
   final DateTime? lastModifiedTime;
 
   Comment({
@@ -25,7 +25,7 @@ class Comment {
     required this.isDeleted,
     required this.likeStatus,
     required this.children,
-    this.createdTime,
+    required this.createdTime,
     this.lastModifiedTime,
   });
 
@@ -52,9 +52,7 @@ class Comment {
           .map((childJson) =>
               Comment.fromJson(childJson as Map<String, dynamic>))
           .toList(),
-      createdTime: json['createdTime'] != null
-          ? DateTime.parse(json['createdTime'] as String)
-          : null,
+      createdTime: DateTime.parse(json['createdTime'] as String),
       lastModifiedTime: json['lastModifiedTime'] != null
           ? DateTime.parse(json['lastModifiedTime'] as String)
           : null,

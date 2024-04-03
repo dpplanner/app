@@ -31,8 +31,10 @@ class _AppSettingPageState extends State<AppSettingPage> {
         return 'assets/images/login/icon_naver.png';
       case "google":
         return 'assets/images/login/icon_google.png';
+      case "apple":
+        return 'assets/images/login/icon_apple.png';
       default:
-        return 'assets/images/login/icon_kakao.png';
+        return 'assets/images/login/icon_apple.png';
     }
   }
 
@@ -80,7 +82,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
                                 height: 30,
                                 width: 30,
                                 findLoginPlatform(
-                                    snapshot.data?.split(" ")[2] ?? ""),
+                                    snapshot.data?.split(" ")[1] ?? ""),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 12),

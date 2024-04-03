@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -11,6 +12,7 @@ import 'nextpage_button.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'package:dplanner/services/club_post_api_service.dart';
 import 'full_screen_image.dart';
+import 'package:dplanner/controllers/member.dart';
 
 ///
 ///
@@ -86,6 +88,19 @@ class _PostContentState extends State<PostContent> {
       });
     } catch (e) {
       Get.snackbar('알림', '오류가 발생했습니다. 다시 시도해주세요: $e');
+    }
+  }
+
+  bool hasAuthority() {
+    if (MemberController.to.clubMember().clubAuthorityTypes == null) {
+      return false;
+    } else {
+      for (int i = 0;
+          i < MemberController.to.clubMember().clubAuthorityTypes!.length;
+          i++)
+        if (MemberController.to.clubMember().clubAuthorityTypes![i] ==
+            'POST_ALL') return true;
+      return false;
     }
   }
 
@@ -342,86 +357,114 @@ class _PostContentState extends State<PostContent> {
                   'assets/images/extra/showmodal_scrollcontrolbar.svg',
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-                child: NextPageButton(
-                  buttonColor: AppColor.backgroundColor2,
-                  text: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        SFSymbols.exclamationmark_octagon,
-                        color: AppColor.markColor,
+              widget.post.clubMemberName ==
+                      MemberController.to.clubMember().name
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                      child: NextPageButton(
+                        buttonColor: AppColor.backgroundColor2,
+                        text: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(SFSymbols.pencil_outline,
+                                color: AppColor.textColor, size: 18),
+                            Text(
+                              " 수정하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.textColor),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          Get.to(PostAddPage(
+                            isEdit: true,
+                            post: post,
+                            clubID: post.clubId,
+                          ));
+                        },
                       ),
-                      Text(
-                        " 이 글 신고하기",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.markColor),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                      child: NextPageButton(
+                        buttonColor: AppColor.backgroundColor2,
+                        text: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              SFSymbols.exclamationmark_octagon,
+                              color: AppColor.markColor,
+                            ),
+                            Text(
+                              " 이 글 신고하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.markColor),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          Get.back();
+                        },
                       ),
-                    ],
-                  ),
-                  onPressed: () {
-                    Get.back();
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                child: NextPageButton(
-                  buttonColor: AppColor.backgroundColor2,
-                  text: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        SFSymbols.pencil_outline,
-                        color: AppColor.textColor,
+                    ),
+              widget.post.clubMemberName ==
+                      MemberController.to.clubMember().name
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                      child: NextPageButton(
+                        buttonColor: AppColor.backgroundColor2,
+                        text: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(SFSymbols.trash,
+                                color: AppColor.markColor, size: 18),
+                            Text(
+                              " 삭제하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.markColor),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          _showDeleteConfirmationDialog(context);
+                          //  Get.back();
+                        },
                       ),
-                      Text(
-                        " 수정하기",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.textColor),
+                    )
+                  : Container(),
+              hasAuthority()
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                      child: NextPageButton(
+                        buttonColor: AppColor.backgroundColor2,
+                        text: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(SFSymbols.pin_fill,
+                                color: AppColor.textColor, size: 18),
+                            Text(
+                              widget.post.isFixed
+                                  ? " 게시글 고정 해제하기"
+                                  : " 게시글 고정하기", //TODO 고정 되어있으면 풀리게
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.textColor),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          PostApiService.fixPost(post.id);
+                        },
                       ),
-                    ],
-                  ),
-                  onPressed: () {
-                    Get.to(PostAddPage(
-                      isEdit: true,
-                      post: post,
-                      clubID: post.clubId,
-                    ));
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                child: NextPageButton(
-                  buttonColor: AppColor.backgroundColor2,
-                  text: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        SFSymbols.trash,
-                        color: AppColor.markColor,
-                      ),
-                      Text(
-                        " 삭제하기",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.markColor),
-                      ),
-                    ],
-                  ),
-                  onPressed: () {
-                    _showDeleteConfirmationDialog(context);
-                    //  Get.back();
-                  },
-                ),
-              ),
+                    )
+                  : Container()
             ],
           ),
         );
