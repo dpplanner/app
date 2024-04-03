@@ -1,11 +1,14 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/controllers/size.dart';
+import 'package:dplanner/models/club_member_model.dart';
 import 'package:dplanner/models/reservation_model.dart';
 import 'package:dplanner/pages/loading_page.dart';
 import 'package:dplanner/services/lock_api_service.dart';
 import 'package:dplanner/style.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -19,9 +22,11 @@ import 'package:table_calendar/table_calendar.dart' as calendar;
 import '../controllers/club.dart';
 import '../models/lock_model.dart';
 import '../models/resource_model.dart';
+import '../services/club_member_api_service.dart';
 import '../services/reservation_api_service.dart';
 import '../services/resource_api_service.dart';
 import '../widgets/bottom_bar.dart';
+import '../widgets/full_screen_image.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/snack_bar.dart';
@@ -85,16 +90,19 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
 
   Future<List<ResourceModel>> getReservations() async {
     try {
+      // 클럽 자원 불러오기
       List<List<ResourceModel>> resources =
           await ResourceApiService.getResources();
       ClubController.to.resources.value = resources[0] + resources[1];
       selectedValue ??= ClubController.to.resources.first;
 
+      // 이벤트 초기화
       for (var i in events) {
         eventController.remove(i);
       }
       events.clear();
 
+      // 지금 페이지 이벤트 불러오기
       int weekday = standardDay.weekday;
       startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
       endOfWeek = standardDay.add(Duration(days: 7 - weekday));
@@ -106,6 +114,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                   DateFormat('yyyy-MM-dd 00:00:00').format(startOfWeek),
               endDateTime: DateFormat('yyyy-MM-dd 00:00:00')
                   .format(endOfWeek.add(const Duration(days: 1))));
+
+      List<LockModel> locks = await LockApiService.getLocks(
+          resourceId: selectedValue!.id,
+          startDateTime: DateFormat('yyyy-MM-dd 00:00:00').format(startOfWeek),
+          endDateTime: DateFormat('yyyy-MM-dd 00:00:00')
+              .format(endOfWeek.add(const Duration(days: 1))));
 
       for (var i in reservations) {
         events.add(CalendarEventData(
@@ -128,6 +142,33 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 : i.title != ""
                     ? AppColor.subColor1
                     : AppColor.subColor3));
+      }
+
+      for (var i in locks) {
+        DateTime startDate = DateTime.parse(i.startDateTime);
+        DateTime endDate = DateTime.parse(i.endDateTime);
+
+        for (DateTime j = startDate;
+            j.isBefore(endDate);
+            j = j.add(const Duration(days: 1))) {
+          DateTime startTime = (j.year == startDate.year &&
+                  j.month == startDate.month &&
+                  j.day == startDate.day)
+              ? startDate
+              : DateTime(startDate.year, startDate.month, startDate.day);
+          DateTime endTime = (j.year == endDate.year &&
+                  j.month == endDate.month &&
+                  j.day == endDate.day)
+              ? endDate
+              : DateTime(endDate.year, endDate.month, endDate.day);
+          events.add(CalendarEventData(
+              date: j,
+              startTime: startTime,
+              endTime: endTime.subtract(const Duration(microseconds: 1)),
+              title: "",
+              description: "",
+              color: AppColor.subColor2));
+        }
       }
 
       eventController.addAll(events);
@@ -471,14 +512,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             height: 0.7,
                             color: AppColor.backgroundColor,
                             offset: 0),
-
-                        //liveTimeIndicatorSettings:
-                        //    const LiveTimeIndicatorSettings(
-                        //  color: AppColor.objectColor,
-                        //  height: 0,
-                        //  offset: 0,
-                        //),
-
+                        liveTimeIndicatorSettings:
+                            const LiveTimeIndicatorSettings(
+                          color: AppColor.objectColor,
+                          height: 0,
+                          offset: 0,
+                        ),
                         eventTileBuilder: (date, events, boundry, start, end) {
                           if (events.isNotEmpty) {
                             return RoundedEventTile(
@@ -489,13 +528,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   .sublist(1)
                                   .join(" "),
                               titleStyle: const TextStyle(
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 color: AppColor.backgroundColor,
                                 fontSize: 12,
                               ),
                               description: events[0].description,
                               descriptionStyle: const TextStyle(
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 color: AppColor.backgroundColor,
                                 fontSize: 12,
                               ),
@@ -507,6 +546,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             return Container();
                           }
                         },
+                        liveTimeIndicatorSettings:
+                            const LiveTimeIndicatorSettings(
+                          color: AppColor.objectColor,
+                          height: 0,
+                          offset: 0,
+                        ),
                         fullDayEventBuilder: (events, date) {
                           return FullDayEventView(
                             events: events,
@@ -529,14 +574,17 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             SizeController.to.screenHeight * 0.0012,
                         eventArranger: const SideEventArranger(),
                         onEventTap: (events, date) async {
-                          try {
-                            ReservationModel reservation =
-                                await ReservationApiService.getReservation(
-                                    reservationId: int.parse(
-                                        events[0].title.split(" ")[0]));
-                            addReservation(types: 3, reservation: reservation);
-                          } catch (e) {
-                            print(e.toString());
+                          if (events[0].title != "") {
+                            try {
+                              ReservationModel reservation =
+                                  await ReservationApiService.getReservation(
+                                      reservationId: int.parse(
+                                          events[0].title.split(" ")[0]));
+                              addReservation(
+                                  types: 3, reservation: reservation);
+                            } catch (e) {
+                              print(e.toString());
+                            }
                           }
                         },
                         onDateLongPress: (date) => {},
@@ -656,10 +704,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   /// types == 4 : 예약 수정
   /// types == 5 : 날짜 변경
   /// types == 6 : 반납하기
-  /// types == 7 : 예약 잠금(시작 시간)
-  /// types == 8 : 예약 잠금(종료 시간)
-  /// types == 9 : 예약 잠금 추가하기
-  /// types == 10 : 예약 잠금 수정하기
+  /// types == 7 : 잠금 정보
+  /// types == 8 : 잠금 수정
+  /// types == 9 : 멤버 선택
 
   Future<void> addReservation(
       {required int types,
@@ -668,40 +715,54 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     DateTime reservationTime = chooseDate ?? now;
     DateTime focusedDay = chooseDate ?? now;
     DateTime selectedDay = chooseDate ?? now;
-    int startTime = 0;
-    int endTime = 0;
-    bool isChecked = false;
+
+    List<Map<String, dynamic>> invitees = [];
+    List<Map<String, dynamic>> updateInvitees = [];
+    List<bool> isChecked = [];
+
+    int startTime = -1;
+    int endTime = -1;
+
+    bool isChecked1 = false;
     bool isChecked2 = false;
+
     Open open = Open.yes;
     title.text = "";
     usage.text = "";
     List<int> checkedTime = [];
     List<int> unableTime = [];
     List<bool> timeButton = List.generate(24, (index) => false);
-    int lastType = types;
     List<XFile> selectedImages = [];
     int maxImageCount = 5;
+    List<int> lastPages = [];
 
     DateTime lockStartDate = now;
     DateTime lockEndDate = now;
     int lockStartTime = -1;
     int lockEndTime = -1;
     int checkedLock = -1;
+    DateTime updateStartDate = now;
+    DateTime updateEndDate = now;
+    int updateStartTime = -1;
     LockModel? lock;
 
-    if (types == 3 || types == 4) {
+    bool checkedMore = false;
+    bool checkedReturn = false;
+
+    if (types == 3) {
       reservationTime = DateTime.parse(reservation!.startDateTime);
       focusedDay = reservationTime;
       selectedDay = reservationTime;
       startTime = int.parse(reservation.startDateTime.substring(11, 13));
       endTime = int.parse(reservation.endDateTime.substring(11, 13));
+      invitees.addAll(reservation.invitees);
       for (var i = startTime; i < endTime; i++) {
         checkedTime.add(i);
         timeButton[i] = true;
       }
       title.text = reservation.title;
       usage.text = reservation.usage;
-      isChecked = true;
+      isChecked1 = true;
       isChecked2 = true;
       if (!reservation.sharing) {
         open = Open.no;
@@ -757,6 +818,22 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       return [];
     }
 
+    Future<List<ClubMemberModel>> getMemberList(StateSetter setState) async {
+      try {
+        List<ClubMemberModel> members =
+            await ClubMemberApiService.getClubMemberList(
+                clubId: ClubController.to.club().id, confirmed: true);
+        List<ClubMemberModel> removeMeMembers = members
+            .where((member) => member.id != MemberController.to.clubMember().id)
+            .toList();
+
+        return removeMeMembers;
+      } catch (e) {
+        print(e.toString());
+      }
+      return [];
+    }
+
     Get.bottomSheet(
       isScrollControlled: true,
       StatefulBuilder(
@@ -774,44 +851,66 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                           'assets/images/extra/showmodal_scrollcontrolbar.svg',
                         ),
                       ),
-                      Text(
-                        reservation != null && reservation.status == "REQUEST"
-                            ? "승인 대기중"
-                            : (types == 0)
-                                ? "예약하기"
-                                : (types == 1 &&
-                                        (lastType == 7 || lastType == 8))
-                                    ? "잠금 날짜"
-                                    : (types == 1 &&
-                                            lastType != 7 &&
-                                            lastType != 8)
-                                        ? "예약 날짜"
-                                        : (types == 2 &&
-                                                (lastType == 7 ||
-                                                    lastType == 8))
-                                            ? "잠금 시간"
-                                            : (types == 2 &&
-                                                    lastType != 7 &&
-                                                    lastType != 8)
-                                                ? "예약 시간"
-                                                : (types == 3)
-                                                    ? "예약 정보"
-                                                    : (types == 4)
-                                                        ? "예약 수정"
-                                                        : (types == 5)
-                                                            ? "날짜 변경"
-                                                            : (types == 6)
-                                                                ? "반납하기"
-                                                                : (types == 7)
-                                                                    ? "예약 잠금"
-                                                                    : (types ==
-                                                                            9)
-                                                                        ? "예약 잠금 추가"
-                                                                        : "예약 잠금 정보",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      Stack(
+                        children: [
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              reservation != null &&
+                                      reservation.status == "REQUEST" &&
+                                      MemberController.to.clubMember().role ==
+                                          "ADMIN"
+                                  ? "예약 요청"
+                                  : reservation?.status == "REQUEST"
+                                      ? "승인 대기중"
+                                      : (types == 0)
+                                          ? "예약하기"
+                                          : (types == 1 && lastPages.last == 0)
+                                              ? "예약 날짜"
+                                              : (types == 1)
+                                                  ? "잠금 날짜"
+                                                  : (types == 2 &&
+                                                          lastPages.last == 0)
+                                                      ? "예약 시간"
+                                                      : (types == 2)
+                                                          ? "잠금 시간"
+                                                          : (types == 3)
+                                                              ? "예약 정보"
+                                                              : (types == 4)
+                                                                  ? "예약 수정"
+                                                                  : (types == 5)
+                                                                      ? "날짜 변경"
+                                                                      : (types ==
+                                                                              6)
+                                                                          ? "반납하기"
+                                                                          : (types == 7)
+                                                                              ? "예약 잠금"
+                                                                              : (types == 8 && lock == null)
+                                                                                  ? "예약 잠금 추가"
+                                                                                  : (types != 9)
+                                                                                      ? "예약 잠금 정보"
+                                                                                      : "함께 사용하는 사람",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          if (lastPages.isNotEmpty && lastPages.last != -1)
+                            Positioned(
+                              left: 14,
+                              top: 0,
+                              bottom: 0,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    types = lastPages.removeLast();
+                                  });
+                                },
+                                child: const Icon(SFSymbols.chevron_left),
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                   ),
@@ -885,9 +984,15 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     Text(
                                       reservation?.status == "REQUEST"
                                           ? "승인 대기중"
-                                          : reservation?.status == "CONFIRMED"
+                                          : reservation?.status ==
+                                                      "CONFIRMED" &&
+                                                  !reservation!.returned
                                               ? "승인 완료"
-                                              : "거절됨",
+                                              : reservation?.status ==
+                                                          "CONFIRMED" &&
+                                                      reservation!.returned
+                                                  ? "승인 및 반납 완료"
+                                                  : "거절됨",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 15),
@@ -898,7 +1003,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             ),
                             Padding(
                               padding: const EdgeInsets.only(
-                                  top: 35.0, bottom: 35.0),
+                                  top: 32.0, bottom: 32.0),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -909,18 +1014,23 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16),
                                   ),
-                                  InkWell(
+                                  GestureDetector(
                                       onTap: () {
-                                        if (types == 3 || types == 4) {
+                                        if (types == 3) {
                                           null;
+                                        } else if (types == 4) {
+                                          snackBar(
+                                              title: "예약 날짜는 수정 불가능합니다",
+                                              content:
+                                                  "날짜를 변경하고 싶으시다면 새로 예약해주세요");
                                         } else {
                                           setState(() {
-                                            lastType = 0;
+                                            selectedDay = reservationTime;
+                                            lastPages.add(0);
                                             types = 1;
                                           });
                                         }
                                       },
-                                      borderRadius: BorderRadius.circular(5),
                                       child: Text(
                                           DateFormat(
                                                   "yyyy. MM. dd. E요일", 'ko_KR')
@@ -941,11 +1051,17 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       fontWeight: FontWeight.w700,
                                       fontSize: 16),
                                 ),
-                                InkWell(
+                                GestureDetector(
                                     onTap: () async {
-                                      if (types == 3 || types == 4) {
+                                      if (types == 3) {
                                         null;
+                                      } else if (types == 4) {
+                                        snackBar(
+                                            title: "예약 시간은 수정 불가능합니다",
+                                            content:
+                                                "시간을 변경하고 싶으시다면 새로 예약해주세요");
                                       } else {
+                                        unableTime.clear();
                                         List<ReservationModel> reservations =
                                             await ReservationApiService.getReservations(
                                                 resourceId: selectedValue!.id,
@@ -971,13 +1087,63 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             }
                                           }
                                         }
+
+                                        List<LockModel> locks =
+                                            await LockApiService.getLocks(
+                                                resourceId: selectedValue!.id,
+                                                startDateTime: DateFormat(
+                                                        'yyyy-MM-dd 00:00:00')
+                                                    .format(reservationTime),
+                                                endDateTime: DateFormat(
+                                                        'yyyy-MM-dd 00:00:00')
+                                                    .format(reservationTime.add(
+                                                        const Duration(
+                                                            days: 1))));
+
+                                        for (var i in locks) {
+                                          DateTime startDate =
+                                              DateTime.parse(i.startDateTime);
+                                          DateTime endDate =
+                                              DateTime.parse(i.endDateTime);
+                                          bool isStart = startDate.year ==
+                                                  reservationTime.year &&
+                                              startDate.month ==
+                                                  reservationTime.month &&
+                                              startDate.day ==
+                                                  reservationTime.day;
+                                          bool isEnd = endDate.year ==
+                                                  reservationTime.year &&
+                                              endDate.month ==
+                                                  reservationTime.month &&
+                                              endDate.day ==
+                                                  reservationTime.day;
+                                          int start = 0;
+                                          int end = 24;
+                                          if (isStart && isEnd) {
+                                            start = int.parse(i.startDateTime
+                                                .substring(11, 13));
+                                            end = int.parse(i.endDateTime
+                                                .substring(11, 13));
+                                          } else if (isStart) {
+                                            start = int.parse(i.startDateTime
+                                                .substring(11, 13));
+                                            end = 24;
+                                          } else if (isEnd) {
+                                            start = 0;
+                                            end = int.parse(i.endDateTime
+                                                .substring(11, 13));
+                                          }
+                                          for (var j = start; j < end; j++) {
+                                            unableTime.add(j);
+                                          }
+                                        }
+
                                         setState(() {
-                                          lastType = 0;
+                                          lastPages.add(0);
                                           types = 2;
                                         });
                                       }
                                     },
-                                    borderRadius: BorderRadius.circular(5),
                                     child: Visibility(
                                       visible: checkedTime.isEmpty,
                                       replacement: Text(
@@ -994,158 +1160,564 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     )),
                               ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                            Visibility(
+                              visible: types == 3,
+                              replacement: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "예약 제목(선택)",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16),
+                                        ),
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 12.0),
+                                            child: Form(
+                                                key: formKey1,
+                                                child: UnderlineTextForm(
+                                                  hintText: types == 3
+                                                      ? ""
+                                                      : '예약 제목을 입력해주세요',
+                                                  controller: title,
+                                                  isFocused: isFocused1,
+                                                  noLine: true,
+                                                  isRight: true,
+                                                  noErrorSign: true,
+                                                  isWritten: (types == 3)
+                                                      ? true
+                                                      : false,
+                                                  fontSize: 15,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      isFocused1 =
+                                                          value.isNotEmpty;
+                                                    });
+                                                  },
+                                                )),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "사용 용도(선택)",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 12.0),
+                                          child: Form(
+                                              key: formKey2,
+                                              child: UnderlineTextForm(
+                                                hintText: types == 3
+                                                    ? ""
+                                                    : '사용 용도를 입력해주세요',
+                                                controller: usage,
+                                                isFocused: isFocused2,
+                                                noLine: true,
+                                                isRight: true,
+                                                noErrorSign: true,
+                                                isWritten:
+                                                    (types == 3) ? true : false,
+                                                fontSize: 15,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    isFocused2 =
+                                                        value.isNotEmpty;
+                                                  });
+                                                },
+                                              )),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 16.0, bottom: 32.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "함께 사용하는 사람(선택)",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              updateInvitees.clear();
+                                              isChecked.clear();
+                                              updateInvitees.addAll(invitees);
+                                              lastPages.add(types);
+                                              types = 9;
+                                            });
+                                          },
+                                          child: Text(
+                                            (types == 0 || types == 4) &&
+                                                    invitees.isEmpty
+                                                ? "선택하기"
+                                                : invitees.isNotEmpty &&
+                                                        invitees.length >= 2
+                                                    ? "${invitees[0]["clubMemberName"]} 외 ${invitees.length - 1}명"
+                                                    : invitees
+                                                        .map((invitee) => invitee[
+                                                                "clubMemberName"]
+                                                            as String)
+                                                        .join(", "),
+                                            style: TextStyle(
+                                                color: invitees.isNotEmpty
+                                                    ? AppColor.textColor
+                                                    : AppColor.textColor2,
+                                                fontWeight: invitees.isNotEmpty
+                                                    ? FontWeight.w500
+                                                    : FontWeight.w400,
+                                                fontSize: 15),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   const Text(
-                                    "예약 제목(선택)",
+                                    "신청하신 시간에\n다른 사람이 함께 사용할 수 있나요?",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16),
                                   ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 14.0),
-                                      child: Form(
-                                          key: formKey1,
-                                          child: UnderlineTextForm(
-                                            hintText: '예약 제목을 입력해주세요',
-                                            controller: title,
-                                            isFocused: isFocused1,
-                                            noLine: true,
-                                            isRight: true,
-                                            noErrorSign: true,
-                                            isWritten:
-                                                (types == 3) ? true : false,
-                                            fontSize: 15,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                isFocused1 = value.isNotEmpty;
-                                              });
-                                            },
-                                          )),
+                                  SizedBox(
+                                    height:
+                                        SizeController.to.screenHeight * 0.05,
+                                    child: RadioListTile(
+                                      title: const Text(
+                                        "누구나 함께 사용 가능합니다",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15),
+                                      ),
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      value: Open.yes,
+                                      groupValue: open,
+                                      onChanged: (Open? value) {
+                                        if (types == 3) {
+                                          null;
+                                        } else {
+                                          setState(() {
+                                            open = value!;
+                                          });
+                                        }
+                                      },
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: -10.0),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height:
+                                        SizeController.to.screenHeight * 0.05,
+                                    child: RadioListTile(
+                                      title: const Text(
+                                        "허가받은 사람 외에는 불가능합니다",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15),
+                                      ),
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      value: Open.no,
+                                      groupValue: open,
+                                      onChanged: (Open? value) {
+                                        if (types == 3) {
+                                          null;
+                                        } else {
+                                          setState(() {
+                                            open = value!;
+                                          });
+                                        }
+                                      },
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: -30.0),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "사용 용도(선택)",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 14.0),
-                                    child: Form(
-                                        key: formKey2,
-                                        child: UnderlineTextForm(
-                                          hintText: '사용 용도를 입력해주세요',
-                                          controller: usage,
-                                          isFocused: isFocused2,
-                                          noLine: true,
-                                          isRight: true,
-                                          noErrorSign: true,
-                                          isWritten:
-                                              (types == 3) ? true : false,
-                                          fontSize: 15,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              isFocused2 = value.isNotEmpty;
-                                            });
-                                          },
-                                        )),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 16.0, bottom: 35.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              child: Column(
                                 children: [
-                                  const Text(
-                                    "함께 사용하는 사람(선택)",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 32.0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          checkedMore = !checkedMore;
+                                        });
+                                      },
+                                      child: Row(
+                                        children: [
+                                          const Text(
+                                            "예약 정보 더보기",
+                                            style: TextStyle(
+                                                color: AppColor.textColor2,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16),
+                                          ),
+                                          Icon(
+                                            checkedMore
+                                                ? SFSymbols.chevron_up
+                                                : SFSymbols.chevron_down,
+                                            color: AppColor.textColor2,
+                                            size: 18,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                  Text(
-                                    types == 0 ? "선택하기" : "내용 없음",
-                                    style: const TextStyle(
-                                        color: AppColor.textColor2,
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 15),
-                                  ),
+                                  if (checkedMore && reservation!.title != "")
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 32),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            "예약 제목",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 16),
+                                          ),
+                                          Text(
+                                            reservation.title,
+                                            style: const TextStyle(
+                                                color: AppColor.textColor,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (checkedMore && reservation!.usage != "")
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 32),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            "사용 용도",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 16),
+                                          ),
+                                          Text(
+                                            reservation.usage,
+                                            style: const TextStyle(
+                                                color: AppColor.textColor,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (checkedMore &&
+                                      reservation!.invitees.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 32),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            "함께 사용하는 사람",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 16),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  String inviteesNames = invitees
+                                                      .map((invitee) => invitee[
+                                                              "clubMemberName"]
+                                                          as String)
+                                                      .join(", ");
+
+                                                  return AlertDialog(
+                                                    backgroundColor: AppColor
+                                                        .backgroundColor,
+                                                    content:
+                                                        SingleChildScrollView(
+                                                      child: Text(
+                                                        inviteesNames,
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Text(
+                                              invitees.length >= 2
+                                                  ? "${invitees[0]["clubMemberName"]} 외 ${invitees.length - 1}명"
+                                                  : invitees
+                                                      .map((invitee) => invitee[
+                                                              "clubMemberName"]
+                                                          as String)
+                                                      .join(", "),
+                                              style: const TextStyle(
+                                                  color: AppColor.textColor,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 15),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (checkedMore)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 32),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            "물품 공유 여부",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 16),
+                                          ),
+                                          Text(
+                                            reservation!.sharing ? "가능" : "불가능",
+                                            style: const TextStyle(
+                                                color: AppColor.textColor,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (reservation!.returned &&
+                                      (MemberController.to.clubMember().role ==
+                                              "ADMIN" ||
+                                          reservation.clubMemberId ==
+                                              MemberController.to
+                                                  .clubMember()
+                                                  .id))
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 32.0),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                checkedReturn = !checkedReturn;
+                                              });
+                                            },
+                                            child: Row(
+                                              children: [
+                                                const Text(
+                                                  "반납 정보 보기",
+                                                  style: TextStyle(
+                                                      color:
+                                                          AppColor.textColor2,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 16),
+                                                ),
+                                                Icon(
+                                                  checkedReturn
+                                                      ? SFSymbols.chevron_up
+                                                      : SFSymbols.chevron_down,
+                                                  color: AppColor.textColor2,
+                                                  size: 18,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        if (checkedReturn &&
+                                            reservation
+                                                .attachmentsUrl.isNotEmpty)
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: 32, bottom: 16),
+                                                child: Text(
+                                                  "반납 사진",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontSize: 16),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 120,
+                                                child: ListView(
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  children: reservation
+                                                      .attachmentsUrl
+                                                      .map((imageUrl) {
+                                                    String formattedUrl =
+                                                        imageUrl.startsWith(
+                                                                'https://')
+                                                            ? imageUrl
+                                                            : 'https://$imageUrl';
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8.0),
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          Get.to(() =>
+                                                              FullScreenImage(
+                                                                  imageUrl:
+                                                                      formattedUrl));
+                                                        },
+                                                        child: Stack(
+                                                          children: [
+                                                            AspectRatio(
+                                                              aspectRatio:
+                                                                  1 / 1,
+                                                              child: ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10),
+                                                                  child: CachedNetworkImage(
+                                                                      placeholder: (context, url) => Container(),
+                                                                      imageUrl: formattedUrl,
+                                                                      errorWidget: (context, url, error) => SvgPicture.asset(
+                                                                            'assets/images/base_image/base_post_image.svg',
+                                                                          ),
+                                                                      fit: BoxFit.cover)),
+                                                            ),
+                                                            Positioned.fill(
+                                                              child: Container(
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10),
+                                                                  gradient:
+                                                                      LinearGradient(
+                                                                    begin: Alignment
+                                                                        .bottomCenter,
+                                                                    end: const Alignment(
+                                                                        0.0,
+                                                                        0.6),
+                                                                    colors: [
+                                                                      AppColor
+                                                                          .objectColor,
+                                                                      AppColor
+                                                                          .objectColor
+                                                                          .withOpacity(
+                                                                              0.9),
+                                                                      AppColor
+                                                                          .objectColor
+                                                                          .withOpacity(
+                                                                              0.7),
+                                                                      AppColor
+                                                                          .objectColor
+                                                                          .withOpacity(
+                                                                              0.5),
+                                                                      AppColor
+                                                                          .objectColor
+                                                                          .withOpacity(
+                                                                              0.3),
+                                                                      AppColor
+                                                                          .objectColor
+                                                                          .withOpacity(
+                                                                              0.1),
+                                                                      Colors
+                                                                          .transparent,
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const Positioned(
+                                                              bottom: 3,
+                                                              right: 7,
+                                                              child: Text(
+                                                                "자세히 보기",
+                                                                style: TextStyle(
+                                                                    color: AppColor
+                                                                        .backgroundColor2,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    fontSize:
+                                                                        12),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }).toList(),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        if (checkedReturn &&
+                                            reservation.returnMessage != null &&
+                                            reservation.returnMessage != "")
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: 32, bottom: 16),
+                                                child: Text(
+                                                  "반납 메시지",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontSize: 16),
+                                                ),
+                                              ),
+                                              Text(
+                                                reservation.returnMessage ?? "",
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                      ],
+                                    ),
                                 ],
-                              ),
-                            ),
-                            const Text(
-                              "신청하신 시간에\n다른 사람이 함께 사용할 수 있나요?",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 16),
-                            ),
-                            SizedBox(
-                              height: SizeController.to.screenHeight * 0.05,
-                              child: RadioListTile(
-                                title: const Text(
-                                  "누구나 함께 사용 가능합니다",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 15),
-                                ),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                value: Open.yes,
-                                groupValue: open,
-                                onChanged: (Open? value) {
-                                  if (types == 3) {
-                                    null;
-                                  } else {
-                                    setState(() {
-                                      open = value!;
-                                    });
-                                  }
-                                },
-                                contentPadding:
-                                    const EdgeInsets.symmetric(vertical: -10.0),
-                              ),
-                            ),
-                            SizedBox(
-                              height: SizeController.to.screenHeight * 0.05,
-                              child: RadioListTile(
-                                title: const Text(
-                                  "허가받은 사람 외에는 불가능합니다",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 15),
-                                ),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                value: Open.no,
-                                groupValue: open,
-                                onChanged: (Open? value) {
-                                  if (types == 3) {
-                                    null;
-                                  } else {
-                                    setState(() {
-                                      open = value!;
-                                    });
-                                  }
-                                },
-                                contentPadding:
-                                    const EdgeInsets.symmetric(vertical: -30.0),
                               ),
                             ),
                           ],
@@ -1157,13 +1729,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  types == 1 && lastType == 0
+                                  types == 1 && lastPages.last == 0
                                       ? "예약할 날짜를 선택해주세요"
                                       : types == 5
                                           ? "변경할 날짜를 선택해주세요"
-                                          : lastType == 7
-                                              ? "잠금 시작 날짜를 선택해주세요"
-                                              : "잠금 종료 날짜를 선택해주세요",
+                                          : types == 1 && lastPages.last == 2
+                                              ? "잠금 종료 날짜를 선택해주세요"
+                                              : "잠금 시작 날짜를 선택해주세요",
                                   style: const TextStyle(
                                       color: AppColor.textColor,
                                       fontWeight: FontWeight.w500,
@@ -1235,7 +1807,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   setState(() {
                                     selectedDay = newSelectedDay;
                                     focusedDay = newFocusedDay;
-                                    reservationTime = selectedDay;
+                                    if (lastPages.last != 0) {
+                                      reservationTime = selectedDay;
+                                    }
                                     if (selectedDay.month != focusedDay.month) {
                                       focusedDay = DateTime(selectedDay.year,
                                           selectedDay.month, 1);
@@ -1247,7 +1821,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 padding: const EdgeInsets.only(top: 16.0),
                                 child: Center(
                                   child: Text(
-                                    "선택한 날짜: ${DateFormat("yyyy년 MM월 dd일 E요일", 'ko_KR').format(reservationTime)}",
+                                    "선택한 날짜: ${DateFormat("yyyy년 MM월 dd일 E요일", 'ko_KR').format(selectedDay)}",
                                     style: const TextStyle(
                                         color: AppColor.textColor,
                                         fontWeight: FontWeight.w500,
@@ -1263,9 +1837,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    types == 2 && lastType != 7 && lastType != 8
+                                    types == 2 && lastPages.last == 0
                                         ? "예약할 시간을 선택해주세요"
-                                        : lastType == 7
+                                        : types == 2 &&
+                                                lastPages[
+                                                        lastPages.length - 2] !=
+                                                    2
                                             ? "잠금 시작 시간을 선택해주세요"
                                             : "잠금 종료 시간을 선택해주세요",
                                     style: const TextStyle(
@@ -1273,10 +1850,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                         fontWeight: FontWeight.w500,
                                         fontSize: 16),
                                   ),
-                                  if (types == 2)
+                                  if (types == 2 && lastPages.last == 0)
                                     const Padding(
-                                      padding:
-                                          EdgeInsets.only(top: 3, bottom: 24),
+                                      padding: EdgeInsets.only(top: 3),
                                       child: Text(
                                         "블록 하나당 1시간입니다",
                                         style: TextStyle(
@@ -1285,93 +1861,114 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             fontSize: 14),
                                       ),
                                     ),
-                                  GridView.count(
-                                    crossAxisCount: 4,
-                                    childAspectRatio: 1.8,
-                                    shrinkWrap: true,
-                                    children: List.generate(24, (index) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          if (lastType == 7 || lastType == 8) {
-                                            setState(() {
-                                              if (checkedTime.isNotEmpty) {
-                                                timeButton[checkedTime.first] =
-                                                    false;
-                                                checkedTime.clear();
-                                              }
-                                              timeButton[index] = true;
-                                              checkedTime.add(index);
-                                              isChecked2 = true;
-                                            });
-                                          } else if (unableTime
-                                              .contains(index)) {
-                                            null;
-                                          } else {
-                                            setState(() {
-                                              if (checkedTime.contains(index)) {
-                                                timeButton[index] = false;
-                                                checkedTime.remove(index);
-                                                if (checkedTime.isEmpty) {
-                                                  isChecked2 = false;
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 24),
+                                    child: GridView.count(
+                                      crossAxisCount: 4,
+                                      childAspectRatio: 1.8,
+                                      shrinkWrap: true,
+                                      children: List.generate(24, (index) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            if (unableTime.contains(index)) {
+                                              null;
+                                            } else if (lastPages.last == 0) {
+                                              setState(() {
+                                                if (checkedTime
+                                                    .contains(index)) {
+                                                  timeButton[index] = false;
+                                                  checkedTime.remove(index);
+                                                  if (checkedTime.isEmpty) {
+                                                    isChecked2 = false;
+                                                  }
+                                                } else if (checkedTime
+                                                    .isEmpty) {
+                                                  timeButton[index] = true;
+                                                  checkedTime.add(index);
+                                                  isChecked2 = true;
+                                                } else {
+                                                  if (!checkTime(index)) {
+                                                    snackBar(
+                                                        title: "연속된 시간을 선택해주세요",
+                                                        content:
+                                                            "연속된 시간만 신청 가능합니다");
+                                                  } else {
+                                                    timeButton[index] = true;
+                                                  }
                                                 }
-                                              } else if (checkedTime.isEmpty) {
+                                              });
+                                            } else {
+                                              setState(() {
+                                                if (checkedTime.isNotEmpty) {
+                                                  timeButton[checkedTime
+                                                      .first] = false;
+                                                  checkedTime.clear();
+                                                }
                                                 timeButton[index] = true;
                                                 checkedTime.add(index);
                                                 isChecked2 = true;
-                                              } else {
-                                                if (!checkTime(index)) {
-                                                  snackBar(
-                                                      title: "연속된 시간을 선택해주세요",
-                                                      content:
-                                                          "연속된 시간만 신청 가능합니다");
-                                                } else {
-                                                  timeButton[index] = true;
-                                                }
-                                              }
-                                            });
-                                          }
-                                        },
-                                        child: Container(
-                                          margin: const EdgeInsets.all(2.0),
-                                          decoration: BoxDecoration(
-                                            color: unableTime.contains(index)
-                                                ? AppColor.markColor
-                                                : timeButton[index]
-                                                    ? AppColor.objectColor
-                                                    : AppColor.backgroundColor2,
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              lastType == 8
-                                                  ? '${index + 1}:00'
-                                                  : '$index:00',
-                                              style: TextStyle(
-                                                color: timeButton[index]
-                                                    ? AppColor.backgroundColor
-                                                    : AppColor.textColor,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 12,
+                                              });
+                                            }
+                                          },
+                                          child: Container(
+                                            margin: const EdgeInsets.all(2.0),
+                                            decoration: BoxDecoration(
+                                              color: unableTime.contains(index)
+                                                  ? AppColor.markColor
+                                                      .withOpacity(0.7)
+                                                  : timeButton[index]
+                                                      ? AppColor.objectColor
+                                                      : AppColor
+                                                          .backgroundColor2,
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                types == 2 &&
+                                                        lastPages.last == 0
+                                                    ? '$index:00'
+                                                    : types == 2 &&
+                                                            lastPages[lastPages
+                                                                        .length -
+                                                                    2] !=
+                                                                2
+                                                        ? '$index:00'
+                                                        : '${index + 1}:00',
+                                                style: TextStyle(
+                                                  color: timeButton[index]
+                                                      ? AppColor.backgroundColor
+                                                      : AppColor.textColor,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 12,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    }),
+                                        );
+                                      }),
+                                    ),
                                   ),
                                   if (checkedTime.isNotEmpty)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 16.0),
                                       child: Center(
                                         child: Text(
-                                          lastType == 7
-                                              ? "선택한 시간: ${checkedTime[0]}시"
-                                              : lastType == 8
-                                                  ? "선택한 시간: ${checkedTime[0] + 1}시"
-                                                  : checkedTime.length == 1
-                                                      ? "선택한 시간: ${checkedTime[0]}시~${checkedTime[0] + 1}시 (총 1시간)"
-                                                      : "선택한 시간: ${checkedTime[0]}시~${checkedTime[checkedTime.length - 1] + 1}시 (총 ${checkedTime[checkedTime.length - 1] + 1 - checkedTime[0]}시간)",
+                                          types == 2 &&
+                                                  lastPages.last == 0 &&
+                                                  checkedTime.length == 1
+                                              ? "선택한 시간: ${checkedTime[0]}시~${checkedTime[0] + 1}시 (총 1시간)"
+                                              : types == 2 &&
+                                                      lastPages.last == 0 &&
+                                                      checkedTime.length != 1
+                                                  ? "선택한 시간: ${checkedTime[0]}시~${checkedTime[checkedTime.length - 1] + 1}시 (총 ${checkedTime[checkedTime.length - 1] + 1 - checkedTime[0]}시간)"
+                                                  : types == 2 &&
+                                                          lastPages[lastPages
+                                                                      .length -
+                                                                  2] !=
+                                                              2
+                                                      ? "선택한 시간: ${checkedTime[0]}시"
+                                                      : "선택한 시간: ${checkedTime[0] + 1}시",
                                           style: const TextStyle(
                                               color: AppColor.textColor,
                                               fontWeight: FontWeight.w500,
@@ -1549,42 +2146,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       } else if (snapshot.hasError) {
                                         return const ErrorPage();
                                       } else if (snapshot.data!.isEmpty) {
-                                        return Center(
-                                          child: TextButton(
-                                            onPressed: () {},
-                                            style: ButtonStyle(
-                                              overlayColor:
-                                                  MaterialStateProperty
-                                                      .resolveWith<Color>(
-                                                (Set<MaterialState> states) {
-                                                  if (states.contains(
-                                                      MaterialState.pressed)) {
-                                                    return Colors.transparent;
-                                                  }
-                                                  return Colors.transparent;
-                                                },
-                                              ),
-                                            ),
-                                            child: const Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  SFSymbols.plus,
-                                                  color: AppColor.objectColor,
-                                                  size: 20,
-                                                ),
-                                                Text(
-                                                  " 잠금 시간 추가하기",
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      color:
-                                                          AppColor.objectColor),
-                                                ),
-                                              ],
-                                            ),
+                                        return const Center(
+                                          child: Text(
+                                            "잠금된 시간이 없습니다",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColor.textColor),
                                           ),
                                         );
                                       } else {
@@ -1739,25 +2307,25 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                                       color: AppColor
                                                                           .backgroundColor),
                                                                 ),
-                                                                buttonColor: AppColor
-                                                                    .markColor
-                                                                    .withOpacity(
-                                                                        0.8),
-                                                                onPressed: () {
+                                                                buttonColor:
+                                                                    AppColor
+                                                                        .subColor3,
+                                                                onPressed:
+                                                                    () async {
                                                                   setState(() {
                                                                     lock = snapshot
                                                                             .data![
                                                                         index];
                                                                   });
-                                                                  checkDeleteReservation(
+                                                                  await checkDeleteReservation(
                                                                       types: 2,
                                                                       id: lock!
                                                                           .id);
-                                                                  getLockList(
-                                                                      setState);
                                                                   setState(() {
                                                                     lock = null;
                                                                   });
+                                                                  getLockList(
+                                                                      setState);
                                                                 },
                                                               ),
                                                             ),
@@ -1792,7 +2360,25 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                                             .text =
                                                                         lock!
                                                                             .message;
-                                                                    types = 10;
+                                                                    lockStartDate =
+                                                                        DateTime.parse(
+                                                                            lock!.startDateTime);
+                                                                    lockEndDate =
+                                                                        DateTime.parse(
+                                                                            lock!.endDateTime);
+                                                                    lockStartTime = int.parse(lock!
+                                                                        .startDateTime
+                                                                        .substring(
+                                                                            11,
+                                                                            13));
+                                                                    lockEndTime = int.parse(lock!
+                                                                        .endDateTime
+                                                                        .substring(
+                                                                            11,
+                                                                            13));
+                                                                    lastPages
+                                                                        .add(7);
+                                                                    types = 8;
                                                                   });
                                                                 },
                                                               ),
@@ -1819,113 +2405,291 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                         );
                                       }
                                     }),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          "잠금 시간",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColor.textColor),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              lastType = 7;
-                                              types = 1;
-                                            });
-                                          },
-                                          style: ButtonStyle(
-                                            overlayColor: MaterialStateProperty
-                                                .resolveWith<Color>(
-                                              (Set<MaterialState> states) {
-                                                if (states.contains(
-                                                    MaterialState.pressed)) {
-                                                  return Colors.transparent;
+                                child: Visibility(
+                                  visible: types != 8,
+                                  replacement: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            "잠금 시간",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColor.textColor),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                updateStartDate = lockStartDate;
+                                                updateEndDate = lockEndDate;
+                                                selectedDay = updateStartDate;
+                                                if (lastPages.isEmpty) {
+                                                  lastPages.add(-1);
                                                 }
-                                                return Colors.transparent;
-                                              },
+                                                lastPages.add(8);
+                                                types = 1;
+                                              });
+                                            },
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  DateFormat(
+                                                          "yy년 MM월 dd일 $lockStartTime:00 부터",
+                                                          'ko_KR')
+                                                      .format(lockStartDate),
+                                                  style: const TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color:
+                                                          AppColor.textColor),
+                                                ),
+                                                Text(
+                                                  DateFormat(
+                                                          "yy년 MM월 dd일 $lockEndTime:00 까지",
+                                                          'ko_KR')
+                                                      .format(lockEndDate),
+                                                  style: const TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color:
+                                                          AppColor.textColor),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                types == 10 &&
-                                                        lock != null &&
-                                                        lastType != 8
-                                                    ? DateFormat(
-                                                            "yy년 MM월 dd일 H:00 부터",
-                                                            'ko_KR')
-                                                        .format(DateTime.parse(
-                                                            lock!
-                                                                .startDateTime))
-                                                    : DateFormat(
-                                                            "yy년 MM월 dd일 $lockStartTime:00 부터",
-                                                            'ko_KR')
-                                                        .format(lockStartDate),
-                                                style: const TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: AppColor.textColor),
-                                              ),
-                                              Text(
-                                                types == 10 &&
-                                                        lock != null &&
-                                                        lastType != 8
-                                                    ? DateFormat(
-                                                            "yy년 MM월 dd일 H:00 까지",
-                                                            'ko_KR')
-                                                        .format(DateTime.parse(
-                                                            lock!.endDateTime))
-                                                    : DateFormat(
-                                                            "yy년 MM월 dd일 $lockEndTime:00 까지",
-                                                            'ko_KR')
-                                                        .format(lockEndDate),
-                                                style: const TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: AppColor.textColor),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const Padding(
-                                      padding:
-                                          EdgeInsets.only(top: 32, bottom: 16),
-                                      child: Text(
-                                        "잠금 사유 (선택)",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 16),
+                                        ],
                                       ),
-                                    ),
-                                    Form(
-                                        key: formKey4,
-                                        child: OutlineTextForm(
-                                          hintText: '회원들에게 간략하게 설명해주세요',
-                                          controller: lockMessage,
-                                          isFocused: isFocused4,
-                                          fontSize: 16,
-                                          maxLines: 7,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              isFocused4 = value.isNotEmpty;
-                                            });
-                                          },
-                                        )),
-                                  ],
+                                      const Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 32, bottom: 16),
+                                        child: Text(
+                                          "잠금 사유 (선택)",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16),
+                                        ),
+                                      ),
+                                      Form(
+                                          key: formKey4,
+                                          child: OutlineTextForm(
+                                            hintText: '회원들에게 간략하게 설명해주세요',
+                                            controller: lockMessage,
+                                            isFocused: isFocused4,
+                                            fontSize: 16,
+                                            maxLines: 7,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                isFocused4 = value.isNotEmpty;
+                                              });
+                                            },
+                                          )),
+                                    ],
+                                  ),
+                                  child: FutureBuilder(
+                                      future: getMemberList(setState),
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<List<ClubMemberModel>>
+                                              snapshot) {
+                                        if (snapshot.hasData == false) {
+                                          return const SizedBox();
+                                        } else if (snapshot.hasError) {
+                                          return const ErrorPage();
+                                        } else if (snapshot.data!.isEmpty) {
+                                          return const Center(
+                                            child: Text(
+                                              "선택할 멤버가 없습니다",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: AppColor.textColor),
+                                            ),
+                                          );
+                                        } else {
+                                          return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8.0),
+                                              child: Column(
+                                                children: List.generate(
+                                                    snapshot.data!.length,
+                                                    (index) {
+                                                  if (updateInvitees.any((element) =>
+                                                      element["clubMemberId"] ==
+                                                          snapshot.data![index]
+                                                              .id &&
+                                                      element["clubMemberName"] ==
+                                                          snapshot.data![index]
+                                                              .name)) {
+                                                    isChecked.add(true);
+                                                  } else {
+                                                    isChecked.add(false);
+                                                  }
+                                                  return Container(
+                                                    width: SizeController
+                                                        .to.screenWidth,
+                                                    color: AppColor
+                                                        .backgroundColor,
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              bottom: 12),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Row(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      Row(
+                                                                        children: [
+                                                                          Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.only(right: 12.0),
+                                                                            child:
+                                                                                ClipOval(
+                                                                              child: snapshot.data![index].url != null
+                                                                                  ? CachedNetworkImage(
+                                                                                      placeholder: (context, url) => Container(),
+                                                                                      imageUrl: "http://${snapshot.data![index].url!}",
+                                                                                      errorWidget: (context, url, error) => SvgPicture.asset(
+                                                                                            'assets/images/base_image/base_member_image.svg',
+                                                                                          ),
+                                                                                      height: SizeController.to.screenWidth * 0.1,
+                                                                                      width: SizeController.to.screenWidth * 0.1,
+                                                                                      fit: BoxFit.fill)
+                                                                                  : SvgPicture.asset(
+                                                                                      'assets/images/base_image/base_member_image.svg',
+                                                                                      height: SizeController.to.screenWidth * 0.1,
+                                                                                      width: SizeController.to.screenWidth * 0.1,
+                                                                                      fit: BoxFit.fill,
+                                                                                    ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            right:
+                                                                                12.0),
+                                                                        child:
+                                                                            Text(
+                                                                          snapshot
+                                                                              .data![index]
+                                                                              .name,
+                                                                          style:
+                                                                              const TextStyle(
+                                                                            color:
+                                                                                AppColor.textColor,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                            fontSize:
+                                                                                16,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      if (!(snapshot.data![index].role ==
+                                                                              "USER" &&
+                                                                          snapshot
+                                                                              .data![index]
+                                                                              .isConfirmed))
+                                                                        Container(
+                                                                          padding: const EdgeInsets
+                                                                              .fromLTRB(
+                                                                              6,
+                                                                              2,
+                                                                              6,
+                                                                              2),
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            shape:
+                                                                                BoxShape.rectangle,
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(15),
+                                                                            color:
+                                                                                AppColor.subColor1, // 배경색 설정
+                                                                          ),
+                                                                          child:
+                                                                              Text(
+                                                                            (snapshot.data![index].role == "MANAGER")
+                                                                                ? snapshot.data![index].clubAuthorityName ?? ""
+                                                                                : "관리자",
+                                                                            style:
+                                                                                const TextStyle(
+                                                                              color: AppColor.backgroundColor,
+                                                                              fontWeight: FontWeight.w400,
+                                                                              fontSize: 11,
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Checkbox(
+                                                                value:
+                                                                    isChecked[
+                                                                        index],
+                                                                onChanged:
+                                                                    (value) {
+                                                                  setState(() {
+                                                                    isChecked[
+                                                                            index] =
+                                                                        value!;
+                                                                    if (value ==
+                                                                        true) {
+                                                                      updateInvitees
+                                                                          .add({
+                                                                        "clubMemberId": snapshot
+                                                                            .data![index]
+                                                                            .id,
+                                                                        "clubMemberName": snapshot
+                                                                            .data![index]
+                                                                            .name
+                                                                      });
+                                                                    } else {
+                                                                      updateInvitees.removeWhere((element) =>
+                                                                          element["clubMemberId"] == snapshot.data![index].id &&
+                                                                          element["clubMemberName"] ==
+                                                                              snapshot.data![index].name);
+                                                                    }
+                                                                  });
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                }),
+                                              ));
+                                        }
+                                      }),
                                 ),
                               ),
                             ),
@@ -1947,8 +2711,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             fontWeight: FontWeight.w700,
                             color: AppColor.backgroundColor),
                       ),
-                      buttonColor:
-                          isChecked ? AppColor.objectColor : AppColor.subColor3,
+                      buttonColor: isChecked1
+                          ? AppColor.objectColor
+                          : AppColor.subColor3,
                       onPressed: () async {
                         if (checkedTime.isNotEmpty) {
                           try {
@@ -1967,6 +2732,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 : DateFormat(
                                         "yyyy-MM-dd $endTime:00:00", 'ko_KR')
                                     .format(reservationTime);
+                            List<int> clubMemberIds = invitees
+                                .map(
+                                    (invitee) => invitee["clubMemberId"] as int)
+                                .toList();
                             if (types == 0) {
                               await ReservationApiService.postReservation(
                                   resourceId: selectedValue!.id,
@@ -1975,7 +2744,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   sharing: (open == Open.yes) ? true : false,
                                   startDateTime: startDateTime,
                                   endDateTime: endDateTime,
-                                  reservationInvitees: []);
+                                  reservationInvitees: clubMemberIds);
                             } else {
                               await ReservationApiService.putReservation(
                                   reservationId: reservation!.reservationId,
@@ -1985,7 +2754,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   sharing: (open == Open.yes) ? true : false,
                                   startDateTime: startDateTime,
                                   endDateTime: endDateTime,
-                                  reservationInvitees: []);
+                                  reservationInvitees: clubMemberIds);
                             }
                             getReservations();
                             Get.back();
@@ -2014,54 +2783,76 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     color: AppColor.backgroundColor),
                               ),
                               buttonColor: AppColor.markColor,
-                              onPressed: () {
-                                checkDeleteReservation(
+                              onPressed: () async {
+                                await checkDeleteReservation(
                                     id: reservation!.reservationId, types: 0);
                               },
                             ),
                             child: Padding(
                               padding: const EdgeInsets.only(
                                   left: 24.0, right: 24.0),
-                              child: Column(
+                              child: Row(
                                 children: [
-                                  NextPageButton(
-                                    text: const Text(
-                                      "예약 승인하기",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColor.backgroundColor),
+                                  Expanded(
+                                    child: NextPageButton(
+                                      text: const Text(
+                                        "거절하기",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColor.backgroundColor),
+                                      ),
+                                      buttonColor: AppColor.subColor3,
+                                      onPressed: () async {
+                                        try {
+                                          await ReservationApiService
+                                              .patchReservation(
+                                                  reservationIds: [
+                                                reservation?.reservationId
+                                              ],
+                                                  isConfirmed: false);
+                                          getReservations();
+                                          Get.back();
+                                        } catch (e) {
+                                          print(e.toString());
+                                          snackBar(
+                                              title: "예약 거절 실패",
+                                              content: e.toString());
+                                        }
+                                      },
                                     ),
-                                    buttonColor: AppColor.markColor,
-                                    onPressed: () async {
-                                      await ReservationApiService
-                                          .patchReservation(reservationIds: [
-                                        reservation?.reservationId
-                                      ], isConfirmed: true);
-                                      getReservations();
-                                      Get.back();
-                                    },
                                   ),
                                   const SizedBox(
-                                    height: 5,
+                                    width: 10,
                                   ),
-                                  NextPageButton(
-                                    text: const Text(
-                                      "예약 거절하기",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColor.backgroundColor),
+                                  Expanded(
+                                    child: NextPageButton(
+                                      text: const Text(
+                                        "승인하기",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColor.backgroundColor),
+                                      ),
+                                      buttonColor: AppColor.objectColor,
+                                      onPressed: () async {
+                                        try {
+                                          await ReservationApiService
+                                              .patchReservation(
+                                                  reservationIds: [
+                                                reservation?.reservationId
+                                              ],
+                                                  isConfirmed: true);
+                                          getReservations();
+                                          Get.back();
+                                        } catch (e) {
+                                          print(e.toString());
+                                          snackBar(
+                                              title: "예약 승인 실패",
+                                              content: e.toString());
+                                        }
+                                      },
                                     ),
-                                    buttonColor: AppColor.objectColor,
-                                    onPressed: () async {
-                                      await ReservationApiService
-                                          .patchReservation(reservationIds: [
-                                        reservation?.reservationId
-                                      ], isConfirmed: false);
-                                      getReservations();
-                                      Get.back();
-                                    },
                                   ),
                                 ],
                               ),
@@ -2071,21 +2862,25 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         child: Visibility(
                           visible: reservation != null &&
                               DateTime.parse(reservation.endDateTime)
-                                  .isAfter(DateTime.now()),
-                          replacement: NextPageButton(
-                            text: const Text(
-                              "반납하기",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColor.backgroundColor),
+                                  .isAfter(now),
+                          replacement: Visibility(
+                            visible: !reservation!.returned,
+                            child: NextPageButton(
+                              text: const Text(
+                                "반납하기",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColor.backgroundColor),
+                              ),
+                              buttonColor: AppColor.objectColor,
+                              onPressed: () {
+                                setState(() {
+                                  lastPages.add(3);
+                                  types = 6;
+                                });
+                              },
                             ),
-                            buttonColor: AppColor.objectColor,
-                            onPressed: () {
-                              setState(() {
-                                types = 6;
-                              });
-                            },
                           ),
                           child: Padding(
                             padding:
@@ -2101,10 +2896,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           fontWeight: FontWeight.w700,
                                           color: AppColor.backgroundColor),
                                     ),
-                                    buttonColor: AppColor.markColor,
-                                    onPressed: () {
-                                      checkDeleteReservation(
-                                          id: reservation!.reservationId,
+                                    buttonColor: AppColor.subColor3,
+                                    onPressed: () async {
+                                      await checkDeleteReservation(
+                                          id: reservation.reservationId,
                                           types: 1);
                                     },
                                   ),
@@ -2159,7 +2954,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                           },
                         ),
                         child: Visibility(
-                          visible: !(types == 7 || types == 9),
+                          visible:
+                              !(types == 7 || (types == 8 && lock == null)),
                           replacement: NextPageButton(
                             text: const Text(
                               "잠금 시간 추가하기",
@@ -2172,7 +2968,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             onPressed: () async {
                               if (types == 7) {
                                 setState(() {
-                                  lastType = 7;
+                                  selectedDay = now;
+                                  updateStartDate = now;
+                                  updateEndDate = now;
+                                  updateStartTime = -1;
+                                  lastPages.add(7);
                                   types = 1;
                                 });
                               } else {
@@ -2204,18 +3004,26 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           endDateTime: endDateTime,
                                           message: lockMessage.text);
                                   getLockList(setState);
+                                  getReservations();
                                   setState(() {
-                                    types = 7;
+                                    lockStartDate = now;
+                                    lockEndDate = now;
+                                    lockStartTime = -1;
+                                    lockEndTime = -1;
                                     lockMessage.clear();
+                                    types = 7;
                                   });
                                 } catch (e) {
                                   print(e.toString());
+                                  snackBar(
+                                      title: "잠금 시간 추가가 불가능합니다",
+                                      content: "시간을 조정해주세요");
                                 }
                               }
                             },
                           ),
                           child: Visibility(
-                            visible: types != 10,
+                            visible: !(types == 8 && lock != null),
                             replacement: NextPageButton(
                               text: const Text(
                                 "잠금 수정하기",
@@ -2229,9 +3037,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 try {
                                   String startDateTime = '';
                                   String endDateTime = '';
-                                  if (types == 10 &&
+                                  if (types == 8 &&
                                       lock != null &&
-                                      lastType != 8) {
+                                      lastPages.last != -1) {
                                     startDateTime = lock!.startDateTime;
                                     endDateTime = lock!.endDateTime;
                                   } else {
@@ -2256,8 +3064,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 'ko_KR')
                                             .format(lockEndDate);
                                   }
-                                  print(startDateTime);
-                                  print(endDateTime);
                                   LockModel temp = await LockApiService.putLock(
                                       resourceId: selectedValue!.id,
                                       startDateTime: startDateTime,
@@ -2265,11 +3071,17 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       message: lockMessage.text,
                                       lockId: lock!.id);
                                   getLockList(setState);
+                                  getReservations();
                                   setState(() {
-                                    types = 7;
-                                    lastType = -1;
                                     lock = null;
+                                    lockStartDate = now;
+                                    lockEndDate = now;
+                                    selectedDay = now;
+                                    lockStartTime = -1;
+                                    lockEndTime = -1;
+                                    lastPages.clear();
                                     lockMessage.clear();
+                                    types = 7;
                                   });
                                 } catch (e) {
                                   print(e.toString());
@@ -2284,57 +3096,79 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     fontWeight: FontWeight.w700,
                                     color: AppColor.backgroundColor),
                               ),
-                              buttonColor: types == 1
+                              buttonColor: types == 1 || types == 9
                                   ? AppColor.objectColor
                                   : isChecked2
                                       ? AppColor.objectColor
                                       : AppColor.subColor3,
                               onPressed: () {
                                 if (types == 1) {
-                                  if (lastType == 7 || lastType == 8) {
+                                  if (lastPages.last == 0) {
                                     setState(() {
-                                      if (lastType == 7) {
-                                        lockStartDate = focusedDay;
-                                      } else {
-                                        lockEndDate = focusedDay;
-                                      }
-                                      types = 2;
+                                      reservationTime = selectedDay;
+                                      types = lastPages.removeLast();
                                     });
-                                  } else {
+                                  } else if (lastPages.last == 7 ||
+                                      lastPages.last == 8 ||
+                                      lastPages.last == 2) {
                                     setState(() {
-                                      types = lastType;
+                                      if (lastPages.last == 7 ||
+                                          lastPages.last == 8) {
+                                        updateStartDate = selectedDay;
+                                      } else {
+                                        updateEndDate = selectedDay;
+                                      }
+                                      lastPages.add(1);
+                                      types = 2;
                                     });
                                   }
                                 } else if (types == 2 &&
                                     checkedTime.isNotEmpty) {
-                                  if (lastType == 7) {
+                                  if (lastPages.last == 0) {
                                     setState(() {
-                                      lockStartTime = checkedTime[0];
-                                      lastType = 8;
-                                      types = 1;
-                                    });
-                                  } else if (lastType == 8) {
-                                    setState(() {
-                                      lockEndTime = checkedTime[0] + 1;
-                                      if (lock != null) {
-                                        types = 10;
-                                      } else {
-                                        types = 9;
+                                      isChecked1 = true;
+                                      startTime = checkedTime[0];
+                                      endTime = checkedTime[0] + 1;
+                                      if (checkedTime.length > 1) {
+                                        endTime = checkedTime[
+                                                checkedTime.length - 1] +
+                                            1;
                                       }
+                                      types = lastPages.removeLast();
+                                    });
+                                  } else if (lastPages[lastPages.length - 2] !=
+                                      2) {
+                                    setState(() {
+                                      updateStartTime = checkedTime[0];
+                                      selectedDay =
+                                          lockEndDate != updateStartDate
+                                              ? updateStartDate
+                                              : lockEndDate;
+                                      focusedDay =
+                                          lockEndDate != updateStartDate
+                                              ? updateStartDate
+                                              : lockEndDate;
+                                      lastPages.add(2);
+                                      types = 1;
                                     });
                                   } else {
                                     setState(() {
-                                      setState(() {
-                                        isChecked = true;
-                                        types = lastType;
-                                        startTime = checkedTime[0];
-                                        endTime = checkedTime[0] + 1;
-                                        if (checkedTime.length > 1) {
-                                          endTime = checkedTime[
-                                                  checkedTime.length - 1] +
-                                              1;
-                                        }
-                                      });
+                                      lockStartDate = updateStartDate;
+                                      lockEndDate = updateEndDate;
+                                      lockStartTime = updateStartTime;
+                                      lockEndTime = checkedTime[0] + 1;
+                                      updateStartDate = now;
+                                      updateEndDate = now;
+                                      updateStartTime = -1;
+                                      if (lastPages[1] == 8 &&
+                                          lastPages.first != -1) {
+                                        lastPages.clear();
+                                        lastPages.add(7);
+                                        lastPages.add(-1);
+                                      } else {
+                                        lastPages.clear();
+                                      }
+                                      types = 8;
                                     });
                                   }
                                 } else if (types == 5) {
@@ -2345,8 +3179,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   getReservations();
                                   weekViewStateKey.currentState
                                       ?.jumpToWeek(selectedDate);
-
                                   Get.back();
+                                } else if (types == 9) {
+                                  setState(() {
+                                    invitees.clear();
+                                    invitees.addAll(updateInvitees);
+                                    updateInvitees.clear();
+                                    types = lastPages.removeLast();
+                                  });
                                 } else {
                                   snackBar(
                                       title: "시간을 선택하지 않았습니다",
@@ -2424,8 +3264,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   /// types == 0 : 삭제
   /// types == 1 : 취소
   /// types == 2 : 잠금 삭제
-  void checkDeleteReservation({required int types, required int id}) {
-    Get.dialog(
+  Future<void> checkDeleteReservation(
+      {required int types, required int id}) async {
+    final result = await Get.dialog<bool>(
       AlertDialog(
         backgroundColor: AppColor.backgroundColor,
         elevation: 0,
@@ -2487,18 +3328,18 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         await ReservationApiService.deleteReservation(
                             reservationId: id);
                         getReservations();
-                        Get.back();
+                        Get.back(result: true);
                         Get.back();
                       } else if (types == 1) {
                         await ReservationApiService.cancelReservation(
                             reservationId: id);
                         getReservations();
-                        Get.back();
+                        Get.back(result: true);
                         Get.back();
                       } else {
                         await LockApiService.deleteLock(lockId: id);
                         getReservations();
-                        Get.back();
+                        Get.back(result: true);
                       }
                     } catch (e) {
                       print(e.toString());

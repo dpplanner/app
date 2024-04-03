@@ -10,7 +10,8 @@ class ReservationModel {
       endDateTime,
       createDate,
       lastModifiedDate;
-  List<dynamic> attachmentsUrl, invitees;
+  List<dynamic> attachmentsUrl;
+  List<Map<String, dynamic>> invitees;
   String? returnMessage;
 
   ReservationModel({
@@ -44,7 +45,8 @@ class ReservationModel {
         status = json['status'],
         returnMessage = json['returnMessage'],
         attachmentsUrl = json['attachmentsUrl'],
-        invitees = json['invitees'],
+        invitees = List<Map<String, dynamic>>.from(
+            json['invitees'].map((i) => Map<String, dynamic>.from(i))),
         startDateTime = json['startDateTime'],
         endDateTime = json['endDateTime'],
         createDate = json['createDate'],
