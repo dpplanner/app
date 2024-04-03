@@ -307,8 +307,9 @@ class ReservationAdminCard extends StatelessWidget {
                           if (checkedMore && reservation.invitees.isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.only(top: 32),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
                                     "함께 사용하는 사람",
@@ -316,19 +317,48 @@ class ReservationAdminCard extends StatelessWidget {
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16),
                                   ),
-                                  ...reservation.invitees
-                                      .map((invitee) => Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 8),
-                                            child: Text(
-                                              invitee["clubMemberName"],
-                                              style: const TextStyle(
-                                                  color: AppColor.textColor,
+                                  GestureDetector(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          String inviteesNames = reservation
+                                              .invitees
+                                              .map((invitee) =>
+                                                  invitee["clubMemberName"]
+                                                      as String)
+                                              .join(", ");
+
+                                          return AlertDialog(
+                                            backgroundColor:
+                                                AppColor.backgroundColor,
+                                            content: SingleChildScrollView(
+                                              child: Text(
+                                                inviteesNames,
+                                                style: const TextStyle(
                                                   fontWeight: FontWeight.w500,
-                                                  fontSize: 16),
+                                                  fontSize: 16,
+                                                ),
+                                              ),
                                             ),
-                                          ))
-                                      .toList(),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Text(
+                                      reservation.invitees.length >= 2
+                                          ? "${reservation.invitees[0]["clubMemberName"]} 외 ${reservation.invitees.length - 1}명"
+                                          : reservation.invitees
+                                              .map((invitee) =>
+                                                  invitee["clubMemberName"]
+                                                      as String)
+                                              .join(", "),
+                                      style: const TextStyle(
+                                          color: AppColor.textColor,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 15),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),

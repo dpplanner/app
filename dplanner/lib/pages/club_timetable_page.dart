@@ -8,6 +8,7 @@ import 'package:dplanner/models/reservation_model.dart';
 import 'package:dplanner/pages/loading_page.dart';
 import 'package:dplanner/services/lock_api_service.dart';
 import 'package:dplanner/style.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -25,6 +26,7 @@ import '../services/club_member_api_service.dart';
 import '../services/reservation_api_service.dart';
 import '../services/resource_api_service.dart';
 import '../widgets/bottom_bar.dart';
+import '../widgets/full_screen_image.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/snack_bar.dart';
@@ -744,6 +746,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     int updateStartTime = -1;
     LockModel? lock;
 
+    bool checkedMore = false;
+    bool checkedReturn = false;
+
     if (types == 3) {
       reservationTime = DateTime.parse(reservation!.startDateTime);
       focusedDay = reservationTime;
@@ -852,35 +857,39 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             alignment: Alignment.center,
                             child: Text(
                               reservation != null &&
-                                      reservation.status == "REQUEST"
-                                  ? "승인 대기중"
-                                  : (types == 0)
-                                      ? "예약하기"
-                                      : (types == 1 && lastPages.last == 0)
-                                          ? "예약 날짜"
-                                          : (types == 1)
-                                              ? "잠금 날짜"
-                                              : (types == 2 &&
-                                                      lastPages.last == 0)
-                                                  ? "예약 시간"
-                                                  : (types == 2)
-                                                      ? "잠금 시간"
-                                                      : (types == 3)
-                                                          ? "예약 정보"
-                                                          : (types == 4)
-                                                              ? "예약 수정"
-                                                              : (types == 5)
-                                                                  ? "날짜 변경"
-                                                                  : (types == 6)
-                                                                      ? "반납하기"
+                                      reservation.status == "REQUEST" &&
+                                      MemberController.to.clubMember().role ==
+                                          "ADMIN"
+                                  ? "예약 요청"
+                                  : reservation?.status == "REQUEST"
+                                      ? "승인 대기중"
+                                      : (types == 0)
+                                          ? "예약하기"
+                                          : (types == 1 && lastPages.last == 0)
+                                              ? "예약 날짜"
+                                              : (types == 1)
+                                                  ? "잠금 날짜"
+                                                  : (types == 2 &&
+                                                          lastPages.last == 0)
+                                                      ? "예약 시간"
+                                                      : (types == 2)
+                                                          ? "잠금 시간"
+                                                          : (types == 3)
+                                                              ? "예약 정보"
+                                                              : (types == 4)
+                                                                  ? "예약 수정"
+                                                                  : (types == 5)
+                                                                      ? "날짜 변경"
                                                                       : (types ==
-                                                                              7)
-                                                                          ? "예약 잠금"
-                                                                          : (types == 8 && lock == null)
-                                                                              ? "예약 잠금 추가"
-                                                                              : (types != 9)
-                                                                                  ? "예약 잠금 정보"
-                                                                                  : "함께 사용하는 사람",
+                                                                              6)
+                                                                          ? "반납하기"
+                                                                          : (types == 7)
+                                                                              ? "예약 잠금"
+                                                                              : (types == 8 && lock == null)
+                                                                                  ? "예약 잠금 추가"
+                                                                                  : (types != 9)
+                                                                                      ? "예약 잠금 정보"
+                                                                                      : "함께 사용하는 사람",
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -975,9 +984,15 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     Text(
                                       reservation?.status == "REQUEST"
                                           ? "승인 대기중"
-                                          : reservation?.status == "CONFIRMED"
+                                          : reservation?.status ==
+                                                      "CONFIRMED" &&
+                                                  !reservation!.returned
                                               ? "승인 완료"
-                                              : "거절됨",
+                                              : reservation?.status ==
+                                                          "CONFIRMED" &&
+                                                      reservation!.returned
+                                                  ? "승인 및 반납 완료"
+                                                  : "거절됨",
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w500,
                                           fontSize: 15),
@@ -1145,215 +1160,564 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     )),
                               ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                            Visibility(
+                              visible: types == 3,
+                              replacement: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "예약 제목(선택)",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16),
+                                        ),
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 12.0),
+                                            child: Form(
+                                                key: formKey1,
+                                                child: UnderlineTextForm(
+                                                  hintText: types == 3
+                                                      ? ""
+                                                      : '예약 제목을 입력해주세요',
+                                                  controller: title,
+                                                  isFocused: isFocused1,
+                                                  noLine: true,
+                                                  isRight: true,
+                                                  noErrorSign: true,
+                                                  isWritten: (types == 3)
+                                                      ? true
+                                                      : false,
+                                                  fontSize: 15,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      isFocused1 =
+                                                          value.isNotEmpty;
+                                                    });
+                                                  },
+                                                )),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "사용 용도(선택)",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 12.0),
+                                          child: Form(
+                                              key: formKey2,
+                                              child: UnderlineTextForm(
+                                                hintText: types == 3
+                                                    ? ""
+                                                    : '사용 용도를 입력해주세요',
+                                                controller: usage,
+                                                isFocused: isFocused2,
+                                                noLine: true,
+                                                isRight: true,
+                                                noErrorSign: true,
+                                                isWritten:
+                                                    (types == 3) ? true : false,
+                                                fontSize: 15,
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    isFocused2 =
+                                                        value.isNotEmpty;
+                                                  });
+                                                },
+                                              )),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 16.0, bottom: 32.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "함께 사용하는 사람(선택)",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              updateInvitees.clear();
+                                              isChecked.clear();
+                                              updateInvitees.addAll(invitees);
+                                              lastPages.add(types);
+                                              types = 9;
+                                            });
+                                          },
+                                          child: Text(
+                                            (types == 0 || types == 4) &&
+                                                    invitees.isEmpty
+                                                ? "선택하기"
+                                                : invitees.isNotEmpty &&
+                                                        invitees.length >= 2
+                                                    ? "${invitees[0]["clubMemberName"]} 외 ${invitees.length - 1}명"
+                                                    : invitees
+                                                        .map((invitee) => invitee[
+                                                                "clubMemberName"]
+                                                            as String)
+                                                        .join(", "),
+                                            style: TextStyle(
+                                                color: invitees.isNotEmpty
+                                                    ? AppColor.textColor
+                                                    : AppColor.textColor2,
+                                                fontWeight: invitees.isNotEmpty
+                                                    ? FontWeight.w500
+                                                    : FontWeight.w400,
+                                                fontSize: 15),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   const Text(
-                                    "예약 제목(선택)",
+                                    "신청하신 시간에\n다른 사람이 함께 사용할 수 있나요?",
                                     style: TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16),
                                   ),
-                                  Expanded(
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 12.0),
-                                      child: Form(
-                                          key: formKey1,
-                                          child: UnderlineTextForm(
-                                            hintText: types == 3
-                                                ? ""
-                                                : '예약 제목을 입력해주세요',
-                                            controller: title,
-                                            isFocused: isFocused1,
-                                            noLine: true,
-                                            isRight: true,
-                                            noErrorSign: true,
-                                            isWritten:
-                                                (types == 3) ? true : false,
-                                            fontSize: 15,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                isFocused1 = value.isNotEmpty;
-                                              });
-                                            },
-                                          )),
+                                  SizedBox(
+                                    height:
+                                        SizeController.to.screenHeight * 0.05,
+                                    child: RadioListTile(
+                                      title: const Text(
+                                        "누구나 함께 사용 가능합니다",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15),
+                                      ),
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      value: Open.yes,
+                                      groupValue: open,
+                                      onChanged: (Open? value) {
+                                        if (types == 3) {
+                                          null;
+                                        } else {
+                                          setState(() {
+                                            open = value!;
+                                          });
+                                        }
+                                      },
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: -10.0),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height:
+                                        SizeController.to.screenHeight * 0.05,
+                                    child: RadioListTile(
+                                      title: const Text(
+                                        "허가받은 사람 외에는 불가능합니다",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15),
+                                      ),
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      value: Open.no,
+                                      groupValue: open,
+                                      onChanged: (Open? value) {
+                                        if (types == 3) {
+                                          null;
+                                        } else {
+                                          setState(() {
+                                            open = value!;
+                                          });
+                                        }
+                                      },
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: -30.0),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "사용 용도(선택)",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 12.0),
-                                    child: Form(
-                                        key: formKey2,
-                                        child: UnderlineTextForm(
-                                          hintText:
-                                              types == 3 ? "" : '사용 용도를 입력해주세요',
-                                          controller: usage,
-                                          isFocused: isFocused2,
-                                          noLine: true,
-                                          isRight: true,
-                                          noErrorSign: true,
-                                          isWritten:
-                                              (types == 3) ? true : false,
-                                          fontSize: 15,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              isFocused2 = value.isNotEmpty;
-                                            });
-                                          },
-                                        )),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 16.0, bottom: 32.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                              child: Column(
                                 children: [
-                                  const Text(
-                                    "함께 사용하는 사람(선택)",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (types == 3) {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            String inviteesNames = invitees
-                                                .map((invitee) =>
-                                                    invitee["clubMemberName"]
-                                                        as String)
-                                                .join(", ");
-
-                                            return AlertDialog(
-                                              backgroundColor:
-                                                  AppColor.backgroundColor2,
-                                              content: SingleChildScrollView(
-                                                child: Text(
-                                                  inviteesNames,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        );
-                                      } else {
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 32.0),
+                                    child: GestureDetector(
+                                      onTap: () {
                                         setState(() {
-                                          updateInvitees.clear();
-                                          isChecked.clear();
-                                          updateInvitees.addAll(invitees);
-                                          lastPages.add(types);
-                                          types = 9;
+                                          checkedMore = !checkedMore;
                                         });
-                                      }
-                                    },
-                                    child: Text(
-                                      (types == 0 || types == 4) &&
-                                              invitees.isEmpty
-                                          ? "선택하기"
-                                          : invitees.isNotEmpty &&
-                                                  invitees.length >= 2
-                                              ? "${invitees[0]["clubMemberName"]} 외 ${invitees.length - 1}명"
-                                              : invitees.isNotEmpty
-                                                  ? invitees
+                                      },
+                                      child: Row(
+                                        children: [
+                                          const Text(
+                                            "예약 정보 더보기",
+                                            style: TextStyle(
+                                                color: AppColor.textColor2,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16),
+                                          ),
+                                          Icon(
+                                            checkedMore
+                                                ? SFSymbols.chevron_up
+                                                : SFSymbols.chevron_down,
+                                            color: AppColor.textColor2,
+                                            size: 18,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  if (checkedMore && reservation!.title != "")
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 32),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            "예약 제목",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 16),
+                                          ),
+                                          Text(
+                                            reservation.title,
+                                            style: const TextStyle(
+                                                color: AppColor.textColor,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (checkedMore && reservation!.usage != "")
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 32),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            "사용 용도",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 16),
+                                          ),
+                                          Text(
+                                            reservation.usage,
+                                            style: const TextStyle(
+                                                color: AppColor.textColor,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (checkedMore &&
+                                      reservation!.invitees.isNotEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 32),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            "함께 사용하는 사람",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 16),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  String inviteesNames = invitees
                                                       .map((invitee) => invitee[
                                                               "clubMemberName"]
                                                           as String)
-                                                      .join(", ")
-                                                  : "",
-                                      style: TextStyle(
-                                          color: invitees.isNotEmpty
-                                              ? AppColor.textColor
-                                              : AppColor.textColor2,
-                                          fontWeight: invitees.isNotEmpty
-                                              ? FontWeight.w500
-                                              : FontWeight.w400,
-                                          fontSize: 15),
+                                                      .join(", ");
+
+                                                  return AlertDialog(
+                                                    backgroundColor: AppColor
+                                                        .backgroundColor,
+                                                    content:
+                                                        SingleChildScrollView(
+                                                      child: Text(
+                                                        inviteesNames,
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Text(
+                                              invitees.length >= 2
+                                                  ? "${invitees[0]["clubMemberName"]} 외 ${invitees.length - 1}명"
+                                                  : invitees
+                                                      .map((invitee) => invitee[
+                                                              "clubMemberName"]
+                                                          as String)
+                                                      .join(", "),
+                                              style: const TextStyle(
+                                                  color: AppColor.textColor,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 15),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
+                                  if (checkedMore)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 32),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                            "물품 공유 여부",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 16),
+                                          ),
+                                          Text(
+                                            reservation!.sharing ? "가능" : "불가능",
+                                            style: const TextStyle(
+                                                color: AppColor.textColor,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (reservation!.returned &&
+                                      (MemberController.to.clubMember().role ==
+                                              "ADMIN" ||
+                                          reservation.clubMemberId ==
+                                              MemberController.to
+                                                  .clubMember()
+                                                  .id))
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 32.0),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                checkedReturn = !checkedReturn;
+                                              });
+                                            },
+                                            child: Row(
+                                              children: [
+                                                const Text(
+                                                  "반납 정보 보기",
+                                                  style: TextStyle(
+                                                      color:
+                                                          AppColor.textColor2,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 16),
+                                                ),
+                                                Icon(
+                                                  checkedReturn
+                                                      ? SFSymbols.chevron_up
+                                                      : SFSymbols.chevron_down,
+                                                  color: AppColor.textColor2,
+                                                  size: 18,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        if (checkedReturn &&
+                                            reservation
+                                                .attachmentsUrl.isNotEmpty)
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: 32, bottom: 16),
+                                                child: Text(
+                                                  "반납 사진",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontSize: 16),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 120,
+                                                child: ListView(
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  children: reservation
+                                                      .attachmentsUrl
+                                                      .map((imageUrl) {
+                                                    String formattedUrl =
+                                                        imageUrl.startsWith(
+                                                                'https://')
+                                                            ? imageUrl
+                                                            : 'https://$imageUrl';
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8.0),
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          Get.to(() =>
+                                                              FullScreenImage(
+                                                                  imageUrl:
+                                                                      formattedUrl));
+                                                        },
+                                                        child: Stack(
+                                                          children: [
+                                                            AspectRatio(
+                                                              aspectRatio:
+                                                                  1 / 1,
+                                                              child: ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10),
+                                                                  child: CachedNetworkImage(
+                                                                      placeholder: (context, url) => Container(),
+                                                                      imageUrl: formattedUrl,
+                                                                      errorWidget: (context, url, error) => SvgPicture.asset(
+                                                                            'assets/images/base_image/base_post_image.svg',
+                                                                          ),
+                                                                      fit: BoxFit.cover)),
+                                                            ),
+                                                            Positioned.fill(
+                                                              child: Container(
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10),
+                                                                  gradient:
+                                                                      LinearGradient(
+                                                                    begin: Alignment
+                                                                        .bottomCenter,
+                                                                    end: const Alignment(
+                                                                        0.0,
+                                                                        0.6),
+                                                                    colors: [
+                                                                      AppColor
+                                                                          .objectColor,
+                                                                      AppColor
+                                                                          .objectColor
+                                                                          .withOpacity(
+                                                                              0.9),
+                                                                      AppColor
+                                                                          .objectColor
+                                                                          .withOpacity(
+                                                                              0.7),
+                                                                      AppColor
+                                                                          .objectColor
+                                                                          .withOpacity(
+                                                                              0.5),
+                                                                      AppColor
+                                                                          .objectColor
+                                                                          .withOpacity(
+                                                                              0.3),
+                                                                      AppColor
+                                                                          .objectColor
+                                                                          .withOpacity(
+                                                                              0.1),
+                                                                      Colors
+                                                                          .transparent,
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            const Positioned(
+                                                              bottom: 3,
+                                                              right: 7,
+                                                              child: Text(
+                                                                "자세히 보기",
+                                                                style: TextStyle(
+                                                                    color: AppColor
+                                                                        .backgroundColor2,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                    fontSize:
+                                                                        12),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }).toList(),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        if (checkedReturn &&
+                                            reservation.returnMessage != null &&
+                                            reservation.returnMessage != "")
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: 32, bottom: 16),
+                                                child: Text(
+                                                  "반납 메시지",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontSize: 16),
+                                                ),
+                                              ),
+                                              Text(
+                                                reservation.returnMessage ?? "",
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                      ],
+                                    ),
                                 ],
-                              ),
-                            ),
-                            const Text(
-                              "신청하신 시간에\n다른 사람이 함께 사용할 수 있나요?",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 16),
-                            ),
-                            SizedBox(
-                              height: SizeController.to.screenHeight * 0.05,
-                              child: RadioListTile(
-                                title: const Text(
-                                  "누구나 함께 사용 가능합니다",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 15),
-                                ),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                value: Open.yes,
-                                groupValue: open,
-                                onChanged: (Open? value) {
-                                  if (types == 3) {
-                                    null;
-                                  } else {
-                                    setState(() {
-                                      open = value!;
-                                    });
-                                  }
-                                },
-                                contentPadding:
-                                    const EdgeInsets.symmetric(vertical: -10.0),
-                              ),
-                            ),
-                            SizedBox(
-                              height: SizeController.to.screenHeight * 0.05,
-                              child: RadioListTile(
-                                title: const Text(
-                                  "허가받은 사람 외에는 불가능합니다",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 15),
-                                ),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                value: Open.no,
-                                groupValue: open,
-                                onChanged: (Open? value) {
-                                  if (types == 3) {
-                                    null;
-                                  } else {
-                                    setState(() {
-                                      open = value!;
-                                    });
-                                  }
-                                },
-                                contentPadding:
-                                    const EdgeInsets.symmetric(vertical: -30.0),
                               ),
                             ),
                           ],
@@ -1943,10 +2307,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                                       color: AppColor
                                                                           .backgroundColor),
                                                                 ),
-                                                                buttonColor: AppColor
-                                                                    .markColor
-                                                                    .withOpacity(
-                                                                        0.8),
+                                                                buttonColor:
+                                                                    AppColor
+                                                                        .subColor3,
                                                                 onPressed:
                                                                     () async {
                                                                   setState(() {
@@ -2254,54 +2617,32 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                                           snapshot
                                                                               .data![index]
                                                                               .isConfirmed))
-                                                                        Visibility(
-                                                                          visible: snapshot
-                                                                              .data![index]
-                                                                              .isConfirmed,
-                                                                          replacement:
-                                                                              Container(
-                                                                            padding: const EdgeInsets.fromLTRB(
-                                                                                6,
-                                                                                2,
-                                                                                6,
-                                                                                2),
-                                                                            decoration:
-                                                                                BoxDecoration(
-                                                                              shape: BoxShape.rectangle,
-                                                                              borderRadius: BorderRadius.circular(15),
-                                                                              color: AppColor.markColor, // 배경색 설정
-                                                                            ),
-                                                                            child:
-                                                                                const Text(
-                                                                              "승인 대기중",
-                                                                              style: TextStyle(
-                                                                                color: AppColor.backgroundColor,
-                                                                                fontWeight: FontWeight.w400,
-                                                                                fontSize: 11,
-                                                                              ),
-                                                                            ),
+                                                                        Container(
+                                                                          padding: const EdgeInsets
+                                                                              .fromLTRB(
+                                                                              6,
+                                                                              2,
+                                                                              6,
+                                                                              2),
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            shape:
+                                                                                BoxShape.rectangle,
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(15),
+                                                                            color:
+                                                                                AppColor.subColor1, // 배경색 설정
                                                                           ),
                                                                           child:
-                                                                              Container(
-                                                                            padding: const EdgeInsets.fromLTRB(
-                                                                                6,
-                                                                                2,
-                                                                                6,
-                                                                                2),
-                                                                            decoration:
-                                                                                BoxDecoration(
-                                                                              shape: BoxShape.rectangle,
-                                                                              borderRadius: BorderRadius.circular(15),
-                                                                              color: AppColor.subColor1, // 배경색 설정
-                                                                            ),
-                                                                            child:
-                                                                                Text(
-                                                                              (snapshot.data![index].role == "MANAGER") ? snapshot.data![index].clubAuthorityName ?? "" : "관리자",
-                                                                              style: const TextStyle(
-                                                                                color: AppColor.backgroundColor,
-                                                                                fontWeight: FontWeight.w400,
-                                                                                fontSize: 11,
-                                                                              ),
+                                                                              Text(
+                                                                            (snapshot.data![index].role == "MANAGER")
+                                                                                ? snapshot.data![index].clubAuthorityName ?? ""
+                                                                                : "관리자",
+                                                                            style:
+                                                                                const TextStyle(
+                                                                              color: AppColor.backgroundColor,
+                                                                              fontWeight: FontWeight.w400,
+                                                                              fontSize: 11,
                                                                             ),
                                                                           ),
                                                                         ),
@@ -2450,46 +2791,68 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             child: Padding(
                               padding: const EdgeInsets.only(
                                   left: 24.0, right: 24.0),
-                              child: Column(
+                              child: Row(
                                 children: [
-                                  NextPageButton(
-                                    text: const Text(
-                                      "예약 승인하기",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColor.backgroundColor),
+                                  Expanded(
+                                    child: NextPageButton(
+                                      text: const Text(
+                                        "거절하기",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColor.backgroundColor),
+                                      ),
+                                      buttonColor: AppColor.subColor3,
+                                      onPressed: () async {
+                                        try {
+                                          await ReservationApiService
+                                              .patchReservation(
+                                                  reservationIds: [
+                                                reservation?.reservationId
+                                              ],
+                                                  isConfirmed: false);
+                                          getReservations();
+                                          Get.back();
+                                        } catch (e) {
+                                          print(e.toString());
+                                          snackBar(
+                                              title: "예약 거절 실패",
+                                              content: e.toString());
+                                        }
+                                      },
                                     ),
-                                    buttonColor: AppColor.markColor,
-                                    onPressed: () async {
-                                      await ReservationApiService
-                                          .patchReservation(reservationIds: [
-                                        reservation?.reservationId
-                                      ], isConfirmed: true);
-                                      getReservations();
-                                      Get.back();
-                                    },
                                   ),
                                   const SizedBox(
-                                    height: 5,
+                                    width: 10,
                                   ),
-                                  NextPageButton(
-                                    text: const Text(
-                                      "예약 거절하기",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                          color: AppColor.backgroundColor),
+                                  Expanded(
+                                    child: NextPageButton(
+                                      text: const Text(
+                                        "승인하기",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColor.backgroundColor),
+                                      ),
+                                      buttonColor: AppColor.objectColor,
+                                      onPressed: () async {
+                                        try {
+                                          await ReservationApiService
+                                              .patchReservation(
+                                                  reservationIds: [
+                                                reservation?.reservationId
+                                              ],
+                                                  isConfirmed: true);
+                                          getReservations();
+                                          Get.back();
+                                        } catch (e) {
+                                          print(e.toString());
+                                          snackBar(
+                                              title: "예약 승인 실패",
+                                              content: e.toString());
+                                        }
+                                      },
                                     ),
-                                    buttonColor: AppColor.objectColor,
-                                    onPressed: () async {
-                                      await ReservationApiService
-                                          .patchReservation(reservationIds: [
-                                        reservation?.reservationId
-                                      ], isConfirmed: false);
-                                      getReservations();
-                                      Get.back();
-                                    },
                                   ),
                                 ],
                               ),
@@ -2533,7 +2896,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           fontWeight: FontWeight.w700,
                                           color: AppColor.backgroundColor),
                                     ),
-                                    buttonColor: AppColor.markColor,
+                                    buttonColor: AppColor.subColor3,
                                     onPressed: () async {
                                       await checkDeleteReservation(
                                           id: reservation.reservationId,
