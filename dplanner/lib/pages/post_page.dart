@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -113,18 +114,23 @@ class _PostPageState extends State<PostPage> {
               child: Row(
                 children: [
                   ClipOval(
-                    child: post.profileUrl != null
-                        ? Image.network(
-                            post.profileUrl!,
+                    child: MemberController.to.clubMember().url != null
+                        ? CachedNetworkImage(
+                            placeholder: (context, url) => Container(),
+                            imageUrl:
+                                "http://${MemberController.to.clubMember().url!}",
+                            errorWidget: (context, url, error) =>
+                                SvgPicture.asset(
+                                  'assets/images/base_image/base_member_image.svg',
+                                ),
                             height: SizeController.to.screenWidth * 0.1,
                             width: SizeController.to.screenWidth * 0.1,
-                            fit: BoxFit.cover,
-                          )
+                            fit: BoxFit.cover)
                         : SvgPicture.asset(
                             'assets/images/base_image/base_member_image.svg',
                             height: SizeController.to.screenWidth * 0.1,
                             width: SizeController.to.screenWidth * 0.1,
-                            fit: BoxFit.fill,
+                            fit: BoxFit.cover,
                           ),
                   ),
                   Expanded(

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
@@ -178,7 +179,9 @@ class _PostContentState extends State<PostContent> {
                           ],
                         ),
                         Text(
-                          '${widget.post.createdTime}',
+                          DateFormat('M월 d일')
+                              .add_jm()
+                              .format(widget.post.createdTime),
                           style: const TextStyle(
                             color: AppColor.textColor,
                             fontWeight: FontWeight.w500,
@@ -202,6 +205,7 @@ class _PostContentState extends State<PostContent> {
             ),
             SizedBox(height: SizeController.to.screenHeight * 0.02),
             Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: EdgeInsets.only(

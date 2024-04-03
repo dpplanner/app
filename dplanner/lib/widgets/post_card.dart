@@ -84,7 +84,7 @@ class _PostCardState extends State<PostCard> {
                               ),
                             ),
                             Text(
-                              DateFormat('M월 dd일')
+                              DateFormat('M월 d일')
                                   .add_jm()
                                   .format(widget.post.createdTime),
                               style: const TextStyle(
@@ -119,6 +119,7 @@ class _PostCardState extends State<PostCard> {
                 ),
                 SizedBox(height: SizeController.to.screenHeight * 0.02),
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
                       padding: EdgeInsets.only(
@@ -135,6 +136,8 @@ class _PostCardState extends State<PostCard> {
                       ),
                     ),
                     Text(
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
                       widget.post.content,
                       style: const TextStyle(
                         color: AppColor.textColor,
@@ -144,31 +147,32 @@ class _PostCardState extends State<PostCard> {
                     ),
                   ],
                 ),
-                SizedBox(height: SizeController.to.screenHeight * 0.02),
+                SizedBox(height: SizeController.to.screenHeight * 0.04),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (widget.post.isFixed)
-                      const Expanded(
-                        flex: 1,
-                        child: Row(
-                          children: [
-                            Icon(
-                              SFSymbols.pin_fill,
-                              color: AppColor.textColor2,
-                              size: 14,
+                    widget.post.isFixed
+                        ? const Expanded(
+                            flex: 1,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  SFSymbols.pin_fill,
+                                  color: AppColor.textColor2,
+                                  size: 14,
+                                ),
+                                Text(
+                                  '고정됨',
+                                  style: TextStyle(
+                                    color: AppColor.textColor2,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '고정됨',
-                              style: TextStyle(
-                                color: AppColor.textColor2,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                          )
+                        : const Expanded(child: SizedBox()),
                     Expanded(
                       flex: 1,
                       child: Row(
