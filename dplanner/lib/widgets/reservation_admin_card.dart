@@ -321,7 +321,7 @@ class ReservationAdminCard extends StatelessWidget {
                                             padding:
                                                 const EdgeInsets.only(top: 8),
                                             child: Text(
-                                              invitee,
+                                              invitee["clubMemberName"],
                                               style: const TextStyle(
                                                   color: AppColor.textColor,
                                                   fontWeight: FontWeight.w500,
