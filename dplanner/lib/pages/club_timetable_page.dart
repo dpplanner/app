@@ -2493,22 +2493,25 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         child: Visibility(
                           visible: reservation != null &&
                               DateTime.parse(reservation.endDateTime)
-                                  .isAfter(DateTime.now()),
-                          replacement: NextPageButton(
-                            text: const Text(
-                              "반납하기",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColor.backgroundColor),
+                                  .isAfter(now),
+                          replacement: Visibility(
+                            visible: !reservation!.returned,
+                            child: NextPageButton(
+                              text: const Text(
+                                "반납하기",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColor.backgroundColor),
+                              ),
+                              buttonColor: AppColor.objectColor,
+                              onPressed: () {
+                                setState(() {
+                                  lastPages.add(3);
+                                  types = 6;
+                                });
+                              },
                             ),
-                            buttonColor: AppColor.objectColor,
-                            onPressed: () {
-                              setState(() {
-                                lastPages.add(3);
-                                types = 6;
-                              });
-                            },
                           ),
                           child: Padding(
                             padding:
@@ -2527,7 +2530,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     buttonColor: AppColor.markColor,
                                     onPressed: () async {
                                       await checkDeleteReservation(
-                                          id: reservation!.reservationId,
+                                          id: reservation.reservationId,
                                           types: 1);
                                     },
                                   ),
