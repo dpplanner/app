@@ -546,12 +546,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             return Container();
                           }
                         },
-                        liveTimeIndicatorSettings:
-                            const LiveTimeIndicatorSettings(
-                          color: AppColor.objectColor,
-                          height: 0,
-                          offset: 0,
-                        ),
                         fullDayEventBuilder: (events, date) {
                           return FullDayEventView(
                             events: events,
