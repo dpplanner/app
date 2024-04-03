@@ -6,8 +6,10 @@ import 'package:dplanner/models/reservation_model.dart';
 import 'package:dplanner/pages/loading_page.dart';
 import 'package:dplanner/services/lock_api_service.dart';
 import 'package:dplanner/style.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -699,10 +701,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   /// types == 4 : 예약 수정
   /// types == 5 : 날짜 변경
   /// types == 6 : 반납하기
-  /// types == 7 : 예약 잠금(시작 시간)
-  /// types == 8 : 예약 잠금(종료 시간)
-  /// types == 9 : 예약 잠금 추가하기
-  /// types == 10 : 예약 잠금 수정하기
+  /// types == 7 : 잠금 정보
+  /// types == 8 : 잠금 수정
 
   Future<void> addReservation(
       {required int types,
@@ -711,25 +711,31 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     DateTime reservationTime = chooseDate ?? now;
     DateTime focusedDay = chooseDate ?? now;
     DateTime selectedDay = chooseDate ?? now;
-    int startTime = 0;
-    int endTime = 0;
+
+    int startTime = -1;
+    int endTime = -1;
+
     bool isChecked = false;
     bool isChecked2 = false;
+
     Open open = Open.yes;
     title.text = "";
     usage.text = "";
     List<int> checkedTime = [];
     List<int> unableTime = [];
     List<bool> timeButton = List.generate(24, (index) => false);
-    int lastType = types;
     List<XFile> selectedImages = [];
     int maxImageCount = 5;
+    List<int> lastPages = [];
 
     DateTime lockStartDate = now;
     DateTime lockEndDate = now;
     int lockStartTime = -1;
     int lockEndTime = -1;
     int checkedLock = -1;
+    DateTime updateStartDate = now;
+    DateTime updateEndDate = now;
+    int updateStartTime = -1;
     LockModel? lock;
 
     if (types == 3 || types == 4) {
@@ -817,44 +823,60 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                           'assets/images/extra/showmodal_scrollcontrolbar.svg',
                         ),
                       ),
-                      Text(
-                        reservation != null && reservation.status == "REQUEST"
-                            ? "승인 대기중"
-                            : (types == 0)
-                                ? "예약하기"
-                                : (types == 1 &&
-                                        (lastType == 7 || lastType == 8))
-                                    ? "잠금 날짜"
-                                    : (types == 1 &&
-                                            lastType != 7 &&
-                                            lastType != 8)
-                                        ? "예약 날짜"
-                                        : (types == 2 &&
-                                                (lastType == 7 ||
-                                                    lastType == 8))
-                                            ? "잠금 시간"
-                                            : (types == 2 &&
-                                                    lastType != 7 &&
-                                                    lastType != 8)
-                                                ? "예약 시간"
-                                                : (types == 3)
-                                                    ? "예약 정보"
-                                                    : (types == 4)
-                                                        ? "예약 수정"
-                                                        : (types == 5)
-                                                            ? "날짜 변경"
-                                                            : (types == 6)
-                                                                ? "반납하기"
-                                                                : (types == 7)
-                                                                    ? "예약 잠금"
-                                                                    : (types ==
-                                                                            9)
-                                                                        ? "예약 잠금 추가"
-                                                                        : "예약 잠금 정보",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      Stack(
+                        children: [
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              reservation != null &&
+                                      reservation.status == "REQUEST"
+                                  ? "승인 대기중"
+                                  : (types == 0)
+                                      ? "예약하기"
+                                      : (types == 1 && lastPages.last == 0)
+                                          ? "예약 날짜"
+                                          : (types == 1)
+                                              ? "잠금 날짜"
+                                              : (types == 2 &&
+                                                      lastPages.last == 0)
+                                                  ? "예약 시간"
+                                                  : (types == 2)
+                                                      ? "잠금 시간"
+                                                      : (types == 3)
+                                                          ? "예약 정보"
+                                                          : (types == 4)
+                                                              ? "예약 수정"
+                                                              : (types == 5)
+                                                                  ? "날짜 변경"
+                                                                  : (types == 6)
+                                                                      ? "반납하기"
+                                                                      : (types ==
+                                                                              7)
+                                                                          ? "예약 잠금"
+                                                                          : (types == 8 && lock == null)
+                                                                              ? "예약 잠금 추가"
+                                                                              : "예약 잠금 정보",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          if (lastPages.isNotEmpty && lastPages.last != -1)
+                            Positioned(
+                              left: 14,
+                              top: 0,
+                              bottom: 0,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    types = lastPages.removeLast();
+                                  });
+                                },
+                                child: const Icon(SFSymbols.chevron_left),
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                   ),
@@ -958,7 +980,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           null;
                                         } else {
                                           setState(() {
-                                            lastType = 0;
+                                            selectedDay = reservationTime;
+                                            lastPages.add(0);
                                             types = 1;
                                           });
                                         }
@@ -989,6 +1012,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       if (types == 3 || types == 4) {
                                         null;
                                       } else {
+                                        unableTime.clear();
                                         List<ReservationModel> reservations =
                                             await ReservationApiService.getReservations(
                                                 resourceId: selectedValue!.id,
@@ -1014,8 +1038,59 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             }
                                           }
                                         }
+
+                                        List<LockModel> locks =
+                                            await LockApiService.getLocks(
+                                                resourceId: selectedValue!.id,
+                                                startDateTime: DateFormat(
+                                                        'yyyy-MM-dd 00:00:00')
+                                                    .format(reservationTime),
+                                                endDateTime: DateFormat(
+                                                        'yyyy-MM-dd 00:00:00')
+                                                    .format(reservationTime.add(
+                                                        const Duration(
+                                                            days: 1))));
+
+                                        for (var i in locks) {
+                                          DateTime startDate =
+                                              DateTime.parse(i.startDateTime);
+                                          DateTime endDate =
+                                              DateTime.parse(i.endDateTime);
+                                          bool isStart = startDate.year ==
+                                                  reservationTime.year &&
+                                              startDate.month ==
+                                                  reservationTime.month &&
+                                              startDate.day ==
+                                                  reservationTime.day;
+                                          bool isEnd = endDate.year ==
+                                                  reservationTime.year &&
+                                              endDate.month ==
+                                                  reservationTime.month &&
+                                              endDate.day ==
+                                                  reservationTime.day;
+                                          int start = 0;
+                                          int end = 24;
+                                          if (isStart && isEnd) {
+                                            start = int.parse(i.startDateTime
+                                                .substring(11, 13));
+                                            end = int.parse(i.endDateTime
+                                                .substring(11, 13));
+                                          } else if (isStart) {
+                                            start = int.parse(i.startDateTime
+                                                .substring(11, 13));
+                                            end = 24;
+                                          } else if (isEnd) {
+                                            start = 0;
+                                            end = int.parse(i.endDateTime
+                                                .substring(11, 13));
+                                          }
+                                          for (var j = start; j < end; j++) {
+                                            unableTime.add(j);
+                                          }
+                                        }
+
                                         setState(() {
-                                          lastType = 0;
+                                          lastPages.add(0);
                                           types = 2;
                                         });
                                       }
@@ -1200,13 +1275,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
-                                  types == 1 && lastType == 0
+                                  types == 1 && lastPages.last == 0
                                       ? "예약할 날짜를 선택해주세요"
                                       : types == 5
                                           ? "변경할 날짜를 선택해주세요"
-                                          : lastType == 7
-                                              ? "잠금 시작 날짜를 선택해주세요"
-                                              : "잠금 종료 날짜를 선택해주세요",
+                                          : types == 1 && lastPages.last == 2
+                                              ? "잠금 종료 날짜를 선택해주세요"
+                                              : "잠금 시작 날짜를 선택해주세요",
                                   style: const TextStyle(
                                       color: AppColor.textColor,
                                       fontWeight: FontWeight.w500,
@@ -1278,7 +1353,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   setState(() {
                                     selectedDay = newSelectedDay;
                                     focusedDay = newFocusedDay;
-                                    reservationTime = selectedDay;
+                                    if (lastPages.last != 0) {
+                                      reservationTime = selectedDay;
+                                    }
                                     if (selectedDay.month != focusedDay.month) {
                                       focusedDay = DateTime(selectedDay.year,
                                           selectedDay.month, 1);
@@ -1290,7 +1367,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 padding: const EdgeInsets.only(top: 16.0),
                                 child: Center(
                                   child: Text(
-                                    "선택한 날짜: ${DateFormat("yyyy년 MM월 dd일 E요일", 'ko_KR').format(reservationTime)}",
+                                    "선택한 날짜: ${DateFormat("yyyy년 MM월 dd일 E요일", 'ko_KR').format(selectedDay)}",
                                     style: const TextStyle(
                                         color: AppColor.textColor,
                                         fontWeight: FontWeight.w500,
@@ -1306,9 +1383,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    types == 2 && lastType != 7 && lastType != 8
+                                    types == 2 && lastPages.last == 0
                                         ? "예약할 시간을 선택해주세요"
-                                        : lastType == 7
+                                        : types == 2 &&
+                                                lastPages[
+                                                        lastPages.length - 2] !=
+                                                    2
                                             ? "잠금 시작 시간을 선택해주세요"
                                             : "잠금 종료 시간을 선택해주세요",
                                     style: const TextStyle(
@@ -1316,10 +1396,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                         fontWeight: FontWeight.w500,
                                         fontSize: 16),
                                   ),
-                                  if (types == 2)
+                                  if (types == 2 && lastPages.last == 0)
                                     const Padding(
-                                      padding:
-                                          EdgeInsets.only(top: 3, bottom: 24),
+                                      padding: EdgeInsets.only(top: 3),
                                       child: Text(
                                         "블록 하나당 1시간입니다",
                                         style: TextStyle(
@@ -1328,93 +1407,114 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             fontSize: 14),
                                       ),
                                     ),
-                                  GridView.count(
-                                    crossAxisCount: 4,
-                                    childAspectRatio: 1.8,
-                                    shrinkWrap: true,
-                                    children: List.generate(24, (index) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          if (lastType == 7 || lastType == 8) {
-                                            setState(() {
-                                              if (checkedTime.isNotEmpty) {
-                                                timeButton[checkedTime.first] =
-                                                    false;
-                                                checkedTime.clear();
-                                              }
-                                              timeButton[index] = true;
-                                              checkedTime.add(index);
-                                              isChecked2 = true;
-                                            });
-                                          } else if (unableTime
-                                              .contains(index)) {
-                                            null;
-                                          } else {
-                                            setState(() {
-                                              if (checkedTime.contains(index)) {
-                                                timeButton[index] = false;
-                                                checkedTime.remove(index);
-                                                if (checkedTime.isEmpty) {
-                                                  isChecked2 = false;
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 24),
+                                    child: GridView.count(
+                                      crossAxisCount: 4,
+                                      childAspectRatio: 1.8,
+                                      shrinkWrap: true,
+                                      children: List.generate(24, (index) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            if (unableTime.contains(index)) {
+                                              null;
+                                            } else if (lastPages.last == 0) {
+                                              setState(() {
+                                                if (checkedTime
+                                                    .contains(index)) {
+                                                  timeButton[index] = false;
+                                                  checkedTime.remove(index);
+                                                  if (checkedTime.isEmpty) {
+                                                    isChecked2 = false;
+                                                  }
+                                                } else if (checkedTime
+                                                    .isEmpty) {
+                                                  timeButton[index] = true;
+                                                  checkedTime.add(index);
+                                                  isChecked2 = true;
+                                                } else {
+                                                  if (!checkTime(index)) {
+                                                    snackBar(
+                                                        title: "연속된 시간을 선택해주세요",
+                                                        content:
+                                                            "연속된 시간만 신청 가능합니다");
+                                                  } else {
+                                                    timeButton[index] = true;
+                                                  }
                                                 }
-                                              } else if (checkedTime.isEmpty) {
+                                              });
+                                            } else {
+                                              setState(() {
+                                                if (checkedTime.isNotEmpty) {
+                                                  timeButton[checkedTime
+                                                      .first] = false;
+                                                  checkedTime.clear();
+                                                }
                                                 timeButton[index] = true;
                                                 checkedTime.add(index);
                                                 isChecked2 = true;
-                                              } else {
-                                                if (!checkTime(index)) {
-                                                  snackBar(
-                                                      title: "연속된 시간을 선택해주세요",
-                                                      content:
-                                                          "연속된 시간만 신청 가능합니다");
-                                                } else {
-                                                  timeButton[index] = true;
-                                                }
-                                              }
-                                            });
-                                          }
-                                        },
-                                        child: Container(
-                                          margin: const EdgeInsets.all(2.0),
-                                          decoration: BoxDecoration(
-                                            color: unableTime.contains(index)
-                                                ? AppColor.markColor
-                                                : timeButton[index]
-                                                    ? AppColor.objectColor
-                                                    : AppColor.backgroundColor2,
-                                            borderRadius:
-                                                BorderRadius.circular(10.0),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              lastType == 8
-                                                  ? '${index + 1}:00'
-                                                  : '$index:00',
-                                              style: TextStyle(
-                                                color: timeButton[index]
-                                                    ? AppColor.backgroundColor
-                                                    : AppColor.textColor,
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 12,
+                                              });
+                                            }
+                                          },
+                                          child: Container(
+                                            margin: const EdgeInsets.all(2.0),
+                                            decoration: BoxDecoration(
+                                              color: unableTime.contains(index)
+                                                  ? AppColor.markColor
+                                                      .withOpacity(0.7)
+                                                  : timeButton[index]
+                                                      ? AppColor.objectColor
+                                                      : AppColor
+                                                          .backgroundColor2,
+                                              borderRadius:
+                                                  BorderRadius.circular(10.0),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                types == 2 &&
+                                                        lastPages.last == 0
+                                                    ? '$index:00'
+                                                    : types == 2 &&
+                                                            lastPages[lastPages
+                                                                        .length -
+                                                                    2] !=
+                                                                2
+                                                        ? '$index:00'
+                                                        : '${index + 1}:00',
+                                                style: TextStyle(
+                                                  color: timeButton[index]
+                                                      ? AppColor.backgroundColor
+                                                      : AppColor.textColor,
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 12,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    }),
+                                        );
+                                      }),
+                                    ),
                                   ),
                                   if (checkedTime.isNotEmpty)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 16.0),
                                       child: Center(
                                         child: Text(
-                                          lastType == 7
-                                              ? "선택한 시간: ${checkedTime[0]}시"
-                                              : lastType == 8
-                                                  ? "선택한 시간: ${checkedTime[0] + 1}시"
-                                                  : checkedTime.length == 1
-                                                      ? "선택한 시간: ${checkedTime[0]}시~${checkedTime[0] + 1}시 (총 1시간)"
-                                                      : "선택한 시간: ${checkedTime[0]}시~${checkedTime[checkedTime.length - 1] + 1}시 (총 ${checkedTime[checkedTime.length - 1] + 1 - checkedTime[0]}시간)",
+                                          types == 2 &&
+                                                  lastPages.last == 0 &&
+                                                  checkedTime.length == 1
+                                              ? "선택한 시간: ${checkedTime[0]}시~${checkedTime[0] + 1}시 (총 1시간)"
+                                              : types == 2 &&
+                                                      lastPages.last == 0 &&
+                                                      checkedTime.length != 1
+                                                  ? "선택한 시간: ${checkedTime[0]}시~${checkedTime[checkedTime.length - 1] + 1}시 (총 ${checkedTime[checkedTime.length - 1] + 1 - checkedTime[0]}시간)"
+                                                  : types == 2 &&
+                                                          lastPages[lastPages
+                                                                      .length -
+                                                                  2] !=
+                                                              2
+                                                      ? "선택한 시간: ${checkedTime[0]}시"
+                                                      : "선택한 시간: ${checkedTime[0] + 1}시",
                                           style: const TextStyle(
                                               color: AppColor.textColor,
                                               fontWeight: FontWeight.w500,
@@ -1768,9 +1868,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                                       types: 2,
                                                                       id: lock!
                                                                           .id);
-                                                                  print(
-                                                                      "ddddddddddddddddddddddddddddd");
-
                                                                   setState(() {
                                                                     lock = null;
                                                                   });
@@ -1810,7 +1907,25 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                                             .text =
                                                                         lock!
                                                                             .message;
-                                                                    types = 10;
+                                                                    lockStartDate =
+                                                                        DateTime.parse(
+                                                                            lock!.startDateTime);
+                                                                    lockEndDate =
+                                                                        DateTime.parse(
+                                                                            lock!.endDateTime);
+                                                                    lockStartTime = int.parse(lock!
+                                                                        .startDateTime
+                                                                        .substring(
+                                                                            11,
+                                                                            13));
+                                                                    lockEndTime = int.parse(lock!
+                                                                        .endDateTime
+                                                                        .substring(
+                                                                            11,
+                                                                            13));
+                                                                    lastPages
+                                                                        .add(7);
+                                                                    types = 8;
                                                                   });
                                                                 },
                                                               ),
@@ -1854,61 +1969,38 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                               fontWeight: FontWeight.w700,
                                               color: AppColor.textColor),
                                         ),
-                                        TextButton(
-                                          onPressed: () {
+                                        GestureDetector(
+                                          onTap: () {
                                             setState(() {
-                                              lastType = 7;
+                                              updateStartDate = lockStartDate;
+                                              updateEndDate = lockEndDate;
+                                              selectedDay = updateStartDate;
+                                              if (lastPages.isEmpty) {
+                                                lastPages.add(-1);
+                                              }
+                                              lastPages.add(8);
                                               types = 1;
                                             });
                                           },
-                                          style: ButtonStyle(
-                                            overlayColor: MaterialStateProperty
-                                                .resolveWith<Color>(
-                                              (Set<MaterialState> states) {
-                                                if (states.contains(
-                                                    MaterialState.pressed)) {
-                                                  return Colors.transparent;
-                                                }
-                                                return Colors.transparent;
-                                              },
-                                            ),
-                                          ),
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             children: [
                                               Text(
-                                                types == 10 &&
-                                                        lock != null &&
-                                                        lastType != 8
-                                                    ? DateFormat(
-                                                            "yy년 MM월 dd일 H:00 부터",
-                                                            'ko_KR')
-                                                        .format(DateTime.parse(
-                                                            lock!
-                                                                .startDateTime))
-                                                    : DateFormat(
-                                                            "yy년 MM월 dd일 $lockStartTime:00 부터",
-                                                            'ko_KR')
-                                                        .format(lockStartDate),
+                                                DateFormat(
+                                                        "yy년 MM월 dd일 $lockStartTime:00 부터",
+                                                        'ko_KR')
+                                                    .format(lockStartDate),
                                                 style: const TextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.w500,
                                                     color: AppColor.textColor),
                                               ),
                                               Text(
-                                                types == 10 &&
-                                                        lock != null &&
-                                                        lastType != 8
-                                                    ? DateFormat(
-                                                            "yy년 MM월 dd일 H:00 까지",
-                                                            'ko_KR')
-                                                        .format(DateTime.parse(
-                                                            lock!.endDateTime))
-                                                    : DateFormat(
-                                                            "yy년 MM월 dd일 $lockEndTime:00 까지",
-                                                            'ko_KR')
-                                                        .format(lockEndDate),
+                                                DateFormat(
+                                                        "yy년 MM월 dd일 $lockEndTime:00 까지",
+                                                        'ko_KR')
+                                                    .format(lockEndDate),
                                                 style: const TextStyle(
                                                     fontSize: 15,
                                                     fontWeight: FontWeight.w500,
@@ -2101,6 +2193,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             buttonColor: AppColor.objectColor,
                             onPressed: () {
                               setState(() {
+                                lastPages.add(3);
                                 types = 6;
                               });
                             },
@@ -2142,6 +2235,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     buttonColor: AppColor.objectColor,
                                     onPressed: () {
                                       setState(() {
+                                        lastPages.add(3);
                                         types = 4;
                                       });
                                     },
@@ -2177,7 +2271,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                           },
                         ),
                         child: Visibility(
-                          visible: !(types == 7 || types == 9),
+                          visible:
+                              !(types == 7 || (types == 8 && lock == null)),
                           replacement: NextPageButton(
                             text: const Text(
                               "잠금 시간 추가하기",
@@ -2190,7 +2285,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             onPressed: () async {
                               if (types == 7) {
                                 setState(() {
-                                  lastType = 7;
+                                  selectedDay = now;
+                                  updateStartDate = now;
+                                  updateEndDate = now;
+                                  updateStartTime = -1;
+                                  lastPages.add(7);
                                   types = 1;
                                 });
                               } else {
@@ -2224,17 +2323,24 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   getLockList(setState);
                                   getReservations();
                                   setState(() {
-                                    types = 7;
+                                    lockStartDate = now;
+                                    lockEndDate = now;
+                                    lockStartTime = -1;
+                                    lockEndTime = -1;
                                     lockMessage.clear();
+                                    types = 7;
                                   });
                                 } catch (e) {
                                   print(e.toString());
+                                  snackBar(
+                                      title: "잠금 시간 추가가 불가능합니다",
+                                      content: "시간을 조정해주세요");
                                 }
                               }
                             },
                           ),
                           child: Visibility(
-                            visible: types != 10,
+                            visible: !(types == 8 && lock != null),
                             replacement: NextPageButton(
                               text: const Text(
                                 "잠금 수정하기",
@@ -2248,9 +2354,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 try {
                                   String startDateTime = '';
                                   String endDateTime = '';
-                                  if (types == 10 &&
+                                  if (types == 8 &&
                                       lock != null &&
-                                      lastType != 8) {
+                                      lastPages.last != -1) {
                                     startDateTime = lock!.startDateTime;
                                     endDateTime = lock!.endDateTime;
                                   } else {
@@ -2275,8 +2381,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 'ko_KR')
                                             .format(lockEndDate);
                                   }
-                                  print(startDateTime);
-                                  print(endDateTime);
                                   LockModel temp = await LockApiService.putLock(
                                       resourceId: selectedValue!.id,
                                       startDateTime: startDateTime,
@@ -2286,10 +2390,15 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   getLockList(setState);
                                   getReservations();
                                   setState(() {
-                                    types = 7;
-                                    lastType = -1;
                                     lock = null;
+                                    lockStartDate = now;
+                                    lockEndDate = now;
+                                    selectedDay = now;
+                                    lockStartTime = -1;
+                                    lockEndTime = -1;
+                                    lastPages.clear();
                                     lockMessage.clear();
+                                    types = 7;
                                   });
                                 } catch (e) {
                                   print(e.toString());
@@ -2311,50 +2420,72 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       : AppColor.subColor3,
                               onPressed: () {
                                 if (types == 1) {
-                                  if (lastType == 7 || lastType == 8) {
+                                  if (lastPages.last == 0) {
                                     setState(() {
-                                      if (lastType == 7) {
-                                        lockStartDate = focusedDay;
-                                      } else {
-                                        lockEndDate = focusedDay;
-                                      }
-                                      types = 2;
+                                      reservationTime = selectedDay;
+                                      types = lastPages.removeLast();
                                     });
-                                  } else {
+                                  } else if (lastPages.last == 7 ||
+                                      lastPages.last == 8 ||
+                                      lastPages.last == 2) {
                                     setState(() {
-                                      types = lastType;
+                                      if (lastPages.last == 7 ||
+                                          lastPages.last == 8) {
+                                        updateStartDate = selectedDay;
+                                      } else {
+                                        updateEndDate = selectedDay;
+                                      }
+                                      lastPages.add(1);
+                                      types = 2;
                                     });
                                   }
                                 } else if (types == 2 &&
                                     checkedTime.isNotEmpty) {
-                                  if (lastType == 7) {
+                                  if (lastPages.last == 0) {
                                     setState(() {
-                                      lockStartTime = checkedTime[0];
-                                      lastType = 8;
-                                      types = 1;
-                                    });
-                                  } else if (lastType == 8) {
-                                    setState(() {
-                                      lockEndTime = checkedTime[0] + 1;
-                                      if (lock != null) {
-                                        types = 10;
-                                      } else {
-                                        types = 9;
+                                      isChecked = true;
+                                      startTime = checkedTime[0];
+                                      endTime = checkedTime[0] + 1;
+                                      if (checkedTime.length > 1) {
+                                        endTime = checkedTime[
+                                                checkedTime.length - 1] +
+                                            1;
                                       }
+                                      types = lastPages.removeLast();
+                                    });
+                                  } else if (lastPages[lastPages.length - 2] !=
+                                      2) {
+                                    setState(() {
+                                      updateStartTime = checkedTime[0];
+                                      selectedDay =
+                                          lockEndDate != updateStartDate
+                                              ? updateStartDate
+                                              : lockEndDate;
+                                      focusedDay =
+                                          lockEndDate != updateStartDate
+                                              ? updateStartDate
+                                              : lockEndDate;
+                                      lastPages.add(2);
+                                      types = 1;
                                     });
                                   } else {
                                     setState(() {
-                                      setState(() {
-                                        isChecked = true;
-                                        types = lastType;
-                                        startTime = checkedTime[0];
-                                        endTime = checkedTime[0] + 1;
-                                        if (checkedTime.length > 1) {
-                                          endTime = checkedTime[
-                                                  checkedTime.length - 1] +
-                                              1;
-                                        }
-                                      });
+                                      lockStartDate = updateStartDate;
+                                      lockEndDate = updateEndDate;
+                                      lockStartTime = updateStartTime;
+                                      lockEndTime = checkedTime[0] + 1;
+                                      updateStartDate = now;
+                                      updateEndDate = now;
+                                      updateStartTime = -1;
+                                      if (lastPages[1] == 8 &&
+                                          lastPages.first != -1) {
+                                        lastPages.clear();
+                                        lastPages.add(7);
+                                        lastPages.add(-1);
+                                      } else {
+                                        lastPages.clear();
+                                      }
+                                      types = 8;
                                     });
                                   }
                                 } else if (types == 5) {
@@ -2365,7 +2496,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   getReservations();
                                   weekViewStateKey.currentState
                                       ?.jumpToWeek(selectedDate);
-
                                   Get.back();
                                 } else {
                                   snackBar(
