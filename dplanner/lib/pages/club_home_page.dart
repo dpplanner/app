@@ -60,6 +60,7 @@ class _ClubHomePageState extends State<ClubHomePage> {
       clubID: ClubController.to.club().id,
       page: _currentPage++,
     );
+
     setState(() {
       _isLoading = false; // 데이터 불러오기가 완료되었음을 표시합니다.
     });
@@ -147,64 +148,67 @@ class _ClubHomePageState extends State<ClubHomePage> {
               ),
               Expanded(
                 child: LayoutBuilder(
-                    builder: (context, constraints) => RefreshIndicator(
-                        onRefresh: () async {
-                          setState(() {
-                            _currentPage = 0;
-                          });
-                          _fetchPosts();
+                  builder: (context, constraints) => RefreshIndicator(
+                    onRefresh: () async {
+                      setState(() {
+                        _currentPage = 0;
+                      });
+                      _fetchPosts();
+                    },
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: (ScrollNotification scrollInfo) {
+                          _onScrollNotification(scrollInfo);
+                          return true;
                         },
-                        child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: NotificationListener<ScrollNotification>(
-                              onNotification: (ScrollNotification scrollInfo) {
-                                _onScrollNotification(scrollInfo);
-                                return true;
-                              },
-                              child: StreamBuilder<List<Post>>(
-                                stream: _postsController.stream,
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<List<Post>> snapshot) {
-                                  if (snapshot.connectionState ==
-                                          ConnectionState.waiting ||
-                                      snapshot.hasData == false) {
-                                    return LoadingPage(
-                                        constraints: constraints);
-                                  } else if (snapshot.hasError) {
-                                    return ErrorPage(constraints: constraints);
-                                  } else if (snapshot.data!.isEmpty &&
-                                      !_isLoading) {
-                                    return Column(
-                                      children: [
-                                        SizedBox(
-                                          height:
-                                              SizeController.to.screenHeight *
-                                                  0.4,
-                                        ),
-                                        const Center(
-                                          child: Text(
-                                            "게시글이 없어요",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  } else {
-                                    return Column(
-                                      children: List.generate(
-                                        snapshot.data!.length,
-                                        (index) => Column(children: [
-                                          Container(width: SizeController.to.screenWidth, height: 10, color: AppColor.backgroundColor2 ),
-                                            PostCard(
-                                                post: snapshot.data![index]),])
-                                      ),
-                                    );
-                                  }
-                                },
-                              ),
-                            ),),),),
+                        child: StreamBuilder<List<Post>>(
+                          stream: _postsController.stream,
+                          builder: (BuildContext context,
+                              AsyncSnapshot<List<Post>> snapshot) {
+                            if (snapshot.data == null && !_isLoading) {
+                              return Column(
+                                children: [
+                                  SizedBox(
+                                    height:
+                                        SizeController.to.screenHeight * 0.4,
+                                  ),
+                                  const Center(
+                                    child: Text(
+                                      "게시글이 없어요",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            } else if (snapshot.hasError) {
+                              return ErrorPage(constraints: constraints);
+                            } else if (snapshot.connectionState ==
+                                    ConnectionState.waiting &&
+                                snapshot.hasData == false) {
+                              return LoadingPage(constraints: constraints);
+                            } else {
+                              return Column(
+                                children: List.generate(
+                                    snapshot.data!.length,
+                                    (index) => Column(children: [
+                                          Container(
+                                              width:
+                                                  SizeController.to.screenWidth,
+                                              height: 10,
+                                              color: AppColor.backgroundColor2),
+                                          PostCard(post: snapshot.data![index]),
+                                        ])),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               )
             ],
           ),
