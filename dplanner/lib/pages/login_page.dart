@@ -20,7 +20,6 @@ import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_naver_login/flutter_naver_login.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../widgets/snack_bar.dart';
 import 'error_page.dart';
@@ -87,40 +86,6 @@ class _LoginPageState extends State<LoginPage> {
       }
     }
     FlutterNativeSplash.remove();
-  }
-
-  Future<void> signInWithApple() async {
-    try {
-      final credential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
-
-      List<String> jwt = credential.identityToken?.split('.') ?? [];
-      String payload = jwt[1];
-      payload = base64.normalize(payload);
-
-      final List<int> jsonData = base64.decode(payload);
-      final userInfo = jsonDecode(utf8.decode(jsonData));
-      print(userInfo);
-      String tokenEmail = userInfo['email'];
-
-      // 서버에 사용자 정보를 전송하고 애플 로그인 처리
-      String email = credential.email ?? tokenEmail;
-      String name =
-          "${credential.givenName ?? "."} ${credential.familyName ?? "."}";
-
-      await TokenApiService.postToken(email: email, name: name);
-      await storage.write(key: loginInfo, value: '$email $name apple');
-
-      // 로그인 성공 후 화면 전환
-      Get.offNamed('/club_list');
-    } catch (e) {
-      print(e.toString());
-      snackBar(title: "애플 로그인 실패", content: e.toString());
-    }
   }
 
   // 구글 로그인
@@ -247,14 +212,6 @@ class _LoginPageState extends State<LoginPage> {
                               onTap: () async {
                                 await signInWithGoogle();
                               }),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
-                          child: SignInWithAppleButton(
-                            onPressed: () async {
-                              await signInWithApple();
-                            },
-                          ),
                         ),
                       ],
                     ),
