@@ -248,14 +248,15 @@ class _LoginPageState extends State<LoginPage> {
                                 await signInWithGoogle();
                               }),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
-                          child: SignInWithAppleButton(
-                            onPressed: () async {
-                              await signInWithApple();
-                            },
+                        if (Platform.isIOS)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
+                            child: SignInWithAppleButton(
+                              onPressed: () async {
+                                await signInWithApple();
+                              },
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
