@@ -24,6 +24,36 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
+  Widget buildPostContent(String content) {
+    final cutoff = 20;
+    final shouldShowMore = content.length > cutoff;
+
+    return RichText(
+      maxLines: 4, // 최대 표시할 라인 수
+      overflow: TextOverflow.ellipsis, // 텍스트가 넘칠 때의 처리
+      text: TextSpan(
+        style: const TextStyle(
+          color: AppColor.textColor,
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
+        children: <TextSpan>[
+          TextSpan(
+            text: shouldShowMore ? content.substring(0, cutoff) : content,
+          ),
+          if (shouldShowMore)
+            TextSpan(
+              text: '... 더 보기',
+              style: TextStyle(
+                color: AppColor.subColor3,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -135,16 +165,7 @@ class _PostCardState extends State<PostCard> {
                         ),
                       ),
                     ),
-                    Text(
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                      widget.post.content,
-                      style: const TextStyle(
-                        color: AppColor.textColor,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
+                    buildPostContent(widget.post.content),
                   ],
                 ),
                 SizedBox(height: SizeController.to.screenHeight * 0.04),
