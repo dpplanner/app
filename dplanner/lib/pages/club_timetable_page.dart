@@ -302,7 +302,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   child: WeekPageHeader(
                                     headerStringBuilder: (DateTime dateTime,
                                         {DateTime? secondaryDate}) {
-                                      return DateFormat("MM월").format(dateTime);
+                                      return DateFormat(" MM월")
+                                          .format(dateTime);
                                     },
                                     headerStyle: HeaderStyle(
                                         decoration: BoxDecoration(
@@ -310,8 +311,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
-                                        headerPadding:
-                                            const EdgeInsets.only(right: 10),
                                         headerTextStyle: const TextStyle(
                                             fontWeight: FontWeight.w700,
                                             fontSize: 18),
@@ -326,9 +325,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                   ?.jumpToWeek(now);
                                             },
                                             child: const Icon(
-                                                SFSymbols.calendar_today,
+                                                SFSymbols.calendar,
                                                 color: AppColor.textColor)),
-                                        titleAlign: TextAlign.left),
+                                        titleAlign: TextAlign.start),
                                     startDate: startDate,
                                     endDate: endDate,
                                     onTitleTapped: () async {
@@ -1801,12 +1800,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   setState(() {
                                     selectedDay = newSelectedDay;
                                     focusedDay = newFocusedDay;
-                                    if (lastPages.last != 0) {
-                                      reservationTime = selectedDay;
-                                    }
                                     if (selectedDay.month != focusedDay.month) {
                                       focusedDay = DateTime(selectedDay.year,
                                           selectedDay.month, 1);
+                                    }
+                                    if (types == 5) {
+                                      chooseDate = selectedDay;
+                                    } else if (lastPages.last != 0) {
+                                      reservationTime = selectedDay;
                                     }
                                   });
                                 },
