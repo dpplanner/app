@@ -167,21 +167,22 @@ class _ClubHomePageState extends State<ClubHomePage> {
                           builder: (BuildContext context,
                               AsyncSnapshot<List<Post>> snapshot) {
                             if (snapshot.data == null && !_isLoading) {
-                              return Column(
-                                children: [
-                                  SizedBox(
-                                    height:
-                                        SizeController.to.screenHeight * 0.4,
-                                  ),
-                                  const Center(
-                                    child: Text(
-                                      "게시글이 없어요",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16),
+                              return ConstrainedBox(
+                                constraints: BoxConstraints(
+                                    minHeight: constraints.maxHeight),
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Center(
+                                      child: Text(
+                                        "게시글이 없어요",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               );
                             } else if (snapshot.hasError) {
                               return ErrorPage(constraints: constraints);
