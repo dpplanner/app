@@ -156,7 +156,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.w500, fontSize: 15),
+                                    fontWeight: FontWeight.w500, fontSize: 16),
                               ),
                             ],
                           ),
