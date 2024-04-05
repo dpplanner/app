@@ -297,7 +297,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   padding: EdgeInsets.only(
                                       left:
                                           SizeController.to.screenWidth * 0.05,
-                                      right: 32),
+                                      right:
+                                          SizeController.to.screenWidth * 0.1),
                                   child: WeekPageHeader(
                                     headerStringBuilder: (DateTime dateTime,
                                         {DateTime? secondaryDate}) {
@@ -315,7 +316,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             fontWeight: FontWeight.w700,
                                             fontSize: 18),
                                         rightIconVisible: false,
-                                        leftIcon: InkWell(
+                                        leftIcon: GestureDetector(
                                             onTap: () {
                                               setState(() {
                                                 standardDay = now;
@@ -339,8 +340,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   ),
                                 ),
                               ),
-                              SizedBox(
-                                  width: SizeController.to.screenWidth * 0.1),
                               Expanded(
                                   child: Padding(
                                       padding: EdgeInsets.only(
