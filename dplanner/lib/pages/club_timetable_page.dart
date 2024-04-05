@@ -1512,7 +1512,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                         ],
                                       ),
                                     ),
-                                  if (reservation!.returned &&
+                                  if (reservation != null &&
+                                      reservation.returned &&
                                       (MemberController.to.clubMember().role ==
                                               "ADMIN" ||
                                           reservation.clubMemberId ==
@@ -2858,7 +2859,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               DateTime.parse(reservation.endDateTime)
                                   .isAfter(now),
                           replacement: Visibility(
-                            visible: !reservation!.returned,
+                            visible:
+                                reservation != null && !reservation.returned,
                             child: NextPageButton(
                               text: const Text(
                                 "반납하기",
@@ -2893,7 +2895,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     buttonColor: AppColor.subColor3,
                                     onPressed: () async {
                                       await checkDeleteReservation(
-                                          id: reservation.reservationId,
+                                          id: reservation!.reservationId,
                                           types: 1);
                                     },
                                   ),
