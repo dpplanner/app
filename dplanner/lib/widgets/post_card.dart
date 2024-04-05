@@ -24,6 +24,34 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
+  Widget buildPostContent(String content) {
+    final cutoff = 100;
+    final shouldShowMore = content.length > cutoff;
+
+    return RichText(
+      text: TextSpan(
+        style: const TextStyle(
+          color: AppColor.textColor,
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
+        children: <TextSpan>[
+          TextSpan(
+            text: shouldShowMore ? content.substring(0, cutoff) : content,
+          ),
+          if (shouldShowMore)
+            const TextSpan(
+              text: '... 더 보기',
+              style: TextStyle(
+                color: AppColor.subColor3,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -84,7 +112,7 @@ class _PostCardState extends State<PostCard> {
                               ),
                             ),
                             Text(
-                              DateFormat('M월 dd일')
+                              DateFormat('M월 d일')
                                   .add_jm()
                                   .format(widget.post.createdTime),
                               style: const TextStyle(
@@ -119,6 +147,7 @@ class _PostCardState extends State<PostCard> {
                 ),
                 SizedBox(height: SizeController.to.screenHeight * 0.02),
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
                       padding: EdgeInsets.only(
@@ -134,41 +163,35 @@ class _PostCardState extends State<PostCard> {
                         ),
                       ),
                     ),
-                    Text(
-                      widget.post.content,
-                      style: const TextStyle(
-                        color: AppColor.textColor,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                      ),
-                    ),
+                    buildPostContent(widget.post.content),
                   ],
                 ),
-                SizedBox(height: SizeController.to.screenHeight * 0.02),
+                SizedBox(height: SizeController.to.screenHeight * 0.04),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (widget.post.isFixed)
-                      const Expanded(
-                        flex: 1,
-                        child: Row(
-                          children: [
-                            Icon(
-                              SFSymbols.pin_fill,
-                              color: AppColor.textColor2,
-                              size: 14,
+                    widget.post.isFixed
+                        ? const Expanded(
+                            flex: 1,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  SFSymbols.pin_fill,
+                                  color: AppColor.textColor2,
+                                  size: 14,
+                                ),
+                                Text(
+                                  '고정됨',
+                                  style: TextStyle(
+                                    color: AppColor.textColor2,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '고정됨',
-                              style: TextStyle(
-                                color: AppColor.textColor2,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                          )
+                        : const Expanded(child: SizedBox()),
                     Expanded(
                       flex: 1,
                       child: Row(
