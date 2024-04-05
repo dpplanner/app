@@ -99,28 +99,30 @@ class _ClubReservationListTab2PageState
                         stream: _confirmedRController.stream,
                         builder: (BuildContext context,
                             AsyncSnapshot<List<ReservationModel>> snapshot) {
-                          if (snapshot.connectionState ==
-                                  ConnectionState.waiting ||
-                              snapshot.hasData == false) {
-                            return LoadingPage(constraints: constraints);
+                          if (snapshot.data == null && !_isLoading) {
+                            return ConstrainedBox(
+                              constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Center(
+                                    child: Text(
+                                      "승인한 예약이 없어요",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
                           } else if (snapshot.hasError) {
                             return ErrorPage(constraints: constraints);
-                          } else if (snapshot.data!.isEmpty && !_isLoading) {
-                            return Column(
-                              children: [
-                                SizedBox(
-                                  height: SizeController.to.screenHeight * 0.4,
-                                ),
-                                const Center(
-                                  child: Text(
-                                    "승인한 예약이 없어요",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16),
-                                  ),
-                                ),
-                              ],
-                            );
+                          } else if (snapshot.connectionState ==
+                                  ConnectionState.waiting &&
+                              snapshot.hasData == false) {
+                            return LoadingPage(constraints: constraints);
                           } else {
                             return Padding(
                               padding: const EdgeInsets.all(24),

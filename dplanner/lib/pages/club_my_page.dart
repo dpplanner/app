@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/reservation_model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -88,76 +90,73 @@ class _ClubMyPageState extends State<ClubMyPage> {
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(right: 16.0),
-                              child: ClipOval(
-                                child: MemberController.to.clubMember().url !=
-                                        null
-                                    ? CachedNetworkImage(
-                                        placeholder: (context, url) =>
-                                            Container(),
-                                        imageUrl:
-                                            "http://${MemberController.to.clubMember().url!}",
-                                        errorWidget: (context, url, error) =>
-                                            SvgPicture.asset(
-                                              'assets/images/base_image/base_member_image.svg',
-                                            ),
-                                        height: SizeController.to.screenWidth *
-                                            0.25,
-                                        width: SizeController.to.screenWidth *
-                                            0.25,
-                                        fit: BoxFit.cover)
-                                    : SvgPicture.asset(
-                                        'assets/images/base_image/base_member_image.svg',
-                                        height: SizeController.to.screenWidth *
-                                            0.25,
-                                        width: SizeController.to.screenWidth *
-                                            0.25,
-                                        fit: BoxFit.cover,
-                                      ),
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  MemberController.to.clubMember().name,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 20),
-                                ),
-                                Text(
-                                  MemberController.to.clubMember().info ?? "",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 18),
-                                ),
-                              ],
-                            ),
-                          ],
+                        Padding(
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: ClipOval(
+                            child: MemberController.to.clubMember().url != null
+                                ? CachedNetworkImage(
+                                    placeholder: (context, url) => Container(),
+                                    imageUrl:
+                                        "http://${MemberController.to.clubMember().url!}",
+                                    errorWidget: (context, url, error) =>
+                                        SvgPicture.asset(
+                                          'assets/images/base_image/base_member_image.svg',
+                                        ),
+                                    height:
+                                        SizeController.to.screenWidth * 0.25,
+                                    width: SizeController.to.screenWidth * 0.25,
+                                    fit: BoxFit.cover)
+                                : SvgPicture.asset(
+                                    'assets/images/base_image/base_member_image.svg',
+                                    height:
+                                        SizeController.to.screenWidth * 0.25,
+                                    width: SizeController.to.screenWidth * 0.25,
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
                         ),
-                        InkWell(
-                          onTap: () {
-                            Get.toNamed('/my_profile');
-                          },
-                          borderRadius: BorderRadius.circular(5),
-                          child: const Row(
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                SFSymbols.pencil,
-                                color: AppColor.textColor2,
+                              GestureDetector(
+                                onTap: () {
+                                  Get.toNamed('/my_profile');
+                                },
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Icon(
+                                      SFSymbols.pencil,
+                                      color: AppColor.textColor2,
+                                      size: 18,
+                                    ),
+                                    Text(
+                                      "프로필 편집하기",
+                                      style: TextStyle(
+                                          color: AppColor.textColor2,
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12),
+                                    ),
+                                  ],
+                                ),
                               ),
                               Text(
-                                "프로필 편집하기",
-                                style: TextStyle(
-                                    color: AppColor.textColor2,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 14),
+                                MemberController.to.clubMember().name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 20),
+                              ),
+                              Text(
+                                MemberController.to.clubMember().info ?? "",
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500, fontSize: 16),
                               ),
                             ],
                           ),
@@ -181,13 +180,13 @@ class _ClubMyPageState extends State<ClubMyPage> {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
-                              color: AppColor.subColor2,
+                              color: AppColor.backgroundColor2,
                             ),
                             child: const Padding(
                               padding: EdgeInsets.all(16.0),
                               child: Center(
                                 child: Text(
-                                  "최근 예약이 없습니다",
+                                  "최근 예약이 없어요",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 14),

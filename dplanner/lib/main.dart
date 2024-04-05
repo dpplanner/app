@@ -62,31 +62,36 @@ class MyApp extends StatelessWidget {
     final memberController = MemberController();
     sizeController.screenWidth = MediaQuery.of(context).size.width;
     sizeController.screenHeight = MediaQuery.of(context).size.height;
-    return CalendarControllerProvider(
-      controller: EventController(),
-      child: GetMaterialApp(
-        title: 'DPlanner',
-        theme: ThemeData(
-            primaryColor: AppColor.objectColor,
-            fontFamily: 'Pretendard',
-            useMaterial3: true),
-        debugShowCheckedModeBanner: false,
-        initialRoute: '/',
-        getPages: page,
-        initialBinding: BindingsBuilder(() {
-          Get.put(sizeController);
-          Get.put(clubController);
-          Get.put(memberController);
-        }),
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('ko', ''),
-          Locale('en', ''),
-        ],
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus(); // 키보드 닫기 이벤트
+      },
+      child: CalendarControllerProvider(
+        controller: EventController(),
+        child: GetMaterialApp(
+          title: 'DPlanner',
+          theme: ThemeData(
+              primaryColor: AppColor.objectColor,
+              fontFamily: 'Pretendard',
+              useMaterial3: true),
+          debugShowCheckedModeBanner: false,
+          initialRoute: '/',
+          getPages: page,
+          initialBinding: BindingsBuilder(() {
+            Get.put(sizeController);
+            Get.put(clubController);
+            Get.put(memberController);
+          }),
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('ko', ''),
+            Locale('en', ''),
+          ],
+        ),
       ),
     );
   }

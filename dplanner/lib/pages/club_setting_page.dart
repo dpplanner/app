@@ -181,7 +181,7 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 16,
-                                    color: AppColor.textColor2),
+                                    color: AppColor.textColor),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 16.0),
@@ -190,7 +190,7 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16,
-                                      color: AppColor.textColor2),
+                                      color: AppColor.textColor),
                                 ),
                               ),
                             ],

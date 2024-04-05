@@ -34,6 +34,7 @@ class OutlineTextForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      //textInputAction: TextInputAction.done,
       controller: controller,
       maxLines: maxLines,
       decoration: InputDecoration(

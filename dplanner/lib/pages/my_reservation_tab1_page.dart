@@ -86,12 +86,30 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                           stream: _upcomingRController.stream,
                           builder: (BuildContext context,
                               AsyncSnapshot<List<ReservationModel>> snapshot) {
-                            if (snapshot.connectionState ==
+                            if (snapshot.data == null) {
+                              return ConstrainedBox(
+                                constraints: BoxConstraints(
+                                    minHeight: constraints.maxHeight),
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Center(
+                                      child: Text(
+                                        "다가오는 예약이 없어요",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else if (snapshot.hasError) {
+                              return ErrorPage(constraints: constraints);
+                            } else if (snapshot.connectionState ==
                                     ConnectionState.waiting ||
                                 snapshot.hasData == false) {
                               return LoadingPage(constraints: constraints);
-                            } else if (snapshot.hasError) {
-                              return ErrorPage(constraints: constraints);
                             } else {
                               return Padding(
                                 padding:

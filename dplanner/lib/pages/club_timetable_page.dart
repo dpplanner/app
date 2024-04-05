@@ -297,11 +297,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   padding: EdgeInsets.only(
                                       left:
                                           SizeController.to.screenWidth * 0.05,
-                                      right: 32),
+                                      right:
+                                          SizeController.to.screenWidth * 0.1),
                                   child: WeekPageHeader(
                                     headerStringBuilder: (DateTime dateTime,
                                         {DateTime? secondaryDate}) {
-                                      return DateFormat("MM월").format(dateTime);
+                                      return DateFormat(" MM월")
+                                          .format(dateTime);
                                     },
                                     headerStyle: HeaderStyle(
                                         decoration: BoxDecoration(
@@ -309,13 +311,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
-                                        headerPadding:
-                                            const EdgeInsets.only(right: 10),
                                         headerTextStyle: const TextStyle(
                                             fontWeight: FontWeight.w700,
                                             fontSize: 18),
                                         rightIconVisible: false,
-                                        leftIcon: InkWell(
+                                        leftIcon: GestureDetector(
                                             onTap: () {
                                               setState(() {
                                                 standardDay = now;
@@ -325,9 +325,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                   ?.jumpToWeek(now);
                                             },
                                             child: const Icon(
-                                                SFSymbols.calendar_today,
+                                                SFSymbols.calendar,
                                                 color: AppColor.textColor)),
-                                        titleAlign: TextAlign.left),
+                                        titleAlign: TextAlign.start),
                                     startDate: startDate,
                                     endDate: endDate,
                                     onTitleTapped: () async {
@@ -339,8 +339,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   ),
                                 ),
                               ),
-                              SizedBox(
-                                  width: SizeController.to.screenWidth * 0.1),
                               Expanded(
                                   child: Padding(
                                       padding: EdgeInsets.only(
@@ -546,12 +544,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             return Container();
                           }
                         },
-                        liveTimeIndicatorSettings:
-                            const LiveTimeIndicatorSettings(
-                          color: AppColor.objectColor,
-                          height: 0,
-                          offset: 0,
-                        ),
                         fullDayEventBuilder: (events, date) {
                           return FullDayEventView(
                             events: events,
@@ -1518,7 +1510,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                         ],
                                       ),
                                     ),
-                                  if (reservation!.returned &&
+                                  if (reservation != null &&
+                                      reservation.returned &&
                                       (MemberController.to.clubMember().role ==
                                               "ADMIN" ||
                                           reservation.clubMemberId ==
@@ -1807,12 +1800,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   setState(() {
                                     selectedDay = newSelectedDay;
                                     focusedDay = newFocusedDay;
-                                    if (lastPages.last != 0) {
-                                      reservationTime = selectedDay;
-                                    }
                                     if (selectedDay.month != focusedDay.month) {
                                       focusedDay = DateTime(selectedDay.year,
                                           selectedDay.month, 1);
+                                    }
+                                    if (types == 5) {
+                                      chooseDate = selectedDay;
+                                    } else if (lastPages.last != 0) {
+                                      reservationTime = selectedDay;
                                     }
                                   });
                                 },
@@ -2864,7 +2859,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               DateTime.parse(reservation.endDateTime)
                                   .isAfter(now),
                           replacement: Visibility(
-                            visible: !reservation!.returned,
+                            visible:
+                                reservation != null && !reservation.returned,
                             child: NextPageButton(
                               text: const Text(
                                 "반납하기",
@@ -2899,7 +2895,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     buttonColor: AppColor.subColor3,
                                     onPressed: () async {
                                       await checkDeleteReservation(
-                                          id: reservation.reservationId,
+                                          id: reservation!.reservationId,
                                           types: 1);
                                     },
                                   ),

@@ -5,6 +5,7 @@ import 'package:dplanner/widgets/reservation_big_card.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../controllers/size.dart';
 import '../models/reservation_model.dart';
 import '../style.dart';
 import 'error_page.dart';
@@ -86,12 +87,30 @@ class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
                           stream: _previousRController.stream,
                           builder: (BuildContext context,
                               AsyncSnapshot<List<ReservationModel>> snapshot) {
-                            if (snapshot.connectionState ==
+                            if (snapshot.data == null) {
+                              return ConstrainedBox(
+                                constraints: BoxConstraints(
+                                    minHeight: constraints.maxHeight),
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Center(
+                                      child: Text(
+                                        "지난 예약이 없어요",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else if (snapshot.hasError) {
+                              return ErrorPage(constraints: constraints);
+                            } else if (snapshot.connectionState ==
                                     ConnectionState.waiting ||
                                 snapshot.hasData == false) {
                               return LoadingPage(constraints: constraints);
-                            } else if (snapshot.hasError) {
-                              return ErrorPage(constraints: constraints);
                             } else {
                               return Padding(
                                 padding:
