@@ -25,12 +25,10 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard> {
   Widget buildPostContent(String content) {
-    final cutoff = 20;
+    final cutoff = 100;
     final shouldShowMore = content.length > cutoff;
 
     return RichText(
-      maxLines: 4, // 최대 표시할 라인 수
-      overflow: TextOverflow.ellipsis, // 텍스트가 넘칠 때의 처리
       text: TextSpan(
         style: const TextStyle(
           color: AppColor.textColor,
@@ -42,7 +40,7 @@ class _PostCardState extends State<PostCard> {
             text: shouldShowMore ? content.substring(0, cutoff) : content,
           ),
           if (shouldShowMore)
-            TextSpan(
+            const TextSpan(
               text: '... 더 보기',
               style: TextStyle(
                 color: AppColor.subColor3,
