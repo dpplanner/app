@@ -256,38 +256,41 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                             MemberController.to.clubMember().info) &&
                         (file == null)) {
                       return;
-                    } else if (file != null) {
-                      try {
-                        MemberController.to.clubMember.value =
-                            await ClubMemberApiService.postProfile(
-                                clubId: clubId,
-                                clubMemberId: clubMemberId,
-                                image: file);
-                      } catch (e) {
-                        print(e.toString());
-                        snackBar(
-                            title: "프로필 편집하는데 오류가 발생하였습니다.",
-                            content: e.toString());
+                    } else {
+                      if (file != null) {
+                        try {
+                          MemberController.to.clubMember.value =
+                              await ClubMemberApiService.postProfile(
+                                  clubId: clubId,
+                                  clubMemberId: clubMemberId,
+                                  image: file);
+                        } catch (e) {
+                          print(e.toString());
+                          snackBar(
+                              title: "프로필 편집하는데 오류가 발생하였습니다.",
+                              content: e.toString());
+                        }
                       }
-                    } else if ((myName.text !=
-                            MemberController.to.clubMember().name) ||
-                        (myContent.text !=
-                            MemberController.to.clubMember().info)) {
-                      try {
-                        MemberController.to.clubMember.value =
-                            await ClubMemberApiService.patchClubMember(
-                                clubMemberId: clubMemberId,
-                                clubId: clubId,
-                                name: myName.text,
-                                info: myContent.text);
-                      } catch (e) {
-                        print(e.toString());
-                        snackBar(
-                            title: "프로필 편집하는데 오류가 발생하였습니다.",
-                            content: e.toString());
+                      if ((myName.text !=
+                              MemberController.to.clubMember().name) ||
+                          (myContent.text !=
+                              MemberController.to.clubMember().info)) {
+                        try {
+                          MemberController.to.clubMember.value =
+                              await ClubMemberApiService.patchClubMember(
+                                  clubMemberId: clubMemberId,
+                                  clubId: clubId,
+                                  name: myName.text,
+                                  info: myContent.text);
+                        } catch (e) {
+                          print(e.toString());
+                          snackBar(
+                              title: "프로필 편집하는데 오류가 발생하였습니다.",
+                              content: e.toString());
+                        }
                       }
+                      Get.offAllNamed('/tab3', arguments: 2);
                     }
-                    Get.offAllNamed('/tab3', arguments: 2);
                   },
                 ),
               ),

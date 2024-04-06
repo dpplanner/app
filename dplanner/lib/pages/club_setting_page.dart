@@ -246,30 +246,33 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                     if ((file == null) &&
                         (info.text == ClubController.to.club().info)) {
                       return;
-                    } else if (file != null) {
-                      try {
-                        ClubController.to.club.value =
-                            await ClubApiService.postClubImage(
-                                clubId: clubId, image: file);
-                      } catch (e) {
-                        print(e.toString());
-                        snackBar(
-                            title: "프로필 편집하는데 오류가 발생하였습니다.",
-                            content: e.toString());
+                    } else {
+                      if (file != null) {
+                        try {
+                          ClubController.to.club.value =
+                              await ClubApiService.postClubImage(
+                                  clubId: clubId, image: file);
+                        } catch (e) {
+                          print(e.toString());
+                          snackBar(
+                              title: "프로필 편집하는데 오류가 발생하였습니다.",
+                              content: e.toString());
+                        }
                       }
-                    } else if (info.text != ClubController.to.club().info) {
-                      try {
-                        ClubController.to.club.value =
-                            await ClubApiService.patchClub(
-                                clubId: clubId, info: info.text);
-                      } catch (e) {
-                        print(e.toString());
-                        snackBar(
-                            title: "프로필 편집하는데 오류가 발생하였습니다.",
-                            content: e.toString());
+                      if (info.text != ClubController.to.club().info) {
+                        try {
+                          ClubController.to.club.value =
+                              await ClubApiService.patchClub(
+                                  clubId: clubId, info: info.text);
+                        } catch (e) {
+                          print(e.toString());
+                          snackBar(
+                              title: "프로필 편집하는데 오류가 발생하였습니다.",
+                              content: e.toString());
+                        }
                       }
+                      Get.back();
                     }
-                    Get.back();
                   },
                 ),
               ),
