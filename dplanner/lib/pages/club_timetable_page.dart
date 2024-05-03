@@ -601,7 +601,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 return const ErrorPage();
               } else {
                 return Visibility(
-                  visible: MemberController.to.clubMember().role == "ADMIN",
+                  visible: (MemberController.to.clubMember().role == "ADMIN" ||
+                      MemberController.to
+                          .clubMember()
+                          .clubAuthorityTypes!
+                          .contains("SCHEDULE_ALL")),
                   replacement: ElevatedButton(
                     onPressed: () {
                       if (selectedValue!.notice == "") {
@@ -852,8 +856,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             child: Text(
                               reservation != null &&
                                       reservation.status == "REQUEST" &&
-                                      MemberController.to.clubMember().role ==
-                                          "ADMIN"
+                                      (MemberController.to.clubMember().role ==
+                                              "ADMIN" ||
+                                          MemberController.to
+                                              .clubMember()
+                                              .clubAuthorityTypes!
+                                              .contains("SCHEDULE_ALL"))
                                   ? "예약 요청"
                                   : reservation?.status == "REQUEST"
                                       ? "승인 대기중"
@@ -1509,6 +1517,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       reservation.returned &&
                                       (MemberController.to.clubMember().role ==
                                               "ADMIN" ||
+                                          MemberController.to
+                                              .clubMember()
+                                              .clubAuthorityTypes!
+                                              .contains("SCHEDULE_ALL") ||
                                           reservation.clubMemberId ==
                                               MemberController.to
                                                   .clubMember()
@@ -2760,8 +2772,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         visible: reservation?.clubMemberId ==
                             MemberController.to.clubMember().id,
                         replacement: Visibility(
-                          visible:
-                              MemberController.to.clubMember().role == "ADMIN",
+                          visible: (MemberController.to.clubMember().role ==
+                                  "ADMIN" ||
+                              MemberController.to
+                                  .clubMember()
+                                  .clubAuthorityTypes!
+                                  .contains("SCHEDULE_ALL")),
                           child: Visibility(
                             visible: reservation?.status == "REQUEST",
                             replacement: NextPageButton(
