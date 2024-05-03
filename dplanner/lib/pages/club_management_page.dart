@@ -65,7 +65,12 @@ class _ClubManagementPageState extends State<ClubManagementPage> {
               Get.toNamed('/resource_list');
             }, true),
             selectButton("클럽 매니저 관리", () {
-              Get.toNamed('/club_manager_list');
+              if (MemberController.to.clubMember().role == "ADMIN") {
+                Get.toNamed('/club_manager_list');
+              } else {
+                snackBar(
+                    title: "권한이 없습니다", content: "클럽 관리자만 클럽 매니저 관리가 가능합니다");
+              }
             }, true),
             selectButton("게시판 신고 관리", () {}, true),
           ],
