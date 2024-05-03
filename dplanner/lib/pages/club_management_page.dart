@@ -72,7 +72,9 @@ class _ClubManagementPageState extends State<ClubManagementPage> {
                     title: "권한이 없습니다", content: "클럽 관리자만 클럽 매니저 관리가 가능합니다");
               }
             }, true),
-            selectButton("게시판 신고 관리", () {}, true),
+            selectButton("게시판 신고 관리", () {
+              snackBar(title: "개발 진행 중입니다", content: "추후에 이용해주세요");
+            }, true),
           ],
         ),
       ),
