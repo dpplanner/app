@@ -148,6 +148,16 @@ class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
                                     }
                                     lastDay = dateText;
 
+                                    var endTime = DateFormat.H().format(
+                                        DateTime.parse(
+                                            snapshot.data![index].endDateTime));
+                                    if (endTime == "00") {
+                                      endTime = "24";
+                                    }
+                                    if (endTime.startsWith("0")) {
+                                      endTime = endTime.substring(1);
+                                    }
+
                                     return Padding(
                                       padding:
                                           const EdgeInsets.only(bottom: 12.0),
@@ -171,13 +181,18 @@ class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
                                           ),
                                           Expanded(
                                             child: ReservationBigCard(
-                                                time:
-                                                    "${DateFormat("yyyy년 MM월 dd일 hh:00 -", 'ko_KR').format(DateTime.parse(snapshot.data![index].startDateTime))} ${snapshot.data![index].endDateTime.substring(11, 16)}",
-                                                resource: snapshot
-                                                    .data![index].resourceName,
-                                                name:
-                                                    "${snapshot.data![index].clubMemberName}의 예약",
-                                                isRecent: false),
+                                              onTap: () async {
+                                                setState(() {
+                                                  _currentPage = 0;
+                                                  lastDay = '';
+                                                });
+                                                _fetchPreviousReservations();
+                                              },
+                                              reservation:
+                                                  snapshot.data![index],
+                                              isRecent: false,
+                                              endTime: endTime,
+                                            ),
                                           ),
                                         ],
                                       ),

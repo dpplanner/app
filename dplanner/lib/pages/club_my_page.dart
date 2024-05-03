@@ -217,18 +217,35 @@ class _ClubMyPageState extends State<ClubMyPage> {
                                       final difference = reservationDate
                                           .difference(today)
                                           .inDays;
+                                      final startTime = DateTime.parse(
+                                          snapshot.data![index].startDateTime);
+                                      var endTime = DateFormat.H().format(
+                                          DateTime.parse(snapshot
+                                              .data![index].endDateTime));
+                                      if (endTime == "00") {
+                                        endTime = "24";
+                                      }
+                                      if (endTime.startsWith("0")) {
+                                        endTime = endTime.substring(1);
+                                      }
                                       return Padding(
                                         padding:
                                             const EdgeInsets.only(right: 8.0),
                                         child: ReservationMiniCard(
                                           title:
-                                              "${DateFormat("MM/dd hh-", 'ko_KR').format(DateTime.parse(snapshot.data![index].startDateTime))}${snapshot.data![index].endDateTime.substring(11, 13)} (${snapshot.data![index].resourceName})",
+                                              "${DateFormat("MM/dd H~", 'ko_KR').format(startTime)}$endTime (${snapshot.data![index].resourceName})",
                                           isToday: difference == 0,
                                           isAccepted:
                                               snapshot.data![index].status ==
                                                   "CONFIRMED",
-                                          name: snapshot
-                                              .data![index].clubMemberName,
+                                          name: snapshot.data![index]
+                                                      .clubMemberId ==
+                                                  MemberController.to
+                                                      .clubMember()
+                                                      .id
+                                              ? null
+                                              : snapshot
+                                                  .data![index].clubMemberName,
                                         ),
                                       );
                                     },
