@@ -1,7 +1,9 @@
+import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
+import '../controllers/member.dart';
 import '../controllers/size.dart';
 import '../style.dart';
 
@@ -39,13 +41,25 @@ class _ClubManagementPageState extends State<ClubManagementPage> {
         child: Column(
           children: [
             selectButton("클럽 설정", () {
-              Get.toNamed('/club_setting');
+              if (MemberController.to.clubMember().role == "ADMIN") {
+                Get.toNamed('/club_setting');
+              } else {
+                snackBar(title: "권한이 없습니다", content: "클럽 관리자만 클럽 설정이 가능합니다");
+              }
             }, true),
             selectButton("회원 목록", () {
               Get.toNamed('/club_member_list');
             }, true),
             selectButton("예약 요청", () {
-              Get.toNamed('/reservation_list');
+              if (MemberController.to.clubMember().role == "ADMIN" ||
+                  MemberController.to
+                      .clubMember()
+                      .clubAuthorityTypes!
+                      .contains("SCHEDULE_ALL")) {
+                Get.toNamed('/reservation_list');
+              } else {
+                snackBar(title: "권한이 없습니다", content: "클럽 관리자에게 권한을 요청하세요");
+              }
             }, true),
             selectButton("공유 물품 목록", () {
               Get.toNamed('/resource_list');
