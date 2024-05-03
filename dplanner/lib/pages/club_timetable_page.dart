@@ -225,7 +225,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   fontWeight: FontWeight.w600, fontSize: 16),
                             ),
                             if (MemberController.to.clubMember().role ==
-                                "ADMIN")
+                                    "ADMIN" ||
+                                MemberController.to
+                                    .clubMember()
+                                    .clubAuthorityTypes!
+                                    .contains("RESOURCE_ALL"))
                               Column(
                                 children: [
                                   const Text(
