@@ -9,9 +9,11 @@ class OutlineTextForm extends StatelessWidget {
   final bool isFocused;
   final bool isColored;
   final int maxLines;
+  final bool expandable;
   final bool noLine;
   final double fontSize;
   final Widget icon;
+  final bool isEnabled;
   final FormFieldValidator<String>? validator;
   final FormFieldSetter<String>? onSaved;
   final ValueChanged<String>? onChanged;
@@ -24,9 +26,11 @@ class OutlineTextForm extends StatelessWidget {
       this.isFocused = false,
       this.isColored = false,
       this.maxLines = 1,
+      this.expandable = false,
       this.noLine = false,
       this.fontSize = 16,
       this.icon = const Icon(Icons.arrow_forward),
+      this.isEnabled = true,
       this.validator,
       this.onSaved,
       this.onChanged});
@@ -36,7 +40,9 @@ class OutlineTextForm extends StatelessWidget {
     return TextFormField(
       //textInputAction: TextInputAction.done,
       controller: controller,
-      maxLines: maxLines,
+      minLines: maxLines,
+      maxLines: expandable ? null : maxLines,
+      enabled: isEnabled,
       decoration: InputDecoration(
         suffixIcon: (isColored) ? icon : null,
         fillColor: AppColor.backgroundColor2,
@@ -49,6 +55,12 @@ class OutlineTextForm extends StatelessWidget {
           color: AppColor.textColor2,
         ),
         enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+                color: noLine || isColored
+                    ? Colors.transparent
+                    : (isFocused ? AppColor.textColor : AppColor.textColor2)),
+            borderRadius: BorderRadius.circular(15.0)),
+        disabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
                 color: noLine || isColored
                     ? Colors.transparent

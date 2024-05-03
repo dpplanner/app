@@ -259,7 +259,8 @@ class _ClubMyPageState extends State<ClubMyPage> {
                 selectButton("클럽 정보", () {
                   Get.toNamed('/club_info', arguments: 2);
                 }, false),
-                if (MemberController.to.clubMember().role == "ADMIN")
+                if (MemberController.to.clubMember().role == "ADMIN" ||
+                    MemberController.to.clubMember().role == "MANAGER")
                   selectButton("클럽 관리", () {
                     Get.toNamed('/club_manage');
                   }, false),

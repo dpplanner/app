@@ -13,7 +13,7 @@ void snackBar({required String title, required String content}) {
       borderRadius: 24,
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
       colorText: AppColor.backgroundColor,
-      backgroundColor: AppColor.subColor1,
+      backgroundColor: AppColor.subColor3,
       snackPosition: SnackPosition.TOP,
       animationDuration: const Duration(milliseconds: 200),
       isDismissible: true);

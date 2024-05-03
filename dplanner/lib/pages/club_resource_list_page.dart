@@ -195,7 +195,11 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                     ),
                   ),
                 ),
-                if (MemberController.to.clubMember().role == "ADMIN")
+                if (MemberController.to.clubMember().role == "ADMIN" ||
+                    MemberController.to
+                        .clubMember()
+                        .clubAuthorityTypes!
+                        .contains("RESOURCE_ALL"))
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
                     child: NextPageButton(
@@ -345,7 +349,7 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                         : "물건",
                                     style: const TextStyle(
                                       fontSize: 15,
-                                      fontWeight: FontWeight.w400,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
@@ -497,7 +501,7 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                     method[0],
                                     style: const TextStyle(
                                       fontSize: 15,
-                                      fontWeight: FontWeight.w400,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
@@ -577,7 +581,8 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                             ],
                           ),
                         ),
-                        if (types != 1)
+                        if (!(types == 1 &&
+                            (!isChecked || updateNotice.text == "")))
                           const Text(
                             "주의사항",
                             style: TextStyle(
@@ -585,7 +590,8 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                        if (types != 1)
+                        if (!(types == 1 &&
+                            (!isChecked || updateNotice.text == "")))
                           Padding(
                             padding:
                                 const EdgeInsets.only(top: 8.0, bottom: 8.0),
@@ -598,12 +604,8 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                       (types == 0) ? notice : updateNotice,
                                   isFocused: isFocused3,
                                   maxLines: 2,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return '클럽 소개글을 작성해주세요';
-                                    }
-                                    return null;
-                                  },
+                                  expandable: true,
+                                  isEnabled: (types == 1) ? false : true,
                                   onChanged: (value) {
                                     setState(() {
                                       isFocused3 = value.isNotEmpty;
@@ -642,7 +644,11 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                   ),
                 ),
               ),
-              if (MemberController.to.clubMember().role == "ADMIN")
+              if (MemberController.to.clubMember().role == "ADMIN" ||
+                  MemberController.to
+                      .clubMember()
+                      .clubAuthorityTypes!
+                      .contains("RESOURCE_ALL"))
                 Visibility(
                   visible: types != 0,
                   replacement: Padding(
@@ -873,7 +879,11 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                   size: 20,
                 ),
               ),
-              if (MemberController.to.clubMember().role == "ADMIN")
+              if (MemberController.to.clubMember().role == "ADMIN" ||
+                  MemberController.to
+                      .clubMember()
+                      .clubAuthorityTypes!
+                      .contains("RESOURCE_ALL"))
                 IconButton(
                   onPressed: () {
                     checkDeleteResource(id: resource.id);

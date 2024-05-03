@@ -121,7 +121,11 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
                       children: [
-                        if (MemberController.to.clubMember().role == "ADMIN")
+                        if (MemberController.to.clubMember().role == "ADMIN" ||
+                            MemberController.to
+                                .clubMember()
+                                .clubAuthorityTypes!
+                                .contains("MEMBER_ALL"))
                           StreamBuilder<List<ClubMemberModel>>(
                               stream: streamController2.stream,
                               builder: (BuildContext context,
@@ -297,8 +301,13 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                           size: 20,
                         ),
                       ),
-                    if (MemberController.to.clubMember().role == "ADMIN" &&
-                        member.role != "ADMIN")
+                    if ((MemberController.to.clubMember().role == "ADMIN" ||
+                            MemberController.to
+                                .clubMember()
+                                .clubAuthorityTypes!
+                                .contains("MEMBER_ALL")) &&
+                        member.role != "ADMIN" &&
+                        member.id != MemberController.to.clubMember().id)
                       Visibility(
                         visible: member.isConfirmed,
                         replacement: IconButton(
@@ -335,7 +344,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
   //types: 0-승인 대기중, 1-회원 정보, 2-등급 수정
   Future<void> _clubMemberInfo(
       {required int types, required ClubMemberModel member}) async {
-    List<String> grade = ['관리자'];
+    List<String> grade = ['일반'];
     String selectedValue = grade[0];
     List<ClubManagerModel> managers = [];
 
@@ -343,14 +352,10 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
       managers = await ClubManagerApiService.getClubManager(
           clubId: ClubController.to.club().id);
       for (var i in managers) {
-        grade.add(i.name);
+        grade.insert(0, i.name);
       }
-      grade.add("일반");
-      selectedValue = (member.role == "MANAGER")
-          ? member.clubAuthorityName ?? ""
-          : (member.role == "ADMIN")
-              ? "관리자"
-              : "일반";
+      selectedValue =
+          (member.role == "MANAGER") ? member.clubAuthorityName ?? "" : "일반";
     } catch (e) {
       print(e.toString());
     }
@@ -715,15 +720,75 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                   ),
                 ),
               ),
-              Visibility(
-                visible: types != 0,
-                replacement: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    children: [
-                      NextPageButton(
+              if (!(member.id == MemberController.to.clubMember().id ||
+                  member.role == "ADMIN"))
+                Visibility(
+                  visible: types != 0,
+                  replacement: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      children: [
+                        NextPageButton(
+                          text: const Text(
+                            "가입 승인하기",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColor.backgroundColor),
+                          ),
+                          buttonColor: AppColor.objectColor,
+                          onPressed: () async {
+                            try {
+                              await ClubMemberApiService.patchMemberToClub(
+                                  clubMemberId: member.id,
+                                  clubId: ClubController.to.club().id);
+                              ClubController.to.club.value =
+                                  await ClubApiService.getClub(
+                                      clubID: ClubController.to.club().id);
+                              getClubMemberList();
+                              Get.back();
+                            } catch (e) {
+                              print(e.toString());
+                            }
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0, top: 5),
+                          child: NextPageButton(
+                            text: const Text(
+                              "가입 거절하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColor.backgroundColor),
+                            ),
+                            buttonColor: AppColor.markColor,
+                            onPressed: () async {
+                              try {
+                                await ClubMemberApiService.deleteClubMember(
+                                    clubMemberId: member.id,
+                                    clubId: ClubController.to.club().id);
+                                getClubMemberList();
+                                ClubController.to.club.value =
+                                    await ClubApiService.getClub(
+                                        clubID: ClubController.to.club().id);
+                                Get.back();
+                              } catch (e) {
+                                print(e.toString());
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  child: Visibility(
+                    visible: types == 1,
+                    replacement: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                      child: NextPageButton(
                         text: const Text(
-                          "가입 승인하기",
+                          "변경사항 반영하기",
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -731,13 +796,27 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                         ),
                         buttonColor: AppColor.objectColor,
                         onPressed: () async {
+                          String role = "";
+                          int? clubAuthorityId;
+                          if (selectedValue == "관리자") {
+                            role = "ADMIN";
+                          } else if (selectedValue == "일반") {
+                            role = "USER";
+                          } else {
+                            role = "MANAGER";
+                            for (var i in managers) {
+                              if (i.name == selectedValue) {
+                                clubAuthorityId = i.id;
+                              }
+                            }
+                          }
                           try {
-                            await ClubMemberApiService.patchMemberToClub(
-                                clubMemberId: member.id,
-                                clubId: ClubController.to.club().id);
-                            ClubController.to.club.value =
-                                await ClubApiService.getClub(
-                                    clubID: ClubController.to.club().id);
+                            ClubMemberModel temp =
+                                await ClubMemberApiService.patchAuthorities(
+                                    clubMemberId: member.id,
+                                    clubId: ClubController.to.club().id,
+                                    role: role,
+                                    clubAuthorityId: clubAuthorityId);
                             getClubMemberList();
                             Get.back();
                           } catch (e) {
@@ -745,99 +824,27 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                           }
                         },
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0, top: 5),
-                        child: NextPageButton(
-                          text: const Text(
-                            "가입 거절하기",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColor.backgroundColor),
-                          ),
-                          buttonColor: AppColor.markColor,
-                          onPressed: () async {
-                            try {
-                              await ClubMemberApiService.deleteClubMember(
-                                  clubMemberId: member.id,
-                                  clubId: ClubController.to.club().id);
-                              getClubMemberList();
-                              ClubController.to.club.value =
-                                  await ClubApiService.getClub(
-                                      clubID: ClubController.to.club().id);
-                              Get.back();
-                            } catch (e) {
-                              print(e.toString());
-                            }
-                          },
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                      child: NextPageButton(
+                        text: const Text(
+                          "회원 등급 변경하기",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColor.backgroundColor),
                         ),
+                        buttonColor: AppColor.objectColor,
+                        onPressed: () {
+                          setState(() {
+                            types = 2;
+                          });
+                        },
                       ),
-                    ],
-                  ),
-                ),
-                child: Visibility(
-                  visible: types == 1,
-                  replacement: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-                    child: NextPageButton(
-                      text: const Text(
-                        "변경사항 반영하기",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColor.backgroundColor),
-                      ),
-                      buttonColor: AppColor.objectColor,
-                      onPressed: () async {
-                        String role = "";
-                        int? clubAuthorityId;
-                        if (selectedValue == "관리자") {
-                          role = "ADMIN";
-                        } else if (selectedValue == "일반") {
-                          role = "USER";
-                        } else {
-                          role = "MANAGER";
-                          for (var i in managers) {
-                            if (i.name == selectedValue) {
-                              clubAuthorityId = i.id;
-                            }
-                          }
-                        }
-                        try {
-                          ClubMemberModel temp =
-                              await ClubMemberApiService.patchAuthorities(
-                                  clubMemberId: member.id,
-                                  clubId: ClubController.to.club().id,
-                                  role: role,
-                                  clubAuthorityId: clubAuthorityId);
-                          getClubMemberList();
-                          Get.back();
-                        } catch (e) {
-                          print(e.toString());
-                        }
-                      },
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-                    child: NextPageButton(
-                      text: const Text(
-                        "회원 등급 변경하기",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColor.backgroundColor),
-                      ),
-                      buttonColor: AppColor.objectColor,
-                      onPressed: () {
-                        setState(() {
-                          types = 2;
-                        });
-                      },
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         );

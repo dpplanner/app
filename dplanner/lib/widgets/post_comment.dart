@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../controllers/member.dart';
 import '../controllers/size.dart';
 import '../style.dart';
 import 'nextpage_button.dart';
@@ -256,82 +257,89 @@ class _PostCommentState extends State<PostComment> {
                   'assets/images/extra/showmodal_scrollcontrolbar.svg',
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-                child: NextPageButton(
-                  buttonColor: AppColor.backgroundColor2,
-                  text: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        SFSymbols.exclamationmark_octagon,
-                        color: AppColor.markColor,
-                      ),
-                      Text(
-                        " 이 댓글 신고하기",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.markColor),
-                      ),
-                    ],
+              if (comment.clubMemberId == MemberController.to.clubMember().id)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                  child: NextPageButton(
+                    buttonColor: AppColor.backgroundColor2,
+                    text: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          SFSymbols.pencil_outline,
+                          color: AppColor.textColor,
+                        ),
+                        Text(
+                          " 수정하기",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.textColor),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      Get.back();
+                    },
                   ),
-                  onPressed: () {
-                    Get.back();
-                  },
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                child: NextPageButton(
-                  buttonColor: AppColor.backgroundColor2,
-                  text: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        SFSymbols.pencil_outline,
-                        color: AppColor.textColor,
+              comment.clubMemberId == MemberController.to.clubMember().id ||
+                      MemberController.to.clubMember().role == "ADMIN" ||
+                      MemberController.to
+                          .clubMember()
+                          .clubAuthorityTypes!
+                          .contains("POST_ALL")
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                      child: NextPageButton(
+                        buttonColor: AppColor.backgroundColor2,
+                        text: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              SFSymbols.trash,
+                              color: AppColor.markColor,
+                            ),
+                            Text(
+                              " 삭제하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.markColor),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          PostCommentApiService.deleteComment(comment.id);
+                          Get.back();
+                        },
                       ),
-                      Text(
-                        " 수정하기",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.textColor),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                      child: NextPageButton(
+                        buttonColor: AppColor.backgroundColor2,
+                        text: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              SFSymbols.exclamationmark_octagon,
+                              color: AppColor.markColor,
+                            ),
+                            Text(
+                              " 이 댓글 신고하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.markColor),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          Get.back();
+                        },
                       ),
-                    ],
-                  ),
-                  onPressed: () {
-                    Get.back();
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                child: NextPageButton(
-                  buttonColor: AppColor.backgroundColor2,
-                  text: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        SFSymbols.trash,
-                        color: AppColor.markColor,
-                      ),
-                      Text(
-                        " 삭제하기",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.markColor),
-                      ),
-                    ],
-                  ),
-                  onPressed: () {
-                    PostCommentApiService.deleteComment(comment.id);
-                    Get.back();
-                  },
-                ),
-              ),
+                    ),
             ],
           ),
         );

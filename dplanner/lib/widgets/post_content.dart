@@ -93,14 +93,13 @@ class _PostContentState extends State<PostContent> {
   }
 
   bool hasAuthority() {
-    if (MemberController.to.clubMember().clubAuthorityTypes == null) {
-      return false;
+    if (MemberController.to.clubMember().role == "ADMIN" ||
+        MemberController.to
+            .clubMember()
+            .clubAuthorityTypes!
+            .contains("POST_ALL")) {
+      return true;
     } else {
-      for (int i = 0;
-          i < MemberController.to.clubMember().clubAuthorityTypes!.length;
-          i++)
-        if (MemberController.to.clubMember().clubAuthorityTypes![i] ==
-            'POST_ALL') return true;
       return false;
     }
   }
@@ -361,8 +360,42 @@ class _PostContentState extends State<PostContent> {
                   'assets/images/extra/showmodal_scrollcontrolbar.svg',
                 ),
               ),
-              widget.post.clubMemberName ==
-                      MemberController.to.clubMember().name
+
+              /// 이름 말고 아이디로 비교하기
+              if (widget.post.clubMemberName ==
+                  MemberController.to.clubMember().name)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                  child: NextPageButton(
+                    buttonColor: AppColor.backgroundColor2,
+                    text: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(SFSymbols.pencil_outline,
+                            color: AppColor.textColor, size: 18),
+                        Text(
+                          " 수정하기",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.textColor),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      Get.to(PostAddPage(
+                        isEdit: true,
+                        post: post,
+                        clubID: post.clubId,
+                      ));
+                    },
+                  ),
+                ),
+
+              /// 이름 말고 아이디로 비교하기
+              hasAuthority() ||
+                      widget.post.clubMemberName ==
+                          MemberController.to.clubMember().name
                   ? Padding(
                       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
                       child: NextPageButton(
@@ -370,23 +403,20 @@ class _PostContentState extends State<PostContent> {
                         text: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(SFSymbols.pencil_outline,
-                                color: AppColor.textColor, size: 18),
+                            Icon(SFSymbols.trash,
+                                color: AppColor.markColor, size: 18),
                             Text(
-                              " 수정하기",
+                              " 삭제하기",
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
-                                  color: AppColor.textColor),
+                                  color: AppColor.markColor),
                             ),
                           ],
                         ),
                         onPressed: () {
-                          Get.to(PostAddPage(
-                            isEdit: true,
-                            post: post,
-                            clubID: post.clubId,
-                          ));
+                          _showDeleteConfirmationDialog(context);
+                          //  Get.back();
                         },
                       ),
                     )
@@ -415,33 +445,6 @@ class _PostContentState extends State<PostContent> {
                         },
                       ),
                     ),
-              widget.post.clubMemberName ==
-                      MemberController.to.clubMember().name
-                  ? Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                      child: NextPageButton(
-                        buttonColor: AppColor.backgroundColor2,
-                        text: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(SFSymbols.trash,
-                                color: AppColor.markColor, size: 18),
-                            Text(
-                              " 삭제하기",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColor.markColor),
-                            ),
-                          ],
-                        ),
-                        onPressed: () {
-                          _showDeleteConfirmationDialog(context);
-                          //  Get.back();
-                        },
-                      ),
-                    )
-                  : Container(),
               hasAuthority()
                   ? Padding(
                       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
