@@ -8,7 +8,6 @@ import 'package:dplanner/models/reservation_model.dart';
 import 'package:dplanner/pages/loading_page.dart';
 import 'package:dplanner/services/lock_api_service.dart';
 import 'package:dplanner/style.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -689,13 +688,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
         bottomNavigationBar: const BottomBar());
   }
 
-  /// types == 0 : 예약하기
+  /// types == 0 : 예약 하기
   /// types == 1 : 예약 날짜
   /// types == 2 : 예약 시간
   /// types == 3 : 예약 정보
   /// types == 4 : 예약 수정
   /// types == 5 : 날짜 변경
-  /// types == 6 : 반납하기
+  /// types == 6 : 반납 하기
   /// types == 7 : 잠금 정보
   /// types == 8 : 잠금 수정
   /// types == 9 : 멤버 선택
@@ -747,6 +746,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       selectedDay = reservationTime;
       startTime = int.parse(reservation.startDateTime.substring(11, 13));
       endTime = int.parse(reservation.endDateTime.substring(11, 13));
+      if (endTime == 00) {
+        endTime = 24;
+      }
       invitees.addAll(reservation.invitees);
       for (var i = startTime; i < endTime; i++) {
         checkedTime.add(i);
@@ -1176,17 +1178,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             child: Form(
                                                 key: formKey1,
                                                 child: UnderlineTextForm(
-                                                  hintText: types == 3
-                                                      ? ""
-                                                      : '예약 제목을 입력해주세요',
+                                                  hintText: '예약 제목을 입력해주세요',
                                                   controller: title,
                                                   isFocused: isFocused1,
                                                   noLine: true,
                                                   isRight: true,
                                                   noErrorSign: true,
-                                                  isWritten: (types == 3)
-                                                      ? true
-                                                      : false,
+                                                  isWritten: false,
                                                   fontSize: 15,
                                                   onChanged: (value) {
                                                     setState(() {
@@ -1217,16 +1215,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           child: Form(
                                               key: formKey2,
                                               child: UnderlineTextForm(
-                                                hintText: types == 3
-                                                    ? ""
-                                                    : '사용 용도를 입력해주세요',
+                                                hintText: '사용 용도를 입력해주세요',
                                                 controller: usage,
                                                 isFocused: isFocused2,
                                                 noLine: true,
                                                 isRight: true,
                                                 noErrorSign: true,
-                                                isWritten:
-                                                    (types == 3) ? true : false,
+                                                isWritten: false,
                                                 fontSize: 15,
                                                 onChanged: (value) {
                                                   setState(() {
