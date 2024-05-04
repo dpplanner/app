@@ -224,7 +224,8 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                     returnMessageRequired: false,
                                     resourceType: "",
                                     notice: "",
-                                    clubId: 0));
+                                    clubId: 0,
+                                    bookableSpan: 0));
                           },
                         ),
                       )
@@ -585,8 +586,7 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                             ],
                           ),
                         ),
-                        if (!(types == 1 &&
-                            (!isChecked || updateNotice.text == "")))
+                        if (!(types == 1 && updateNotice.text == ""))
                           const Text(
                             "주의사항",
                             style: TextStyle(
@@ -594,8 +594,7 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                        if (!(types == 1 &&
-                            (!isChecked || updateNotice.text == "")))
+                        if (!(types == 1 && updateNotice.text == ""))
                           Padding(
                             padding:
                                 const EdgeInsets.only(top: 8.0, bottom: 8.0),
@@ -683,7 +682,8 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                     notice: notice.text,
                                     resourceType: (selectedValue1 == "공간")
                                         ? "PLACE"
-                                        : "THING");
+                                        : "THING",
+                                    bookableSpan: 7);
                             name.text = "";
                             info.text = "";
                             notice.text = "";
@@ -742,7 +742,8 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                       notice: updateNotice.text,
                                       resourceType: (selectedValue1 == "공간")
                                           ? "PLACE"
-                                          : "THING");
+                                          : "THING",
+                                      bookableSpan: 7);
                               getResourceList();
                               Get.back();
                             } catch (e) {
