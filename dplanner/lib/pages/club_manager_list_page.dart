@@ -7,6 +7,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
+import '../controllers/member.dart';
 import '../controllers/size.dart';
 import '../models/club_manager_model.dart';
 import '../services/club_manager_api_service.dart';
@@ -155,12 +156,28 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
   //types: 0-물품 추가, 1-물품 정보, 2-물품 수정
   void addManager({required int types, required ClubManagerModel manager}) {
     bool isChecked1 =
-        (manager.authorities.contains("SCHEDULE_ALL")) ? true : false;
-    bool isChecked2 = (manager.authorities.contains("POST_ALL")) ? true : false;
+        (MemberController.to.clubMember().clubAuthorityTypes != null &&
+                MemberController.to
+                    .clubMember()
+                    .clubAuthorityTypes!
+                    .contains("SCHEDULE_ALL"))
+            ? true
+            : false;
+    bool isChecked2 =
+        (MemberController.to.clubMember().clubAuthorityTypes != null &&
+                manager.authorities.contains("POST_ALL"))
+            ? true
+            : false;
     bool isChecked3 =
-        (manager.authorities.contains("MEMBER_ALL")) ? true : false;
+        (MemberController.to.clubMember().clubAuthorityTypes != null &&
+                manager.authorities.contains("MEMBER_ALL"))
+            ? true
+            : false;
     bool isChecked4 =
-        (manager.authorities.contains("RESOURCE_ALL")) ? true : false;
+        (MemberController.to.clubMember().clubAuthorityTypes != null &&
+                manager.authorities.contains("RESOURCE_ALL"))
+            ? true
+            : false;
 
     Get.bottomSheet(
       isScrollControlled: true,

@@ -104,7 +104,8 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
             child: Column(
               children: [
                 Expanded(
-                  child: SingleChildScrollView(
+                    child: LayoutBuilder(
+                  builder: (context, constraints) => SingleChildScrollView(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,9 +125,9 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                               if (snapshot.connectionState ==
                                       ConnectionState.waiting ||
                                   snapshot.hasData == false) {
-                                return const LoadingPage();
+                                return LoadingPage(constraints: constraints);
                               } else if (snapshot.hasError) {
-                                return const ErrorPage();
+                                return ErrorPage(constraints: constraints);
                               } else if (snapshot.data[0].length == 0) {
                                 return Padding(
                                   padding: const EdgeInsets.all(16.0),
@@ -165,9 +166,9 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                               if (snapshot.connectionState ==
                                       ConnectionState.waiting ||
                                   snapshot.hasData == false) {
-                                return const LoadingPage();
+                                return LoadingPage(constraints: constraints);
                               } else if (snapshot.hasError) {
-                                return const ErrorPage();
+                                return ErrorPage(constraints: constraints);
                               } else if (snapshot.data[1].length == 0) {
                                 return Padding(
                                   padding: const EdgeInsets.all(16.0),
@@ -194,37 +195,40 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                       ],
                     ),
                   ),
-                ),
-                if (MemberController.to.clubMember().role == "ADMIN" ||
-                    MemberController.to
-                        .clubMember()
-                        .clubAuthorityTypes!
-                        .contains("RESOURCE_ALL"))
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                    child: NextPageButton(
-                      text: const Text(
-                        "공유 물품 추가하기",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColor.backgroundColor),
-                      ),
-                      buttonColor: AppColor.objectColor,
-                      onPressed: () {
-                        addResource(
-                            types: 0,
-                            resource: ResourceModel(
-                                id: 0,
-                                name: "",
-                                info: "",
-                                returnMessageRequired: false,
-                                resourceType: "",
-                                notice: "",
-                                clubId: 0));
-                      },
-                    ),
-                  ),
+                )),
+                (MemberController.to.clubMember().role == "ADMIN" ||
+                        (MemberController.to.clubMember().clubAuthorityTypes !=
+                                null &&
+                            MemberController.to
+                                .clubMember()
+                                .clubAuthorityTypes!
+                                .contains("RESOURCE_ALL")))
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                        child: NextPageButton(
+                          text: const Text(
+                            "공유 물품 추가하기",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColor.backgroundColor),
+                          ),
+                          buttonColor: AppColor.objectColor,
+                          onPressed: () {
+                            addResource(
+                                types: 0,
+                                resource: ResourceModel(
+                                    id: 0,
+                                    name: "",
+                                    info: "",
+                                    returnMessageRequired: false,
+                                    resourceType: "",
+                                    notice: "",
+                                    clubId: 0));
+                          },
+                        ),
+                      )
+                    : Container()
               ],
             ),
           ),
@@ -645,10 +649,12 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                 ),
               ),
               if (MemberController.to.clubMember().role == "ADMIN" ||
-                  MemberController.to
-                      .clubMember()
-                      .clubAuthorityTypes!
-                      .contains("RESOURCE_ALL"))
+                  (MemberController.to.clubMember().clubAuthorityTypes !=
+                          null &&
+                      MemberController.to
+                          .clubMember()
+                          .clubAuthorityTypes!
+                          .contains("RESOURCE_ALL")))
                 Visibility(
                   visible: types != 0,
                   replacement: Padding(
@@ -880,10 +886,12 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                 ),
               ),
               if (MemberController.to.clubMember().role == "ADMIN" ||
-                  MemberController.to
-                      .clubMember()
-                      .clubAuthorityTypes!
-                      .contains("RESOURCE_ALL"))
+                  (MemberController.to.clubMember().clubAuthorityTypes !=
+                          null &&
+                      MemberController.to
+                          .clubMember()
+                          .clubAuthorityTypes!
+                          .contains("RESOURCE_ALL")))
                 IconButton(
                   onPressed: () {
                     checkDeleteResource(id: resource.id);

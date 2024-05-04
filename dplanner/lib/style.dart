@@ -14,5 +14,6 @@ class AppColor extends Color {
   static const subColor3 = Color(0xFF908F9C);
   static const subColor4 = Color(0xFFE3E3F0);
   static const subColor5 = Color(0xFFBABABA);
+  static const lockColor = Color(0xFFCDCDCD);
   static const markColor = Color(0xFFFF443D);
 }

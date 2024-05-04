@@ -285,10 +285,12 @@ class _PostCommentState extends State<PostComment> {
                 ),
               comment.clubMemberId == MemberController.to.clubMember().id ||
                       MemberController.to.clubMember().role == "ADMIN" ||
-                      MemberController.to
-                          .clubMember()
-                          .clubAuthorityTypes!
-                          .contains("POST_ALL")
+                      (MemberController.to.clubMember().clubAuthorityTypes !=
+                              null &&
+                          MemberController.to
+                              .clubMember()
+                              .clubAuthorityTypes!
+                              .contains("POST_ALL"))
                   ? Padding(
                       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
                       child: NextPageButton(
