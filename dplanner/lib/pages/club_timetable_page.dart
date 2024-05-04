@@ -136,7 +136,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 : i.title == ""
                     ? i.usage
                     : "",
-            color: i.status != "REQUEST"
+            color: i.status == "REQUEST"
                 ? (i.clubMemberId == MemberController.to.clubMember().id
                     ? AppColor.subColor2
                     : AppColor.subColor4)
@@ -532,27 +532,67 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         ),
                         eventTileBuilder: (date, events, boundry, start, end) {
                           if (events.isNotEmpty) {
-                            return RoundedEventTile(
-                              borderRadius: BorderRadius.circular(0.0),
-                              title: events[0]
-                                  .title
-                                  .split(" ")
-                                  .sublist(1)
-                                  .join(" "),
-                              titleStyle: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.backgroundColor,
-                                fontSize: 12,
+                            return Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: events[0].color ==
+                                              AppColor.subColor4 &&
+                                          (MemberController.to
+                                                      .clubMember()
+                                                      .role ==
+                                                  "ADMIN" ||
+                                              (MemberController.to
+                                                          .clubMember()
+                                                          .clubAuthorityTypes !=
+                                                      null &&
+                                                  MemberController.to
+                                                      .clubMember()
+                                                      .clubAuthorityTypes!
+                                                      .contains(
+                                                          "SCHEDULE_ALL")))
+                                      ? AppColor.objectColor
+                                      : Colors.transparent,
+                                  width: events[0].color ==
+                                              AppColor.subColor4 &&
+                                          (MemberController.to
+                                                      .clubMember()
+                                                      .role ==
+                                                  "ADMIN" ||
+                                              (MemberController.to
+                                                          .clubMember()
+                                                          .clubAuthorityTypes !=
+                                                      null &&
+                                                  MemberController.to
+                                                      .clubMember()
+                                                      .clubAuthorityTypes!
+                                                      .contains(
+                                                          "SCHEDULE_ALL")))
+                                      ? 2.0
+                                      : 0.0,
+                                ),
                               ),
-                              description: events[0].description,
-                              descriptionStyle: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.backgroundColor,
-                                fontSize: 12,
+                              child: RoundedEventTile(
+                                borderRadius: BorderRadius.circular(0.0),
+                                title: events[0]
+                                    .title
+                                    .split(" ")
+                                    .sublist(1)
+                                    .join(" "),
+                                titleStyle: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.backgroundColor,
+                                  fontSize: 12,
+                                ),
+                                description: events[0].description,
+                                descriptionStyle: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.backgroundColor,
+                                  fontSize: 12,
+                                ),
+                                totalEvents: events.length,
+                                padding: const EdgeInsets.all(3.0),
+                                backgroundColor: events[0].color,
                               ),
-                              totalEvents: events.length,
-                              padding: const EdgeInsets.all(3.0),
-                              backgroundColor: events[0].color,
                             );
                           } else {
                             return Container();
