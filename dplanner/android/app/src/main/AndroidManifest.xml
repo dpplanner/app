@@ -8,9 +8,9 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />-->
     <application
         android:requestLegacyExternalStorage="true"
-        android:label="dplanner"
+        android:label="Dplanner"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/dplanner_logo">
         <activity
             android:enableOnBackInvokedCallback="true"
             android:name=".MainActivity"
