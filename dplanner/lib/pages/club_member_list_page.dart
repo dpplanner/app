@@ -122,10 +122,14 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                     child: Column(
                       children: [
                         if (MemberController.to.clubMember().role == "ADMIN" ||
-                            MemberController.to
-                                .clubMember()
-                                .clubAuthorityTypes!
-                                .contains("MEMBER_ALL"))
+                            (MemberController.to
+                                        .clubMember()
+                                        .clubAuthorityTypes !=
+                                    null &&
+                                MemberController.to
+                                    .clubMember()
+                                    .clubAuthorityTypes!
+                                    .contains("Member_ALL")))
                           StreamBuilder<List<ClubMemberModel>>(
                               stream: streamController2.stream,
                               builder: (BuildContext context,
@@ -302,10 +306,14 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                         ),
                       ),
                     if ((MemberController.to.clubMember().role == "ADMIN" ||
-                            MemberController.to
-                                .clubMember()
-                                .clubAuthorityTypes!
-                                .contains("MEMBER_ALL")) &&
+                            (MemberController.to
+                                        .clubMember()
+                                        .clubAuthorityTypes !=
+                                    null &&
+                                MemberController.to
+                                    .clubMember()
+                                    .clubAuthorityTypes!
+                                    .contains("MEMBER_ALL"))) &&
                         member.role != "ADMIN" &&
                         member.id != MemberController.to.clubMember().id)
                       Visibility(

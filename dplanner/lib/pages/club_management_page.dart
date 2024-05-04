@@ -52,10 +52,12 @@ class _ClubManagementPageState extends State<ClubManagementPage> {
             }, true),
             selectButton("예약 요청", () {
               if (MemberController.to.clubMember().role == "ADMIN" ||
-                  MemberController.to
-                      .clubMember()
-                      .clubAuthorityTypes!
-                      .contains("SCHEDULE_ALL")) {
+                  (MemberController.to.clubMember().clubAuthorityTypes !=
+                          null &&
+                      MemberController.to
+                          .clubMember()
+                          .clubAuthorityTypes!
+                          .contains("SCHEDULE_ALL"))) {
                 Get.toNamed('/reservation_list');
               } else {
                 snackBar(title: "권한이 없습니다", content: "클럽 관리자에게 권한을 요청하세요");

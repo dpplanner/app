@@ -94,10 +94,11 @@ class _PostContentState extends State<PostContent> {
 
   bool hasAuthority() {
     if (MemberController.to.clubMember().role == "ADMIN" ||
-        MemberController.to
-            .clubMember()
-            .clubAuthorityTypes!
-            .contains("POST_ALL")) {
+        (MemberController.to.clubMember().clubAuthorityTypes != null &&
+            MemberController.to
+                .clubMember()
+                .clubAuthorityTypes!
+                .contains("POST_ALL"))) {
       return true;
     } else {
       return false;

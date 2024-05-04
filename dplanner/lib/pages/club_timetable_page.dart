@@ -136,9 +136,16 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 : i.title == ""
                     ? i.usage
                     : "",
-            color: i.status != "CONFIRMED"
-                ? AppColor.subColor4
-                : i.title != ""
+            color: i.status == "REQUEST"
+                ? (i.clubMemberId == MemberController.to.clubMember().id
+                    ? AppColor.subColor2
+                    : AppColor.subColor4)
+                : (i.clubMemberId == MemberController.to.clubMember().id ||
+                        i.invitees.any((element) =>
+                            element["clubMemberId"] ==
+                                MemberController.to.clubMember().id &&
+                            element["clubMemberName"] ==
+                                MemberController.to.clubMember().name))
                     ? AppColor.subColor1
                     : AppColor.subColor3));
       }
@@ -166,7 +173,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               endTime: endTime.subtract(const Duration(microseconds: 1)),
               title: "",
               description: "",
-              color: AppColor.subColor2));
+              color: AppColor.lockColor));
         }
       }
 
@@ -226,10 +233,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             ),
                             if (MemberController.to.clubMember().role ==
                                     "ADMIN" ||
-                                MemberController.to
-                                    .clubMember()
-                                    .clubAuthorityTypes!
-                                    .contains("RESOURCE_ALL"))
+                                (MemberController.to
+                                            .clubMember()
+                                            .clubAuthorityTypes !=
+                                        null &&
+                                    MemberController.to
+                                        .clubMember()
+                                        .clubAuthorityTypes!
+                                        .contains("RESOURCE_ALL")))
                               Column(
                                 children: [
                                   const Text(
@@ -521,27 +532,67 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         ),
                         eventTileBuilder: (date, events, boundry, start, end) {
                           if (events.isNotEmpty) {
-                            return RoundedEventTile(
-                              borderRadius: BorderRadius.circular(0.0),
-                              title: events[0]
-                                  .title
-                                  .split(" ")
-                                  .sublist(1)
-                                  .join(" "),
-                              titleStyle: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.backgroundColor,
-                                fontSize: 12,
+                            return Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: events[0].color ==
+                                              AppColor.subColor4 &&
+                                          (MemberController.to
+                                                      .clubMember()
+                                                      .role ==
+                                                  "ADMIN" ||
+                                              (MemberController.to
+                                                          .clubMember()
+                                                          .clubAuthorityTypes !=
+                                                      null &&
+                                                  MemberController.to
+                                                      .clubMember()
+                                                      .clubAuthorityTypes!
+                                                      .contains(
+                                                          "SCHEDULE_ALL")))
+                                      ? AppColor.objectColor
+                                      : Colors.transparent,
+                                  width: events[0].color ==
+                                              AppColor.subColor4 &&
+                                          (MemberController.to
+                                                      .clubMember()
+                                                      .role ==
+                                                  "ADMIN" ||
+                                              (MemberController.to
+                                                          .clubMember()
+                                                          .clubAuthorityTypes !=
+                                                      null &&
+                                                  MemberController.to
+                                                      .clubMember()
+                                                      .clubAuthorityTypes!
+                                                      .contains(
+                                                          "SCHEDULE_ALL")))
+                                      ? 2.0
+                                      : 0.0,
+                                ),
                               ),
-                              description: events[0].description,
-                              descriptionStyle: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: AppColor.backgroundColor,
-                                fontSize: 12,
+                              child: RoundedEventTile(
+                                borderRadius: BorderRadius.circular(0.0),
+                                title: events[0]
+                                    .title
+                                    .split(" ")
+                                    .sublist(1)
+                                    .join(" "),
+                                titleStyle: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.backgroundColor,
+                                  fontSize: 12,
+                                ),
+                                description: events[0].description,
+                                descriptionStyle: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.backgroundColor,
+                                  fontSize: 12,
+                                ),
+                                totalEvents: events.length,
+                                padding: const EdgeInsets.all(3.0),
+                                backgroundColor: events[0].color,
                               ),
-                              totalEvents: events.length,
-                              padding: const EdgeInsets.all(3.0),
-                              backgroundColor: events[0].color,
                             );
                           } else {
                             return Container();
@@ -606,10 +657,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
               } else {
                 return Visibility(
                   visible: (MemberController.to.clubMember().role == "ADMIN" ||
-                      MemberController.to
-                          .clubMember()
-                          .clubAuthorityTypes!
-                          .contains("SCHEDULE_ALL")),
+                      (MemberController.to.clubMember().clubAuthorityTypes !=
+                              null &&
+                          MemberController.to
+                              .clubMember()
+                              .clubAuthorityTypes!
+                              .contains("SCHEDULE_ALL"))),
                   replacement: ElevatedButton(
                     onPressed: () {
                       if (selectedValue!.notice == "") {
@@ -862,10 +915,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       reservation.status == "REQUEST" &&
                                       (MemberController.to.clubMember().role ==
                                               "ADMIN" ||
-                                          MemberController.to
-                                              .clubMember()
-                                              .clubAuthorityTypes!
-                                              .contains("SCHEDULE_ALL"))
+                                          (MemberController.to
+                                                      .clubMember()
+                                                      .clubAuthorityTypes !=
+                                                  null &&
+                                              MemberController.to
+                                                  .clubMember()
+                                                  .clubAuthorityTypes!
+                                                  .contains("SCHEDULE_ALL")))
                                   ? "예약 요청"
                                   : reservation?.status == "REQUEST"
                                       ? "승인 대기중"
@@ -1521,10 +1578,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       reservation.returned &&
                                       (MemberController.to.clubMember().role ==
                                               "ADMIN" ||
-                                          MemberController.to
-                                              .clubMember()
-                                              .clubAuthorityTypes!
-                                              .contains("SCHEDULE_ALL") ||
+                                          (MemberController.to
+                                                      .clubMember()
+                                                      .clubAuthorityTypes !=
+                                                  null &&
+                                              MemberController.to
+                                                  .clubMember()
+                                                  .clubAuthorityTypes!
+                                                  .contains("SCHEDULE_ALL")) ||
                                           reservation.clubMemberId ==
                                               MemberController.to
                                                   .clubMember()
@@ -2778,10 +2839,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         replacement: Visibility(
                           visible: (MemberController.to.clubMember().role ==
                                   "ADMIN" ||
-                              MemberController.to
-                                  .clubMember()
-                                  .clubAuthorityTypes!
-                                  .contains("SCHEDULE_ALL")),
+                              (MemberController.to
+                                          .clubMember()
+                                          .clubAuthorityTypes !=
+                                      null &&
+                                  MemberController.to
+                                      .clubMember()
+                                      .clubAuthorityTypes!
+                                      .contains("SCHEDULE_ALL"))),
                           child: Visibility(
                             visible: reservation?.status == "REQUEST",
                             replacement: NextPageButton(
