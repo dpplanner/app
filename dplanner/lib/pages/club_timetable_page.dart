@@ -527,7 +527,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         liveTimeIndicatorSettings:
                             const LiveTimeIndicatorSettings(
                           color: AppColor.objectColor,
-                          height: 0,
+                          height: 1,
                           offset: 0,
                         ),
                         eventTileBuilder: (date, events, boundry, start, end) {
