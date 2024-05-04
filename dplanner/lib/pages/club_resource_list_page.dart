@@ -41,9 +41,14 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
   final TextEditingController notice = TextEditingController();
   bool isFocused3 = false;
 
+  final formKey4 = GlobalKey<FormState>();
+  final TextEditingController span = TextEditingController();
+  bool isFocused4 = false;
+
   final TextEditingController updateName = TextEditingController();
   final TextEditingController updateInfo = TextEditingController();
   final TextEditingController updateNotice = TextEditingController();
+  final TextEditingController updateSpan = TextEditingController();
 
   final StreamController<List<List<ResourceModel>>> _streamController =
       StreamController<List<List<ResourceModel>>>.broadcast();
@@ -457,7 +462,7 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                     hintText: '대여 위치를 작성해주세요',
                                     controller:
                                         (types == 0) ? info : updateInfo,
-                                    isFocused: isFocused1,
+                                    isFocused: isFocused2,
                                     noLine: true,
                                     isRight: true,
                                     noErrorSign: true,
@@ -480,6 +485,64 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                   )),
                             ),
                           ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const Expanded(
+                                child: Padding(
+                                  padding: EdgeInsets.only(bottom: 5.0),
+                                  child: Text(
+                                    "예약 가능 기간",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Form(
+                                    key: formKey4,
+                                    child: UnderlineTextForm(
+                                      hintText: '미입력시 7일로 작성됩니다',
+                                      keyboardType: TextInputType.number,
+                                      controller:
+                                          (types == 0) ? span : updateSpan,
+                                      isFocused: isFocused4,
+                                      noLine: true,
+                                      isRight: true,
+                                      noErrorSign: true,
+                                      isWritten: (types == 1) ? true : false,
+                                      fontSize: 15,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          snackBar(
+                                              title: "작성이 끝나지 않았습니다",
+                                              content:
+                                                  "공유 물품 예약 가능 기간을 작성해주세요");
+                                          return '';
+                                        }
+                                        if (!RegExp(r'^\d+$').hasMatch(value)) {
+                                          snackBar(
+                                              title: "잘못된 입력",
+                                              content: "예약 가능 기간은 숫자로만 입력해주세요");
+                                          return '';
+                                        }
+                                        return null;
+                                      },
+                                      onChanged: (value) {
+                                        setState(() {
+                                          isFocused4 = value.isNotEmpty;
+                                        });
+                                      },
+                                    )),
+                              ),
+                            ],
+                          ),
                         ),
                         Padding(
                           padding: (types == 1)
@@ -670,8 +733,10 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                       onPressed: () async {
                         final formKeyState1 = formKey1.currentState!;
                         final formKeyState2 = formKey2.currentState!;
+                        final formKeyState4 = formKey4.currentState!;
                         if (formKeyState1.validate() &&
-                            formKeyState2.validate()) {
+                            formKeyState2.validate() &&
+                            formKeyState4.validate()) {
                           try {
                             ResourceModel temp =
                                 await ResourceApiService.postResource(
@@ -683,10 +748,14 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                     resourceType: (selectedValue1 == "공간")
                                         ? "PLACE"
                                         : "THING",
-                                    bookableSpan: 7);
+                                    bookableSpan: span.text == ""
+                                        ? 7
+                                        : int.parse(span.text));
+
                             name.text = "";
                             info.text = "";
                             notice.text = "";
+                            span.text = "";
                             getResourceList();
                             Get.back();
                           } catch (e) {
@@ -743,7 +812,7 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                       resourceType: (selectedValue1 == "공간")
                                           ? "PLACE"
                                           : "THING",
-                                      bookableSpan: 7);
+                                      bookableSpan: int.parse(updateSpan.text));
                               getResourceList();
                               Get.back();
                             } catch (e) {
@@ -878,6 +947,7 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                   updateName.text = resource.name;
                   updateInfo.text = resource.info;
                   updateNotice.text = resource.notice;
+                  updateSpan.text = resource.bookableSpan.toString();
                   addResource(types: 1, resource: resource);
                 },
                 icon: const Icon(

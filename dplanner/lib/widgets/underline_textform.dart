@@ -37,6 +37,7 @@ class UnderlineTextForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       textAlign: isRight ? TextAlign.end : TextAlign.start,
+      keyboardType: keyboardType,
       controller: controller,
       maxLength: maxLength != 0 ? maxLength : null,
       enabled: isWritten ? false : true,
