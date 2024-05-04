@@ -360,10 +360,8 @@ class _PostContentState extends State<PostContent> {
                   'assets/images/extra/showmodal_scrollcontrolbar.svg',
                 ),
               ),
-
-              /// 이름 말고 아이디로 비교하기
-              if (widget.post.clubMemberName ==
-                  MemberController.to.clubMember().name)
+              if (widget.post.clubMemberId ==
+                  MemberController.to.clubMember().id)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
                   child: NextPageButton(
@@ -391,11 +389,9 @@ class _PostContentState extends State<PostContent> {
                     },
                   ),
                 ),
-
-              /// 이름 말고 아이디로 비교하기
               hasAuthority() ||
-                      widget.post.clubMemberName ==
-                          MemberController.to.clubMember().name
+                      widget.post.clubMemberId ==
+                          MemberController.to.clubMember().id
                   ? Padding(
                       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
                       child: NextPageButton(

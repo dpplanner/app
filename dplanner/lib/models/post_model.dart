@@ -4,6 +4,7 @@ class Post {
   final String content;
   final bool isFixed;
   final int clubId;
+  final int clubMemberId;
   final String clubMemberName;
   final String? profileUrl;
   final String clubRole;
@@ -19,6 +20,7 @@ class Post {
     this.title,
     required this.content,
     required this.isFixed,
+    required this.clubMemberId,
     required this.clubId,
     required this.clubMemberName,
     this.profileUrl,
@@ -46,6 +48,7 @@ class Post {
       content: json['content'],
       isFixed: json['isFixed'],
       clubId: json['clubId'],
+      clubMemberId: json['clubMemberId'] as int,
       clubMemberName: json['clubMemberName'],
       profileUrl: profileUrl,
       clubRole: json['clubRole'],
