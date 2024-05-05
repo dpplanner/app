@@ -45,7 +45,7 @@ class _PostCardState extends State<PostCard> {
               text: '... 더 보기',
               style: TextStyle(
                 color: AppColor.subColor3,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.normal,
               ),
             ),
         ],

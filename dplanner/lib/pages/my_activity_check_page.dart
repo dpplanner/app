@@ -1,5 +1,4 @@
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
-import 'package:dplanner/services/club_api_service.dart';
 import 'package:dplanner/services/club_post_api_service.dart';
 import 'package:dplanner/widgets/post_mini_card.dart';
 import 'package:flutter/material.dart';
@@ -154,7 +153,7 @@ class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
                       child: PostMiniCard(
                         title: _myPosts[index].title ?? '제목 없음',
                         content: _myPosts[index].content,
-                        date: '${_myPosts[index].createdTime}',
+                        dateTime: _myPosts[index].createdTime,
                         isPhoto: _myPosts[index].attachmentsUrl.isNotEmpty,
                       ),
                     );
