@@ -17,6 +17,7 @@ import 'package:dplanner/models/post_model.dart';
 ///
 class PostCard extends StatefulWidget {
   final Post post;
+
   const PostCard({Key? key, required this.post}) : super(key: key);
 
   @override
@@ -218,23 +219,33 @@ class _PostCardState extends State<PostCard> {
                           ),
                           Expanded(
                             flex: 1,
-                            child: Icon(
-                              widget.post.likeStatus
-                                  ? SFSymbols.heart_fill
-                                  : SFSymbols.heart,
-                              color: AppColor.textColor2,
-                              size: 16,
-                            ),
+                            child: widget.post.likeStatus
+                                ? const Icon(
+                                    SFSymbols.heart_fill,
+                                    color: AppColor.objectColor,
+                                    size: 16,
+                                  )
+                                : const Icon(
+                                    SFSymbols.heart,
+                                    color: AppColor.textColor2,
+                                    size: 16,
+                                  ),
                           ),
                           Expanded(
                             flex: 1,
                             child: Text(
                               '${widget.post.likeCount}',
-                              style: const TextStyle(
-                                color: AppColor.textColor2,
-                                fontWeight: FontWeight.normal,
-                                fontSize: 16,
-                              ),
+                              style: widget.post.likeStatus
+                                  ? const TextStyle(
+                                      color: AppColor.objectColor,
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 16,
+                                    )
+                                  : const TextStyle(
+                                      color: AppColor.textColor2,
+                                      fontWeight: FontWeight.normal,
+                                      fontSize: 16,
+                                    ),
                             ),
                           ),
                         ],

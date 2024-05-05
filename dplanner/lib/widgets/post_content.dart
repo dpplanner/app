@@ -311,22 +311,34 @@ class _PostContentState extends State<PostContent> {
                         flex: 1,
                         child: GestureDetector(
                           onTap: _toggleLike,
-                          child: Icon(
-                            isLiked ? SFSymbols.heart_fill : SFSymbols.heart,
-                            color: AppColor.textColor2,
-                            size: 16,
-                          ),
+                          child: isLiked
+                              ? const Icon(
+                                  SFSymbols.heart_fill,
+                                  color: AppColor.objectColor,
+                                  size: 16,
+                                )
+                              : const Icon(
+                                  SFSymbols.heart,
+                                  color: AppColor.textColor2,
+                                  size: 16,
+                                ),
                         ),
                       ),
                       Expanded(
                         flex: 1,
                         child: Text(
                           '${likeCount}',
-                          style: TextStyle(
-                            color: AppColor.textColor2,
-                            fontWeight: FontWeight.normal,
-                            fontSize: 16,
-                          ),
+                          style: isLiked
+                              ? const TextStyle(
+                                  color: AppColor.objectColor,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 16,
+                                )
+                              : const TextStyle(
+                                  color: AppColor.textColor2,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 16,
+                                ),
                         ),
                       ),
                     ],
