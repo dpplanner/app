@@ -32,7 +32,7 @@ class _PostCardState extends State<PostCard> {
       text: TextSpan(
         style: const TextStyle(
           color: AppColor.textColor,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.normal,
           fontSize: 16,
         ),
         children: <TextSpan>[
@@ -107,7 +107,7 @@ class _PostCardState extends State<PostCard> {
                               widget.post.clubMemberName,
                               style: const TextStyle(
                                 color: AppColor.textColor,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
@@ -117,7 +117,7 @@ class _PostCardState extends State<PostCard> {
                                   .format(widget.post.createdTime),
                               style: const TextStyle(
                                 color: AppColor.textColor,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.normal,
                                 fontSize: 12,
                               ),
                             ),
@@ -137,7 +137,7 @@ class _PostCardState extends State<PostCard> {
                               '관리자',
                               style: TextStyle(
                                 color: AppColor.backgroundColor,
-                                fontWeight: FontWeight.w400,
+                                fontWeight: FontWeight.normal,
                                 fontSize: 11,
                               ),
                             ),
@@ -158,7 +158,7 @@ class _PostCardState extends State<PostCard> {
                             : "제목 없음", //제목 생기면 그때 수정할 것
                         style: const TextStyle(
                           color: AppColor.textColor,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.bold,
                           fontSize: 20,
                         ),
                       ),
@@ -174,17 +174,18 @@ class _PostCardState extends State<PostCard> {
                         ? const Expanded(
                             flex: 1,
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Icon(
                                   SFSymbols.pin_fill,
-                                  color: AppColor.textColor2,
+                                  color: AppColor.objectColor,
                                   size: 14,
                                 ),
                                 Text(
                                   '고정됨',
                                   style: TextStyle(
-                                    color: AppColor.textColor2,
-                                    fontWeight: FontWeight.w500,
+                                    color: AppColor.objectColor,
+                                    fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                   ),
                                 ),
@@ -210,7 +211,7 @@ class _PostCardState extends State<PostCard> {
                               '${widget.post.commentCount}',
                               style: const TextStyle(
                                 color: AppColor.textColor2,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.normal,
                                 fontSize: 16,
                               ),
                             ),
@@ -231,7 +232,7 @@ class _PostCardState extends State<PostCard> {
                               '${widget.post.likeCount}',
                               style: const TextStyle(
                                 color: AppColor.textColor2,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.normal,
                                 fontSize: 16,
                               ),
                             ),

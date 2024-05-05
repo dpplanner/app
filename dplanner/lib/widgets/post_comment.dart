@@ -135,7 +135,7 @@ class _PostCommentState extends State<PostComment> {
                         comment.content,
                         style: TextStyle(
                           color: AppColor.textColor,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.normal,
                           fontSize: 14,
                         ),
                       ),
@@ -147,7 +147,7 @@ class _PostCommentState extends State<PostComment> {
                                 .format(comment.createdTime),
                             style: TextStyle(
                               color: AppColor.textColor2,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.normal,
                               fontSize: 12,
                             ),
                           ),

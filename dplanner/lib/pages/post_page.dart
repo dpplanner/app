@@ -81,7 +81,7 @@ class _PostPageState extends State<PostPage> {
                 icon: const Icon(SFSymbols.chevron_left)),
             title: const Text(
               "게시글",
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
             centerTitle: true,
           ),
