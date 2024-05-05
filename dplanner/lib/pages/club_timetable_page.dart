@@ -492,29 +492,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                           );
                         },
                         timeLineBuilder: (DateTime date) {
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(3, 0, 3, 42.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: DateTime.now().hour == date.hour
-                                    ? AppColor.subColor1
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(7.0),
-                              ),
-                              child: Text(
-                                date.hour < 10
-                                    ? "0${date.hour}"
-                                    : "${date.hour}",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: DateTime.now().hour == date.hour
-                                      ? AppColor.textColor
-                                      : AppColor.textColor2,
-                                  //color: AppColor.textColor2,
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 14,
-                                ),
-                              ),
+                          return Text(
+                            date.hour < 10 ? "0${date.hour}" : "${date.hour}",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: AppColor.textColor2,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 14,
                             ),
                           );
                         },
@@ -528,7 +512,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             const LiveTimeIndicatorSettings(
                           color: AppColor.objectColor,
                           height: 1,
-                          offset: 0,
+                          offset: 1,
                         ),
                         eventTileBuilder: (date, events, boundry, start, end) {
                           if (events.isNotEmpty) {
