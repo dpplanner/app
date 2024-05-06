@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../controllers/size.dart';
+import '../models/post_comment_model.dart';
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/outline_textform.dart';
@@ -35,12 +36,14 @@ class _PostPageState extends State<PostPage> {
   bool _isFocused = false;
   bool _isReplying = false; //답글을 다는 중인지 체크
   int? _replyingCommentId; //답글을 달려고 클릭한 댓글의 ID
+  List<Comment> _comments = [];
   late Post post; // 상태 변수로 'post' 선언
 
   @override
   void initState() {
     super.initState();
     post = widget.post; // 초기화에서 widget의 post를 사용하여 상태 변수 초기화
+    _fetchComments();
   }
 
   Future<void> refreshPost() async {
@@ -48,7 +51,17 @@ class _PostPageState extends State<PostPage> {
         await PostApiService.fetchPost(postID: post.id); // post를 새로 로드
     setState(() {
       post = updatedPost; // 상태 업데이트
+      _fetchComments();
     });
+  }
+
+  Future<void> _fetchComments() async {
+    final comments = await PostCommentApiService.fetchComments(post.id);
+    if (comments != null) {
+      setState(() {
+        _comments = comments;
+      });
+    }
   }
 
   void startReplying(int commentId) {
@@ -104,7 +117,8 @@ class _PostPageState extends State<PostPage> {
                       height: SizeController.to.screenHeight * 0.01,
                     ),
                     PostComment(
-                        post: post, onCommentSelected: _handleCommentSelected),
+                        comments: _comments,
+                        onCommentSelected: _handleCommentSelected),
                   ],
                 ),
               ),
@@ -139,7 +153,9 @@ class _PostPageState extends State<PostPage> {
                       child: Form(
                         key: _formKey,
                         child: OutlineTextForm(
-                          hintText: '댓글을 남겨보세요',
+                          hintText: _replyingCommentId == null
+                              ? '댓글을 남겨보세요'
+                              : "답글을 남겨보세요",
                           controller: addComment,
                           isColored: true,
                           onChanged: (value) {
