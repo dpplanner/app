@@ -27,7 +27,6 @@ class CommentBlock extends StatefulWidget {
 }
 
 class _CommentBlockState extends State<CommentBlock> {
-
   bool _showReplies = false;
 
   void _toggleShowReplies() {
@@ -72,7 +71,8 @@ class _CommentBlockState extends State<CommentBlock> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
+                    Expanded(
+                        child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -134,7 +134,7 @@ class _CommentBlockState extends State<CommentBlock> {
                           ],
                         ),
                       ],
-                    ),
+                    )),
                     IconButton(
                       onPressed: () {
                         _commentMore(context, widget.comment);
