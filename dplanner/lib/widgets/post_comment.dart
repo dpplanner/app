@@ -10,13 +10,28 @@ import 'package:dplanner/models/post_comment_model.dart';
 /// POST 자세히보기 화면에서 댓글 내용 그리는 class
 ///
 ///
-class PostComment extends StatelessWidget {
-  final Function(int) onCommentSelected;
+class PostComment extends StatefulWidget {
+  final Function(int?) onCommentSelected;
   final List<Comment> comments;
 
   const PostComment(
       {Key? key, required this.comments, required this.onCommentSelected})
       : super(key: key);
+
+  @override
+  State<PostComment> createState() => _PostCommentState();
+}
+
+class _PostCommentState extends State<PostComment> {
+  int? _selectedCommentId;
+
+  void _handleSelected(int? commentId) {
+    setState(() {
+      _selectedCommentId = commentId;
+    });
+
+    widget.onCommentSelected(_selectedCommentId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,26 +40,26 @@ class PostComment extends StatelessWidget {
       color: AppColor.backgroundColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: comments.isEmpty
+        children: widget.comments.isEmpty
             ? [
-                const SizedBox(
-                  height: 24,
-                ),
-                const Center(
-                  child: Text(
-                    "댓글이 없습니다",
-                  ),
-                ),
-              ]
+          const SizedBox(
+            height: 24,
+          ),
+          const Center(
+            child: Text(
+              "댓글이 없습니다",
+            ),
+          ),
+        ]
             : [
-                // 댓글 데이터를 화면에 표시하는 부분
-                for (var comment in comments)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
-                    child: CommentBlock(
-                        comment: comment, onCommentSelected: onCommentSelected),
-                  )
-              ],
+          // 댓글 데이터를 화면에 표시하는 부분
+          for (var comment in widget.comments)
+            CommentBlock(
+                isSelected: comment.id == _selectedCommentId ? true : false,
+                comment: comment,
+                onCommentSelected: _handleSelected
+            ),
+        ],
       ),
     );
   }

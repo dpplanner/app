@@ -71,7 +71,7 @@ class _PostPageState extends State<PostPage> {
     });
   }
 
-  void _handleCommentSelected(int commentId) {
+  void _handleCommentSelected(int? commentId) {
     setState(() {
       _replyingCommentId = commentId;
     });
