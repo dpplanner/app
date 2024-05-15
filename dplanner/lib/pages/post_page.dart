@@ -179,6 +179,7 @@ class _PostPageState extends State<PostPage> {
                                 FocusScope.of(context).requestFocus(
                                     FocusNode()); //TODO: 체크해라 dismiss 되는지
                               }
+                              _fetchComments();
                             },
                             child: _isFocused
                                 ? const Icon(
