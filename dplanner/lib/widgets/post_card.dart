@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../controllers/size.dart';
+import '../services/club_post_api_service.dart';
 import '../style.dart';
 import 'package:dplanner/models/post_model.dart';
 
@@ -25,6 +26,21 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
+  late bool _isLike = false;
+  late int _likeCount = 0;
+  late Post _post = widget.post;
+
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _post = widget.post;
+      _isLike = _post.likeStatus;
+      _likeCount = _post.likeCount;
+    });
+  }
+
   Widget buildPostContent(String content) {
     final cutoff = 100;
     final shouldShowMore = content.length > cutoff;
@@ -53,6 +69,23 @@ class _PostCardState extends State<PostCard> {
     );
   }
 
+  void _toggleLike() async {
+    try {
+      final bool newLikeStatus =
+          await PostApiService.toggleLike(_post.id);
+      setState(() {
+        _isLike = newLikeStatus;
+        if (_isLike) {
+          _likeCount += 1;
+        } else {
+          _likeCount -= 1;
+        }
+      });
+    } catch (e) {
+      Get.snackbar('알림', '오류가 발생했습니다. 다시 시도해주세요: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -60,7 +93,7 @@ class _PostCardState extends State<PostCard> {
       highlightColor: AppColor.subColor2.withOpacity(0.8),
       borderRadius: BorderRadius.circular(16),
       onTap: () {
-        Get.to(PostPage(post: widget.post), arguments: 1);
+        Get.to(PostPage(postId: _post.id), arguments: 1);
       },
       child: Ink(
         decoration: BoxDecoration(
@@ -81,10 +114,10 @@ class _PostCardState extends State<PostCard> {
                     Row(
                       children: [
                         ClipOval(
-                          child: widget.post.profileUrl != null
+                          child: _post.profileUrl != null
                               ? CachedNetworkImage(
                                   placeholder: (context, url) => Container(),
-                                  imageUrl: widget.post.profileUrl!,
+                                  imageUrl: _post.profileUrl!,
                                   errorWidget: (context, url, error) =>
                                       SvgPicture.asset(
                                         'assets/images/base_image/base_member_image.svg',
@@ -105,7 +138,7 @@ class _PostCardState extends State<PostCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.post.clubMemberName,
+                              _post.clubMemberName,
                               style: const TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.bold,
@@ -115,7 +148,7 @@ class _PostCardState extends State<PostCard> {
                             Text(
                               DateFormat('M월 d일')
                                   .add_jm()
-                                  .format(widget.post.createdTime),
+                                  .format(_post.createdTime),
                               style: const TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.normal,
@@ -126,7 +159,7 @@ class _PostCardState extends State<PostCard> {
                         ),
                       ],
                     ),
-                    widget.post.clubRole == 'ADMIN'
+                    _post.clubRole == 'ADMIN'
                         ? Container(
                             padding: const EdgeInsets.fromLTRB(6, 2, 6, 2),
                             decoration: BoxDecoration(
@@ -154,8 +187,8 @@ class _PostCardState extends State<PostCard> {
                       padding: EdgeInsets.only(
                           bottom: SizeController.to.screenHeight * 0.01),
                       child: Text(
-                        widget.post.title != null
-                            ? widget.post.title!
+                        _post.title != null
+                            ? _post.title!
                             : "제목 없음", //제목 생기면 그때 수정할 것
                         style: const TextStyle(
                           color: AppColor.textColor,
@@ -164,14 +197,14 @@ class _PostCardState extends State<PostCard> {
                         ),
                       ),
                     ),
-                    buildPostContent(widget.post.content),
+                    buildPostContent(_post.content),
                   ],
                 ),
                 SizedBox(height: SizeController.to.screenHeight * 0.04),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    widget.post.isFixed
+                    _post.isFixed
                         ? const Expanded(
                             flex: 1,
                             child: Row(
@@ -209,7 +242,7 @@ class _PostCardState extends State<PostCard> {
                           Expanded(
                             flex: 1,
                             child: Text(
-                              '${widget.post.commentCount}',
+                              '${_post.commentCount}',
                               style: const TextStyle(
                                 color: AppColor.textColor2,
                                 fontWeight: FontWeight.normal,
@@ -219,34 +252,40 @@ class _PostCardState extends State<PostCard> {
                           ),
                           Expanded(
                             flex: 1,
-                            child: widget.post.likeStatus
-                                ? const Icon(
-                                    SFSymbols.heart_fill,
-                                    color: AppColor.objectColor,
-                                    size: 16,
-                                  )
-                                : const Icon(
-                                    SFSymbols.heart,
-                                    color: AppColor.textColor2,
-                                    size: 16,
-                                  ),
+                            child: GestureDetector(
+                              onTap: _toggleLike,
+                              child: _isLike
+                                  ? const Icon(
+                                SFSymbols.heart_fill,
+                                color: AppColor.objectColor,
+                                size: 16,
+                              )
+                                  : const Icon(
+                                SFSymbols.heart,
+                                color: AppColor.textColor2,
+                                size: 16,
+                              ),
+                            )
                           ),
                           Expanded(
                             flex: 1,
-                            child: Text(
-                              '${widget.post.likeCount}',
-                              style: widget.post.likeStatus
-                                  ? const TextStyle(
-                                      color: AppColor.objectColor,
-                                      fontWeight: FontWeight.normal,
-                                      fontSize: 16,
-                                    )
-                                  : const TextStyle(
-                                      color: AppColor.textColor2,
-                                      fontWeight: FontWeight.normal,
-                                      fontSize: 16,
-                                    ),
-                            ),
+                            child: GestureDetector(
+                              onTap: _toggleLike,
+                              child: Text(
+                                '$_likeCount',
+                                style: _isLike
+                                    ? const TextStyle(
+                                  color: AppColor.objectColor,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 16,
+                                )
+                                    : const TextStyle(
+                                  color: AppColor.textColor2,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            )
                           ),
                         ],
                       ),
