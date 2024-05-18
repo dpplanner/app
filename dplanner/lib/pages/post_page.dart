@@ -120,6 +120,7 @@ class _PostPageState extends State<PostPage> {
                     ),
                     PostComment(
                         comments: _comments,
+                        selectedCommentId: _replyingCommentId,
                         onCommentSelected: _handleCommentSelected),
                   ],
                 ),

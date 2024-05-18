@@ -10,28 +10,18 @@ import 'package:dplanner/models/post_comment_model.dart';
 /// POST 자세히보기 화면에서 댓글 내용 그리는 class
 ///
 ///
-class PostComment extends StatefulWidget {
-  final Function(int?) onCommentSelected;
+class PostComment extends StatelessWidget {
   final List<Comment> comments;
+  final int? selectedCommentId;
+  final Function(int?) onCommentSelected;
 
   const PostComment(
-      {Key? key, required this.comments, required this.onCommentSelected})
+      {Key? key,
+        required this.comments,
+        required this.selectedCommentId,
+        required this.onCommentSelected,
+      })
       : super(key: key);
-
-  @override
-  State<PostComment> createState() => _PostCommentState();
-}
-
-class _PostCommentState extends State<PostComment> {
-  int? _selectedCommentId;
-
-  void _handleSelected(int? commentId) {
-    setState(() {
-      _selectedCommentId = commentId;
-    });
-
-    widget.onCommentSelected(_selectedCommentId);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +30,7 @@ class _PostCommentState extends State<PostComment> {
       color: AppColor.backgroundColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: widget.comments.isEmpty
+        children: comments.isEmpty
             ? [
           const SizedBox(
             height: 24,
@@ -53,11 +43,11 @@ class _PostCommentState extends State<PostComment> {
         ]
             : [
           // 댓글 데이터를 화면에 표시하는 부분
-          for (var comment in widget.comments)
+          for (var comment in comments)
             CommentBlock(
-                isSelected: comment.id == _selectedCommentId ? true : false,
+                isSelected: comment.id == selectedCommentId ? true : false,
                 comment: comment,
-                onCommentSelected: _handleSelected
+                onCommentSelected: onCommentSelected
             ),
         ],
       ),
