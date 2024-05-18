@@ -151,6 +151,7 @@ class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: PostMiniCard(
+                        id: _myPosts[index].id,
                         title: _myPosts[index].title ?? '제목 없음',
                         content: _myPosts[index].content,
                         dateTime: _myPosts[index].createdTime,
