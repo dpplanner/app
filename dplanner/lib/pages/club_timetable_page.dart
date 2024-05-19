@@ -1956,7 +1956,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                         Duration(
                                             days:
                                                 selectedValue!.bookableSpan!));
-                                    if (types == 5) {
+                                    if (types == 5 ||
+                                        !(types == 1 && lastPages.last == 0)) {
                                       selectedDay = newSelectedDay;
                                       focusedDay = newFocusedDay;
                                       chooseDate = selectedDay;
