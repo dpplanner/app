@@ -22,7 +22,9 @@ class MyActivityCheckPage extends StatefulWidget {
 class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
   List<Post> _myPosts = [];
   List<Comment> _postComments = [];
-  int _currentPage = 0;
+  List<Post> _likedPosts = [];
+  int _currentPage1 = 0;
+  int _currentPage2 = 0;
   bool _isLoading = false;
   ScrollController _scrollController = ScrollController();
 
@@ -32,6 +34,7 @@ class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
     _scrollController.addListener(_scrollListener);
     _fetchMyPosts();
     _fetchMyComments(1043);
+    _fetchLikedPosts();
   }
 
   @override
@@ -57,10 +60,10 @@ class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
     try {
       List<Post> newPosts = await PostApiService.fetchMyPosts(
           clubMemberID: MemberController.to.clubMember().id,
-          page: _currentPage);
+          page: _currentPage1);
       setState(() {
         _myPosts.addAll(newPosts);
-        _currentPage++;
+        _currentPage1++;
         _isLoading = false;
       });
     } catch (e) {
@@ -92,6 +95,28 @@ class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
         _isLoading = false;
       });
       print('Error fetching comments: $e');
+    }
+  }
+
+  Future<void> _fetchLikedPosts() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      List<Post> likedPosts = await PostApiService.fetchLikedPosts(
+          clubMemberID: MemberController.to.clubMember().id,
+          page: _currentPage2);
+      setState(() {
+        _likedPosts.addAll(likedPosts);
+        _currentPage2++;
+      });
+    } catch (e) {
+      print('Error fetching posts: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -190,6 +215,31 @@ class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
                     ),
           Container(
             color: AppColor.backgroundColor2,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 24, 24, 24),
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: _likedPosts.length + (_isLoading ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index < _likedPosts.length) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: PostMiniCard(
+                        id: _likedPosts[index].id,
+                        title: _likedPosts[index].title ?? '제목 없음',
+                        content: _likedPosts[index].content,
+                        dateTime: _likedPosts[index].createdTime,
+                        isPhoto: _likedPosts[index].attachmentsUrl.isNotEmpty,
+                      ),
+                    );
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+              ),
+            ),
           ),
         ],
       ),

@@ -153,6 +153,25 @@ class PostApiService {
     }
   }
 
+  static Future<List<Post>> fetchLikedPosts(
+    {required int clubMemberID, required int page}) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/posts/clubMembers/$clubMemberID/like?size=100&page=$page'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(utf8.decode(response.bodyBytes));
+      final List<dynamic> content = responseData['data']['content'];
+      return content.map((data) => Post.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load posts');
+    }
+  }
+
   static Future<Post> fetchPost({required int postID}) async {
     final storage = FlutterSecureStorage();
     final accessToken = await storage.read(key: accessTokenKey);
