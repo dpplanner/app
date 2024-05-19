@@ -1855,6 +1855,52 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 selectedDayPredicate: (day) {
                                   return calendar.isSameDay(selectedDay, day);
                                 },
+                                rangeSelectionMode: (types == 1 &&
+                                        !(MemberController.to
+                                                    .clubMember()
+                                                    .role ==
+                                                "ADMIN" ||
+                                            (MemberController.to
+                                                        .clubMember()
+                                                        .clubAuthorityTypes !=
+                                                    null &&
+                                                MemberController.to
+                                                    .clubMember()
+                                                    .clubAuthorityTypes!
+                                                    .contains("SCHEDULE_ALL"))))
+                                    ? calendar.RangeSelectionMode.toggledOn
+                                    : calendar.RangeSelectionMode.disabled,
+                                rangeStartDay: (types == 1 &&
+                                        !(MemberController.to
+                                                    .clubMember()
+                                                    .role ==
+                                                "ADMIN" ||
+                                            (MemberController.to
+                                                        .clubMember()
+                                                        .clubAuthorityTypes !=
+                                                    null &&
+                                                MemberController.to
+                                                    .clubMember()
+                                                    .clubAuthorityTypes!
+                                                    .contains("SCHEDULE_ALL"))))
+                                    ? DateTime.now()
+                                    : null,
+                                rangeEndDay: (types == 1 &&
+                                        !(MemberController.to
+                                                    .clubMember()
+                                                    .role ==
+                                                "ADMIN" ||
+                                            (MemberController.to
+                                                        .clubMember()
+                                                        .clubAuthorityTypes !=
+                                                    null &&
+                                                MemberController.to
+                                                    .clubMember()
+                                                    .clubAuthorityTypes!
+                                                    .contains("SCHEDULE_ALL"))))
+                                    ? DateTime.now().add(Duration(
+                                        days: selectedValue!.bookableSpan!))
+                                    : null,
                                 calendarStyle: const calendar.CalendarStyle(
                                     isTodayHighlighted: false,
                                     outsideTextStyle: TextStyle(
@@ -1876,19 +1922,62 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     selectedTextStyle: TextStyle(
                                         fontWeight: FontWeight.w400,
                                         color: AppColor.backgroundColor,
-                                        fontSize: 12)),
+                                        fontSize: 12),
+                                    rangeHighlightColor: AppColor.subColor2,
+                                    rangeStartDecoration: BoxDecoration(
+                                      color: AppColor.subColor2,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    rangeStartTextStyle: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColor.backgroundColor,
+                                        fontSize: 14),
+                                    rangeEndDecoration: BoxDecoration(
+                                      color: AppColor.subColor2,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    rangeEndTextStyle: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColor.backgroundColor,
+                                        fontSize: 14),
+                                    withinRangeDecoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    withinRangeTextStyle: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColor.backgroundColor,
+                                        fontSize: 14)),
                                 onDaySelected: (newSelectedDay, newFocusedDay) {
                                   setState(() {
-                                    selectedDay = newSelectedDay;
-                                    focusedDay = newFocusedDay;
-                                    if (selectedDay.month != focusedDay.month) {
-                                      focusedDay = DateTime(selectedDay.year,
-                                          selectedDay.month, 1);
-                                    }
+                                    DateTime rangeStart = DateTime.now()
+                                        .subtract(const Duration(days: 1));
+                                    DateTime rangeEnd = DateTime.now().add(
+                                        Duration(
+                                            days:
+                                                selectedValue!.bookableSpan!));
                                     if (types == 5) {
+                                      selectedDay = newSelectedDay;
+                                      focusedDay = newFocusedDay;
                                       chooseDate = selectedDay;
-                                    } else if (lastPages.last != 0) {
-                                      reservationTime = selectedDay;
+                                    } else if (newSelectedDay
+                                                .isAfter(rangeStart) &&
+                                            newSelectedDay.isBefore(rangeEnd) ||
+                                        newSelectedDay == rangeStart ||
+                                        newSelectedDay == rangeEnd) {
+                                      selectedDay = newSelectedDay;
+                                      focusedDay = newFocusedDay;
+                                      if (selectedDay.month !=
+                                          focusedDay.month) {
+                                        focusedDay = DateTime(selectedDay.year,
+                                            selectedDay.month, 1);
+                                      } else if (lastPages.last != 0) {
+                                        reservationTime = selectedDay;
+                                      }
+                                    } else {
+                                      snackBar(
+                                          title: "선택할 수 없는 날짜입니다",
+                                          content: "선택 가능한 날짜를 선택해주세요");
                                     }
                                   });
                                 },
