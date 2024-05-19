@@ -41,9 +41,25 @@ class _PostCardState extends State<PostCard> {
     });
   }
 
+  int _getPostCardContentLength(String content) {
+    const contentCutoff = 100;
+    if (content.length > contentCutoff) return contentCutoff;
+
+    int newLineCount = 0;
+    for (int i = 0; i < content.length; i++) {
+      if (content[i] == '\n') {
+        newLineCount++;
+        if (newLineCount > 3) return i;
+      }
+    }
+
+    return content.length;
+  }
+
+
   Widget buildPostContent(String content) {
-    final cutoff = 100;
-    final shouldShowMore = content.length > cutoff;
+    final postCardContentLength = _getPostCardContentLength(content);
+    final shouldShowMore = postCardContentLength < content.length;
 
     return RichText(
       text: TextSpan(
@@ -54,7 +70,7 @@ class _PostCardState extends State<PostCard> {
         ),
         children: <TextSpan>[
           TextSpan(
-            text: shouldShowMore ? content.substring(0, cutoff) : content,
+            text: content.substring(0, postCardContentLength),
           ),
           if (shouldShowMore)
             const TextSpan(

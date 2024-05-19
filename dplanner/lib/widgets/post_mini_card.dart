@@ -22,9 +22,24 @@ class PostMiniCard extends StatelessWidget {
       required this.dateTime,
       this.isPhoto = false});
 
+  int _getPostCardContentLength(String content) {
+    const contentCutoff = 100;
+    if (content.length > contentCutoff) return contentCutoff;
+
+    int newLineCount = 0;
+    for (int i = 0; i < content.length; i++) {
+      if (content[i] == '\n') {
+        newLineCount++;
+        if (newLineCount > 3) return i;
+      }
+    }
+
+    return content.length;
+  }
+
   Widget buildPostContent(String content) {
-    final cutoff = 100;
-    final shouldShowMore = content.length > cutoff;
+    final postCardContentLength = _getPostCardContentLength(content);
+    final shouldShowMore = postCardContentLength < content.length;
 
     return RichText(
       text: TextSpan(
@@ -35,7 +50,7 @@ class PostMiniCard extends StatelessWidget {
         ),
         children: <TextSpan>[
           TextSpan(
-            text: shouldShowMore ? content.substring(0, cutoff) : content,
+            text: content.substring(0, postCardContentLength),
           ),
           if (shouldShowMore)
             const TextSpan(
@@ -53,52 +68,51 @@ class PostMiniCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Get.to(PostPage(postId: id), arguments: 1);
-      },
-      child: Container(
-        width: SizeController.to.screenWidth,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: AppColor.backgroundColor,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                          color: AppColor.textColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    ),
-                    buildPostContent(content),
-                    Text(
-                      DateFormat('yyyy년 M월 d일').add_jm().format(dateTime),
-                      style: const TextStyle(
-                        color: AppColor.textColor,
-                        fontWeight: FontWeight.normal,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (isPhoto)
-                SvgPicture.asset(
-                  'assets/images/base_image/base_post_image.svg',
-                  height: 64,
-                  width: 64,
-                )
-            ],
+        onTap: () {
+          Get.to(PostPage(postId: id), arguments: 1);
+        },
+        child: Container(
+          width: SizeController.to.screenWidth,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: AppColor.backgroundColor,
           ),
-        ),
-      )
-    );
+          child: Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                            color: AppColor.textColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
+                      ),
+                      buildPostContent(content),
+                      Text(
+                        DateFormat('yyyy년 M월 d일').add_jm().format(dateTime),
+                        style: const TextStyle(
+                          color: AppColor.textColor,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isPhoto)
+                  SvgPicture.asset(
+                    'assets/images/base_image/base_post_image.svg',
+                    height: 64,
+                    width: 64,
+                  )
+              ],
+            ),
+          ),
+        ));
   }
 }
