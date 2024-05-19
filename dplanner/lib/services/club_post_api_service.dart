@@ -12,6 +12,8 @@ import '../const.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'package:dplanner/models/post_comment_model.dart';
 
+import '../pages/post_page.dart';
+
 class PostApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
 
@@ -93,10 +95,11 @@ class PostApiService {
       final responseBody = await http.Response.fromStream(response);
 
       if (response.statusCode == 201) {
-        Get.back();
+        final json = jsonDecode(utf8.decode(responseBody.bodyBytes));
+        final newPost = Post.fromJson(json['data']);
+        Get.off(() => PostPage(postId: newPost.id,), arguments: 1); // 게시글 등록 이후 바로 작성한 게시글로 이동
         // 요청이 성공한 경우
         Get.snackbar('알림', '게시글이 작성되었습니다.');
-        print(responseBody.body);
       } else {
         // 요청이 실패한 경우
         Get.snackbar('알림',
