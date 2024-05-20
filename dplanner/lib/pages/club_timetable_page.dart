@@ -105,72 +105,97 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       int weekday = standardDay.weekday;
       startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
       endOfWeek = standardDay.add(Duration(days: 7 - weekday));
+      DateTime endOfResource =
+          DateTime.now().add(Duration(days: selectedValue!.bookableSpan!));
+      DateTime endDate = (endOfResource.isBefore(endOfWeek) &&
+              endOfResource.isAfter(startOfWeek))
+          ? endOfResource
+          : endOfWeek;
 
-      List<ReservationModel> reservations =
-          await ReservationApiService.getReservations(
-              resourceId: selectedValue!.id,
-              startDateTime:
-                  DateFormat('yyyy-MM-dd 00:00:00').format(startOfWeek),
-              endDateTime: DateFormat('yyyy-MM-dd 00:00:00')
-                  .format(endOfWeek.add(const Duration(days: 1))));
+      if (endOfResource.isBefore(startOfWeek)) {
+        List<ReservationModel> reservations =
+            await ReservationApiService.getReservations(
+                resourceId: selectedValue!.id,
+                startDateTime:
+                    DateFormat('yyyy-MM-dd 00:00:00').format(startOfWeek),
+                endDateTime: DateFormat('yyyy-MM-dd 00:00:00')
+                    .format(endDate.add(const Duration(days: 1))));
 
-      List<LockModel> locks = await LockApiService.getLocks(
-          resourceId: selectedValue!.id,
-          startDateTime: DateFormat('yyyy-MM-dd 00:00:00').format(startOfWeek),
-          endDateTime: DateFormat('yyyy-MM-dd 00:00:00')
-              .format(endOfWeek.add(const Duration(days: 1))));
+        List<LockModel> locks = await LockApiService.getLocks(
+            resourceId: selectedValue!.id,
+            startDateTime:
+                DateFormat('yyyy-MM-dd 00:00:00').format(startOfWeek),
+            endDateTime: DateFormat('yyyy-MM-dd 00:00:00')
+                .format(endDate.add(const Duration(days: 1))));
 
-      for (var i in reservations) {
-        events.add(CalendarEventData(
-            date: DateTime.parse(i.startDateTime),
-            startTime: DateTime.parse(i.startDateTime),
-            endTime: DateTime.parse(i.endDateTime)
-                .subtract(const Duration(microseconds: 1)),
-            title: i.status == "REQUEST"
-                ? "${i.reservationId}"
-                : i.title == ""
-                    ? "${i.reservationId} ${i.clubMemberName}"
-                    : "${i.reservationId} ${i.title}",
-            description: i.status == "REQUEST"
-                ? ""
-                : i.title == ""
-                    ? i.usage
-                    : "",
-            color: i.status == "REQUEST"
-                ? (i.clubMemberId == MemberController.to.clubMember().id
-                    ? AppColor.subColor2
-                    : AppColor.subColor4)
-                : (i.clubMemberId == MemberController.to.clubMember().id ||
-                        i.invitees.any((element) =>
-                            element["clubMemberId"] ==
-                                MemberController.to.clubMember().id &&
-                            element["clubMemberName"] ==
-                                MemberController.to.clubMember().name))
-                    ? AppColor.subColor1
-                    : AppColor.subColor3));
+        for (var i in reservations) {
+          events.add(CalendarEventData(
+              date: DateTime.parse(i.startDateTime),
+              startTime: DateTime.parse(i.startDateTime),
+              endTime: DateTime.parse(i.endDateTime)
+                  .subtract(const Duration(microseconds: 1)),
+              title: i.status == "REQUEST"
+                  ? "${i.reservationId}"
+                  : i.title == ""
+                      ? "${i.reservationId} ${i.clubMemberName}"
+                      : "${i.reservationId} ${i.title}",
+              description: i.status == "REQUEST"
+                  ? ""
+                  : i.title == ""
+                      ? i.usage
+                      : "",
+              color: i.status == "REQUEST"
+                  ? (i.clubMemberId == MemberController.to.clubMember().id
+                      ? AppColor.subColor2
+                      : AppColor.subColor4)
+                  : (i.clubMemberId == MemberController.to.clubMember().id ||
+                          i.invitees.any((element) =>
+                              element["clubMemberId"] ==
+                                  MemberController.to.clubMember().id &&
+                              element["clubMemberName"] ==
+                                  MemberController.to.clubMember().name))
+                      ? AppColor.subColor1
+                      : AppColor.subColor3));
+        }
+
+        for (var i in locks) {
+          DateTime startDate = DateTime.parse(i.startDateTime);
+          DateTime endDate = DateTime.parse(i.endDateTime);
+
+          for (DateTime j = startDate;
+              j.isBefore(endDate);
+              j = j.add(const Duration(days: 1))) {
+            DateTime startTime = (j.year == startDate.year &&
+                    j.month == startDate.month &&
+                    j.day == startDate.day)
+                ? startDate
+                : DateTime(startDate.year, startDate.month, startDate.day);
+            DateTime endTime = (j.year == endDate.year &&
+                    j.month == endDate.month &&
+                    j.day == endDate.day)
+                ? endDate
+                : DateTime(endDate.year, endDate.month, endDate.day);
+            events.add(CalendarEventData(
+                date: j,
+                startTime: startTime,
+                endTime: endTime.subtract(const Duration(microseconds: 1)),
+                title: "",
+                description: "",
+                color: AppColor.lockColor));
+          }
+        }
       }
 
-      for (var i in locks) {
-        DateTime startDate = DateTime.parse(i.startDateTime);
-        DateTime endDate = DateTime.parse(i.endDateTime);
-
-        for (DateTime j = startDate;
-            j.isBefore(endDate);
+      if (endOfWeek.isAfter(endOfResource)) {
+        for (DateTime j = endOfResource;
+            j.isBefore(endOfWeek.add(const Duration(days: 1)));
             j = j.add(const Duration(days: 1))) {
-          DateTime startTime = (j.year == startDate.year &&
-                  j.month == startDate.month &&
-                  j.day == startDate.day)
-              ? startDate
-              : DateTime(startDate.year, startDate.month, startDate.day);
-          DateTime endTime = (j.year == endDate.year &&
-                  j.month == endDate.month &&
-                  j.day == endDate.day)
-              ? endDate
-              : DateTime(endDate.year, endDate.month, endDate.day);
           events.add(CalendarEventData(
               date: j,
-              startTime: startTime,
-              endTime: endTime.subtract(const Duration(microseconds: 1)),
+              startTime:
+                  DateTime.parse(DateFormat('yyyy-MM-dd 00:00:00').format(j)),
+              endTime:
+                  DateTime.parse(DateFormat('yyyy-MM-dd 23:59:59').format(j)),
               title: "",
               description: "",
               color: AppColor.lockColor));
@@ -492,29 +517,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                           );
                         },
                         timeLineBuilder: (DateTime date) {
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(3, 0, 3, 42.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: DateTime.now().hour == date.hour
-                                    ? AppColor.subColor1
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(7.0),
-                              ),
-                              child: Text(
-                                date.hour < 10
-                                    ? "0${date.hour}"
-                                    : "${date.hour}",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: DateTime.now().hour == date.hour
-                                      ? AppColor.textColor
-                                      : AppColor.textColor2,
-                                  //color: AppColor.textColor2,
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 14,
-                                ),
-                              ),
+                          return Text(
+                            date.hour < 10 ? "0${date.hour}" : "${date.hour}",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: AppColor.textColor2,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 14,
                             ),
                           );
                         },
@@ -527,8 +536,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         liveTimeIndicatorSettings:
                             const LiveTimeIndicatorSettings(
                           color: AppColor.objectColor,
-                          height: 0,
-                          offset: 0,
+                          height: 1,
+                          offset: 1,
                         ),
                         eventTileBuilder: (date, events, boundry, start, end) {
                           if (events.isNotEmpty) {
@@ -1846,6 +1855,52 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 selectedDayPredicate: (day) {
                                   return calendar.isSameDay(selectedDay, day);
                                 },
+                                rangeSelectionMode: (types == 1 &&
+                                        !(MemberController.to
+                                                    .clubMember()
+                                                    .role ==
+                                                "ADMIN" ||
+                                            (MemberController.to
+                                                        .clubMember()
+                                                        .clubAuthorityTypes !=
+                                                    null &&
+                                                MemberController.to
+                                                    .clubMember()
+                                                    .clubAuthorityTypes!
+                                                    .contains("SCHEDULE_ALL"))))
+                                    ? calendar.RangeSelectionMode.toggledOn
+                                    : calendar.RangeSelectionMode.disabled,
+                                rangeStartDay: (types == 1 &&
+                                        !(MemberController.to
+                                                    .clubMember()
+                                                    .role ==
+                                                "ADMIN" ||
+                                            (MemberController.to
+                                                        .clubMember()
+                                                        .clubAuthorityTypes !=
+                                                    null &&
+                                                MemberController.to
+                                                    .clubMember()
+                                                    .clubAuthorityTypes!
+                                                    .contains("SCHEDULE_ALL"))))
+                                    ? DateTime.now()
+                                    : null,
+                                rangeEndDay: (types == 1 &&
+                                        !(MemberController.to
+                                                    .clubMember()
+                                                    .role ==
+                                                "ADMIN" ||
+                                            (MemberController.to
+                                                        .clubMember()
+                                                        .clubAuthorityTypes !=
+                                                    null &&
+                                                MemberController.to
+                                                    .clubMember()
+                                                    .clubAuthorityTypes!
+                                                    .contains("SCHEDULE_ALL"))))
+                                    ? DateTime.now().add(Duration(
+                                        days: selectedValue!.bookableSpan!))
+                                    : null,
                                 calendarStyle: const calendar.CalendarStyle(
                                     isTodayHighlighted: false,
                                     outsideTextStyle: TextStyle(
@@ -1867,19 +1922,63 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     selectedTextStyle: TextStyle(
                                         fontWeight: FontWeight.w400,
                                         color: AppColor.backgroundColor,
-                                        fontSize: 12)),
+                                        fontSize: 12),
+                                    rangeHighlightColor: AppColor.subColor2,
+                                    rangeStartDecoration: BoxDecoration(
+                                      color: AppColor.subColor2,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    rangeStartTextStyle: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColor.backgroundColor,
+                                        fontSize: 14),
+                                    rangeEndDecoration: BoxDecoration(
+                                      color: AppColor.subColor2,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    rangeEndTextStyle: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColor.backgroundColor,
+                                        fontSize: 14),
+                                    withinRangeDecoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    withinRangeTextStyle: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColor.backgroundColor,
+                                        fontSize: 14)),
                                 onDaySelected: (newSelectedDay, newFocusedDay) {
                                   setState(() {
-                                    selectedDay = newSelectedDay;
-                                    focusedDay = newFocusedDay;
-                                    if (selectedDay.month != focusedDay.month) {
-                                      focusedDay = DateTime(selectedDay.year,
-                                          selectedDay.month, 1);
-                                    }
-                                    if (types == 5) {
+                                    DateTime rangeStart = DateTime.now()
+                                        .subtract(const Duration(days: 1));
+                                    DateTime rangeEnd = DateTime.now().add(
+                                        Duration(
+                                            days:
+                                                selectedValue!.bookableSpan!));
+                                    if (types == 5 ||
+                                        !(types == 1 && lastPages.last == 0)) {
+                                      selectedDay = newSelectedDay;
+                                      focusedDay = newFocusedDay;
                                       chooseDate = selectedDay;
-                                    } else if (lastPages.last != 0) {
-                                      reservationTime = selectedDay;
+                                    } else if (newSelectedDay
+                                                .isAfter(rangeStart) &&
+                                            newSelectedDay.isBefore(rangeEnd) ||
+                                        newSelectedDay == rangeStart ||
+                                        newSelectedDay == rangeEnd) {
+                                      selectedDay = newSelectedDay;
+                                      focusedDay = newFocusedDay;
+                                      if (selectedDay.month !=
+                                          focusedDay.month) {
+                                        focusedDay = DateTime(selectedDay.year,
+                                            selectedDay.month, 1);
+                                      } else if (lastPages.last != 0) {
+                                        reservationTime = selectedDay;
+                                      }
+                                    } else {
+                                      snackBar(
+                                          title: "선택할 수 없는 날짜입니다",
+                                          content: "선택 가능한 날짜를 선택해주세요");
                                     }
                                   });
                                 },

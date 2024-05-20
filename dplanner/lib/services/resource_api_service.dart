@@ -17,7 +17,8 @@ class ResourceApiService {
       required String info,
       required bool returnMessageRequired,
       required String notice,
-      required String resourceType}) async {
+      required String resourceType,
+      required int bookableSpan}) async {
     final url = Uri.parse('$baseUrl/resources');
     const storage = FlutterSecureStorage();
 
@@ -36,6 +37,7 @@ class ResourceApiService {
         "returnMessageRequired": returnMessageRequired,
         "notice": notice,
         "resourceType": resourceType,
+        "bookableSpan": bookableSpan,
       }),
     );
 
@@ -90,7 +92,8 @@ class ResourceApiService {
       required String info,
       required bool returnMessageRequired,
       required String notice,
-      required String resourceType}) async {
+      required String resourceType,
+      required int bookableSpan}) async {
     final url = Uri.parse('$baseUrl/resources/$id');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
@@ -108,6 +111,7 @@ class ResourceApiService {
         "returnMessageRequired": returnMessageRequired,
         "notice": notice,
         "resourceType": resourceType,
+        "bookableSpan": bookableSpan
       }),
     );
 
