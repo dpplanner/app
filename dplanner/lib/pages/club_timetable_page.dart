@@ -106,13 +106,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
       endOfWeek = standardDay.add(Duration(days: 7 - weekday));
       DateTime endOfResource =
-          DateTime.now().add(Duration(days: selectedValue!.bookableSpan!));
+          DateTime.now().add(Duration(days: selectedValue!.bookableSpan! + 1));
       DateTime endDate = (endOfResource.isBefore(endOfWeek) &&
               endOfResource.isAfter(startOfWeek))
           ? endOfResource
           : endOfWeek;
 
-      if (endOfResource.isBefore(startOfWeek)) {
+      if (startOfWeek.isBefore(endDate)) {
         List<ReservationModel> reservations =
             await ReservationApiService.getReservations(
                 resourceId: selectedValue!.id,
@@ -1956,29 +1956,59 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                         Duration(
                                             days:
                                                 selectedValue!.bookableSpan!));
-                                    if (types == 5 ||
-                                        !(types == 1 && lastPages.last == 0)) {
+                                    if (types == 5) {
+                                      // 날짜 선택
                                       selectedDay = newSelectedDay;
                                       focusedDay = newFocusedDay;
                                       chooseDate = selectedDay;
-                                    } else if (newSelectedDay
-                                                .isAfter(rangeStart) &&
-                                            newSelectedDay.isBefore(rangeEnd) ||
-                                        newSelectedDay == rangeStart ||
-                                        newSelectedDay == rangeEnd) {
-                                      selectedDay = newSelectedDay;
-                                      focusedDay = newFocusedDay;
-                                      if (selectedDay.month !=
-                                          focusedDay.month) {
-                                        focusedDay = DateTime(selectedDay.year,
-                                            selectedDay.month, 1);
-                                      } else if (lastPages.last != 0) {
-                                        reservationTime = selectedDay;
-                                      }
                                     } else {
-                                      snackBar(
-                                          title: "선택할 수 없는 날짜입니다",
-                                          content: "선택 가능한 날짜를 선택해주세요");
+                                      if (MemberController.to
+                                                  .clubMember()
+                                                  .role ==
+                                              "ADMIN" ||
+                                          (MemberController.to
+                                                      .clubMember()
+                                                      .clubAuthorityTypes !=
+                                                  null &&
+                                              MemberController.to
+                                                  .clubMember()
+                                                  .clubAuthorityTypes!
+                                                  .contains("SCHEDULE_ALL"))) {
+                                        selectedDay = newSelectedDay;
+                                        focusedDay = newFocusedDay;
+                                        if (selectedDay.month !=
+                                            focusedDay.month) {
+                                          focusedDay = DateTime(
+                                              selectedDay.year,
+                                              selectedDay.month,
+                                              1);
+                                        } else if (lastPages.last != 0) {
+                                          reservationTime = selectedDay;
+                                        }
+                                      } else {
+                                        if (newSelectedDay
+                                                    .isAfter(rangeStart) &&
+                                                newSelectedDay
+                                                    .isBefore(rangeEnd) ||
+                                            newSelectedDay == rangeStart ||
+                                            newSelectedDay == rangeEnd) {
+                                          selectedDay = newSelectedDay;
+                                          focusedDay = newFocusedDay;
+                                          if (selectedDay.month !=
+                                              focusedDay.month) {
+                                            focusedDay = DateTime(
+                                                selectedDay.year,
+                                                selectedDay.month,
+                                                1);
+                                          } else if (lastPages.last != 0) {
+                                            reservationTime = selectedDay;
+                                          }
+                                        } else {
+                                          snackBar(
+                                              title: "선택할 수 없는 날짜입니다",
+                                              content: "선택 가능한 날짜를 선택해주세요");
+                                        }
+                                      }
                                     }
                                   });
                                 },
