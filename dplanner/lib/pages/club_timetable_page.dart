@@ -106,13 +106,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
       endOfWeek = standardDay.add(Duration(days: 7 - weekday));
       DateTime endOfResource =
-          DateTime.now().add(Duration(days: selectedValue!.bookableSpan!));
+          DateTime.now().add(Duration(days: selectedValue!.bookableSpan! + 1));
       DateTime endDate = (endOfResource.isBefore(endOfWeek) &&
               endOfResource.isAfter(startOfWeek))
           ? endOfResource
           : endOfWeek;
 
-      if (endOfResource.isBefore(startOfWeek)) {
+      if (startOfWeek.isBefore(endDate)) {
         List<ReservationModel> reservations =
             await ReservationApiService.getReservations(
                 resourceId: selectedValue!.id,
