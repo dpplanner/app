@@ -1,3 +1,4 @@
+import 'package:dplanner/pages/loading_page.dart';
 import 'package:dplanner/widgets/post_comment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -6,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../controllers/size.dart';
+import '../models/post_comment_model.dart';
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/outline_textform.dart';
@@ -21,9 +23,9 @@ import 'package:dplanner/controllers/member.dart';
 ///
 
 class PostPage extends StatefulWidget {
-  final Post post;
+  final int postId;
 
-  const PostPage({Key? key, required this.post}) : super(key: key);
+  const PostPage({Key? key, required this.postId}) : super(key: key);
 
   @override
   State<PostPage> createState() => _PostPageState();
@@ -35,20 +37,31 @@ class _PostPageState extends State<PostPage> {
   bool _isFocused = false;
   bool _isReplying = false; //답글을 다는 중인지 체크
   int? _replyingCommentId; //답글을 달려고 클릭한 댓글의 ID
-  late Post post; // 상태 변수로 'post' 선언
+  List<Comment> _comments = [];
+  Post? post; // 상태 변수로 'post' 선언
 
   @override
   void initState() {
     super.initState();
-    post = widget.post; // 초기화에서 widget의 post를 사용하여 상태 변수 초기화
+    _fetchPost();
   }
 
-  Future<void> refreshPost() async {
+  Future<void> _fetchPost() async {
     final updatedPost =
-        await PostApiService.fetchPost(postID: post.id); // post를 새로 로드
+        await PostApiService.fetchPost(postID: widget.postId); // post를 새로 로드
     setState(() {
       post = updatedPost; // 상태 업데이트
+      _fetchComments();
     });
+  }
+
+  Future<void> _fetchComments() async {
+    final comments = await PostCommentApiService.fetchComments(widget.postId);
+    if (comments != null) {
+      setState(() {
+        _comments = comments;
+      });
+    }
   }
 
   void startReplying(int commentId) {
@@ -58,7 +71,7 @@ class _PostPageState extends State<PostPage> {
     });
   }
 
-  void _handleCommentSelected(int commentId) {
+  void _handleCommentSelected(int? commentId) {
     setState(() {
       _replyingCommentId = commentId;
     });
@@ -81,30 +94,34 @@ class _PostPageState extends State<PostPage> {
                 icon: const Icon(SFSymbols.chevron_left)),
             title: const Text(
               "게시글",
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
             centerTitle: true,
           ),
         ),
         body: SafeArea(
-            child: Column(
+            child: post == null
+            ? const LoadingPage() // constraints 없어도 되나?
+            : Column(
           children: [
             Expanded(
                 child: RefreshIndicator(
               onRefresh: () async {
-                refreshPost();
+                _fetchPost();
               },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Column(
                   children: [
-                    PostContent(post: post),
+                    PostContent(post: post!),
                     Container(
                       color: AppColor.backgroundColor2,
                       height: SizeController.to.screenHeight * 0.01,
                     ),
                     PostComment(
-                        post: post, onCommentSelected: _handleCommentSelected),
+                        comments: _comments,
+                        selectedCommentId: _replyingCommentId,
+                        onCommentSelected: _handleCommentSelected),
                   ],
                 ),
               ),
@@ -139,7 +156,9 @@ class _PostPageState extends State<PostPage> {
                       child: Form(
                         key: _formKey,
                         child: OutlineTextForm(
-                          hintText: '댓글을 남겨보세요',
+                          hintText: _replyingCommentId == null
+                              ? '댓글을 남겨보세요'
+                              : "답글을 남겨보세요",
                           controller: addComment,
                           isColored: true,
                           onChanged: (value) {
@@ -153,7 +172,7 @@ class _PostPageState extends State<PostPage> {
                                 // 폼이 유효한 경우 댓글을 서버에 게시
                                 print("==parentID: ${_replyingCommentId}");
                                 await PostCommentApiService.postComment(
-                                    postId: post.id,
+                                    postId: widget.postId,
                                     content: addComment.text,
                                     parentId: _replyingCommentId);
                                 // 댓글 입력 필드 초기화
@@ -163,6 +182,7 @@ class _PostPageState extends State<PostPage> {
                                 FocusScope.of(context).requestFocus(
                                     FocusNode()); //TODO: 체크해라 dismiss 되는지
                               }
+                              _fetchPost(); // 댓글 단 후 게시글 새로고침
                             },
                             child: _isFocused
                                 ? const Icon(

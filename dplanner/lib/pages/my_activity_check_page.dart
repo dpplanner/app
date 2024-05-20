@@ -1,100 +1,16 @@
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
-import 'package:dplanner/services/club_api_service.dart';
 import 'package:dplanner/services/club_post_api_service.dart';
-import 'package:dplanner/widgets/post_mini_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../style.dart';
-import 'package:dplanner/models/post_model.dart';
-import 'package:dplanner/models/post_comment_model.dart';
-import 'package:dplanner/controllers/member.dart';
-import 'package:dplanner/widgets/comment_mini_card.dart';
 
-class MyActivityCheckPage extends StatefulWidget {
+import '../widgets/my_activity_posts.dart';
+
+class MyActivityCheckPage extends StatelessWidget {
   const MyActivityCheckPage({super.key});
-
-  @override
-  State<MyActivityCheckPage> createState() => _MyActivityCheckPageState();
-}
-
-class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
-  List<Post> _myPosts = [];
-  List<Comment> _postComments = [];
-  int _currentPage = 0;
-  bool _isLoading = false;
-  ScrollController _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_scrollListener);
-    _fetchMyPosts();
-    _fetchMyComments(1043);
-  }
-
-  @override
-  void dispose() {
-    _scrollController.removeListener(_scrollListener);
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _scrollListener() {
-    if (!_isLoading &&
-        _scrollController.position.pixels ==
-            _scrollController.position.maxScrollExtent) {
-      _fetchMyPosts();
-    }
-  }
-
-  Future<void> _fetchMyPosts() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      List<Post> newPosts = await PostApiService.fetchMyPosts(
-          clubMemberID: MemberController.to.clubMember().id,
-          page: _currentPage);
-      setState(() {
-        _myPosts.addAll(newPosts);
-        _currentPage++;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      print('Error fetching posts: $e');
-    }
-  }
-
-  Future<void> _fetchMyComments(int postId) async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      List<Comment>? comments =
-          await PostCommentApiService.fetchMyComments(postId);
-      if (comments != null) {
-        setState(() {
-          _postComments = comments;
-        });
-      }
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      print('Error fetching comments: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +40,7 @@ class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
             "내 게시글",
           ),
           Text(
-            "내 댓글",
+            "댓글 단 글",
           ),
           Text(
             "좋아요한 글",
@@ -138,59 +54,11 @@ class _MyActivityCheckPageState extends State<MyActivityCheckPage> {
             labelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
             unselectedLabelColor: AppColor.textColor,
             unselectedLabelStyle:
-                TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-        views: [
-          Container(
-            color: AppColor.backgroundColor2,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 24, 24, 24),
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: _myPosts.length + (_isLoading ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index < _myPosts.length) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: PostMiniCard(
-                        title: _myPosts[index].title ?? '제목 없음',
-                        content: _myPosts[index].content,
-                        date: '${_myPosts[index].createdTime}',
-                        isPhoto: _myPosts[index].attachmentsUrl.isNotEmpty,
-                      ),
-                    );
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                },
-              ),
-            ),
-          ),
-          _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : _postComments.isEmpty
-                  ? Center(child: Text('댓글이 없습니다.'))
-                  : Container(
-                      color: AppColor.backgroundColor2,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(18, 24, 24, 24),
-                        child: ListView.builder(
-                          itemCount: _postComments.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12.0),
-                              child: CommentCard(
-                                comment: _postComments[index],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-          Container(
-            color: AppColor.backgroundColor2,
-          ),
+            TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+        views: const [
+          MyActivityPosts(fetchPosts: PostApiService.fetchMyPosts),
+          MyActivityPosts(fetchPosts: PostApiService.fetchCommentedPosts),
+          MyActivityPosts(fetchPosts: PostApiService.fetchLikedPosts),
         ],
       ),
     );

@@ -150,7 +150,7 @@ class _PostContentState extends State<PostContent> {
                               widget.post.clubMemberName,
                               style: const TextStyle(
                                 color: AppColor.textColor,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
@@ -170,7 +170,7 @@ class _PostContentState extends State<PostContent> {
                                       "관리자",
                                       style: TextStyle(
                                         color: AppColor.backgroundColor,
-                                        fontWeight: FontWeight.w400,
+                                        fontWeight: FontWeight.normal,
                                         fontSize: 11,
                                       ),
                                     ),
@@ -184,7 +184,7 @@ class _PostContentState extends State<PostContent> {
                               .format(widget.post.createdTime),
                           style: const TextStyle(
                             color: AppColor.textColor,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.normal,
                             fontSize: 12,
                           ),
                         ),
@@ -214,7 +214,7 @@ class _PostContentState extends State<PostContent> {
                     widget.post.title ?? "제목없음", //TODO: 제목 생기면 수정해야함
                     style: TextStyle(
                       color: AppColor.textColor,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.bold,
                       fontSize: 20,
                     ),
                   ),
@@ -223,7 +223,7 @@ class _PostContentState extends State<PostContent> {
                   widget.post.content,
                   style: TextStyle(
                     color: AppColor.textColor,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.normal,
                     fontSize: 16,
                   ),
                 ),
@@ -269,14 +269,14 @@ class _PostContentState extends State<PostContent> {
                           children: [
                             Icon(
                               SFSymbols.pin_fill,
-                              color: AppColor.textColor2,
+                              color: AppColor.objectColor,
                               size: 14,
                             ),
                             Text(
                               " 고정됨",
                               style: TextStyle(
-                                color: AppColor.textColor2,
-                                fontWeight: FontWeight.w500,
+                                color: AppColor.objectColor,
+                                fontWeight: FontWeight.bold,
                                 fontSize: 14,
                               ),
                             ),
@@ -302,7 +302,7 @@ class _PostContentState extends State<PostContent> {
                           '${widget.post.commentCount}',
                           style: TextStyle(
                             color: AppColor.textColor2,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.normal,
                             fontSize: 16,
                           ),
                         ),
@@ -311,22 +311,34 @@ class _PostContentState extends State<PostContent> {
                         flex: 1,
                         child: GestureDetector(
                           onTap: _toggleLike,
-                          child: Icon(
-                            isLiked ? SFSymbols.heart_fill : SFSymbols.heart,
-                            color: AppColor.textColor2,
-                            size: 16,
-                          ),
+                          child: isLiked
+                              ? const Icon(
+                                  SFSymbols.heart_fill,
+                                  color: AppColor.objectColor,
+                                  size: 16,
+                                )
+                              : const Icon(
+                                  SFSymbols.heart,
+                                  color: AppColor.textColor2,
+                                  size: 16,
+                                ),
                         ),
                       ),
                       Expanded(
                         flex: 1,
                         child: Text(
                           '${likeCount}',
-                          style: TextStyle(
-                            color: AppColor.textColor2,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                          ),
+                          style: isLiked
+                              ? const TextStyle(
+                                  color: AppColor.objectColor,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 16,
+                                )
+                              : const TextStyle(
+                                  color: AppColor.textColor2,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 16,
+                                ),
                         ),
                       ),
                     ],

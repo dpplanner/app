@@ -12,6 +12,8 @@ import '../const.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'package:dplanner/models/post_comment_model.dart';
 
+import '../pages/post_page.dart';
+
 class PostApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
 
@@ -93,10 +95,11 @@ class PostApiService {
       final responseBody = await http.Response.fromStream(response);
 
       if (response.statusCode == 201) {
-        Get.back();
+        final json = jsonDecode(utf8.decode(responseBody.bodyBytes));
+        final newPost = Post.fromJson(json['data']);
+        Get.off(() => PostPage(postId: newPost.id,), arguments: 1); // 게시글 등록 이후 바로 작성한 게시글로 이동
         // 요청이 성공한 경우
         Get.snackbar('알림', '게시글이 작성되었습니다.');
-        print(responseBody.body);
       } else {
         // 요청이 실패한 경우
         Get.snackbar('알림',
@@ -131,13 +134,51 @@ class PostApiService {
 
   static Future<List<Post>> fetchMyPosts(
       //TODO: 포스트 없을때
-      {required int clubMemberID,
-      required int page}) async {
+      {required int clubMemberID, required int page}) async {
     final storage = FlutterSecureStorage();
     final accessToken = await storage.read(key: accessTokenKey);
 
     final response = await http.get(
       Uri.parse('$baseUrl/posts/clubMembers/$clubMemberID?size=100&page=$page'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(utf8.decode(response.bodyBytes));
+      final List<dynamic> content = responseData['data']['content'];
+      return content.map((data) => Post.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load posts');
+    }
+  }
+
+  static Future<List<Post>> fetchCommentedPosts(
+      {required int clubMemberID, required int page}) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    //todo api 나오면 uri 바꾸기
+    final response = await http.get(
+      Uri.parse('$baseUrl/posts/clubMembers/$clubMemberID/commented?size=100&page=$page'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(utf8.decode(response.bodyBytes));
+      final List<dynamic> content = responseData['data']['content'];
+      return content.map((data) => Post.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load posts');
+    }
+  }
+
+  static Future<List<Post>> fetchLikedPosts(
+      {required int clubMemberID, required int page}) async {
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/posts/clubMembers/$clubMemberID/like?size=100&page=$page'),
       headers: {'Authorization': 'Bearer $accessToken'},
     );
 
@@ -381,12 +422,13 @@ class PostCommentApiService {
     }
   }
 
-  static Future<List<Comment>?> fetchMyComments(int clubMemberId) async {
+  static Future<List<Comment>?> fetchMyComments(
+      {required int clubMemberID}) async {
     final storage = FlutterSecureStorage();
     final accessToken = await storage.read(key: accessTokenKey);
 
     final response = await http.get(
-      Uri.parse('$baseUrl/clubMembers/$clubMemberId/comments'),
+      Uri.parse('$baseUrl/clubMembers/$clubMemberID/comments'),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
