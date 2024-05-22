@@ -174,13 +174,11 @@ class _ClubCreatePageState extends State<ClubCreatePage> {
                     final formKeyState2 = _formKey2.currentState!;
                     if (formKeyState1.validate() && formKeyState2.validate()) {
                       try {
-                        print(clubName.text);
-                        print(clubContent.text);
                         ClubController.to.club.value =
                             await ClubApiService.postClub(
                                 clubName: clubName.text,
                                 info: clubContent.text);
-                        Get.offNamed('/club_create_success');
+                        Get.offNamed('/club_create2');
                       } catch (e) {
                         print(e.toString());
                       }
