@@ -1154,6 +1154,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 .substring(11, 13));
                                             int end = int.parse(i.endDateTime
                                                 .substring(11, 13));
+                                            if (end == 0) {
+                                              // 다음날 00으로 설정 되어 있을 경우 24로 설정
+                                              end = 24;
+                                            }
                                             for (var j = start; j < end; j++) {
                                               unableTime.add(j);
                                             }
