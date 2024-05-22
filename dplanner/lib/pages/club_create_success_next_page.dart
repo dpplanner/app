@@ -129,7 +129,7 @@ class _ClubCreateSuccessNextPageState extends State<ClubCreateSuccessNextPage> {
               ),
               buttonColor: AppColor.objectColor,
               onPressed: () {
-                Get.offAllNamed('/club_list');
+                Get.offNamed('/tab2', arguments: 1);
               },
             ),
             SizedBox(
