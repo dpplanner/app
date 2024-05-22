@@ -2989,6 +2989,15 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             Get.back();
                           } catch (e) {
                             print(e.toString());
+                            if (types == 0) {
+                              snackBar(
+                                  title: "예약 신청에 문제가 발생하였습니다",
+                                  content: "관리자에게 문의해주세요");
+                            } else {
+                              snackBar(
+                                  title: "예약 수정에 문제가 발생하였습니다",
+                                  content: "관리자에게 문의해주세요");
+                            }
                           }
                         }
                       },
