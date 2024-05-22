@@ -211,7 +211,7 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                                     title: "해당 클럽에 이미 가입 중입니다.",
                                     content: "다른 클럽 초대코드를 입력해주세요");
                               } else {
-                                Get.toNamed('/club_join_next');
+                                Get.toNamed('/club_join2');
                               }
                             } catch (e) {
                               print(e.toString());

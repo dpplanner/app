@@ -20,7 +20,7 @@ class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
     super.initState();
 
     Timer(const Duration(seconds: 2), () {
-      Get.offNamed('/club_create_success_next');
+      Get.offNamed('/club_create3');
     });
   }
 
@@ -49,7 +49,7 @@ class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
             children: [
               const Text(
                 "클럽",
-                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
               ),
               Text(
                 " ${ClubController.to.club().clubName} ",
@@ -58,22 +58,22 @@ class _ClubCreateSuccessPageState extends State<ClubCreateSuccessPage> {
               ),
               const Text(
                 "를",
-                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
               ),
             ],
           ),
           const Text(
             "만들었어요!",
-            style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
           ),
           SizedBox(height: SizeController.to.screenHeight * 0.005),
           const Text(
             "더 다양하게 클럽을 꾸미고 싶다면",
-            style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
           ),
           const Text(
             "설정에서 바꿀 수 있어요",
-            style: TextStyle(fontWeight: FontWeight.w400, fontSize: 15),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
           ),
         ],
       ),

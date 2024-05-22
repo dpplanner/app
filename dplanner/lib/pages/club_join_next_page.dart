@@ -174,7 +174,7 @@ class _ClubJoinNextPageState extends State<ClubJoinNextPage> {
                                 clubId: ClubController.to.club().id,
                                 name: myName.text,
                                 info: myContent.text);
-                        Get.offAllNamed('/club_join_success');
+                        Get.offAllNamed('/club_join3');
                       } catch (e) {
                         print(e.toString());
                       }
