@@ -1134,6 +1134,34 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 "시간을 변경하고 싶으시다면 새로 예약해주세요");
                                       } else {
                                         unableTime.clear();
+
+                                        // 일반 사용자의 경우 지난 시간 제외
+                                        if (!(MemberController.to
+                                                    .clubMember()
+                                                    .role ==
+                                                "ADMIN" ||
+                                            (MemberController.to
+                                                        .clubMember()
+                                                        .clubAuthorityTypes !=
+                                                    null &&
+                                                MemberController.to
+                                                    .clubMember()
+                                                    .clubAuthorityTypes!
+                                                    .contains(
+                                                        "SCHEDULE_ALL")))) {
+                                          if (reservationTime
+                                                  .isBefore(DateTime.now()) ||
+                                              reservationTime.day ==
+                                                  DateTime.now().day) {
+                                            for (var j = 0;
+                                                j <= DateTime.now().hour;
+                                                j++) {
+                                              unableTime.add(j);
+                                            }
+                                          }
+                                        }
+
+                                        // 기존 예약 시간 제외
                                         List<ReservationModel> reservations =
                                             await ReservationApiService.getReservations(
                                                 resourceId: selectedValue!.id,
@@ -1154,12 +1182,17 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 .substring(11, 13));
                                             int end = int.parse(i.endDateTime
                                                 .substring(11, 13));
+                                            if (end == 0) {
+                                              // 다음날 00으로 설정 되어 있을 경우 24로 설정
+                                              end = 24;
+                                            }
                                             for (var j = start; j < end; j++) {
                                               unableTime.add(j);
                                             }
                                           }
                                         }
 
+                                        // 기존 락 시간 제외
                                         List<LockModel> locks =
                                             await LockApiService.getLocks(
                                                 resourceId: selectedValue!.id,
@@ -2956,6 +2989,15 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             Get.back();
                           } catch (e) {
                             print(e.toString());
+                            if (types == 0) {
+                              snackBar(
+                                  title: "예약 신청에 문제가 발생하였습니다",
+                                  content: "관리자에게 문의해주세요");
+                            } else {
+                              snackBar(
+                                  title: "예약 수정에 문제가 발생하였습니다",
+                                  content: "관리자에게 문의해주세요");
+                            }
                           }
                         }
                       },
