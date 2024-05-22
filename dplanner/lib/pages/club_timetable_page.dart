@@ -810,6 +810,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     bool checkedMore = false;
     bool checkedReturn = false;
 
+    int weekday = standardDay.weekday;
+    startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
+    String dateOfLock = DateFormat('yyyy년 MM월').format(startOfWeek);
+
     if (types == 3) {
       reservationTime = DateTime.parse(reservation!.startDateTime);
       focusedDay = reservationTime;
@@ -868,9 +872,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
 
     Future<List<LockModel>> getLockList(StateSetter setState) async {
       try {
-        String startTimeLock = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
-        String endTimeLock = DateFormat('yyyy-MM-dd HH:mm:ss')
-            .format(now.add(const Duration(days: 60)));
+        DateTime startOfMonth =
+            DateTime(startOfWeek.year, startOfWeek.month, 1);
+        DateTime endOfMonth =
+            DateTime(startOfWeek.year, startOfWeek.month + 1, 0);
+        String startTimeLock =
+            DateFormat('yyyy-MM-dd 00:00:00').format(startOfMonth);
+        String endTimeLock = DateFormat('yyyy-MM-dd 00:00:00')
+            .format(endOfMonth.add(const Duration(days: 1)));
         List<LockModel> locks = await LockApiService.getLocks(
             resourceId: selectedValue!.id,
             startDateTime: startTimeLock,
@@ -917,56 +926,73 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       ),
                       Stack(
                         children: [
-                          Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              reservation != null &&
-                                      reservation.status == "REQUEST" &&
-                                      (MemberController.to.clubMember().role ==
-                                              "ADMIN" ||
+                          Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  reservation != null &&
+                                          reservation.status == "REQUEST" &&
                                           (MemberController.to
                                                       .clubMember()
-                                                      .clubAuthorityTypes !=
-                                                  null &&
-                                              MemberController.to
-                                                  .clubMember()
-                                                  .clubAuthorityTypes!
-                                                  .contains("SCHEDULE_ALL")))
-                                  ? "예약 요청"
-                                  : reservation?.status == "REQUEST"
-                                      ? "승인 대기중"
-                                      : (types == 0)
-                                          ? "예약하기"
-                                          : (types == 1 && lastPages.last == 0)
-                                              ? "예약 날짜"
-                                              : (types == 1)
-                                                  ? "잠금 날짜"
-                                                  : (types == 2 &&
-                                                          lastPages.last == 0)
-                                                      ? "예약 시간"
-                                                      : (types == 2)
-                                                          ? "잠금 시간"
-                                                          : (types == 3)
-                                                              ? "예약 정보"
-                                                              : (types == 4)
-                                                                  ? "예약 수정"
-                                                                  : (types == 5)
-                                                                      ? "날짜 변경"
+                                                      .role ==
+                                                  "ADMIN" ||
+                                              (MemberController.to
+                                                          .clubMember()
+                                                          .clubAuthorityTypes !=
+                                                      null &&
+                                                  MemberController.to
+                                                      .clubMember()
+                                                      .clubAuthorityTypes!
+                                                      .contains(
+                                                          "SCHEDULE_ALL")))
+                                      ? "예약 요청"
+                                      : reservation?.status == "REQUEST"
+                                          ? "승인 대기중"
+                                          : (types == 0)
+                                              ? "예약하기"
+                                              : (types == 1 &&
+                                                      lastPages.last == 0)
+                                                  ? "예약 날짜"
+                                                  : (types == 1)
+                                                      ? "잠금 날짜"
+                                                      : (types == 2 &&
+                                                              lastPages.last ==
+                                                                  0)
+                                                          ? "예약 시간"
+                                                          : (types == 2)
+                                                              ? "잠금 시간"
+                                                              : (types == 3)
+                                                                  ? "예약 정보"
+                                                                  : (types == 4)
+                                                                      ? "예약 수정"
                                                                       : (types ==
-                                                                              6)
-                                                                          ? "반납하기"
-                                                                          : (types == 7)
-                                                                              ? "예약 잠금"
-                                                                              : (types == 8 && lock == null)
-                                                                                  ? "예약 잠금 추가"
-                                                                                  : (types != 9)
-                                                                                      ? "예약 잠금 정보"
-                                                                                      : "함께 사용하는 사람",
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
+                                                                              5)
+                                                                          ? "날짜 변경"
+                                                                          : (types == 6)
+                                                                              ? "반납하기"
+                                                                              : (types == 7)
+                                                                                  ? "예약 잠금"
+                                                                                  : (types == 8 && lock == null)
+                                                                                      ? "예약 잠금 추가"
+                                                                                      : (types != 9)
+                                                                                          ? "예약 잠금 정보"
+                                                                                          : "함께 사용하는 사람",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
-                            ),
+                              if (types == 7)
+                                Text(
+                                  "[$dateOfLock]",
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColor.textColor),
+                                ),
+                            ],
                           ),
                           if (lastPages.isNotEmpty && lastPages.last != -1)
                             Positioned(
@@ -1994,6 +2020,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       selectedDay = newSelectedDay;
                                       focusedDay = newFocusedDay;
                                       chooseDate = selectedDay;
+                                      if (selectedDay.month !=
+                                          focusedDay.month) {
+                                        focusedDay = DateTime(selectedDay.year,
+                                            selectedDay.month, 1);
+                                      }
                                     } else {
                                       if (MemberController.to
                                                   .clubMember()
