@@ -1134,6 +1134,34 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 "시간을 변경하고 싶으시다면 새로 예약해주세요");
                                       } else {
                                         unableTime.clear();
+
+                                        // 일반 사용자의 경우 지난 시간 제외
+                                        if (!(MemberController.to
+                                                    .clubMember()
+                                                    .role ==
+                                                "ADMIN" ||
+                                            (MemberController.to
+                                                        .clubMember()
+                                                        .clubAuthorityTypes !=
+                                                    null &&
+                                                MemberController.to
+                                                    .clubMember()
+                                                    .clubAuthorityTypes!
+                                                    .contains(
+                                                        "SCHEDULE_ALL")))) {
+                                          if (reservationTime
+                                                  .isBefore(DateTime.now()) ||
+                                              reservationTime.day ==
+                                                  DateTime.now().day) {
+                                            for (var j = 0;
+                                                j <= DateTime.now().hour;
+                                                j++) {
+                                              unableTime.add(j);
+                                            }
+                                          }
+                                        }
+
+                                        // 기존 예약 시간 제외
                                         List<ReservationModel> reservations =
                                             await ReservationApiService.getReservations(
                                                 resourceId: selectedValue!.id,
@@ -1164,6 +1192,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           }
                                         }
 
+                                        // 기존 락 시간 제외
                                         List<LockModel> locks =
                                             await LockApiService.getLocks(
                                                 resourceId: selectedValue!.id,
