@@ -63,7 +63,7 @@ class _CommentBlockState extends State<CommentBlock> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipOval(
-                child: widget.comment.profileUrl != null
+                child: widget.comment.profileUrl != null && !widget.comment.isDeleted
                     ? CachedNetworkImage(
                         placeholder: (context, url) => Container(),
                         imageUrl: widget.comment.profileUrl!,
@@ -94,10 +94,19 @@ class _CommentBlockState extends State<CommentBlock> {
                         children: [
                           Row(
                             children: [
-                              Text(
+                              !widget.comment.isDeleted
+                              ? Text(
                                 widget.comment.clubMemberName,
                                 style: const TextStyle(
                                   color: AppColor.textColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              )
+                              : const Text(
+                                "(삭제)",
+                                style: TextStyle(
+                                  color: AppColor.textColor2,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                 ),
@@ -107,10 +116,19 @@ class _CommentBlockState extends State<CommentBlock> {
                               ),
                             ],
                           ),
-                          Text(
+                          !widget.comment.isDeleted
+                          ? Text(
                             widget.comment.content,
                             style: const TextStyle(
                               color: AppColor.textColor,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14,
+                            ),
+                          )
+                          : const Text(
+                            "삭제된 댓글입니다.",
+                            style: TextStyle(
+                              color: AppColor.textColor2,
                               fontWeight: FontWeight.normal,
                               fontSize: 14,
                             ),
