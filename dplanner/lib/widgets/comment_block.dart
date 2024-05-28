@@ -231,32 +231,6 @@ class _CommentBlockState extends State<CommentBlock> {
                   'assets/images/extra/showmodal_scrollcontrolbar.svg',
                 ),
               ),
-              if (comment.clubMemberId == MemberController.to.clubMember().id)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                  child: NextPageButton(
-                    buttonColor: AppColor.backgroundColor2,
-                    text: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          SFSymbols.pencil_outline,
-                          color: AppColor.textColor,
-                        ),
-                        Text(
-                          " 수정하기",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColor.textColor),
-                        ),
-                      ],
-                    ),
-                    onPressed: () {
-                      Get.back();
-                    },
-                  ),
-                ),
               comment.clubMemberId == MemberController.to.clubMember().id ||
                       MemberController.to.clubMember().role == "ADMIN" ||
                       (MemberController.to.clubMember().clubAuthorityTypes !=
