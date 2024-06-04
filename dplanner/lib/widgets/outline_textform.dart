@@ -8,6 +8,7 @@ class OutlineTextForm extends StatelessWidget {
   final TextInputType keyboardType;
   final bool isFocused;
   final bool isColored;
+  final Color hintTextColor;
   final int maxLines;
   final bool expandable;
   final bool noLine;
@@ -25,6 +26,7 @@ class OutlineTextForm extends StatelessWidget {
       this.keyboardType = TextInputType.text,
       this.isFocused = false,
       this.isColored = false,
+      this.hintTextColor = AppColor.textColor2,
       this.maxLines = 1,
       this.expandable = false,
       this.noLine = false,
@@ -52,7 +54,7 @@ class OutlineTextForm extends StatelessWidget {
         hintStyle: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.w400,
-          color: AppColor.textColor2,
+          color: hintTextColor,
         ),
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(

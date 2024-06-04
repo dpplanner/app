@@ -62,6 +62,10 @@ class _PostPageState extends State<PostPage> {
       setState(() {
         _comments = comments;
       });
+    } else {
+      setState(() {
+        _comments = [];
+      });
     }
   }
 
@@ -76,6 +80,11 @@ class _PostPageState extends State<PostPage> {
     setState(() {
       _replyingCommentId = commentId;
     });
+  }
+
+  void _handleCommentDeleted() async {
+    await _fetchComments();
+    await _fetchPost();
   }
 
   @override
@@ -127,7 +136,8 @@ class _PostPageState extends State<PostPage> {
                                 PostComment(
                                     comments: _comments,
                                     selectedCommentId: _replyingCommentId,
-                                    onCommentSelected: _handleCommentSelected
+                                    onCommentSelected: _handleCommentSelected,
+                                    onCommentDeleted: _handleCommentDeleted
                                 ),
                               ],
                             ),
@@ -173,6 +183,9 @@ class _PostPageState extends State<PostPage> {
                                 hintText: _replyingCommentId == null
                                     ? '댓글을 남겨보세요'
                                     : "답글을 남겨보세요",
+                                hintTextColor: _replyingCommentId == null
+                                    ? AppColor.textColor2
+                                    : AppColor.subColor1,
                                 controller: addComment,
                                 isColored: true,
                                 onChanged: (value) {
