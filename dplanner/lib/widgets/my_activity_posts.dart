@@ -1,18 +1,16 @@
 import 'dart:async';
 
 import 'package:dplanner/controllers/member.dart';
-import 'package:dplanner/models/post_model.dart';
 import 'package:dplanner/widgets/post_mini_card.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-import '../pages/error_page.dart';
+import '../controllers/posts.dart';
 import '../pages/loading_page.dart';
 import '../style.dart';
 
 class MyActivityPosts extends StatefulWidget {
-  final Future<List<Post>> Function(
-      {required int clubMemberID, required int page}) fetchPosts;
+  final Future<void> Function(int clubMemberID, int page) fetchPosts;
 
   const MyActivityPosts({super.key, required this.fetchPosts});
 
@@ -21,13 +19,8 @@ class MyActivityPosts extends StatefulWidget {
 }
 
 class _MyActivityPostsState extends State<MyActivityPosts> {
-  final List<Post> _posts = [];
   int _currentPage = 0;
-  bool _hasNextPage = true;
-  bool _isLoading = false;
-
-  final StreamController<List<Post>> _postsController =
-      StreamController<List<Post>>();
+  final RxBool _isLoading = false.obs;
 
   @override
   void initState() {
@@ -35,36 +28,10 @@ class _MyActivityPostsState extends State<MyActivityPosts> {
     _fetchPosts();
   }
 
-  @override
-  void dispose() {
-    _postsController.close();
-    super.dispose();
-  }
-
-  void _fetchPosts() async {
-    if (!_hasNextPage) return;
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    if (_currentPage == 0) _posts.clear();
-
-    List<Post> posts = await widget.fetchPosts(
-        clubMemberID: MemberController.to.clubMember().id, page: _currentPage);
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (posts.isNotEmpty) {
-      setState(() {
-        _posts.addAll(posts);
-      });
-      _postsController.add(_posts);
-    } else {
-      _hasNextPage = false; // 받아온 포스트가 없다면, 다음 페이지가 없는 것으로 간주합니다.
-    }
+  Future<void> _fetchPosts() async {
+    _isLoading.value = true;
+    await widget.fetchPosts(MemberController.to.clubMember().id, _currentPage++);
+    _isLoading.value = false;
   }
 
   void _onScrollNotification(ScrollNotification scrollInfo) {
@@ -91,58 +58,57 @@ class _MyActivityPostsState extends State<MyActivityPosts> {
                     _onScrollNotification(scrollInfo);
                     return true;
                   },
-                  child: StreamBuilder<List<Post>>(
-                      stream: _postsController.stream,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<List<Post>> snapshot) {
-                        if (snapshot.data == null && !_isLoading) {
-                          return ConstrainedBox(
-                            constraints: BoxConstraints(
-                                minHeight: constraints.maxHeight),
-                            child: const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Center(
-                                  child: Text(
-                                    "게시글이 없어요",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16),
-                                  ),
+                  child: Obx(() {
+                    if (_isLoading.value) {
+                      return LoadingPage(constraints: constraints);
+                    } else if (PostController.to.posts.isEmpty) {
+                      return ConstrainedBox(
+                        constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight),
+                        child: Container(
+                          color: AppColor.backgroundColor2,
+                          child: const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                child: Text(
+                                  "게시글이 없어요",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16),
                                 ),
-                              ],
-                            ),
-                          );
-                        } else if (snapshot.hasError) {
-                          return ErrorPage(constraints: constraints);
-                        } else if (snapshot.connectionState ==
-                                ConnectionState.waiting &&
-                            snapshot.hasData == false) {
-                          return LoadingPage(constraints: constraints);
-                        } else {
-                          return Container(
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    } else {
+                      return ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        child: Container(
                             color: AppColor.backgroundColor2,
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(18, 24, 24, 24),
-                              child: Column(
-                                children: List.generate(
-                                    snapshot.data!.length,
-                                    (index) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 12.0),
-                                      child: PostMiniCard(
-                                        id: snapshot.data![index].id,
-                                        title: snapshot.data![index].title ?? '제목 없음',
-                                        content: snapshot.data![index].content,
-                                        dateTime: snapshot.data![index].createdTime,
-                                        isPhoto: snapshot.data![index].attachmentsUrl.isNotEmpty,
-                                      ),
-                                    )
-                                ),
-                                  )
-                              )
-                            );
-                        }
-                      })),
+                                padding: const EdgeInsets.fromLTRB(18, 24, 24, 24),
+                                child: Column(
+                                  children: List.generate(
+                                      PostController.to.posts.length,
+                                          (index) => Padding(
+                                        padding: const EdgeInsets.only(bottom: 12.0),
+                                        child: PostMiniCard(
+                                          id: PostController.to.posts[index].value.id,
+                                          title: PostController.to.posts[index].value.title ?? '제목 없음',
+                                          content: PostController.to.posts[index].value.content,
+                                          dateTime: PostController.to.posts[index].value.createdTime,
+                                          isPhoto: PostController.to.posts[index].value.attachmentsUrl.isNotEmpty,
+                                        ),
+                                      )
+                                  ),
+                                )
+                            )
+                        ),
+                      );
+                    }
+                  })),
             )));
   }
 }

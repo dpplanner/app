@@ -23,6 +23,21 @@ class PostController extends GetxController {
     posts.value = fetchedPosts.map((post) => post.obs).toList();
   }
 
+  Future<void> fetchMyPosts(int clubMemberId, int page) async {
+    List<Post> fetchedPosts = await PostApiService.fetchMyPosts(clubMemberID: clubMemberId, page: page);
+    posts.value = fetchedPosts.map((post) => post.obs).toList();
+  }
+
+  Future<void> fetchCommentedPosts(int clubMemberId, int page) async {
+    List<Post> fetchedPosts = await PostApiService.fetchCommentedPosts(clubMemberID: clubMemberId, page: page);
+    posts.value = fetchedPosts.map((post) => post.obs).toList();
+  }
+
+  Future<void> fetchLikedPosts(int clubMemberId, int page) async {
+    List<Post> fetchedPosts = await PostApiService.fetchLikedPosts(clubMemberID: clubMemberId, page: page);
+    posts.value = fetchedPosts.map((post) => post.obs).toList();
+  }
+
   Future<void> fetchPost(int postId) async {
     Post post = await PostApiService.fetchPost(postID: postId);
     int idx = _findPostIndex(postId);
