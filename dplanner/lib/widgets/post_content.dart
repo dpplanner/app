@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dplanner/controllers/posts.dart';
 import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -11,7 +11,6 @@ import '../controllers/size.dart';
 import '../style.dart';
 import 'nextpage_button.dart';
 import 'package:dplanner/models/post_model.dart';
-import 'package:dplanner/services/club_post_api_service.dart';
 import 'full_screen_image.dart';
 import 'package:dplanner/controllers/member.dart';
 
@@ -21,18 +20,10 @@ import 'package:dplanner/controllers/member.dart';
 ///
 ///
 
-class PostContent extends StatefulWidget {
+class PostContent extends StatelessWidget {
   final Post post;
 
   const PostContent({Key? key, required this.post}) : super(key: key);
-
-  @override
-  State<PostContent> createState() => _PostContentState();
-}
-
-class _PostContentState extends State<PostContent> {
-  late bool isLiked = widget.post.likeStatus;
-  late int likeCount = widget.post.likeCount;
 
   Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
@@ -40,8 +31,8 @@ class _PostContentState extends State<PostContent> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('게시글 삭제'),
-          content: SingleChildScrollView(
+          title: const Text('게시글 삭제'),
+          content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text('정말로 이 게시글을 삭제하시겠습니까?'),
@@ -53,21 +44,22 @@ class _PostContentState extends State<PostContent> {
               onPressed: () {
                 Get.back();
               },
-              child: Text('취소'),
+              child: const Text('취소'),
             ),
             TextButton(
               onPressed: () async {
                 try {
-                  await PostApiService.deletePost(widget.post.id);
-                  Get.back();
-                  Get.back();
+                  await PostController.to.deletePost(post.id);
+                  Get.back(); // 경고창 닫기
+                  Get.back(); // 바텀 시트 닫기
+                  Get.back(); // 삭제된 게시글 나가기
                   Get.snackbar('알림', '게시글이 성공적으로 삭제되었습니다.');
                 } catch (e) {
                   Get.snackbar('알림', '게시글 삭제 중 오류가 발생했습니다.');
-                  print('게시글 삭제 중 오류: $e');
+                  // print('게시글 삭제 중 오류: $e');
                 }
               },
-              child: Text('예'),
+              child: const Text('예'),
             ),
           ],
         );
@@ -76,20 +68,7 @@ class _PostContentState extends State<PostContent> {
   }
 
   void _toggleLike() async {
-    try {
-      final bool newLikeStatus =
-          await PostApiService.toggleLike(widget.post.id);
-      setState(() {
-        isLiked = newLikeStatus;
-        if (isLiked) {
-          likeCount += 1;
-        } else {
-          likeCount -= 1;
-        }
-      });
-    } catch (e) {
-      Get.snackbar('알림', '오류가 발생했습니다. 다시 시도해주세요: $e');
-    }
+    await PostController.to.toggleLike(post.obs);
   }
 
   bool hasAuthority() {
@@ -121,10 +100,10 @@ class _PostContentState extends State<PostContent> {
                 Row(
                   children: [
                     ClipOval(
-                      child: widget.post.profileUrl != null
+                      child: post.profileUrl != null
                           ? CachedNetworkImage(
                               placeholder: (context, url) => Container(),
-                              imageUrl: widget.post.profileUrl!,
+                              imageUrl: post.profileUrl!,
                               errorWidget: (context, url, error) =>
                                   SvgPicture.asset(
                                     'assets/images/base_image/base_member_image.svg',
@@ -147,7 +126,7 @@ class _PostContentState extends State<PostContent> {
                         Row(
                           children: [
                             Text(
-                              widget.post.clubMemberName,
+                              post.clubMemberName,
                               style: const TextStyle(
                                 color: AppColor.textColor,
                                 fontWeight: FontWeight.bold,
@@ -157,7 +136,7 @@ class _PostContentState extends State<PostContent> {
                             SizedBox(
                               width: SizeController.to.screenWidth * 0.05,
                             ),
-                            widget.post.clubRole == 'ADMIN'
+                            post.clubRole == 'ADMIN'
                                 ? Container(
                                     padding:
                                         const EdgeInsets.fromLTRB(6, 2, 6, 2),
@@ -181,7 +160,7 @@ class _PostContentState extends State<PostContent> {
                         Text(
                           DateFormat('M월 d일')
                               .add_jm()
-                              .format(widget.post.createdTime),
+                              .format(post.createdTime),
                           style: const TextStyle(
                             color: AppColor.textColor,
                             fontWeight: FontWeight.normal,
@@ -194,7 +173,7 @@ class _PostContentState extends State<PostContent> {
                 ),
                 IconButton(
                   onPressed: () {
-                    _postMore(context, widget.post);
+                    _postMore(context, post);
                   },
                   icon: const Icon(
                     SFSymbols.ellipsis,
@@ -211,8 +190,8 @@ class _PostContentState extends State<PostContent> {
                   padding: EdgeInsets.only(
                       bottom: SizeController.to.screenHeight * 0.01),
                   child: Text(
-                    widget.post.title ?? "제목없음", //TODO: 제목 생기면 수정해야함
-                    style: TextStyle(
+                    post.title ?? "제목없음", //TODO: 제목 생기면 수정해야함
+                    style: const TextStyle(
                       color: AppColor.textColor,
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
@@ -220,8 +199,8 @@ class _PostContentState extends State<PostContent> {
                   ),
                 ),
                 Text(
-                  widget.post.content,
-                  style: TextStyle(
+                  post.content,
+                  style: const TextStyle(
                     color: AppColor.textColor,
                     fontWeight: FontWeight.normal,
                     fontSize: 16,
@@ -230,7 +209,7 @@ class _PostContentState extends State<PostContent> {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: widget.post.attachmentsUrl.map((imageUrl) {
+                    children: post.attachmentsUrl.map((imageUrl) {
                       String formattedUrl = imageUrl.startsWith('https://')
                           ? imageUrl
                           : 'https://$imageUrl';
@@ -262,8 +241,8 @@ class _PostContentState extends State<PostContent> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                widget.post.isFixed
-                    ? Expanded(
+                post.isFixed
+                    ? const Expanded(
                         flex: 1,
                         child: Row(
                           children: [
@@ -288,7 +267,7 @@ class _PostContentState extends State<PostContent> {
                   flex: 1,
                   child: Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                         flex: 1,
                         child: Icon(
                           SFSymbols.text_bubble,
@@ -299,8 +278,8 @@ class _PostContentState extends State<PostContent> {
                       Expanded(
                         flex: 1,
                         child: Text(
-                          '${widget.post.commentCount}',
-                          style: TextStyle(
+                          '${post.commentCount}',
+                          style: const TextStyle(
                             color: AppColor.textColor2,
                             fontWeight: FontWeight.normal,
                             fontSize: 16,
@@ -311,7 +290,7 @@ class _PostContentState extends State<PostContent> {
                         flex: 1,
                         child: GestureDetector(
                           onTap: _toggleLike,
-                          child: isLiked
+                          child: post.likeStatus
                               ? const Icon(
                                   SFSymbols.heart_fill,
                                   color: AppColor.objectColor,
@@ -327,8 +306,8 @@ class _PostContentState extends State<PostContent> {
                       Expanded(
                         flex: 1,
                         child: Text(
-                          '${likeCount}',
-                          style: isLiked
+                          '${post.likeCount}',
+                          style: post.likeStatus
                               ? const TextStyle(
                                   color: AppColor.objectColor,
                                   fontWeight: FontWeight.normal,
@@ -373,7 +352,7 @@ class _PostContentState extends State<PostContent> {
                   'assets/images/extra/showmodal_scrollcontrolbar.svg',
                 ),
               ),
-              if (widget.post.clubMemberId ==
+              if (post.clubMemberId ==
                   MemberController.to.clubMember().id)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
@@ -403,7 +382,7 @@ class _PostContentState extends State<PostContent> {
                   ),
                 ),
               hasAuthority() ||
-                      widget.post.clubMemberId ==
+                      post.clubMemberId ==
                           MemberController.to.clubMember().id
                   ? Padding(
                       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
@@ -462,13 +441,13 @@ class _PostContentState extends State<PostContent> {
                         text: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(SFSymbols.pin_fill,
+                            const Icon(SFSymbols.pin_fill,
                                 color: AppColor.textColor, size: 18),
                             Text(
-                              widget.post.isFixed
+                              post.isFixed
                                   ? " 게시글 고정 해제하기"
                                   : " 게시글 고정하기", //TODO 고정 되어있으면 풀리게
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                   color: AppColor.textColor),
@@ -476,7 +455,7 @@ class _PostContentState extends State<PostContent> {
                           ],
                         ),
                         onPressed: () {
-                          PostApiService.fixPost(post.id);
+                          PostController.to.fixPost(post.id);
                         },
                       ),
                     )

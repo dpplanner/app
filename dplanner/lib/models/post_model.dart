@@ -2,15 +2,15 @@ class Post {
   final int id;
   final String? title; //TODO: 예시 데이터 다 갈면..
   final String content;
-  final bool isFixed;
+  bool isFixed;
   final int clubId;
   final int clubMemberId;
   final String clubMemberName;
   final String? profileUrl;
   final String clubRole;
-  final int likeCount;
   final int commentCount;
-  final bool likeStatus;
+  int likeCount;
+  bool likeStatus;
   final List<String> attachmentsUrl;
   final DateTime createdTime;
   final DateTime? lastModifiedTime;

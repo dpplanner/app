@@ -4,16 +4,14 @@ import 'package:dplanner/pages/post_add_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
 import 'dart:async';
 
+import '../controllers/posts.dart';
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
-import '../widgets/outline_textform.dart';
 import '../widgets/post_card.dart';
-import 'package:dplanner/models/post_model.dart';
-import 'package:dplanner/services/club_post_api_service.dart';
 
-import 'error_page.dart';
 import 'loading_page.dart';
 
 class ClubHomePage extends StatefulWidget {
@@ -24,17 +22,13 @@ class ClubHomePage extends StatefulWidget {
 }
 
 class _ClubHomePageState extends State<ClubHomePage> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController searchPost = TextEditingController();
-  bool _isFocused = false;
-  final List<Post> _posts = [];
-  String temp = '';
+  // final _formKey = GlobalKey<FormState>();
+  // final TextEditingController searchPost = TextEditingController();
+  // bool _isFocused = false;
+  // String temp = '';
+  // bool _hasNextPage = true;
   int _currentPage = 0;
-  bool _hasNextPage = true;
-  bool _isLoading = false;
-
-  final StreamController<List<Post>> _postsController =
-      StreamController<List<Post>>();
+  final RxBool _isLoading = false.obs;
 
   @override
   void initState() {
@@ -42,37 +36,10 @@ class _ClubHomePageState extends State<ClubHomePage> {
     _fetchPosts();
   }
 
-  @override
-  void dispose() {
-    _postsController.close();
-    searchPost.dispose();
-    super.dispose();
-  }
-
   Future<void> _fetchPosts() async {
-    if (!_hasNextPage) return; // 다음 페이지가 없으면 요청을 중단합니다.
-    setState(() {
-      _isLoading = true; // 데이터를 불러오는 중임을 표시합니다.
-    });
-    if (_currentPage == 0) _posts.clear();
-
-    final posts = await PostApiService.fetchPosts(
-      clubID: ClubController.to.club().id,
-      page: _currentPage++,
-    );
-
-    setState(() {
-      _isLoading = false; // 데이터 불러오기가 완료되었음을 표시합니다.
-    });
-
-    if (posts.isNotEmpty) {
-      setState(() {
-        _posts.addAll(posts);
-      });
-      _postsController.add(_posts);
-    } else {
-      _hasNextPage = false; // 받아온 포스트가 없다면, 다음 페이지가 없는 것으로 간주합니다.
-    }
+    _isLoading.value = true;
+    await PostController.to.fetchPosts(ClubController.to.club().id, _currentPage++);
+    _isLoading.value = false;
   }
 
   void _onScrollNotification(ScrollNotification scrollInfo) {
@@ -122,30 +89,31 @@ class _ClubHomePageState extends State<ClubHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                color: AppColor.backgroundColor,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 0),
-                  child: Form(
-                      key: _formKey,
-                      child: OutlineTextForm(
-                        hintText: '게시글 제목, 내용, 작성자를 검색해보세요',
-                        controller: searchPost,
-                        isColored: true,
-                        icon: Icon(
-                          SFSymbols.search,
-                          color: _isFocused
-                              ? AppColor.objectColor
-                              : AppColor.textColor2,
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            _isFocused = value.isNotEmpty;
-                          });
-                        },
-                      )),
-                ),
-              ),
+              // todo 검색 기능 구현 이후 주석 해제
+              // Container(
+              //   color: AppColor.backgroundColor,
+              //   child: Padding(
+              //     padding: const EdgeInsets.fromLTRB(18, 0, 18, 0),
+              //     child: Form(
+              //         key: _formKey,
+              //         child: OutlineTextForm(
+              //           hintText: '게시글 제목, 내용, 작성자를 검색해보세요',
+              //           controller: searchPost,
+              //           isColored: true,
+              //           icon: Icon(
+              //             SFSymbols.search,
+              //             color: _isFocused
+              //                 ? AppColor.objectColor
+              //                 : AppColor.textColor2,
+              //           ),
+              //           onChanged: (value) {
+              //             setState(() {
+              //               _isFocused = value.isNotEmpty;
+              //             });
+              //           },
+              //         )),
+              //   ),
+              // ),
               Expanded(
                 child: LayoutBuilder(
                   builder: (context, constraints) => RefreshIndicator(
@@ -162,50 +130,44 @@ class _ClubHomePageState extends State<ClubHomePage> {
                           _onScrollNotification(scrollInfo);
                           return true;
                         },
-                        child: StreamBuilder<List<Post>>(
-                          stream: _postsController.stream,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<List<Post>> snapshot) {
-                            if (snapshot.data == null && !_isLoading) {
-                              return ConstrainedBox(
-                                constraints: BoxConstraints(
-                                    minHeight: constraints.maxHeight),
-                                child: const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Center(
-                                      child: Text(
-                                        "게시글이 없어요",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16),
-                                      ),
+                        child: Obx(() {
+                          if (_isLoading.value) {
+                            return LoadingPage(constraints: constraints);
+                          } else if (PostController.to.posts.isEmpty) {
+                            return ConstrainedBox(
+                              constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Center(
+                                    child: Text(
+                                      "게시글이 없어요",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16),
                                     ),
-                                  ],
-                                ),
-                              );
-                            } else if (snapshot.hasError) {
-                              return ErrorPage(constraints: constraints);
-                            } else if (snapshot.connectionState ==
-                                    ConnectionState.waiting &&
-                                snapshot.hasData == false) {
-                              return LoadingPage(constraints: constraints);
-                            } else {
-                              return Column(
-                                children: List.generate(
-                                    snapshot.data!.length,
-                                    (index) => Column(children: [
-                                          Container(
-                                              width:
-                                                  SizeController.to.screenWidth,
-                                              height: 10,
-                                              color: AppColor.backgroundColor2),
-                                          PostCard(post: snapshot.data![index]),
-                                        ])),
-                              );
-                            }
-                          },
-                        ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            return ConstrainedBox(
+                                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                                child: Column(
+                                  children: List.generate(
+                                      PostController.to.posts.length,
+                                          (index) => Column(children: [
+                                        Container(
+                                            width: SizeController.to.screenWidth,
+                                            height: 10,
+                                            color: AppColor.backgroundColor2),
+                                        PostCard(rxPost: PostController.to.posts[index]),
+                                      ])),
+                                )
+                            );
+                          }
+                        }),
                       ),
                     ),
                   ),
