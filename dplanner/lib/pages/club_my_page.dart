@@ -1,26 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/reservation_model.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_naver_login/flutter_naver_login.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
-import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
-import '../const.dart';
 import '../controllers/size.dart';
 import '../services/reservation_api_service.dart';
 import '../style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/reservation_mini_card.dart';
 import 'error_page.dart';
-import 'loading_page.dart';
 
 class ClubMyPage extends StatefulWidget {
   const ClubMyPage({super.key});
@@ -30,28 +22,6 @@ class ClubMyPage extends StatefulWidget {
 }
 
 class _ClubMyPageState extends State<ClubMyPage> {
-  static const storage = FlutterSecureStorage();
-
-  // 소셜 로그아웃
-  void signOut() async {
-    String loginPlatform = await storage.read(key: loginInfo) ?? ". . none";
-    switch (loginPlatform.split(" ")[2]) {
-      case "google":
-        await GoogleSignIn().signOut();
-        break;
-      case "kakao":
-        await UserApi.instance.logout();
-        break;
-      case "naver":
-        await FlutterNaverLogin.logOut();
-        break;
-      case "none":
-        break;
-    }
-    await storage.deleteAll();
-    Get.offAllNamed('/');
-  }
-
   Future<List<ReservationModel>> getMyReservation() async {
     try {
       return await ReservationApiService.getMyReservations(
@@ -256,6 +226,10 @@ class _ClubMyPageState extends State<ClubMyPage> {
                 selectButton("내 활동 보기", () {
                   Get.toNamed('/my_activity');
                 }, true),
+                Container(
+                  height: SizeController.to.screenHeight * 0.01,
+                  color: AppColor.backgroundColor2,
+                ),
                 selectButton("클럽 정보", () {
                   Get.toNamed('/club_info', arguments: 2);
                 }, false),
@@ -264,17 +238,9 @@ class _ClubMyPageState extends State<ClubMyPage> {
                   selectButton("클럽 관리", () {
                     Get.toNamed('/club_manage');
                   }, false),
-                Container(
-                  height: SizeController.to.screenHeight * 0.01,
-                  color: AppColor.backgroundColor2,
-                ),
-                selectButton("앱 설정", () {
-                  Get.toNamed('/app_setting');
+                selectButton("클럽 목록", () {
+                  Get.offAllNamed('/club_list');
                 }, false),
-                selectButton("로그아웃", () {
-                  signOut();
-                }, false),
-                selectButton("탈퇴하기", () {}, false),
               ],
             ),
           ),

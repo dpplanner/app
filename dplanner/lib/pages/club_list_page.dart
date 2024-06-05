@@ -91,6 +91,18 @@ class _ClubListPageState extends State<ClubListPage> {
               "클럽 목록",
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
             ),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Get.toNamed('/setting');
+                },
+                icon: const Icon(
+                  SFSymbols.gear_alt_fill,
+                  color: AppColor.textColor,
+                ),
+              ),
+              SizedBox(width: SizeController.to.screenWidth * 0.05)
+            ],
             centerTitle: true,
           ),
         ),
