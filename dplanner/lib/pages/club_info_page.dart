@@ -14,6 +14,7 @@ import '../services/club_api_service.dart';
 import '../services/resource_api_service.dart';
 import '../style.dart';
 import '../widgets/nextpage_button.dart';
+import '../widgets/snack_bar.dart';
 import 'error_page.dart';
 
 class ClubInfoPage extends StatefulWidget {
@@ -269,12 +270,7 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                         buttonColor: AppColor.markColor,
                         onPressed: () async {
                           try {
-                            print(MemberController.to.clubMember().id);
-                            await ClubApiService.deleteClub(
-                                clubId: ClubController.to.club().id,
-                                clubMemberId:
-                                    MemberController.to.clubMember().id);
-                            Get.offAllNamed('club_list');
+                            checkLeaveClub();
                           } catch (e) {
                             print(e.toString());
                           }
@@ -284,6 +280,94 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                   )
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> checkLeaveClub() async {
+    await Get.dialog<bool>(
+      AlertDialog(
+        backgroundColor: AppColor.backgroundColor,
+        elevation: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: Center(
+            child: Text(
+              "${ClubController.to.club().clubName} 클럽 탈퇴",
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "탈퇴 시 모든 계정 및 활동 정보가 삭제되며",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              "삭제된 정보는 복구할 수 없습니다.",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 4.0),
+              child: Text(
+                "정말 탈퇴하시겠습니까?",
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                child: NextPageButton(
+                  text: const Text(
+                    "탈퇴하기",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.backgroundColor),
+                  ),
+                  buttonColor: AppColor.objectColor,
+                  onPressed: () async {
+                    try {
+                      await ClubApiService.leaveClub(
+                          clubId: ClubController.to.club().id,
+                          clubMemberId: MemberController.to.clubMember().id);
+                      Get.offAllNamed('club_list');
+                    } catch (e) {
+                      print(e.toString());
+                      snackBar(title: "클럽 탈퇴 실패", content: e.toString());
+                    }
+                  },
+                ),
+              ),
+              TextButton(
+                onPressed: Get.back,
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.resolveWith<Color>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.pressed)) {
+                        return Colors.transparent;
+                      }
+                      return Colors.transparent;
+                    },
+                  ),
+                ),
+                child: const Text(
+                  "취소",
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.textColor2),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

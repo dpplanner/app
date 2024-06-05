@@ -256,6 +256,10 @@ class _ClubMyPageState extends State<ClubMyPage> {
                 selectButton("내 활동 보기", () {
                   Get.toNamed('/my_activity');
                 }, true),
+                Container(
+                  height: SizeController.to.screenHeight * 0.01,
+                  color: AppColor.backgroundColor2,
+                ),
                 selectButton("클럽 정보", () {
                   Get.toNamed('/club_info', arguments: 2);
                 }, false),
@@ -264,17 +268,16 @@ class _ClubMyPageState extends State<ClubMyPage> {
                   selectButton("클럽 관리", () {
                     Get.toNamed('/club_manage');
                   }, false),
-                Container(
-                  height: SizeController.to.screenHeight * 0.01,
-                  color: AppColor.backgroundColor2,
-                ),
-                selectButton("앱 설정", () {
-                  Get.toNamed('/app_setting');
+                selectButton("클럽 목록", () {
+                  Get.offAllNamed('/club_list');
                 }, false),
-                selectButton("로그아웃", () {
-                  signOut();
-                }, false),
-                selectButton("탈퇴하기", () {}, false),
+                // selectButton("앱 설정", () {
+                //   Get.toNamed('/app_setting');
+                // }, false),
+                // selectButton("로그아웃", () {
+                //   signOut();
+                // }, false),
+                // selectButton("탈퇴하기", () {}, false),
               ],
             ),
           ),

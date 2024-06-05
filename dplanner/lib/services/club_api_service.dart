@@ -199,7 +199,7 @@ class ClubApiService {
   }
 
   /// DELETE: /clubs/(_.club_id)/club-members/(_.club_member_id)/leave [클럽 탈퇴] 클럽 탈퇴하기
-  static Future<void> deleteClub(
+  static Future<void> leaveClub(
       {required int clubId, required int clubMemberId}) async {
     final url =
         Uri.parse('$baseUrl/clubs/$clubId/club-members/$clubMemberId/leave');
