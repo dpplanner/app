@@ -1,5 +1,5 @@
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
-import 'package:dplanner/services/club_post_api_service.dart';
+import 'package:dplanner/controllers/posts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
@@ -55,10 +55,10 @@ class MyActivityCheckPage extends StatelessWidget {
             unselectedLabelColor: AppColor.textColor,
             unselectedLabelStyle:
             TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-        views: const [
-          MyActivityPosts(fetchPosts: PostApiService.fetchMyPosts),
-          MyActivityPosts(fetchPosts: PostApiService.fetchCommentedPosts),
-          MyActivityPosts(fetchPosts: PostApiService.fetchLikedPosts),
+        views: [
+          MyActivityPosts(fetchPosts: PostController.to.fetchMyPosts),
+          MyActivityPosts(fetchPosts: PostController.to.fetchCommentedPosts),
+          MyActivityPosts(fetchPosts: PostController.to.fetchLikedPosts),
         ],
       ),
     );

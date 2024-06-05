@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'controllers/club.dart';
+import 'controllers/posts.dart';
 import 'controllers/size.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
     final sizeController = SizeController();
     final clubController = ClubController();
     final memberController = MemberController();
+    final postController = PostController();
     sizeController.screenWidth = MediaQuery.of(context).size.width;
     sizeController.screenHeight = MediaQuery.of(context).size.height;
     return GestureDetector(
@@ -81,6 +83,7 @@ class MyApp extends StatelessWidget {
             Get.put(sizeController);
             Get.put(clubController);
             Get.put(memberController);
+            Get.put(postController);
           }),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,

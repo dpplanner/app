@@ -16,14 +16,16 @@ import 'nextpage_button.dart';
 
 class CommentBlock extends StatefulWidget {
   final bool isSelected;
-  final Function(int?) onCommentSelected;
   final Comment comment;
+  final Function(int?) onCommentSelected;
+  final void Function() onCommentDeleted;
 
   const CommentBlock(
       {Key? key,
         required this.isSelected,
         required this.comment,
-        required this.onCommentSelected})
+        required this.onCommentSelected,
+        required this.onCommentDeleted})
       : super(key: key);
 
   @override
@@ -63,7 +65,7 @@ class _CommentBlockState extends State<CommentBlock> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipOval(
-                child: widget.comment.profileUrl != null
+                child: widget.comment.profileUrl != null && !widget.comment.isDeleted
                     ? CachedNetworkImage(
                         placeholder: (context, url) => Container(),
                         imageUrl: widget.comment.profileUrl!,
@@ -94,10 +96,19 @@ class _CommentBlockState extends State<CommentBlock> {
                         children: [
                           Row(
                             children: [
-                              Text(
+                              !widget.comment.isDeleted
+                              ? Text(
                                 widget.comment.clubMemberName,
                                 style: const TextStyle(
                                   color: AppColor.textColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              )
+                              : const Text(
+                                "(삭제)",
+                                style: TextStyle(
+                                  color: AppColor.textColor2,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                 ),
@@ -107,10 +118,19 @@ class _CommentBlockState extends State<CommentBlock> {
                               ),
                             ],
                           ),
-                          Text(
+                          !widget.comment.isDeleted
+                          ? Text(
                             widget.comment.content,
                             style: const TextStyle(
                               color: AppColor.textColor,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14,
+                            ),
+                          )
+                          : const Text(
+                            "삭제된 댓글입니다.",
+                            style: TextStyle(
+                              color: AppColor.textColor2,
                               fontWeight: FontWeight.normal,
                               fontSize: 14,
                             ),
@@ -171,8 +191,9 @@ class _CommentBlockState extends State<CommentBlock> {
                                   // 답글 블록 생성
                                   return CommentBlock(
                                     isSelected: false,
-                                    onCommentSelected: widget.onCommentSelected,
                                     comment: child,
+                                    onCommentSelected: widget.onCommentSelected,
+                                    onCommentDeleted: widget.onCommentDeleted,
                                   );
                                 }).toList(),
                               ),
@@ -231,32 +252,6 @@ class _CommentBlockState extends State<CommentBlock> {
                   'assets/images/extra/showmodal_scrollcontrolbar.svg',
                 ),
               ),
-              if (comment.clubMemberId == MemberController.to.clubMember().id)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                  child: NextPageButton(
-                    buttonColor: AppColor.backgroundColor2,
-                    text: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          SFSymbols.pencil_outline,
-                          color: AppColor.textColor,
-                        ),
-                        Text(
-                          " 수정하기",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColor.textColor),
-                        ),
-                      ],
-                    ),
-                    onPressed: () {
-                      Get.back();
-                    },
-                  ),
-                ),
               comment.clubMemberId == MemberController.to.clubMember().id ||
                       MemberController.to.clubMember().role == "ADMIN" ||
                       (MemberController.to.clubMember().clubAuthorityTypes !=
@@ -287,6 +282,7 @@ class _CommentBlockState extends State<CommentBlock> {
                         ),
                         onPressed: () {
                           PostCommentApiService.deleteComment(comment.id);
+                          widget.onCommentDeleted();
                           Get.back();
                         },
                       ),

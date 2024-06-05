@@ -14,12 +14,14 @@ class PostComment extends StatelessWidget {
   final List<Comment> comments;
   final int? selectedCommentId;
   final Function(int?) onCommentSelected;
+  final void Function() onCommentDeleted;
 
   const PostComment(
       {Key? key,
         required this.comments,
         required this.selectedCommentId,
         required this.onCommentSelected,
+        required this.onCommentDeleted,
       })
       : super(key: key);
 
@@ -47,7 +49,8 @@ class PostComment extends StatelessWidget {
             CommentBlock(
                 isSelected: comment.id == selectedCommentId ? true : false,
                 comment: comment,
-                onCommentSelected: onCommentSelected
+                onCommentSelected: onCommentSelected,
+                onCommentDeleted: onCommentDeleted
             ),
         ],
       ),

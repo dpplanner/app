@@ -1,4 +1,4 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:dplanner/controllers/posts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,7 +11,6 @@ import '../style.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/underline_textform.dart';
 import 'package:dplanner/models/post_model.dart';
-import 'package:dplanner/services/club_post_api_service.dart';
 
 class PostAddPage extends StatefulWidget {
   final bool isEdit;
@@ -82,24 +81,24 @@ class _PostAddPageState extends State<PostAddPage> {
               icon: const Icon(SFSymbols.chevron_left)),
           title: Text(
             widget.isEdit ? "글 수정" : "글 쓰기",
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
           ),
           actions: [
             TextButton(
               onPressed: widget.isEdit
                   ? () {
-                      PostApiService.editPost(
-                          postID: widget.post!.id,
-                          title: postSubject.text,
-                          content: postContent.text,
-                          imageFileList: selectedImages,
-                          previousImageFileList: widget.post!.attachmentsUrl);
-                    }
+                PostController.to.updatePost(
+                    postId: widget.post!.id,
+                    title: postSubject.text,
+                    content: postContent.text,
+                    imageFileList: selectedImages,
+                    previousImageFileList: widget.post!.attachmentsUrl);
+              }
                   : () {
                       if (_formKey1.currentState!.validate() &&
                           _formKey2.currentState!.validate()) {
                         //TODO: 비어있지 않은 것 제대로 확인하도록 수정
-                        PostApiService.submitPost(
+                        PostController.to.createPost(
                             clubId: widget.clubID,
                             title: postSubject.text,
                             content: postContent.text,

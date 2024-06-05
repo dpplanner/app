@@ -43,7 +43,7 @@ class PostApiService {
     return compressedFile != null ? XFile(compressedFile.path) : null;
   }
 
-  static Future<void> submitPost(
+  static Future<Post?> submitPost(
       {required int clubId,
       required String title,
       required String content,
@@ -95,11 +95,11 @@ class PostApiService {
       final responseBody = await http.Response.fromStream(response);
 
       if (response.statusCode == 201) {
-        final json = jsonDecode(utf8.decode(responseBody.bodyBytes));
-        final newPost = Post.fromJson(json['data']);
-        Get.off(() => PostPage(postId: newPost.id,), arguments: 1); // 게시글 등록 이후 바로 작성한 게시글로 이동
         // 요청이 성공한 경우
+        final post = Post.fromJson(jsonDecode(utf8.decode(responseBody.bodyBytes))['data']);
         Get.snackbar('알림', '게시글이 작성되었습니다.');
+        Get.off(() => PostPage(postId: post.id,), arguments: 1); // 게시글 등록 이후 바로 작성한 게시글로 이동
+        return post;
       } else {
         // 요청이 실패한 경우
         Get.snackbar('알림',
@@ -109,6 +109,7 @@ class PostApiService {
       // 요청 중 오류가 발생한 경우
       Get.snackbar('알림', '오류가 발생했습니다.');
     }
+    return null;
   }
 
   static Future<List<Post>> fetchPosts(
@@ -209,7 +210,7 @@ class PostApiService {
     }
   }
 
-  static Future<void> editPost(
+  static Future<Post?> editPost(
       {required int postID,
       required String title,
       required String content,
@@ -258,10 +259,12 @@ class PostApiService {
 
     try {
       final response = await formData.send();
-
+      final responseBody = await http.Response.fromStream(response);
       if (response.statusCode == 200) {
-        Get.back();
+        Get.back(); // 게시글 수정 페이지 나가기
+        Get.back(); // 바텀 시트 닫기
         Get.snackbar('알림', '게시글이 수정되었습니다.');
+        return Post.fromJson(jsonDecode(utf8.decode(responseBody.bodyBytes))['data']);
       } else {
         // 요청이 실패한 경우
         Get.snackbar('알림', '게시글 수정에 실패했습니다. error: ${response.statusCode}');
@@ -270,6 +273,7 @@ class PostApiService {
       // 요청 중 오류가 발생한 경우
       Get.snackbar('알림', '오류가 발생했습니다.');
     }
+    return null;
   }
 
   static Future<void> deletePost(int postId) async {
