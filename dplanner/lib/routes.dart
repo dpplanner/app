@@ -23,6 +23,7 @@ import 'package:dplanner/pages/my_profile_modification_page.dart';
 import 'package:dplanner/pages/club_resource_list_page.dart';
 import 'package:dplanner/pages/notification_page.dart';
 import 'package:dplanner/pages/my_reservation_page.dart';
+import 'package:dplanner/pages/setting_page.dart';
 
 import 'package:get/get.dart';
 
@@ -38,6 +39,7 @@ final page = [
   GetPage(name: '/club_join1', page: () => const ClubJoinPage()),
   GetPage(name: '/club_join2', page: () => const ClubJoinNextPage()),
   GetPage(name: '/club_join3', page: () => const ClubJoinSuccessPage()),
+  GetPage(name: '/setting', page: () => const SettingPage()),
 
   /// 예약 테이블
   GetPage(

@@ -3,7 +3,6 @@ import 'package:dplanner/pages/error_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
@@ -24,6 +23,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
   }
 
   String findLoginPlatform(String login) {
+    print(login);
     switch (login) {
       case "kakao":
         return 'assets/images/login/icon_kakao.png';
@@ -82,7 +82,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
                                 height: 30,
                                 width: 30,
                                 findLoginPlatform(
-                                    snapshot.data?.split(" ")[1] ?? ""),
+                                    snapshot.data?.split(" ")[2] ?? ""),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 12),
