@@ -519,14 +519,9 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                       isWritten: (types == 1) ? true : false,
                                       fontSize: 15,
                                       validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          snackBar(
-                                              title: "작성이 끝나지 않았습니다",
-                                              content:
-                                                  "공유 물품 예약 가능 기간을 작성해주세요");
-                                          return '';
-                                        }
-                                        if (!RegExp(r'^\d+$').hasMatch(value)) {
+                                        if (!(value == null || value.isEmpty) &&
+                                            (!RegExp(r'^\d+$')
+                                                .hasMatch(value))) {
                                           snackBar(
                                               title: "잘못된 입력",
                                               content: "예약 가능 기간은 숫자로만 입력해주세요");
