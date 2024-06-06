@@ -10,7 +10,9 @@ import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import '../const.dart';
 import '../controllers/member.dart';
 import '../controllers/size.dart';
+import '../services/member_service.dart';
 import '../style.dart';
+import '../widgets/nextpage_button.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -74,7 +76,7 @@ class _SettingPageState extends State<SettingPage> {
               signOut();
             }, false),
             selectButton("탈퇴하기", () {
-              snackBar(title: "개발 진행 중입니다", content: "추후에 이용해주세요");
+              checkLeaveApp();
             }, false),
           ],
         ),
@@ -117,6 +119,96 @@ class _SettingPageState extends State<SettingPage> {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> checkLeaveApp() async {
+    await Get.dialog<bool>(
+      AlertDialog(
+        backgroundColor: AppColor.backgroundColor,
+        elevation: 0,
+        title: const Padding(
+          padding: EdgeInsets.only(top: 16.0),
+          child: Center(
+            child: Text(
+              "계정 탈퇴",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              "탈퇴 시 모든 계정 및",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              "가입 클럽 활동 정보가 삭제되며",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Text(
+              "삭제된 정보는 복구할 수 없습니다.",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 4.0),
+              child: Text(
+                "정말 탈퇴하시겠습니까?",
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                child: NextPageButton(
+                  text: const Text(
+                    "탈퇴하기",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.backgroundColor),
+                  ),
+                  buttonColor: AppColor.objectColor,
+                  onPressed: () async {
+                    try {
+                      await MemberApiService.deleteMember();
+                      Get.offAllNamed('/');
+                    } catch (e) {
+                      print(e.toString());
+                      snackBar(title: "앱 탈퇴 실패", content: e.toString());
+                    }
+                  },
+                ),
+              ),
+              TextButton(
+                onPressed: Get.back,
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.resolveWith<Color>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.pressed)) {
+                        return Colors.transparent;
+                      }
+                      return Colors.transparent;
+                    },
+                  ),
+                ),
+                child: const Text(
+                  "취소",
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.textColor2),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
