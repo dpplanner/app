@@ -147,8 +147,8 @@ class ReservationAdminCard extends StatelessWidget {
                         types == 1
                             ? "예약 요청"
                             : types == 2
-                                ? "승인된 예약 정보"
-                                : "거절된 예약 정보",
+                                ? "승인한 예약 정보"
+                                : "거절한 예약 정보",
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,

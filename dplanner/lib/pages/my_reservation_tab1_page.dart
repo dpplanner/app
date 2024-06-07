@@ -113,7 +113,7 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                             } else {
                               return Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(18, 24, 24, 24),
+                                    const EdgeInsets.fromLTRB(24, 24, 24, 24),
                                 child: Column(
                                   children: List.generate(snapshot.data!.length,
                                       (index) {
@@ -163,20 +163,20 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                0, 5, 18, 0),
-                                            child: Text(
-                                              dateText,
-                                              style: TextStyle(
-                                                  color: isWritten
-                                                      ? AppColor
-                                                          .backgroundColor2
-                                                      : AppColor.textColor,
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 16),
-                                            ),
-                                          ),
+                                          // Padding(
+                                          //   padding: const EdgeInsets.fromLTRB(
+                                          //       0, 5, 18, 0),
+                                          //   child: Text(
+                                          //     dateText,
+                                          //     style: TextStyle(
+                                          //         color: isWritten
+                                          //             ? AppColor
+                                          //                 .backgroundColor2
+                                          //             : AppColor.textColor,
+                                          //         fontWeight: FontWeight.w700,
+                                          //         fontSize: 16),
+                                          //   ),
+                                          // ),
                                           Expanded(
                                             child: ReservationBigCard(
                                               onTap: () async {

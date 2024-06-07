@@ -10,47 +10,47 @@ import '../style.dart';
 import 'error_page.dart';
 import 'loading_page.dart';
 
-class MyReservationTab2Page extends StatefulWidget {
-  const MyReservationTab2Page({super.key});
+class MyReservationTab3Page extends StatefulWidget {
+  const MyReservationTab3Page({super.key});
 
   @override
-  State<MyReservationTab2Page> createState() => _MyReservationTab2PageState();
+  State<MyReservationTab3Page> createState() => _MyReservationTab3PageState();
 }
 
-class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
+class _MyReservationTab3PageState extends State<MyReservationTab3Page> {
   String lastDay = '';
 
-  final StreamController<List<ReservationModel>> _previousRController =
+  final StreamController<List<ReservationModel>> _rejectRController =
       StreamController<List<ReservationModel>>();
 
-  final List<ReservationModel> _previousReservations = [];
+  final List<ReservationModel> _rejectReservations = [];
   int _currentPage = 0;
   bool _hasNextPage = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchPreviousReservations();
+    _fetchRejectReservations();
   }
 
   @override
   void dispose() {
-    _previousRController.close();
+    _rejectRController.close();
     super.dispose();
   }
 
-  Future<void> _fetchPreviousReservations() async {
+  Future<void> _fetchRejectReservations() async {
     if (!_hasNextPage) return; // 다음 페이지가 없으면 요청을 중단합니다.
-    if (_currentPage == 0) _previousReservations.clear();
+    if (_currentPage == 0) _rejectReservations.clear();
 
-    final previousReservations = await ReservationApiService.getMyReservations(
-        page: _currentPage++, status: 'previous');
+    final rejectReservations = await ReservationApiService.getMyReservations(
+        page: _currentPage++, status: 'reject');
 
-    if (previousReservations.isNotEmpty) {
+    if (rejectReservations.isNotEmpty) {
       setState(() {
-        _previousReservations.addAll(previousReservations);
+        _rejectReservations.addAll(rejectReservations);
       });
-      _previousRController.add(_previousReservations);
+      _rejectRController.add(_rejectReservations);
     } else {
       _hasNextPage = false; // 받아온 포스트가 없다면, 다음 페이지가 없는 것으로 간주합니다.
     }
@@ -59,7 +59,7 @@ class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
   void _onScrollNotification(ScrollNotification scrollInfo) {
     if (scrollInfo is ScrollEndNotification &&
         scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-      _fetchPreviousReservations(); // 스크롤이 끝에 도달하면 다음 페이지의 포스트를 로드
+      _fetchRejectReservations(); // 스크롤이 끝에 도달하면 다음 페이지의 포스트를 로드
     }
   }
 
@@ -73,7 +73,7 @@ class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
                     _currentPage = 0;
                     lastDay = '';
                   });
-                  _fetchPreviousReservations();
+                  _fetchRejectReservations();
                 },
                 child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -83,7 +83,7 @@ class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
                         return true;
                       },
                       child: StreamBuilder<List<ReservationModel>>(
-                          stream: _previousRController.stream,
+                          stream: _rejectRController.stream,
                           builder: (BuildContext context,
                               AsyncSnapshot<List<ReservationModel>> snapshot) {
                             if (snapshot.data == null) {
@@ -95,7 +95,7 @@ class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
                                   children: [
                                     Center(
                                       child: Text(
-                                        "지난 예약이 없어요",
+                                        "거절된 예약이 없어요",
                                         style: TextStyle(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 16),
@@ -185,7 +185,7 @@ class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
                                                   _currentPage = 0;
                                                   lastDay = '';
                                                 });
-                                                _fetchPreviousReservations();
+                                                _fetchRejectReservations();
                                               },
                                               reservation:
                                                   snapshot.data![index],
