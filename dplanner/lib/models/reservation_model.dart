@@ -12,26 +12,26 @@ class ReservationModel {
       lastModifiedDate;
   List<dynamic> attachmentsUrl;
   List<Map<String, dynamic>> invitees;
-  String? returnMessage;
+  String? returnMessage, rejectMessage;
 
-  ReservationModel({
-    required this.reservationId,
-    required this.clubMemberId,
-    required this.clubMemberName,
-    required this.resourceId,
-    required this.resourceName,
-    required this.title,
-    required this.usage,
-    required this.sharing,
-    required this.status,
-    required this.attachmentsUrl,
-    required this.invitees,
-    required this.startDateTime,
-    required this.endDateTime,
-    required this.createDate,
-    required this.lastModifiedDate,
-    required this.returned,
-  });
+  ReservationModel(
+      {required this.reservationId,
+      required this.clubMemberId,
+      required this.clubMemberName,
+      required this.resourceId,
+      required this.resourceName,
+      required this.title,
+      required this.usage,
+      required this.sharing,
+      required this.status,
+      required this.attachmentsUrl,
+      required this.invitees,
+      required this.startDateTime,
+      required this.endDateTime,
+      required this.createDate,
+      required this.lastModifiedDate,
+      required this.returned,
+      required this.rejectMessage});
 
   ReservationModel.fromJson(Map<String, dynamic> json)
       : reservationId = json['reservationId'],
@@ -51,7 +51,8 @@ class ReservationModel {
         endDateTime = json['endDateTime'],
         createDate = json['createDate'],
         lastModifiedDate = json['lastModifiedDate'],
-        returned = json['returned'];
+        returned = json['returned'],
+        rejectMessage = json['rejectMessage'];
 }
 
 // "reservationId": 25,

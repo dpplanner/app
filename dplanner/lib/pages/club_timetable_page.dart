@@ -1990,7 +1990,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     rangeStartTextStyle: TextStyle(
                                         fontWeight: FontWeight.w400,
                                         color: AppColor.backgroundColor,
-                                        fontSize: 14),
+                                        fontSize: 12),
                                     rangeEndDecoration: BoxDecoration(
                                       color: AppColor.subColor2,
                                       shape: BoxShape.circle,
@@ -1998,7 +1998,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     rangeEndTextStyle: TextStyle(
                                         fontWeight: FontWeight.w400,
                                         color: AppColor.backgroundColor,
-                                        fontSize: 14),
+                                        fontSize: 12),
                                     withinRangeDecoration: BoxDecoration(
                                       color: Colors.transparent,
                                       shape: BoxShape.circle,
@@ -2006,7 +2006,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     withinRangeTextStyle: TextStyle(
                                         fontWeight: FontWeight.w400,
                                         color: AppColor.backgroundColor,
-                                        fontSize: 14)),
+                                        fontSize: 12)),
                                 onDaySelected: (newSelectedDay, newFocusedDay) {
                                   setState(() {
                                     DateTime rangeStart = DateTime.now()
@@ -3080,22 +3080,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             color: AppColor.backgroundColor),
                                       ),
                                       buttonColor: AppColor.subColor3,
-                                      onPressed: () async {
-                                        try {
-                                          await ReservationApiService
-                                              .patchReservation(
-                                                  reservationIds: [
-                                                reservation?.reservationId
-                                              ],
-                                                  isConfirmed: false);
-                                          getReservations();
-                                          Get.back();
-                                        } catch (e) {
-                                          print(e.toString());
-                                          snackBar(
-                                              title: "예약 거절 실패",
-                                              content: e.toString());
-                                        }
+                                      onPressed: () {
+                                        rejectReservation(
+                                            id: reservation!.reservationId);
                                       },
                                     ),
                                   ),
@@ -3119,6 +3106,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                   reservationIds: [
                                                 reservation?.reservationId
                                               ],
+                                                  rejectMessages: [],
                                                   isConfirmed: true);
                                           getReservations();
                                           Get.back();
@@ -3639,6 +3627,115 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 ),
                 child: const Text(
                   "닫기",
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColor.textColor2),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> rejectReservation({required int id}) async {
+    final formKey1 = GlobalKey<FormState>();
+    final TextEditingController rejectMessage = TextEditingController();
+    bool isFocused1 = false;
+
+    await Get.dialog<bool>(
+      AlertDialog(
+        backgroundColor: AppColor.backgroundColor,
+        elevation: 0,
+        title: const Padding(
+          padding: EdgeInsets.only(top: 16.0),
+          child: Center(
+            child: Text(
+              "예약 거절",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+          ),
+        ),
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "거절 사유를 작성해주세요",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                ),
+                Flexible(
+                  child: Form(
+                    key: formKey1,
+                    child: OutlineTextForm(
+                      hintText: '예시) 적합하지 않은 예약입니다',
+                      controller: rejectMessage,
+                      isFocused: isFocused1,
+                      noLine: false,
+                      fontSize: 14,
+                      onChanged: (value) {
+                        setState(() {
+                          isFocused1 = value.isNotEmpty;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        actions: [
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                child: NextPageButton(
+                  text: const Text(
+                    "거절하기",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.backgroundColor),
+                  ),
+                  buttonColor: AppColor.objectColor,
+                  onPressed: () async {
+                    try {
+                      await ReservationApiService.patchReservation(
+                          reservationIds: [id],
+                          rejectMessages: [rejectMessage.text],
+                          isConfirmed: false);
+                      getReservations();
+                      Get.back();
+                      Get.back();
+                    } catch (e) {
+                      print(e.toString());
+                      snackBar(title: "예약 거절 실패", content: e.toString());
+                    }
+                  },
+                ),
+              ),
+              TextButton(
+                onPressed: Get.back,
+                style: ButtonStyle(
+                  overlayColor: MaterialStateProperty.resolveWith<Color>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.pressed)) {
+                        return Colors.transparent;
+                      }
+                      return Colors.transparent;
+                    },
+                  ),
+                ),
+                child: const Text(
+                  "취소",
                   style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
