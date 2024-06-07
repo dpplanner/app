@@ -1,7 +1,9 @@
 import 'package:dplanner/controllers/size.dart';
 import 'package:dplanner/models/reservation_model.dart';
 import 'package:dplanner/widgets/snack_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -27,9 +29,7 @@ class ReservationAdminCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (type == 1) {
-          getRequestInfo(reservation: reservation);
-        }
+        getRequestInfo(types: type, reservation: reservation);
       },
       child: Container(
         width: SizeController.to.screenWidth,
@@ -122,7 +122,8 @@ class ReservationAdminCard extends StatelessWidget {
     );
   }
 
-  Future<void> getRequestInfo({required ReservationModel reservation}) async {
+  Future<void> getRequestInfo(
+      {required int types, required ReservationModel reservation}) async {
     bool checkedMore = false;
 
     Get.bottomSheet(
@@ -142,9 +143,13 @@ class ReservationAdminCard extends StatelessWidget {
                           'assets/images/extra/showmodal_scrollcontrolbar.svg',
                         ),
                       ),
-                      const Text(
-                        "예약 요청",
-                        style: TextStyle(
+                      Text(
+                        types == 1
+                            ? "예약 요청"
+                            : types == 2
+                                ? "승인된 예약 정보"
+                                : "거절된 예약 정보",
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
@@ -224,7 +229,7 @@ class ReservationAdminCard extends StatelessWidget {
                                       fontSize: 16),
                                 ),
                                 Text(
-                                  DateFormat("yy.MM.dd  hh:mm", 'ko_KR').format(
+                                  DateFormat("yy.MM.dd  HH:mm", 'ko_KR').format(
                                       DateTime.parse(reservation.createDate)),
                                   style: const TextStyle(
                                       color: AppColor.textColor,
@@ -234,6 +239,37 @@ class ReservationAdminCard extends StatelessWidget {
                               ],
                             ),
                           ),
+                          if (types == 3)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 32),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Flexible(
+                                    flex: 1,
+                                    child: Text(
+                                      "거절 사유",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                  Flexible(
+                                    flex: 2,
+                                    child: Text(
+                                      textAlign: TextAlign.center,
+                                      reservation.rejectMessage ??
+                                          "거절 사유가 없습니다.",
+                                      style: const TextStyle(
+                                          color: AppColor.textColor,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           GestureDetector(
                             onTap: () {
                               setState(() {
@@ -391,57 +427,58 @@ class ReservationAdminCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: NextPageButton(
-                          text: const Text(
-                            "거절하기",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColor.backgroundColor),
+                if (types == 1)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: NextPageButton(
+                            text: const Text(
+                              "거절하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColor.backgroundColor),
+                            ),
+                            buttonColor: AppColor.subColor3,
+                            onPressed: () {
+                              rejectReservation();
+                            },
                           ),
-                          buttonColor: AppColor.subColor3,
-                          onPressed: () {
-                            rejectReservation();
-                          },
                         ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        child: NextPageButton(
-                          text: const Text(
-                            "승인하기",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColor.backgroundColor),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: NextPageButton(
+                            text: const Text(
+                              "승인하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColor.backgroundColor),
+                            ),
+                            buttonColor: AppColor.objectColor,
+                            onPressed: () async {
+                              try {
+                                await ReservationApiService.patchReservation(
+                                    reservationIds: [reservation.reservationId],
+                                    rejectMessages: [],
+                                    isConfirmed: true);
+                              } catch (e) {
+                                print(e.toString());
+                                snackBar(
+                                    title: "예약 승인 실패", content: e.toString());
+                              }
+                              onTap();
+                              Get.back();
+                            },
                           ),
-                          buttonColor: AppColor.objectColor,
-                          onPressed: () async {
-                            try {
-                              await ReservationApiService.patchReservation(
-                                  reservationIds: [reservation.reservationId],
-                                  rejectMessages: [],
-                                  isConfirmed: true);
-                            } catch (e) {
-                              print(e.toString());
-                              snackBar(
-                                  title: "예약 승인 실패", content: e.toString());
-                            }
-                            onTap();
-                            Get.back();
-                          },
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           );

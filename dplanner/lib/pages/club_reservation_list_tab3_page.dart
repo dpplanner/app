@@ -131,7 +131,12 @@ class _ClubReservationListTab3PageState
                                     child: ReservationAdminCard(
                                       type: 3,
                                       reservation: snapshot.data![index],
-                                      onTap: () {},
+                                      onTap: () async {
+                                        setState(() {
+                                          _currentPage = 0;
+                                        });
+                                        _fetchRejectedReservations();
+                                      },
                                     ),
                                   ),
                                 ),
