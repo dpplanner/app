@@ -358,6 +358,38 @@ class ReservationBigCard extends StatelessWidget {
                                 ],
                               ),
                             ),
+                            if (reservation.status == "REJECTED")
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 16, bottom: 16),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Flexible(
+                                      flex: 1,
+                                      child: Text(
+                                        "거절 사유",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16),
+                                      ),
+                                    ),
+                                    Flexible(
+                                      flex: 2,
+                                      child: Text(
+                                        textAlign: TextAlign.center,
+                                        reservation.rejectMessage ??
+                                            "거절 사유가 없습니다.",
+                                        style: const TextStyle(
+                                            color: AppColor.markColor,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             Visibility(
                               visible: types == 0,
                               replacement: Column(
@@ -1133,13 +1165,12 @@ class ReservationBigCard extends StatelessWidget {
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16),
                                   ),
-                                  if (reservation != null)
-                                    Text(
-                                      reservation.resourceName,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 15),
-                                    ),
+                                  Text(
+                                    reservation.resourceName,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 15),
+                                  ),
                                 ],
                               ),
                               const Padding(
@@ -1272,68 +1303,16 @@ class ReservationBigCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-                  child: Visibility(
-                    visible: types == 0 || types == 1,
-                    replacement: Visibility(
-                      visible: types == 3,
-                      replacement: NextPageButton(
-                        text: const Text(
-                          "선택 완료",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppColor.backgroundColor),
-                        ),
-                        buttonColor: AppColor.objectColor,
-                        onPressed: () {
-                          setState(() {
-                            invitees.clear();
-                            invitees.addAll(updateInvitees);
-                            updateInvitees.clear();
-                            types = lastPages.removeLast();
-                          });
-                        },
-                      ),
-                      child: NextPageButton(
-                        text: const Text(
-                          "반납 완료",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppColor.backgroundColor),
-                        ),
-                        buttonColor: AppColor.objectColor,
-                        onPressed: () async {
-                          try {
-                            ReservationModel temp =
-                                await ReservationApiService.postReturn(
-                                    reservationId: reservation.reservationId,
-                                    returnImage: selectedImages,
-                                    returnMessage: message.text);
-                            onTap();
-                            Get.back();
-                          } catch (e) {
-                            print(e.toString());
-                          }
-                        },
-                      ),
-                    ),
+                if (reservation.status != "REJECTED")
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
                     child: Visibility(
-                      visible: (reservation.clubMemberId ==
-                              MemberController.to.clubMember().id &&
-                          DateTime.now().isBefore(
-                              DateTime.parse(reservation.endDateTime))),
+                      visible: types == 0 || types == 1,
                       replacement: Visibility(
-                        visible: !reservation.returned &&
-                            DateTime.now().isAfter(
-                                DateTime.parse(reservation.endDateTime)) &&
-                            reservation.clubMemberId ==
-                                MemberController.to.clubMember().id,
-                        child: NextPageButton(
+                        visible: types == 3,
+                        replacement: NextPageButton(
                           text: const Text(
-                            "반납하기",
+                            "선택 완료",
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
@@ -1342,92 +1321,150 @@ class ReservationBigCard extends StatelessWidget {
                           buttonColor: AppColor.objectColor,
                           onPressed: () {
                             setState(() {
-                              types = 3;
+                              invitees.clear();
+                              invitees.addAll(updateInvitees);
+                              updateInvitees.clear();
+                              types = lastPages.removeLast();
                             });
                           },
                         ),
+                        child: NextPageButton(
+                          text: const Text(
+                            "반납 완료",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColor.backgroundColor),
+                          ),
+                          buttonColor: AppColor.objectColor,
+                          onPressed: () async {
+                            try {
+                              ReservationModel temp =
+                                  await ReservationApiService.postReturn(
+                                      reservationId: reservation.reservationId,
+                                      returnImage: selectedImages,
+                                      returnMessage: message.text);
+                              onTap();
+                              Get.back();
+                            } catch (e) {
+                              print(e.toString());
+                            }
+                          },
+                        ),
                       ),
-                      child: Row(
-                        children: [
-                          if (types == 0)
+                      child: Visibility(
+                        visible: (reservation.clubMemberId ==
+                                MemberController.to.clubMember().id &&
+                            DateTime.now().isBefore(
+                                DateTime.parse(reservation.endDateTime))),
+                        replacement: Visibility(
+                          visible: !reservation.returned &&
+                              DateTime.now().isAfter(
+                                  DateTime.parse(reservation.endDateTime)) &&
+                              reservation.clubMemberId ==
+                                  MemberController.to.clubMember().id,
+                          child: NextPageButton(
+                            text: const Text(
+                              "반납하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColor.backgroundColor),
+                            ),
+                            buttonColor: AppColor.objectColor,
+                            onPressed: () {
+                              setState(() {
+                                types = 3;
+                              });
+                            },
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            if (types == 0)
+                              Expanded(
+                                child: NextPageButton(
+                                  text: const Text(
+                                    "예약 취소하기",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColor.backgroundColor),
+                                  ),
+                                  buttonColor: AppColor.subColor3,
+                                  onPressed: () async {
+                                    try {
+                                      await checkCancleReservation(
+                                          id: reservation.reservationId,
+                                          onTap: onTap);
+                                    } catch (e) {
+                                      print(e.toString());
+                                      snackBar(
+                                          title: "예약 취소 실패",
+                                          content: e.toString());
+                                    }
+                                  },
+                                ),
+                              ),
+                            if (types == 0)
+                              const SizedBox(
+                                width: 10,
+                              ),
                             Expanded(
                               child: NextPageButton(
                                 text: const Text(
-                                  "예약 취소하기",
+                                  "예약 수정하기",
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
                                       color: AppColor.backgroundColor),
                                 ),
-                                buttonColor: AppColor.subColor3,
+                                buttonColor: AppColor.objectColor,
                                 onPressed: () async {
-                                  try {
-                                    await checkCancleReservation(
-                                        id: reservation.reservationId,
-                                        onTap: onTap);
-                                  } catch (e) {
-                                    print(e.toString());
-                                    snackBar(
-                                        title: "예약 취소 실패",
-                                        content: e.toString());
+                                  if (types == 0) {
+                                    setState(() {
+                                      types = 1;
+                                    });
+                                  } else {
+                                    List<int> clubMemberIds = invitees
+                                        .map((invitee) =>
+                                            invitee["clubMemberId"] as int)
+                                        .toList();
+                                    try {
+                                      await ReservationApiService
+                                          .putReservation(
+                                              reservationId:
+                                                  reservation.reservationId,
+                                              resourceId:
+                                                  reservation.resourceId,
+                                              title: title.text,
+                                              usage: usage.text,
+                                              sharing: (open == Open.yes)
+                                                  ? true
+                                                  : false,
+                                              startDateTime:
+                                                  reservation.startDateTime,
+                                              endDateTime:
+                                                  reservation.endDateTime,
+                                              reservationInvitees:
+                                                  clubMemberIds);
+                                      onTap();
+                                      Get.back();
+                                    } catch (e) {
+                                      print(e.toString());
+                                      snackBar(
+                                          title: "예약 수정 실패",
+                                          content: e.toString());
+                                    }
                                   }
                                 },
                               ),
                             ),
-                          if (types == 0)
-                            const SizedBox(
-                              width: 10,
-                            ),
-                          Expanded(
-                            child: NextPageButton(
-                              text: const Text(
-                                "예약 수정하기",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColor.backgroundColor),
-                              ),
-                              buttonColor: AppColor.objectColor,
-                              onPressed: () async {
-                                if (types == 0) {
-                                  setState(() {
-                                    types = 1;
-                                  });
-                                } else {
-                                  List<int> clubMemberIds = invitees
-                                      .map((invitee) =>
-                                          invitee["clubMemberId"] as int)
-                                      .toList();
-                                  try {
-                                    await ReservationApiService.putReservation(
-                                        reservationId:
-                                            reservation.reservationId,
-                                        resourceId: reservation.resourceId,
-                                        title: title.text,
-                                        usage: usage.text,
-                                        sharing:
-                                            (open == Open.yes) ? true : false,
-                                        startDateTime:
-                                            reservation.startDateTime,
-                                        endDateTime: reservation.endDateTime,
-                                        reservationInvitees: clubMemberIds);
-                                    onTap();
-                                    Get.back();
-                                  } catch (e) {
-                                    print(e.toString());
-                                    snackBar(
-                                        title: "예약 수정 실패",
-                                        content: e.toString());
-                                  }
-                                }
-                              },
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           );

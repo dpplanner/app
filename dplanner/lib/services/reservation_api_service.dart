@@ -297,13 +297,25 @@ class ReservationApiService {
 
   /// PATCH: /reservations?confirm=(_.isConfirmed) [예약 Confirm하기] 클럽 예약 승인 & 거절하기
   static Future<void> patchReservation(
-      {required List<int?> reservationIds, required bool isConfirmed}) async {
+      {required List<int?> reservationIds,
+      required List<String?> rejectMessages,
+      required bool isConfirmed}) async {
     final url = Uri.parse('$baseUrl/reservations?confirm=$isConfirmed');
     const storage = FlutterSecureStorage();
     String? accessToken = await storage.read(key: accessTokenKey);
 
-    List<Map<String, int?>> reservations =
-        reservationIds.map((id) => {"reservationId": id}).toList();
+    List<Map<String, dynamic>> reservations = [];
+
+    if (isConfirmed) {
+      reservations = reservationIds.map((id) => {"reservationId": id}).toList();
+    } else {
+      for (int i = 0; i < reservationIds.length; i++) {
+        reservations.add({
+          "reservationId": reservationIds[i],
+          "rejectMessage": rejectMessages[i]
+        });
+      }
+    }
 
     final response = await http.patch(
       url,
