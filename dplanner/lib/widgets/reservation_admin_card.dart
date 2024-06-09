@@ -37,7 +37,7 @@ class ReservationAdminCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // 예약 요청 알림 메시지 눌러서 온거면 바텀시트 열기
     if (isFromNotification()) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getRequestInfo(reservation: reservation));
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getRequestInfo(reservation: reservation, types: 0));
       Get.parameters.clear();
     }
     return GestureDetector(
