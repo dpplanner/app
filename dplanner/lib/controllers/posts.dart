@@ -9,13 +9,7 @@ class PostController extends GetxController {
   RxList<Rx<Post>> posts = <Rx<Post>>[].obs;
 
   Rx<Post>? getRxPost(int postId) {
-    int idx = _findPostIndex(postId);
-
-    if(idx < 0) {
-      return null;
-    }
-
-    return posts[idx];
+    return posts.firstWhereOrNull((rxPost) => rxPost.value.id == postId);
   }
 
   Future<void> fetchPosts(int clubId, int page) async {
@@ -40,8 +34,7 @@ class PostController extends GetxController {
 
   Future<void> fetchPost(int postId) async {
     Post post = await PostApiService.fetchPost(postID: postId);
-    int idx = _findPostIndex(postId);
-    posts[idx].value = post;
+    getRxPost(postId)!.value = post;
     posts.refresh();
   }
 
@@ -77,10 +70,8 @@ class PostController extends GetxController {
         imageFileList: imageFileList,
         previousImageFileList: previousImageFileList);
 
-    int idx = _findPostIndex(postId);
-
-    if (idx >= 0 && post != null) {
-      posts[idx].value = post;
+    if (post != null) {
+      getRxPost(postId)!.value = post;
       posts.refresh();
     }
   }
@@ -107,10 +98,5 @@ class PostController extends GetxController {
   Future<void> fixPost(int postId) async {
     await PostApiService.fixPost(postId);
     fetchPosts(posts[0].value.clubId, 0);
-  }
-
-  int _findPostIndex(int postId) {
-    int idx = posts.indexWhere((rxPost) => rxPost.value.id == postId);
-    return idx;
   }
 }

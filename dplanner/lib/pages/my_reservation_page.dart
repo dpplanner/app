@@ -67,7 +67,25 @@ class _MyReservationPageState extends State<MyReservationPage> {
           MyReservationTab2Page(),
           MyReservationTab3Page()
         ],
+        initialIndex: getInitialTab(),
       ),
     );
+  }
+
+  int getInitialTab() {
+    Map<String, String?> params = Get.parameters;
+
+    // 거절된 예약
+    if (params.containsKey("rejected") && params["rejected"] != null && bool.parse(params["rejected"]!) == true) {
+      return 2;
+    }
+
+    // 지난 예약
+    if (params.containsKey("isPast") && params["isPast"] != null && bool.parse(params["isPast"]!) == true) {
+      return 1;
+    }
+
+    // 다가오는 예약(default)
+    return 0;
   }
 }

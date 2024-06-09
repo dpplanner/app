@@ -33,7 +33,8 @@ class ClubAlertApiService {
     final storage = FlutterSecureStorage();
     final accessToken = await storage.read(key: accessTokenKey);
 
-    final url = Uri.parse('$baseUrl/messages');
+    const int searchMonths = 1;
+    final url = Uri.parse('$baseUrl/messages?months=$searchMonths');
     final headers = {
       'Authorization': 'Bearer $accessToken',
       'Content-Type': 'application/json'
