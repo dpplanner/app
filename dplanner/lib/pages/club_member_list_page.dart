@@ -32,6 +32,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController searchPost = TextEditingController();
   bool _isFocused = false;
+  final Map<String, String?> params = Get.parameters;
 
   final StreamController<List<ClubMemberModel>> streamController =
       StreamController<List<ClubMemberModel>>();
@@ -144,6 +145,12 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                                 } else if (snapshot.data!.isEmpty) {
                                   return const SizedBox();
                                 } else {
+                                  if (params.containsKey("clubMemberId") && params["clubMemberId"] != null) {
+                                    int clubMemberId = int.parse(params["clubMemberId"]!);
+                                    _clubMemberInfo(types: 0, member: snapshot.data!.firstWhere((member) => member.id == clubMemberId));
+                                    Get.parameters.clear();
+                                  }
+
                                   return Column(
                                     children: [
                                       Padding(

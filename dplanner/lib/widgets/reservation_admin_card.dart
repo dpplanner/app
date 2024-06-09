@@ -22,8 +22,21 @@ class ReservationAdminCard extends StatelessWidget {
       required this.reservation,
       required this.onTap});
 
+  bool isFromNotification() {
+    Map<String, String?> params = Get.parameters;
+    return params.containsKey("reservationId")
+        && params["reservationId"] != null
+        && int.parse(params["reservationId"]!) == reservation.reservationId
+        && reservation.status == "REQUEST";
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 예약 요청 알림 메시지 눌러서 온거면 바텀시트 열기
+    if (isFromNotification()) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getRequestInfo(reservation: reservation));
+      Get.parameters.clear();
+    }
     return GestureDetector(
       onTap: () {
         if (type == 1) {

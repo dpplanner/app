@@ -39,8 +39,21 @@ class ReservationBigCard extends StatelessWidget {
     this.isRecent = false,
   });
 
+  bool isFromNotification() {
+    Map<String, String?> params = Get.parameters;
+    return params.containsKey("reservationId")
+        && params["reservationId"] != null
+        && int.parse(params["reservationId"]!) == reservation.reservationId;
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    if (isFromNotification()) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getReservationInfo(reservation: reservation, types: 0));
+      Get.parameters.clear();
+    }
+
     return GestureDetector(
       onTap: () {
         getReservationInfo(reservation: reservation, types: 0);

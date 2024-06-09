@@ -53,25 +53,27 @@ class _NotificationPageState extends State<NotificationPage> {
             future: alertListFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return Center(child: Text("데이터를 불러오는데 실패했습니다."));
-              } else if (snapshot.hasData) {
+                return const Center(child: Text("데이터를 불러오는데 실패했습니다."));
+              } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                 final alerts = snapshot.data!;
                 return Column(
                   children: alerts
                       .map((alert) => NotificationCard(
-                            ID: alert.id,
-                            isRead: alert.isRead,
-                            // icon: alert.icon,
+                            id: alert.id,
+                            type: alert.type,
                             title: alert.title,
                             content: alert.content,
+                            isRead: alert.isRead,
                             redirectUrl: alert.redirectUrl,
+                            infoType: alert.infoType,
+                            info: alert.info,
                           ))
                       .toList(),
                 );
               } else {
-                return Center(child: Text("알림이 없습니다."));
+                return const Center(child: Text("알림이 없습니다."));
               }
             },
           ),
