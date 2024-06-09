@@ -7,6 +7,7 @@ import '../controllers/size.dart';
 import '../style.dart';
 import 'my_reservation_tab1_page.dart';
 import 'my_reservation_tab2_page.dart';
+import 'my_reservation_tab3_page.dart';
 
 class MyReservationPage extends StatefulWidget {
   const MyReservationPage({super.key});
@@ -46,6 +47,9 @@ class _MyReservationPageState extends State<MyReservationPage> {
           Text(
             "지난 예약",
           ),
+          Text(
+            "거절된 예약",
+          ),
         ],
         tabBarProperties: TabBarProperties(
             background: Container(color: AppColor.backgroundColor),
@@ -58,7 +62,11 @@ class _MyReservationPageState extends State<MyReservationPage> {
             unselectedLabelColor: AppColor.textColor,
             unselectedLabelStyle:
                 const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-        views: const [MyReservationTab1Page(), MyReservationTab2Page()],
+        views: const [
+          MyReservationTab1Page(),
+          MyReservationTab2Page(),
+          MyReservationTab3Page()
+        ],
         initialIndex: getInitialTab(),
       ),
     );

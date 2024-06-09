@@ -302,7 +302,7 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              "탈퇴 시 모든 계정 및 활동 정보가 삭제되며",
+              "탈퇴 시 클럽 내 모든 활동 정보가 삭제되며",
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
             ),
             Text(
