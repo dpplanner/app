@@ -13,6 +13,7 @@ class ReservationModel {
   List<dynamic> attachmentsUrl;
   List<Map<String, dynamic>> invitees;
   String? returnMessage, rejectMessage;
+  bool isDummy;
 
   ReservationModel(
       {required this.reservationId,
@@ -31,7 +32,8 @@ class ReservationModel {
       required this.createDate,
       required this.lastModifiedDate,
       required this.returned,
-      required this.rejectMessage});
+      required this.rejectMessage,
+      this.isDummy = false});
 
   ReservationModel.fromJson(Map<String, dynamic> json)
       : reservationId = json['reservationId'],
@@ -52,7 +54,31 @@ class ReservationModel {
         createDate = json['createDate'],
         lastModifiedDate = json['lastModifiedDate'],
         returned = json['returned'],
-        rejectMessage = json['rejectMessage'];
+        rejectMessage = json['rejectMessage'],
+        isDummy = false;
+
+  static ReservationModel ofDummy(String startDateTime, String endDateTime) {
+    return ReservationModel(
+        reservationId: -1,
+        clubMemberId: -1,
+        clubMemberName: "SYSTEM",
+        resourceId: -1,
+        resourceName: "",
+        title: "",
+        usage: "",
+        sharing: false,
+        status: "",
+        attachmentsUrl: [],
+        invitees: [],
+        startDateTime: startDateTime,
+        endDateTime: endDateTime,
+        createDate: DateTime.now().toString(),
+        lastModifiedDate: DateTime.now().toString(),
+        returned: false,
+        rejectMessage: null,
+        isDummy: true
+    );
+  }
 }
 
 // "reservationId": 25,

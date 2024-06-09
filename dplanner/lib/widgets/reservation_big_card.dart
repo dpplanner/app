@@ -41,91 +41,114 @@ class ReservationBigCard extends StatelessWidget {
 
   bool isFromNotification() {
     Map<String, String?> params = Get.parameters;
-    return params.containsKey("reservationId")
-        && params["reservationId"] != null
-        && int.parse(params["reservationId"]!) == reservation.reservationId;
+    return params.containsKey("reservationId") &&
+        params["reservationId"] != null &&
+        int.parse(params["reservationId"]!) == reservation.reservationId;
   }
 
   @override
   Widget build(BuildContext context) {
-
     if (isFromNotification()) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getReservationInfo(reservation: reservation, types: 0));
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) =>
+          getReservationInfo(reservation: reservation, types: 0));
       Get.parameters.clear();
     }
 
-    return GestureDetector(
-      onTap: () {
-        getReservationInfo(reservation: reservation, types: 0);
-      },
-      child: Container(
-        width: SizeController.to.screenWidth,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: isRecent ? AppColor.subColor2 : AppColor.backgroundColor,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "${DateFormat("yyyy년 MM월 dd일 H:00 ~", 'ko_KR').format(DateTime.parse(reservation.startDateTime))} $endTime:00",
-                style: const TextStyle(
-                    color: AppColor.textColor,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15),
-              ),
-              Text(
-                reservation.resourceName,
-                style: const TextStyle(
-                    color: AppColor.textColor,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 15),
-              ),
-              Row(
+    return reservation.isDummy
+        ? Container(
+            width: SizeController.to.screenWidth,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: AppColor.subColor4
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(12),
+              child: Column(
                 children: [
+                  Text(""),
                   Text(
-                    reservation.clubMemberId ==
-                            MemberController.to.clubMember().id
-                        ? "내 예약"
-                        : "${reservation.clubMemberName}의 예약",
-                    style: const TextStyle(
-                        color: AppColor.textColor2,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15),
+                    "예약이 없어요",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16),
                   ),
-                  if (reservation.status == "REQUEST")
-                    const Text(
-                      " - 승인 대기중",
-                      style: TextStyle(
-                          color: AppColor.textColor2,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15),
-                    ),
-                  if (reservation.status == "REJECTED")
-                    const Text(
-                      " - 거절됨",
-                      style: TextStyle(
-                          color: AppColor.textColor2,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15),
-                    ),
-                  if (reservation.returned)
-                    const Text(
-                      " - 반납 완료",
-                      style: TextStyle(
-                          color: AppColor.textColor2,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15),
-                    ),
-                ],
+                  Text(""),
+                ]
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          )
+        : GestureDetector(
+            onTap: () {
+              getReservationInfo(reservation: reservation, types: 0);
+            },
+            child: Container(
+              width: SizeController.to.screenWidth,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: isRecent ? AppColor.subColor2 : AppColor.backgroundColor,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${DateFormat("yyyy년 MM월 dd일 H:00 ~", 'ko_KR').format(DateTime.parse(reservation.startDateTime))} $endTime:00",
+                      style: const TextStyle(
+                          color: AppColor.textColor,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15),
+                    ),
+                    Text(
+                      reservation.resourceName,
+                      style: const TextStyle(
+                          color: AppColor.textColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          reservation.clubMemberId ==
+                                  MemberController.to.clubMember().id
+                              ? "내 예약"
+                              : "${reservation.clubMemberName}의 예약",
+                          style: const TextStyle(
+                              color: AppColor.textColor2,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 15),
+                        ),
+                        if (reservation.status == "REQUEST")
+                          const Text(
+                            " - 승인 대기중",
+                            style: TextStyle(
+                                color: AppColor.textColor2,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15),
+                          ),
+                        if (reservation.status == "REJECTED")
+                          const Text(
+                            " - 거절됨",
+                            style: TextStyle(
+                                color: AppColor.textColor2,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15),
+                          ),
+                        if (reservation.returned)
+                          const Text(
+                            " - 반납 완료",
+                            style: TextStyle(
+                                color: AppColor.textColor2,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
   }
 
   /// types == 0 : 예약 정보

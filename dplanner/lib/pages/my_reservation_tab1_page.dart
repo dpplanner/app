@@ -111,24 +111,15 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                                 snapshot.hasData == false) {
                               return LoadingPage(constraints: constraints);
                             } else {
+                              List<ReservationModel> data = _addEmptyReservation(snapshot.data!);
                               return Padding(
                                 padding:
                                     const EdgeInsets.fromLTRB(24, 24, 24, 24),
                                 child: Column(
-                                  children: List.generate(snapshot.data!.length,
+                                  children: List.generate(data.length,
                                       (index) {
-                                    final startDate = DateTime.parse(
-                                        snapshot.data![index].startDateTime);
-                                    final now = DateTime.now();
-                                    final today =
-                                        DateTime(now.year, now.month, now.day);
-                                    final reservationDate = DateTime(
-                                        startDate.year,
-                                        startDate.month,
-                                        startDate.day);
-                                    final difference = reservationDate
-                                        .difference(today)
-                                        .inDays;
+
+                                    final difference = _getDateDiffFromNow(data[index]);
 
                                     String dateText;
                                     bool isWritten = false;
@@ -136,11 +127,10 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                                       dateText = "오늘";
                                     } else if (difference == 1) {
                                       dateText = "내일";
-                                    } else if (difference == -1) {
-                                      dateText = "어제";
                                     } else {
                                       dateText = "그외";
                                     }
+
                                     if (index != 0 && lastDay == dateText) {
                                       isWritten = true;
                                     }
@@ -148,7 +138,7 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
 
                                     var endTime = DateFormat.H().format(
                                         DateTime.parse(
-                                            snapshot.data![index].endDateTime));
+                                            data[index].endDateTime));
                                     if (endTime == "00") {
                                       endTime = "24";
                                     }
@@ -163,20 +153,20 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          // Padding(
-                                          //   padding: const EdgeInsets.fromLTRB(
-                                          //       0, 5, 18, 0),
-                                          //   child: Text(
-                                          //     dateText,
-                                          //     style: TextStyle(
-                                          //         color: isWritten
-                                          //             ? AppColor
-                                          //                 .backgroundColor2
-                                          //             : AppColor.textColor,
-                                          //         fontWeight: FontWeight.w700,
-                                          //         fontSize: 16),
-                                          //   ),
-                                          // ),
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 5, 18, 0),
+                                            child: Text(
+                                              dateText,
+                                              style: TextStyle(
+                                                  color: isWritten
+                                                      ? AppColor
+                                                          .backgroundColor2
+                                                      : AppColor.textColor,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 16),
+                                            ),
+                                          ),
                                           Expanded(
                                             child: ReservationBigCard(
                                               onTap: () async {
@@ -186,8 +176,7 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                                                 });
                                                 _fetchUpcomingReservations();
                                               },
-                                              reservation:
-                                                  snapshot.data![index],
+                                              reservation: data[index],
                                               isRecent: dateText == "오늘",
                                               endTime: endTime,
                                             ),
@@ -200,6 +189,57 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                               );
                             }
                           }),
-                    )))));
+                    )
+                )
+            )
+        )
+    );
+  }
+
+  int _getDateDiffFromNow(ReservationModel reservation) {
+    final startDate = DateTime.parse(reservation.startDateTime);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final reservationDate = DateTime(startDate.year, startDate.month, startDate.day);
+
+    return reservationDate.difference(today).inDays;
+  }
+
+  List<ReservationModel> _addEmptyReservation(List<ReservationModel> data) {
+    // 오늘 : diff = 0, 내일 : diff = 1, 그외 : diff > 1
+    // case0. 오늘 0 내일 0 그외 0 -> 오늘, 내일, 모레 날짜로 빈 예약 하나씩 추가
+    // case1. 오늘 0 내일 0 그외 n -> 오늘, 내일 날짜로 빈 예약 하나씩 추가
+    // case2. 오늘 0 내일 n 그외 m -> 오늘 날짜로 빈 예약 하나 추가
+    // case3. 오늘 n 내일 0 그외 m -> 내일 날짜로 빈 예약 하나 추가
+    // case4. 오늘 n 내일 m 그외 l -> 별도 처리 불필요
+
+    List<ReservationModel> processedData = [];
+    var now = DateTime.now();
+
+    // 오늘 예약이 없는 경우
+    int idxToday = data.indexWhere((reservation) => _getDateDiffFromNow(reservation) == 0);
+    if (idxToday < 0) {
+      var today = DateTime(now.year, now.month, now.day, 12, 00, 00).toString().split('.')[0];
+      processedData.add(ReservationModel.ofDummy(today, today));
+    }
+
+    // 내일 예약이 없는 경우
+    int idxTomorrow = data.indexWhere((reservation) => _getDateDiffFromNow(reservation) == 1);
+    if (idxTomorrow < 0) {
+      var tomorrow = DateTime(now.year, now.month, now.day + 1, 12, 00, 00).toString().split('.')[0];
+      processedData.add(ReservationModel.ofDummy(tomorrow, tomorrow));
+    }
+
+    // 그외 예약이 없는 경우
+    int idxAfterTomorrow = data.indexWhere((reservation) => _getDateDiffFromNow(reservation) > 1);
+    if (idxAfterTomorrow < 0) {
+      // 오늘, 내일 예약 먼저 추가 후 더미 추가
+      processedData.addAll(data);
+
+      var afterTomorrow = DateTime(now.year, now.month, now.day + 2, 12, 00, 00).toString().split('.')[0];
+      processedData.add(ReservationModel.ofDummy(afterTomorrow, afterTomorrow));
+    }
+
+    return processedData;
   }
 }
