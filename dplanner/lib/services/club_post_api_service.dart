@@ -353,6 +353,45 @@ class PostApiService {
       throw Exception('Failed to toggle like: $e');
     }
   }
+
+  static Future<void> reportPost({
+    required int postId, required int clubMemberId, required String reportMessage}) async {
+    try {
+      // AccessToken 가져오기
+      final storage = FlutterSecureStorage();
+      final accessToken = await storage.read(key: accessTokenKey);
+      final url = Uri.parse('$baseUrl/posts/$postId/report');
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      };
+
+      final body = jsonEncode({
+        "postId": postId,
+        "clubMemberId": clubMemberId,
+        "reportMessage": reportMessage,
+      });
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: body,
+      );
+
+      // 응답 확인
+      if (response.statusCode == 200) {
+        // 성공한 경우
+        Get.snackbar('알림', '게시글이 신고되었습니다.');
+      } else {
+        // 실패한 경우
+        Get.snackbar('알림', '게시글 신고에 실패했습니다. 에러 코드: ${response.statusCode}');
+      }
+    } catch (e) {
+      // 오류 처리
+      print('오류 발생: $e');
+    }
+  }
 }
 
 class PostCommentApiService {
@@ -477,6 +516,45 @@ class PostCommentApiService {
     } catch (e) {
       // 요청 중 오류 발생
       print('댓글 삭제 중 오류가 발생했습니다. 오류: $e');
+    }
+  }
+
+  static Future<void> reportComment({
+    required int commentId, required int clubMemberId, required String reportMessage}) async {
+    try {
+      // AccessToken 가져오기
+      final storage = FlutterSecureStorage();
+      final accessToken = await storage.read(key: accessTokenKey);
+      final url = Uri.parse('$baseUrl/comments/$commentId/report');
+
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      };
+
+      final body = jsonEncode({
+        "commentId": commentId,
+        "clubMemberId": clubMemberId,
+        "reportMessage": reportMessage,
+      });
+
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: body,
+      );
+
+      // 응답 확인
+      if (response.statusCode == 200) {
+        // 성공한 경우
+        Get.snackbar('알림', '댓글이 신고되었습니다.');
+      } else {
+        // 실패한 경우
+        Get.snackbar('알림', '게시글 신고에 실패했습니다. 에러 코드: ${response.statusCode}');
+      }
+    } catch (e) {
+      // 오류 처리
+      print('오류 발생: $e');
     }
   }
 }
