@@ -426,8 +426,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             ),
                                           ),
                                           iconStyleData: const IconStyleData(
-                                              icon: Icon(
-                                                SFSymbols.chevron_down,
+                                              icon: Padding(
+                                                padding: EdgeInsets.only(left: 8, right: 8),
+                                                child: Icon(SFSymbols.chevron_down),
                                               ),
                                               iconSize: 15,
                                               iconEnabledColor:
