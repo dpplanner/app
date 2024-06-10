@@ -397,7 +397,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                       child: Text(
                                                         resource.name,
                                                         style: const TextStyle(
-                                                            fontSize: 15,
+                                                            fontSize: 14,
                                                             fontWeight:
                                                                 FontWeight.w500,
                                                             color: AppColor
@@ -415,7 +415,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             });
                                           },
                                           buttonStyleData: ButtonStyleData(
-                                            height: 50,
+                                            height: 40,
                                             width:
                                                 SizeController.to.screenWidth *
                                                     0.1,
@@ -440,11 +440,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                     0.3,
                                             decoration: BoxDecoration(
                                               borderRadius:
-                                                  BorderRadius.circular(14),
+                                                  BorderRadius.circular(15),
                                               color: AppColor.backgroundColor,
                                             ),
                                             direction: DropdownDirection.left,
-                                            offset: const Offset(0, 50),
+                                            offset: const Offset(0, 40),
                                             scrollbarTheme: ScrollbarThemeData(
                                               radius: const Radius.circular(40),
                                               thickness: MaterialStateProperty
@@ -456,7 +456,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           ),
                                           menuItemStyleData:
                                               const MenuItemStyleData(
-                                            height: 40,
+                                            height: 32,
                                           ),
                                         ),
                                       )))

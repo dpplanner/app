@@ -90,13 +90,13 @@ class _NotificationCardState extends State<NotificationCard> {
                       child: Text(
                         widget.title,
                         style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 18),
+                            fontWeight: FontWeight.w600, fontSize: 16),
                       ),
                     ),
                     Text(
                       widget.content,
                       style: const TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 15),
+                          fontWeight: FontWeight.w500, fontSize: 14),
                     ),
                   ],
                 ),

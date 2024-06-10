@@ -560,59 +560,53 @@ class ReservationAdminCard extends StatelessWidget {
             );
           },
         ),
-        actions: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                child: NextPageButton(
-                  text: const Text(
-                    "거절하기",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppColor.backgroundColor),
+          // 변경 후
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                  child: TextButton(
+                    onPressed: Get.back,
+                    child: const Text(
+                      "취소",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColor.textColor2),
+                    ),
                   ),
-                  buttonColor: AppColor.objectColor,
-                  onPressed: () async {
-                    try {
-                      await ReservationApiService.patchReservation(
-                          reservationIds: [reservation.reservationId],
-                          rejectMessages: [rejectMessage.text],
-                          isConfirmed: false);
-                    } catch (e) {
-                      print(e.toString());
-                      snackBar(title: "예약 거절 실패", content: e.toString());
-                    }
-                    onTap();
-                    Get.back();
-                    Get.back();
-                  },
-                ),
-              ),
-              TextButton(
-                onPressed: Get.back,
-                style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.resolveWith<Color>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.pressed)) {
-                        return Colors.transparent;
+                ), Padding(
+                  padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                  child: TextButton(
+                    child: const Text(
+                      "거절하기",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.objectColor),
+                    ),
+                    // buttonColor: AppColor.markColor,
+                    onPressed: () async {
+                      try {
+                        await ReservationApiService.patchReservation(
+                            reservationIds: [reservation.reservationId],
+                            rejectMessages: [rejectMessage.text],
+                            isConfirmed: false);
+                      } catch (e) {
+                        print(e.toString());
+                        snackBar(title: "알림", content: "예약을 거절하지 못했습니다");
                       }
-                      return Colors.transparent;
+                      onTap();
+                      Get.back(); // 거절 사유 다이얼로그 닫기
+                      Get.back(); // 바텀시트 닫기
                     },
                   ),
                 ),
-                child: const Text(
-                  "취소",
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColor.textColor2),
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ]
       ),
     );
   }
