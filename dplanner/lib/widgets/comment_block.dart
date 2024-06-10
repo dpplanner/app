@@ -1,11 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/models/post_comment_model.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:dplanner/widgets/report_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 
 import '../controllers/member.dart';
@@ -50,6 +49,16 @@ class _CommentBlockState extends State<CommentBlock> {
     }
 
     widget.onCommentSelected(selectedCommentId);
+  }
+
+  Future<void> _showReportDialog(BuildContext context, int commentId) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return ReportDialog(targetId: commentId, targetType: "COMMENT");
+      },
+    );
   }
 
   @override
@@ -308,7 +317,7 @@ class _CommentBlockState extends State<CommentBlock> {
                           ],
                         ),
                         onPressed: () {
-                          Get.back();
+                          _showReportDialog(context, comment.id);
                         },
                       ),
                     ),

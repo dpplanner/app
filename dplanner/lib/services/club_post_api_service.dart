@@ -381,11 +381,9 @@ class PostApiService {
 
       // 응답 확인
       if (response.statusCode == 200) {
-        // 성공한 경우
-        Get.snackbar('알림', '게시글이 신고되었습니다.');
+        return;
       } else {
-        // 실패한 경우
-        Get.snackbar('알림', '게시글 신고에 실패했습니다. 에러 코드: ${response.statusCode}');
+        throw Error();
       }
     } catch (e) {
       // 오류 처리
@@ -546,11 +544,9 @@ class PostCommentApiService {
 
       // 응답 확인
       if (response.statusCode == 200) {
-        // 성공한 경우
-        Get.snackbar('알림', '댓글이 신고되었습니다.');
+        return;
       } else {
-        // 실패한 경우
-        Get.snackbar('알림', '게시글 신고에 실패했습니다. 에러 코드: ${response.statusCode}');
+        throw Error();
       }
     } catch (e) {
       // 오류 처리

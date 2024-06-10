@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/posts.dart';
 import 'package:dplanner/pages/post_add_page.dart';
+import 'package:dplanner/widgets/report_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -28,41 +29,91 @@ class PostContent extends StatelessWidget {
   Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('게시글 삭제'),
-          content: const SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('정말로 이 게시글을 삭제하시겠습니까?'),
-              ],
+          title: const Padding(
+            padding: EdgeInsets.only(top: 16.0),
+            child: Center(
+              child: Text(
+                "게시글 삭제",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              ),
             ),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Get.back();
-              },
-              child: const Text('취소'),
+          backgroundColor: AppColor.backgroundColor,
+          elevation: 0,
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: Text(
+                      '정말로 이 게시글을 삭제하시겠습니까?',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    ),
+                  )
+                ]
+              );
+            },
+          ),
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                  child: TextButton(
+                    onPressed: Get.back,
+                    child: const Text(
+                      "취소",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColor.textColor2),
+                    ),
+                  ),
+                ), Padding(
+                  padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                  child: TextButton(
+                    child: const Text(
+                      "삭제하기",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.markColor),
+                    ),
+                    // buttonColor: AppColor.markColor,
+                    onPressed: () async {
+                      try {
+                        await PostController.to.deletePost(post.id);
+                        Get.back(); // 경고창 닫기
+                        Get.back(); // 바텀 시트 닫기
+                        Get.back(); // 삭제된 게시글 나가기
+                        Get.snackbar('알림', '게시글이 성공적으로 삭제되었습니다.');
+                      } catch (e) {
+                        Get.snackbar('알림', '게시글 삭제 중 오류가 발생했습니다.');
+                        // print('게시글 삭제 중 오류: $e');
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () async {
-                try {
-                  await PostController.to.deletePost(post.id);
-                  Get.back(); // 경고창 닫기
-                  Get.back(); // 바텀 시트 닫기
-                  Get.back(); // 삭제된 게시글 나가기
-                  Get.snackbar('알림', '게시글이 성공적으로 삭제되었습니다.');
-                } catch (e) {
-                  Get.snackbar('알림', '게시글 삭제 중 오류가 발생했습니다.');
-                  // print('게시글 삭제 중 오류: $e');
-                }
-              },
-              child: const Text('예'),
-            ),
-          ],
+          ]
         );
+      },
+    );
+  }
+
+  Future<void> _showReportDialog(BuildContext context, int postId) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return ReportDialog(targetId: postId, targetType: "POST");
       },
     );
   }
@@ -429,7 +480,7 @@ class PostContent extends StatelessWidget {
                           ],
                         ),
                         onPressed: () {
-                          Get.back();
+                          _showReportDialog(context, post.id);
                         },
                       ),
                     ),
