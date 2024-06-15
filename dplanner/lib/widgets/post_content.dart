@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/posts.dart';
 import 'package:dplanner/pages/post_add_page.dart';
 import 'package:dplanner/widgets/report_dialog.dart';
+import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -92,9 +93,9 @@ class PostContent extends StatelessWidget {
                         Get.back(); // 경고창 닫기
                         Get.back(); // 바텀 시트 닫기
                         Get.back(); // 삭제된 게시글 나가기
-                        Get.snackbar('알림', '게시글이 성공적으로 삭제되었습니다.');
+                        snackBar(title: "게시글이 삭제되었습니다", content: "게시판을 확인해 주세요");
                       } catch (e) {
-                        Get.snackbar('알림', '게시글 삭제 중 오류가 발생했습니다.');
+                        snackBar(title: "게시글을 삭제하지 못헸습니다", content: "잠시 후 다시 시도해 주세요");
                         // print('게시글 삭제 중 오류: $e');
                       }
                     },

@@ -1,3 +1,4 @@
+import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
@@ -191,10 +192,10 @@ class _ReportDialogState extends State<ReportDialog> {
 
                     Get.back(); // 다이얼로그 닫기
                     Get.back(); // 바텀시트 닫기
-                    Get.snackbar('알림', '신고가 접수되었습니다.');
+                    snackBar(title: "신고가 접수되었습니다", content: "신고 의견은 관리자에 의해 검토후 처리됩니다");
                   } catch (e) {
                     Get.back(); // 다이얼로그 닫기
-                    Get.snackbar('알림', '게시글을 신고하지 못했습니다.');
+                    snackBar(title: "게시글을 신고하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                   }
                 },
               ),

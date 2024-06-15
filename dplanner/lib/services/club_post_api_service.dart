@@ -13,6 +13,7 @@ import 'package:dplanner/models/post_model.dart';
 import 'package:dplanner/models/post_comment_model.dart';
 
 import '../pages/post_page.dart';
+import '../widgets/snack_bar.dart';
 
 class PostApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
@@ -97,17 +98,16 @@ class PostApiService {
       if (response.statusCode == 201) {
         // 요청이 성공한 경우
         final post = Post.fromJson(jsonDecode(utf8.decode(responseBody.bodyBytes))['data']);
-        Get.snackbar('알림', '게시글이 작성되었습니다.');
+        snackBar(title: "게시글이 작성되었습니다", content: "게시글을 확인해 주세요");
         Get.off(() => PostPage(postId: post.id,), arguments: 1); // 게시글 등록 이후 바로 작성한 게시글로 이동
         return post;
       } else {
         // 요청이 실패한 경우
-        Get.snackbar('알림',
-            '게시글 작성에 실패했습니다. error: ${response.statusCode} ${responseBody.body}');
+        snackBar(title: "게시글을 작성하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
       }
     } catch (e) {
       // 요청 중 오류가 발생한 경우
-      Get.snackbar('알림', '오류가 발생했습니다.');
+      snackBar(title: "게시글을 작성하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
     }
     return null;
   }
@@ -263,15 +263,15 @@ class PostApiService {
       if (response.statusCode == 200) {
         Get.back(); // 게시글 수정 페이지 나가기
         Get.back(); // 바텀 시트 닫기
-        Get.snackbar('알림', '게시글이 수정되었습니다.');
+        snackBar(title: "게시글이 수정되었습니다", content: "게시글을 확인해 주세요");
         return Post.fromJson(jsonDecode(utf8.decode(responseBody.bodyBytes))['data']);
       } else {
         // 요청이 실패한 경우
-        Get.snackbar('알림', '게시글 수정에 실패했습니다. error: ${response.statusCode}');
+        snackBar(title: "게시글을 수정하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
       }
     } catch (e) {
       // 요청 중 오류가 발생한 경우
-      Get.snackbar('알림', '오류가 발생했습니다.');
+      snackBar(title: "게시글을 수정하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
     }
     return null;
   }
@@ -341,16 +341,16 @@ class PostApiService {
             Post.fromJson(jsonDecode(utf8.decode(response.bodyBytes))['data']);
         if (result.isFixed == true) {
           Get.back();
-          Get.snackbar('알림', '이 게시글을 고정했습니다');
+          snackBar(title: "이 게시글을 고정했습니다", content: "게시판을 확인해 주세요");
         } else {
           Get.back();
-          Get.snackbar('알림', '이 게시글을 고정해제했습니다');
+          snackBar(title: "이 게시글을 고정 해제했습니다", content: "게시판을 확인해 주세요");
         }
         return; // 성공적으로 업데이트
       }
       throw Exception('Failed to toggle like');
     } catch (e) {
-      throw Exception('Failed to toggle like: $e');
+      snackBar(title: "이 게시글을 고정/고정 해제하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
@@ -423,14 +423,15 @@ class PostCommentApiService {
       // 응답 확인
       if (response.statusCode == 201) {
         // 성공한 경우
-        Get.snackbar('알림', '댓글이 성공적으로 게시되었습니다.');
+        snackBar(title: "댓글이 등록되었습니다", content: "게시글을 확인해 주세요");
       } else {
         // 실패한 경우
-        Get.snackbar('알림', '댓글 게시에 실패했습니다. 에러 코드: ${response.statusCode}');
+        snackBar(title: "댓글을 등록하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
       }
     } catch (e) {
       // 오류 처리
       print('오류 발생: $e');
+      snackBar(title: "댓글을 등록하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
@@ -506,14 +507,15 @@ class PostCommentApiService {
       final response = await http.delete(url, headers: headers);
       if (response.statusCode == 204) {
         // 삭제 성공
-        Get.snackbar('알림', '댓글이 성공적으로 삭제되었습니다.');
+        snackBar(title: "댓글이 삭제되었습니다", content: "게시글을 확인해 주세요");
       } else {
         // 삭제 실패
-        Get.snackbar('알림', '댓글 삭제를 실패했습니다. 에러 코드: ${response.statusCode}');
+        snackBar(title: "댓글을 삭제하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
       }
     } catch (e) {
       // 요청 중 오류 발생
       print('댓글 삭제 중 오류가 발생했습니다. 오류: $e');
+      snackBar(title: "댓글을 삭제하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
