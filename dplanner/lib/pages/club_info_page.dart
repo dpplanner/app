@@ -340,7 +340,7 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                       Get.offAllNamed('club_list');
                     } catch (e) {
                       print(e.toString());
-                      snackBar(title: "클럽 탈퇴 실패", content: e.toString());
+                      snackBar(title: "클럽을 탈퇴하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                     }
                   },
                 ),

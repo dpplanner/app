@@ -177,7 +177,7 @@ class _SettingPageState extends State<SettingPage> {
                       Get.offAllNamed('/');
                     } catch (e) {
                       print(e.toString());
-                      snackBar(title: "앱 탈퇴 실패", content: e.toString());
+                      snackBar(title: "앱을 탈퇴하지 못했습니다.", content: "잠시 후 다시 시도해 주세요");
                     }
                   },
                 ),

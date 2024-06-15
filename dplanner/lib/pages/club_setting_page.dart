@@ -17,7 +17,6 @@ import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/snack_bar.dart';
 import 'error_page.dart';
-import 'loading_page.dart';
 
 class ClubSettingPage extends StatefulWidget {
   const ClubSettingPage({super.key});
@@ -254,9 +253,7 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                                   clubId: clubId, image: file);
                         } catch (e) {
                           print(e.toString());
-                          snackBar(
-                              title: "프로필 편집하는데 오류가 발생하였습니다.",
-                              content: e.toString());
+                          snackBar(title: "프로필을 편집하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                         }
                       }
                       if (info.text != ClubController.to.club().info) {
@@ -266,9 +263,7 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                                   clubId: clubId, info: info.text);
                         } catch (e) {
                           print(e.toString());
-                          snackBar(
-                              title: "프로필 편집하는데 오류가 발생하였습니다.",
-                              content: e.toString());
+                          snackBar(title: "프로필을 편집하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                         }
                       }
                       Get.back();

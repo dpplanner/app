@@ -522,9 +522,7 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
                                         if (!(value == null || value.isEmpty) &&
                                             (!RegExp(r'^\d+$')
                                                 .hasMatch(value))) {
-                                          snackBar(
-                                              title: "잘못된 입력",
-                                              content: "예약 가능 기간은 숫자로만 입력해주세요");
+                                          snackBar(title: "잘못된 입력값입니다", content: "예약 가능 기간은 숫자로만 입력 해주세요");
                                           return '';
                                         }
                                         return null;

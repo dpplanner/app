@@ -3113,9 +3113,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           Get.back();
                                         } catch (e) {
                                           print(e.toString());
-                                          snackBar(
-                                              title: "예약 승인 실패",
-                                              content: e.toString());
+                                          snackBar(title: "예약을 승인하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                                         }
                                       },
                                     ),
@@ -3457,7 +3455,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 } else {
                                   snackBar(
                                       title: "시간을 선택하지 않았습니다",
-                                      content: "최소 한시간을 선택해주세요");
+                                      content: "최소 한시간 이상 선택해주세요");
                                 }
                               },
                             ),
@@ -3718,7 +3716,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       Get.back();
                     } catch (e) {
                       print(e.toString());
-                      snackBar(title: "예약 거절 실패", content: e.toString());
+                      snackBar(title: "예약을 거절하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                     }
                   },
                 ),

@@ -481,8 +481,7 @@ class ReservationAdminCard extends StatelessWidget {
                                     isConfirmed: true);
                               } catch (e) {
                                 print(e.toString());
-                                snackBar(
-                                    title: "예약 승인 실패", content: e.toString());
+                                snackBar(title: "예약을 승인하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                               }
                               onTap();
                               Get.back();
@@ -596,7 +595,7 @@ class ReservationAdminCard extends StatelessWidget {
                             isConfirmed: false);
                       } catch (e) {
                         print(e.toString());
-                        snackBar(title: "알림", content: "예약을 거절하지 못했습니다");
+                        snackBar(title: "예약을 거절하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                       }
                       onTap();
                       Get.back(); // 거절 사유 다이얼로그 닫기

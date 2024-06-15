@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
       Get.offNamed('/club_list');
     } catch (e) {
       print(e.toString());
-      snackBar(title: "애플 로그인 실패", content: e.toString());
+      snackBar(title: "애플 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
@@ -137,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
         Get.offNamed('/club_list');
       } catch (e) {
         print(e.toString());
-        snackBar(title: "구글 로그인 실패", content: e.toString());
+        snackBar(title: "구글 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
       }
     }
   }
@@ -173,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
       Get.offNamed('/club_list');
     } catch (e) {
       print(e.toString());
-      snackBar(title: "카카오 로그인 실패", content: e.toString());
+      snackBar(title: "카카오 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
@@ -191,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
         Get.offNamed('/club_list');
       } catch (e) {
         print(e.toString());
-        snackBar(title: "네이버 로그인 실패", content: e.toString());
+        snackBar(title: "네이버 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
       }
     }
   }
