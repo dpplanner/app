@@ -233,12 +233,13 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
     // 그외 예약이 없는 경우
     int idxAfterTomorrow = data.indexWhere((reservation) => _getDateDiffFromNow(reservation) > 1);
     if (idxAfterTomorrow < 0) {
-      // 오늘, 내일 예약 먼저 추가 후 더미 추가
-      processedData.addAll(data);
-
       var afterTomorrow = DateTime(now.year, now.month, now.day + 2, 12, 00, 00).toString().split('.')[0];
       processedData.add(ReservationModel.ofDummy(afterTomorrow, afterTomorrow));
     }
+
+    // 실제 데이터 추가 후 정렬
+    processedData.addAll(data);
+    processedData.sort((a, b) => DateTime.parse(a.startDateTime).compareTo(DateTime.parse(b.startDateTime)));
 
     return processedData;
   }
