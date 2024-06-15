@@ -181,7 +181,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 endTime: endTime.subtract(const Duration(microseconds: 1)),
                 title: "",
                 description: "",
-                color: AppColor.lockColor));
+                color: AppColor.lockColor.withOpacity(0.5)));
           }
         }
       }
@@ -198,7 +198,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                   DateTime.parse(DateFormat('yyyy-MM-dd 23:59:59').format(j)),
               title: "",
               description: "",
-              color: AppColor.lockColor));
+              color: AppColor.lockColor.withOpacity(0.5)));
         }
       }
 

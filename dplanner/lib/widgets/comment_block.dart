@@ -64,8 +64,7 @@ class _CommentBlockState extends State<CommentBlock> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // todo 하이라이트 색상이 기본 프사 배경색이랑 겹치는듯
-      color: widget.isSelected ? AppColor.subColor2 : null,
+      color: widget.isSelected ? AppColor.subColor2.withOpacity(0.3) : null,
       child: Padding(
         padding: widget.comment.parentId == null
             ? const EdgeInsets.fromLTRB(24, 12, 24, 12)   // 댓글일때
