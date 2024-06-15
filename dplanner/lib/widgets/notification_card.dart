@@ -20,6 +20,7 @@ class NotificationCard extends StatefulWidget {
   final String redirectUrl;
   final AlertMessageInfoType infoType;
   final String? info;
+  final bool isSelected;
 
   const NotificationCard({
     super.key,
@@ -30,7 +31,8 @@ class NotificationCard extends StatefulWidget {
     required this.isRead,
     required this.redirectUrl,
     required this.infoType,
-    required this.info
+    required this.info,
+    required this.isSelected
   });
 
   @override
@@ -39,32 +41,16 @@ class NotificationCard extends StatefulWidget {
 
 class _NotificationCardState extends State<NotificationCard> {
   late bool isRead = widget.isRead;
-  
+
   @override
   Widget build(BuildContext context) {
+    if (widget.isSelected) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _handleMessage());
+      Get.parameters.clear();
+    }
+
     return GestureDetector(
-      onTap: () async {
-        await ClubAlertApiService.markAsRead(widget.id);
-
-        setState(() {
-          isRead = true;
-        });
-
-        switch(widget.infoType) {
-          case AlertMessageInfoType.MEMBER:
-            _handleMemberNotification();
-
-          case AlertMessageInfoType.POST:
-            _handlePostNotification();
-
-          case AlertMessageInfoType.RESERVATION:
-            await _handleReservationNotification();
-
-          default:
-            // 데이터가 잘못된 케이스(NOTHING)
-            print("[Error] infoType = ${widget.infoType}");
-        }
-      },
+      onTap: _handleMessage,
       child: Container(
         color: (!isRead)
             ? AppColor.markColor.withOpacity(0.15)
@@ -107,6 +93,29 @@ class _NotificationCardState extends State<NotificationCard> {
       ),
     );
   }
+
+  void _handleMessage() async {
+      await ClubAlertApiService.markAsRead(widget.id);
+
+      setState(() {
+        isRead = true;
+      });
+
+      switch(widget.infoType) {
+        case AlertMessageInfoType.MEMBER:
+          _handleMemberNotification();
+
+        case AlertMessageInfoType.POST:
+          _handlePostNotification();
+
+        case AlertMessageInfoType.RESERVATION:
+          await _handleReservationNotification();
+
+        default:
+          // 데이터가 잘못된 케이스(NOTHING)
+          print("[Error] infoType = ${widget.infoType}");
+      }
+    }
 
   bool hasAuthority(String authority) {
     ClubMemberModel user = MemberController.to.clubMember();

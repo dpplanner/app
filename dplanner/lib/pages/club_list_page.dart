@@ -20,7 +20,6 @@ import '../widgets/snack_bar.dart';
 import 'error_page.dart';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:dplanner/services/club_alert_api_service.dart';
 
 import 'loading_page.dart';
@@ -136,49 +135,26 @@ class _ClubListPageState extends State<ClubListPage> {
                                       child: ClubCard(
                                         thisClub: snapshot.data![index],
                                         event: () async {
-                                          if (snapshot
-                                                  .data![index].isConfirmed ??
-                                              false) {
+                                          if (snapshot.data![index].isConfirmed ?? false) {
                                             try {
-                                              const storage =
-                                                  FlutterSecureStorage();
-                                              String? accessToken =
-                                                  await storage.read(
-                                                      key: accessTokenKey);
-                                              await TokenApiService
-                                                  .patchUpdateClub(
-                                                      memberId: decodeToken(
-                                                          accessToken!)['sub'],
-                                                      clubId: snapshot
-                                                          .data![index].id
-                                                          .toString());
-                                              String? updatedAccessToken =
-                                                  await storage.read(
-                                                      key: accessTokenKey);
-                                              ClubController.to.club.value =
-                                                  await ClubApiService.getClub(
-                                                      clubID: decodeToken(
-                                                              updatedAccessToken!)[
-                                                          'recent_club_id']);
-                                              MemberController
-                                                      .to.clubMember.value =
-                                                  await ClubMemberApiService.getClubMember(
-                                                      clubId: decodeToken(
-                                                              updatedAccessToken)[
-                                                          'recent_club_id'],
-                                                      clubMemberId: decodeToken(
-                                                              updatedAccessToken)[
-                                                          'club_member_id']);
-                                              Get.toNamed('/tab2',
-                                                  arguments: 1);
+                                              const storage = FlutterSecureStorage();
+                                              String? accessToken = await storage.read(key: accessTokenKey);
+                                              await TokenApiService.patchUpdateClub(
+                                                      memberId: decodeToken(accessToken!)['sub'],
+                                                      clubId: snapshot.data![index].id.toString());
+                                              String? updatedAccessToken = await storage.read(key: accessTokenKey);
+                                              ClubController.to.club.value = await ClubApiService.getClub(
+                                                  clubID: decodeToken(updatedAccessToken!)['recent_club_id']);
+                                              MemberController.to.clubMember.value = await ClubMemberApiService.getClubMember(
+                                                  clubId: decodeToken(updatedAccessToken)['recent_club_id'],
+                                                  clubMemberId: decodeToken(updatedAccessToken)['club_member_id']);
+                                              Get.toNamed('/tab2', arguments: 1);
                                             } catch (e) {
                                               print(e.toString());
                                             }
                                           } else {
                                             getClubList();
-                                            snackBar(
-                                                title: "해당 클럽에 가입 진행 중입니다.",
-                                                content: "가입 후에 눌러주세요.");
+                                            snackBar(title: "해당 클럽에 가입 진행 중입니다.", content: "가입 후에 눌러주세요.");
                                           }
                                         },
                                       ));

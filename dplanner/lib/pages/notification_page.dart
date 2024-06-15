@@ -18,6 +18,7 @@ class NotificationPage extends StatefulWidget {
 
 class _NotificationPageState extends State<NotificationPage> {
   Future<List<AlertMessageModel>>? alertListFuture;
+  Map<String, String?> params = Get.parameters;
 
   @override
   void initState() {
@@ -69,6 +70,7 @@ class _NotificationPageState extends State<NotificationPage> {
                             redirectUrl: alert.redirectUrl,
                             infoType: alert.infoType,
                             info: alert.info,
+                            isSelected: params.containsKey("id") && int.parse(params["id"]!) == alert.id
                           ))
                       .toList(),
                 );
