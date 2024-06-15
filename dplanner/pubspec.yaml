@@ -94,6 +94,7 @@ flutter:
     - assets/images/login/
     - assets/images/notification_icon/
     - assets/images/splash/
+    - assets/texts/
 
   # assets:
   #   - images/a_dot_burr.jpeg

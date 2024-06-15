@@ -8,7 +8,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import '../const.dart';
-import '../controllers/member.dart';
 import '../controllers/size.dart';
 import '../services/member_service.dart';
 import '../style.dart';
@@ -92,15 +91,13 @@ class _SettingPageState extends State<SettingPage> {
     return TextButton(
       style: TextButton.styleFrom(
         foregroundColor: AppColor.textColor,
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
         backgroundColor: AppColor.backgroundColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(0),
         ),
       ),
       onPressed: onTap,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -119,7 +116,6 @@ class _SettingPageState extends State<SettingPage> {
               ),
           ],
         ),
-      ),
     );
   }
 
