@@ -7,7 +7,7 @@ import 'package:dplanner/models/club_member_model.dart';
 import 'package:dplanner/models/reservation_model.dart';
 import 'package:dplanner/pages/loading_page.dart';
 import 'package:dplanner/services/lock_api_service.dart';
-import 'package:dplanner/style.dart';
+import 'package:dplanner/const/style.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';

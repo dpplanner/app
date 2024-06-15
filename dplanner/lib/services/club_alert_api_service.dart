@@ -1,5 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:dplanner/const.dart';
+import 'package:dplanner/const/const.dart';
 import 'package:http/http.dart' as http;
 import 'package:dplanner/models/club_alert_message_model.dart';
 import 'dart:convert';

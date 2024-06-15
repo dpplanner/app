@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../style.dart';
+import '../const/style.dart';
 
 class ReservationMiniCard extends StatelessWidget {
   final String title;

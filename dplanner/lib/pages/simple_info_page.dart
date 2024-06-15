@@ -4,7 +4,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 
 class SimpleInfoPage extends StatefulWidget {
   final String title;

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../models/reservation_model.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'error_page.dart';
 import 'loading_page.dart';
 

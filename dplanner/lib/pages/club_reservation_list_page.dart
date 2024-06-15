@@ -5,7 +5,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'club_reservation_list_tab2_page.dart';
 import 'club_reservation_list_tab3_page.dart';
 

@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 import '../models/reservation_model.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/reservation_admin_card.dart';
 import 'error_page.dart';
 import 'loading_page.dart';

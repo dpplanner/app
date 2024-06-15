@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dplanner/controllers/size.dart';
 
-import '../style.dart';
+import '../const/style.dart';
 import 'package:dplanner/models/post_comment_model.dart';
 
 class CommentCard extends StatelessWidget {

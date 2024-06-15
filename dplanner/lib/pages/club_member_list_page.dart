@@ -15,7 +15,7 @@ import '../controllers/size.dart';
 import '../models/club_member_model.dart';
 import '../services/club_manager_api_service.dart';
 import '../services/club_member_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import 'error_page.dart';

@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../services/reservation_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'nextpage_button.dart';
 import 'outline_textform.dart';
 

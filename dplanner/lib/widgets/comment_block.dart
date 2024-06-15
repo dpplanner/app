@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 import '../controllers/member.dart';
 import '../controllers/size.dart';
 import '../services/club_post_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'nextpage_button.dart';
 
 class CommentBlock extends StatefulWidget {

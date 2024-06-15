@@ -1,4 +1,4 @@
-import 'package:dplanner/const.dart';
+import 'package:dplanner/const/const.dart';
 import 'package:dplanner/pages/error_page.dart';
 import 'package:dplanner/pages/simple_info_page.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +7,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 
 class AppSettingPage extends StatefulWidget {
   const AppSettingPage({super.key});

@@ -5,9 +5,9 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 
 import '../controllers/member.dart';
 import '../controllers/size.dart';
-import '../report_message.dart';
+import '../const/report_message.dart';
 import '../services/club_post_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 
 class ReportDialog extends StatefulWidget {
   final int targetId;

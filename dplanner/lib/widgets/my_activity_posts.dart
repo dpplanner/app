@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 
 import '../controllers/posts.dart';
 import '../pages/loading_page.dart';
-import '../style.dart';
+import '../const/style.dart';
 
 class MyActivityPosts extends StatefulWidget {
   final Future<void> Function(int clubMemberID, int page) fetchPosts;

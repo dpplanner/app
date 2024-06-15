@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'comment_block.dart';
 import 'package:dplanner/models/post_comment_model.dart';
 

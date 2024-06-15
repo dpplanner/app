@@ -8,7 +8,7 @@ import 'package:get/get_rx/get_rx.dart';
 import 'dart:async';
 
 import '../controllers/posts.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/post_card.dart';
 

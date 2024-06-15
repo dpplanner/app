@@ -4,7 +4,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/bottom_bar.dart';
 import 'package:dplanner/services/club_alert_api_service.dart';
 import 'package:dplanner/models/club_alert_message_model.dart';

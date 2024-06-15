@@ -18,7 +18,7 @@ import '../models/reservation_model.dart';
 import '../pages/error_page.dart';
 import '../services/club_member_api_service.dart';
 import '../services/reservation_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'full_screen_image.dart';
 import 'nextpage_button.dart';
 import 'outline_textform.dart';

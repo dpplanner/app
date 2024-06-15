@@ -9,7 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 
-import '../style.dart';
+import '../const/style.dart';
 
 class FullScreenImage extends StatelessWidget {
   final String imageUrl;

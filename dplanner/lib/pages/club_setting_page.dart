@@ -12,7 +12,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../controllers/size.dart';
 import '../services/club_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/snack_bar.dart';

@@ -8,13 +8,13 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import '../const.dart';
+import '../const/const.dart';
 import '../controllers/club.dart';
 import '../controllers/member.dart';
 import '../services/club_api_service.dart';
 import '../services/club_member_api_service.dart';
 import '../services/token_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:google_sign_in/google_sign_in.dart';

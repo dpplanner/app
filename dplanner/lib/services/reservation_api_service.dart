@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../const.dart';
+import '../const/const.dart';
 import '../models/reservation_model.dart';
 
 class ReservationApiService {

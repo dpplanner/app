@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/underline_textform.dart';
 import 'package:dplanner/models/post_model.dart';

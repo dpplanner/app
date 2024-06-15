@@ -7,10 +7,10 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
-import '../const.dart';
+import '../const/const.dart';
 import '../controllers/size.dart';
 import '../services/member_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/nextpage_button.dart';
 
 class SettingPage extends StatefulWidget {

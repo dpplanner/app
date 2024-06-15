@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../models/club_model.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/club_card.dart';
 import '../widgets/nextpage_button.dart';
 

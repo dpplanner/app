@@ -1,7 +1,7 @@
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/club_member_model.dart';
 import 'package:dplanner/pages/post_page.dart';
-import 'package:dplanner/style.dart';
+import 'package:dplanner/const/style.dart';
 import 'package:flutter/material.dart';
 import 'package:dplanner/services/club_alert_api_service.dart';
 import 'package:flutter_svg/svg.dart';

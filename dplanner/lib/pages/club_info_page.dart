@@ -12,7 +12,7 @@ import '../controllers/size.dart';
 import '../models/resource_model.dart';
 import '../services/club_api_service.dart';
 import '../services/resource_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/snack_bar.dart';
 import 'error_page.dart';

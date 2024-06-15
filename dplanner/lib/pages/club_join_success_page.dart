@@ -2,7 +2,7 @@ import 'package:dplanner/controllers/club.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/nextpage_button.dart';
 
 class ClubJoinSuccessPage extends StatelessWidget {

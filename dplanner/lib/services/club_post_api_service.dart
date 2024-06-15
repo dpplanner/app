@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../const.dart';
+import '../const/const.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'package:dplanner/models/post_comment_model.dart';
 

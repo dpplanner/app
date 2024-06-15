@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../services/club_member_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 

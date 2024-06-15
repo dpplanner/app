@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'nextpage_button.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'full_screen_image.dart';
