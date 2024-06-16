@@ -249,8 +249,10 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                             Clipboard.setData(ClipboardData(
                                 text: await ClubApiService.postClubCode(
                                     clubId: ClubController.to.club().id)));
+                            snackBar(title: "초대코드가 복사되었습니다", content: "클럽에 초대할 사람에게 공유해주세요");
                           } catch (e) {
                             print(e.toString());
+                            snackBar(title: "초대코드를 복사하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                           }
                         },
                       ),
