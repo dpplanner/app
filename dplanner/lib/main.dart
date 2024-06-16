@@ -169,6 +169,8 @@ Future<void> _handleFirebaseNotification(RemoteMessage? message) async {
 }
 
 Future<void> _handleNotificationData(Map<String, dynamic> data) async {
+  Get.offAllNamed("/club_list");
+
   if (data.containsKey("clubId") && data["clubId"] != null) {
     // recentClub 갱신
     const storage = FlutterSecureStorage();

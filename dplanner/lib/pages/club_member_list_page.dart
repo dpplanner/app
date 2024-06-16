@@ -754,7 +754,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                           buttonColor: AppColor.objectColor,
                           onPressed: () async {
                             try {
-                              await ClubMemberApiService.patchMemberToClub(
+                              await ClubMemberApiService.confirmMemberToClub(
                                   clubMemberId: member.id,
                                   clubId: ClubController.to.club().id);
                               ClubController.to.club.value =
@@ -780,7 +780,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                             buttonColor: AppColor.markColor,
                             onPressed: () async {
                               try {
-                                await ClubMemberApiService.deleteClubMember(
+                                await ClubMemberApiService.rejectMemberToClub(
                                     clubMemberId: member.id,
                                     clubId: ClubController.to.club().id);
                                 getClubMemberList();

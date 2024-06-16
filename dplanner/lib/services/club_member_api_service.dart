@@ -162,8 +162,8 @@ class ClubMemberApiService {
     throw ErrorDescription(errorMessage);
   }
 
-  /// PATCH: /clubs/(_.club_id)/club-members/confirm [클럽 멤버 승인] 클럽 멤버로 승인하기
-  static Future<void> patchMemberToClub(
+  /// PATCH: /clubs/(_.club_id)/club-members/confirm [클럽 가입 승인] 클럽 가입 승인하기
+  static Future<void> confirmMemberToClub(
       {required int clubMemberId, required int clubId}) async {
     final url = Uri.parse('$baseUrl/clubs/$clubId/club-members/confirm');
     const storage = FlutterSecureStorage();
@@ -188,6 +188,34 @@ class ClubMemberApiService {
     print(errorMessage);
     throw ErrorDescription(errorMessage);
   }
+
+  /// PATCH: /clubs/(_.club_id)/club-members/reject [클럽 가입 거절] 클럽 가입 거절하기
+  static Future<void> rejectMemberToClub(
+      {required int clubMemberId, required int clubId}) async {
+    final url = Uri.parse('$baseUrl/clubs/$clubId/club-members/reject');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.patch(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({"id": clubMemberId}),
+    );
+
+    if (response.statusCode == 204) {
+      return;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
 
   /// PATCH: /clubs/(_.club_id)/club-members/(_.club_member_id)/role [클럽 멤버 권한 및 롤 변경] 클럽 멤버 등급 변경하기
   static Future<ClubMemberModel> patchAuthorities(
