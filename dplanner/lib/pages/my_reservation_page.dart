@@ -4,7 +4,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'my_reservation_tab1_page.dart';
 import 'my_reservation_tab2_page.dart';
 import 'my_reservation_tab3_page.dart';

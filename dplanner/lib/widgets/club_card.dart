@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 
 class ClubCard extends StatelessWidget {
   final ClubModel thisClub;

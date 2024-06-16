@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../pages/post_page.dart';
-import '../style.dart';
+import '../const/style.dart';
 
 class PostMiniCard extends StatelessWidget {
   final int id;

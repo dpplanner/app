@@ -1,17 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/models/post_comment_model.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:dplanner/widgets/report_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 
 import '../controllers/member.dart';
 import '../controllers/size.dart';
 import '../services/club_post_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'nextpage_button.dart';
 
 class CommentBlock extends StatefulWidget {
@@ -52,11 +51,20 @@ class _CommentBlockState extends State<CommentBlock> {
     widget.onCommentSelected(selectedCommentId);
   }
 
+  Future<void> _showReportDialog(BuildContext context, int commentId) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return ReportDialog(targetId: commentId, targetType: "COMMENT");
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      // todo 하이라이트 색상이 기본 프사 배경색이랑 겹치는듯
-      color: widget.isSelected ? AppColor.subColor2 : null,
+      color: widget.isSelected ? AppColor.subColor2.withOpacity(0.3) : null,
       child: Padding(
         padding: widget.comment.parentId == null
             ? const EdgeInsets.fromLTRB(24, 12, 24, 12)   // 댓글일때
@@ -308,7 +316,7 @@ class _CommentBlockState extends State<CommentBlock> {
                           ],
                         ),
                         onPressed: () {
-                          Get.back();
+                          _showReportDialog(context, comment.id);
                         },
                       ),
                     ),

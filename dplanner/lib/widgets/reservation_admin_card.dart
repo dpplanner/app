@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../services/reservation_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'nextpage_button.dart';
 import 'outline_textform.dart';
 
@@ -29,15 +29,17 @@ class ReservationAdminCard extends StatelessWidget {
     Map<String, String?> params = Get.parameters;
     return params.containsKey("reservationId")
         && params["reservationId"] != null
-        && int.parse(params["reservationId"]!) == reservation.reservationId
-        && reservation.status == "REQUEST";
+        && int.parse(params["reservationId"]!) == reservation.reservationId;
   }
 
   @override
   Widget build(BuildContext context) {
     // 예약 요청 알림 메시지 눌러서 온거면 바텀시트 열기
     if (isFromNotification()) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getRequestInfo(reservation: reservation, types: 0));
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getRequestInfo(
+          reservation: reservation,
+          types: reservation.status != "REQUEST" ? reservation.status == "REJECTED" ? 3 : 2 : 1)
+      );
       Get.parameters.clear();
     }
     return GestureDetector(
@@ -481,11 +483,11 @@ class ReservationAdminCard extends StatelessWidget {
                                     isConfirmed: true);
                               } catch (e) {
                                 print(e.toString());
-                                snackBar(
-                                    title: "예약 승인 실패", content: e.toString());
+                                snackBar(title: "예약을 승인하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                               }
                               onTap();
                               Get.back();
+                              snackBar(title: "예약이 승인되었습니다", content: "예약 시간표를 확인해 주세요");
                             },
                           ),
                         ),
@@ -560,59 +562,54 @@ class ReservationAdminCard extends StatelessWidget {
             );
           },
         ),
-        actions: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                child: NextPageButton(
-                  text: const Text(
-                    "거절하기",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppColor.backgroundColor),
+          // 변경 후
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                  child: TextButton(
+                    onPressed: Get.back,
+                    child: const Text(
+                      "취소",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColor.textColor2),
+                    ),
                   ),
-                  buttonColor: AppColor.objectColor,
-                  onPressed: () async {
-                    try {
-                      await ReservationApiService.patchReservation(
-                          reservationIds: [reservation.reservationId],
-                          rejectMessages: [rejectMessage.text],
-                          isConfirmed: false);
-                    } catch (e) {
-                      print(e.toString());
-                      snackBar(title: "예약 거절 실패", content: e.toString());
-                    }
-                    onTap();
-                    Get.back();
-                    Get.back();
-                  },
-                ),
-              ),
-              TextButton(
-                onPressed: Get.back,
-                style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.resolveWith<Color>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.pressed)) {
-                        return Colors.transparent;
+                ), Padding(
+                  padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                  child: TextButton(
+                    child: const Text(
+                      "거절하기",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.objectColor),
+                    ),
+                    // buttonColor: AppColor.markColor,
+                    onPressed: () async {
+                      try {
+                        await ReservationApiService.patchReservation(
+                            reservationIds: [reservation.reservationId],
+                            rejectMessages: [rejectMessage.text],
+                            isConfirmed: false);
+                      } catch (e) {
+                        print(e.toString());
+                        snackBar(title: "예약을 거절하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                       }
-                      return Colors.transparent;
+                      onTap();
+                      Get.back(); // 거절 사유 다이얼로그 닫기
+                      Get.back(); // 바텀시트 닫기
+                      snackBar(title: "예약이 거절되었습니다", content: "예약 시간표를 확인해 주세요");
                     },
                   ),
                 ),
-                child: const Text(
-                  "취소",
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColor.textColor2),
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ]
       ),
     );
   }

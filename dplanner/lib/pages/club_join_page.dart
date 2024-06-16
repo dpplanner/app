@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../models/club_model.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/club_card.dart';
 import '../widgets/nextpage_button.dart';
 
@@ -208,7 +208,7 @@ class _ClubJoinPagePageState extends State<ClubJoinPage> {
                               if (myClubs.any((club) =>
                                   club.id == ClubController.to.club().id)) {
                                 snackBar(
-                                    title: "해당 클럽에 이미 가입 중입니다.",
+                                    title: "해당 클럽에 이미 참여 중입니다.",
                                     content: "다른 클럽 초대코드를 입력해주세요");
                               } else {
                                 Get.toNamed('/club_join2');

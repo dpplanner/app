@@ -53,11 +53,13 @@ dependencies:
   flutter_image_compress: ^2.1.0
   path_provider: ^2.1.2
   firebase_messaging: ^14.7.20
+  flutter_local_notifications: ^17.1.2
   kakao_flutter_sdk_common: ^1.9.0
   image_gallery_saver: ^2.0.3
   dio: ^5.4.2
   cached_network_image: ^3.3.1
   sign_in_with_apple: ^6.0.0
+  google_mobile_ads: ^5.1.0
 
 dependency_overrides:
   calendar_view:
@@ -94,6 +96,7 @@ flutter:
     - assets/images/login/
     - assets/images/notification_icon/
     - assets/images/splash/
+    - assets/texts/
 
   # assets:
   #   - images/a_dot_burr.jpeg

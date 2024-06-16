@@ -7,11 +7,10 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
-import '../const.dart';
-import '../controllers/member.dart';
+import '../const/const.dart';
 import '../controllers/size.dart';
 import '../services/member_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/nextpage_button.dart';
 
 class SettingPage extends StatefulWidget {
@@ -92,15 +91,13 @@ class _SettingPageState extends State<SettingPage> {
     return TextButton(
       style: TextButton.styleFrom(
         foregroundColor: AppColor.textColor,
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
         backgroundColor: AppColor.backgroundColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(0),
         ),
       ),
       onPressed: onTap,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -119,7 +116,6 @@ class _SettingPageState extends State<SettingPage> {
               ),
           ],
         ),
-      ),
     );
   }
 
@@ -181,7 +177,7 @@ class _SettingPageState extends State<SettingPage> {
                       Get.offAllNamed('/');
                     } catch (e) {
                       print(e.toString());
-                      snackBar(title: "앱 탈퇴 실패", content: e.toString());
+                      snackBar(title: "앱을 탈퇴하지 못했습니다.", content: "잠시 후 다시 시도해 주세요");
                     }
                   },
                 ),

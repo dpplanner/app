@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../style.dart';
+import '../const/style.dart';
 import 'full_screen_image.dart';
 
 class ReservationReturnCard extends StatelessWidget {
@@ -47,7 +47,7 @@ class ReservationReturnCard extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     fontSize: 15),
               ),
-              child: Row(
+              child: Wrap(
                 children: [
                   Text(
                     reservation.clubMemberName,

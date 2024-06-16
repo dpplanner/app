@@ -4,8 +4,8 @@ import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/services/reservation_api_service.dart';
 import 'package:flutter/material.dart';
 
-import '../controllers/size.dart';
 import '../models/reservation_model.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/reservation_admin_card.dart';
 import 'error_page.dart';
 import 'loading_page.dart';
@@ -96,22 +96,27 @@ class _ClubReservationListTab3PageState
                         builder: (BuildContext context,
                             AsyncSnapshot<List<ReservationModel>> snapshot) {
                           if (snapshot.data == null && !_isLoading) {
-                            return ConstrainedBox(
-                              constraints: BoxConstraints(
-                                  minHeight: constraints.maxHeight),
-                              child: const Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Center(
-                                    child: Text(
-                                      "거절한 예약이 없어요",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16),
-                                    ),
+                            return Column(
+                              children: [
+                                const BannerAdWidget(),
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                      minHeight: constraints.maxHeight - 50),
+                                  child: const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Center(
+                                        child: Text(
+                                          "거절한 예약이 없어요",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             );
                           } else if (snapshot.hasError) {
                             return ErrorPage(constraints: constraints);
@@ -120,27 +125,33 @@ class _ClubReservationListTab3PageState
                               snapshot.hasData == false) {
                             return LoadingPage(constraints: constraints);
                           } else {
-                            return Padding(
-                              padding: const EdgeInsets.all(24),
-                              child: Column(
-                                children: List.generate(
-                                  snapshot.data!.length,
-                                  (index) => Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 12.0),
-                                    child: ReservationAdminCard(
-                                      type: 3,
-                                      reservation: snapshot.data![index],
-                                      onTap: () async {
-                                        setState(() {
-                                          _currentPage = 0;
-                                        });
-                                        _fetchRejectedReservations();
-                                      },
+                            return Column(
+                              children: [
+                                const BannerAdWidget(),
+                                const SizedBox(height: 8,),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 24),
+                                  child: Column(
+                                    children: List.generate(
+                                      snapshot.data!.length,
+                                      (index) => Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 12.0),
+                                        child: ReservationAdminCard(
+                                          type: 3,
+                                          reservation: snapshot.data![index],
+                                          onTap: () async {
+                                            setState(() {
+                                              _currentPage = 0;
+                                            });
+                                            _fetchRejectedReservations();
+                                          },
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                             );
                           }
                         }),

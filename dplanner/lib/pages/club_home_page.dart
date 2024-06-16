@@ -8,7 +8,8 @@ import 'package:get/get_rx/get_rx.dart';
 import 'dart:async';
 
 import '../controllers/posts.dart';
-import '../style.dart';
+import '../const/style.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/post_card.dart';
 
@@ -130,44 +131,49 @@ class _ClubHomePageState extends State<ClubHomePage> {
                           _onScrollNotification(scrollInfo);
                           return true;
                         },
-                        child: Obx(() {
-                          if (_isLoading.value) {
-                            return LoadingPage(constraints: constraints);
-                          } else if (PostController.to.posts.isEmpty) {
-                            return ConstrainedBox(
-                              constraints: BoxConstraints(
-                                  minHeight: constraints.maxHeight),
-                              child: const Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Center(
-                                    child: Text(
-                                      "게시글이 없어요",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16),
-                                    ),
+                        child: Column(
+                          children: [
+                            const BannerAdWidget(),
+                            Obx(() {
+                              if (_isLoading.value) {
+                                return LoadingPage(constraints: constraints);
+                              } else if (PostController.to.posts.isEmpty) {
+                                return ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                      minHeight: constraints.maxHeight),
+                                  child: const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Center(
+                                        child: Text(
+                                          "게시글이 없어요",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            return ConstrainedBox(
-                                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                                child: Column(
-                                  children: List.generate(
-                                      PostController.to.posts.length,
-                                          (index) => Column(children: [
-                                        Container(
-                                            width: SizeController.to.screenWidth,
-                                            height: 10,
-                                            color: AppColor.backgroundColor2),
-                                        PostCard(rxPost: PostController.to.posts[index]),
-                                      ])),
-                                )
-                            );
-                          }
-                        }),
+                                );
+                              } else {
+                                return ConstrainedBox(
+                                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                                    child: Column(
+                                      children: List.generate(
+                                          PostController.to.posts.length,
+                                              (index) => Column(children: [
+                                            Container(
+                                                width: SizeController.to.screenWidth,
+                                                height: 10,
+                                                color: AppColor.backgroundColor2),
+                                            PostCard(rxPost: PostController.to.posts[index]),
+                                          ])),
+                                    )
+                                );
+                              }
+                            }),
+                          ],
+                        ),
                       ),
                     ),
                   ),

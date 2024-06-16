@@ -1,4 +1,5 @@
 import 'package:dplanner/pages/loading_page.dart';
+import 'package:dplanner/widgets/banner_ad_widget.dart';
 import 'package:dplanner/widgets/post_comment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -9,7 +10,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../controllers/posts.dart';
 import '../controllers/size.dart';
 import '../models/post_comment_model.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/post_content.dart';
@@ -124,6 +125,7 @@ class _PostPageState extends State<PostPage> {
                             constraints: BoxConstraints(minHeight: constraints.maxHeight),
                             child: Column(
                               children: [
+                                const BannerAdWidget(),
                                 Obx(() {
                                   return PostController.to.getRxPost(widget.postId) == null
                                       ? Container()

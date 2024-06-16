@@ -5,7 +5,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'club_reservation_list_tab2_page.dart';
 import 'club_reservation_list_tab3_page.dart';
 
@@ -68,7 +68,25 @@ class _ClubReservationListPageState extends State<ClubReservationListPage> {
           ClubReservationListTab2Page(),
           ClubReservationListTab3Page(),
         ],
+        initialIndex: getInitialTab(),
       ),
     );
+  }
+
+  int getInitialTab() {
+    Map<String, String?> params = Get.parameters;
+
+    if (params.containsKey("status") && params["status"] != null) {
+      if (params["status"] == "REJECTED") {
+        // 거절한 예약
+        return 2;
+      } else if (params["status"] == "CONFIRMED") {
+        // 승인한 예약
+        return 1;
+      }
+    }
+
+    // 승인 대기중(default)
+    return 0;
   }
 }

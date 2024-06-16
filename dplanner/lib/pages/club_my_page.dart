@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 
 import '../controllers/size.dart';
 import '../services/reservation_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/reservation_mini_card.dart';
 import 'error_page.dart';

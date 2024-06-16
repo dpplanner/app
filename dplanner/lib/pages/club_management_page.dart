@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 import '../controllers/member.dart';
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 
 class ClubManagementPage extends StatefulWidget {
   const ClubManagementPage({super.key});

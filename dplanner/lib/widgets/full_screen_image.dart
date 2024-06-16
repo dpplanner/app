@@ -9,7 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 
-import '../style.dart';
+import '../const/style.dart';
 
 class FullScreenImage extends StatelessWidget {
   final String imageUrl;
@@ -57,10 +57,10 @@ class FullScreenImage extends StatelessWidget {
                           quality: 100,
                           name: imageUrl);
                       Get.back();
-                      snackBar(title: "사진 저장 성공", content: "사진이 저장되었어요");
+                      snackBar(title: "사진이 저장되었습니다", content: "앨범을 확인해 주세요");
                     } catch (e) {
                       print(e.toString());
-                      snackBar(title: "사진 저장 실패", content: e.toString());
+                      snackBar(title: "사진이 저장되지 않았습니다", content: "잠시 후 다시 시도해 주세요");
                     }
                   },
                   buttonColor: AppColor.objectColor,

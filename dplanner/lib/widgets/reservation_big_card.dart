@@ -18,7 +18,7 @@ import '../models/reservation_model.dart';
 import '../pages/error_page.dart';
 import '../services/club_member_api_service.dart';
 import '../services/reservation_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import 'full_screen_image.dart';
 import 'nextpage_button.dart';
 import 'outline_textform.dart';
@@ -1435,9 +1435,7 @@ class ReservationBigCard extends StatelessWidget {
                                           onTap: onTap);
                                     } catch (e) {
                                       print(e.toString());
-                                      snackBar(
-                                          title: "예약 취소 실패",
-                                          content: e.toString());
+                                      snackBar(title: "예약을 취소하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                                     }
                                   },
                                 ),
@@ -1488,9 +1486,7 @@ class ReservationBigCard extends StatelessWidget {
                                       Get.back();
                                     } catch (e) {
                                       print(e.toString());
-                                      snackBar(
-                                          title: "예약 수정 실패",
-                                          content: e.toString());
+                                      snackBar(title: "예약을 수정하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                                     }
                                   }
                                 },
@@ -1575,7 +1571,7 @@ class ReservationBigCard extends StatelessWidget {
                       Get.back();
                     } catch (e) {
                       print(e.toString());
-                      snackBar(title: "예약 취소 실패", content: e.toString());
+                      snackBar(title: "예약을 취소하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                     }
                   },
                 ),

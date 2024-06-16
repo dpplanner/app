@@ -4,7 +4,8 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/bottom_bar.dart';
 import 'package:dplanner/services/club_alert_api_service.dart';
 import 'package:dplanner/models/club_alert_message_model.dart';
@@ -18,6 +19,7 @@ class NotificationPage extends StatefulWidget {
 
 class _NotificationPageState extends State<NotificationPage> {
   Future<List<AlertMessageModel>>? alertListFuture;
+  Map<String, String?> params = Get.parameters;
 
   @override
   void initState() {
@@ -59,18 +61,24 @@ class _NotificationPageState extends State<NotificationPage> {
               } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                 final alerts = snapshot.data!;
                 return Column(
-                  children: alerts
-                      .map((alert) => NotificationCard(
-                            id: alert.id,
-                            type: alert.type,
-                            title: alert.title,
-                            content: alert.content,
-                            isRead: alert.isRead,
-                            redirectUrl: alert.redirectUrl,
-                            infoType: alert.infoType,
-                            info: alert.info,
-                          ))
-                      .toList(),
+                  children: [
+                    const BannerAdWidget(),
+                    Column(
+                      children: alerts
+                          .map((alert) => NotificationCard(
+                                id: alert.id,
+                                type: alert.type,
+                                title: alert.title,
+                                content: alert.content,
+                                isRead: alert.isRead,
+                                redirectUrl: alert.redirectUrl,
+                                infoType: alert.infoType,
+                                info: alert.info,
+                                isSelected: params.containsKey("id") && int.parse(params["id"]!) == alert.id
+                              ))
+                          .toList(),
+                    ),
+                  ],
                 );
               } else {
                 return const Center(child: Text("알림이 없습니다."));

@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
 import '../models/reservation_model.dart';
-import '../style.dart';
+import '../const/style.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/reservation_admin_card.dart';
 import 'error_page.dart';
 import 'loading_page.dart';
@@ -99,22 +100,27 @@ class _ClubReservationListTab2PageState
                         builder: (BuildContext context,
                             AsyncSnapshot<List<ReservationModel>> snapshot) {
                           if (snapshot.data == null && !_isLoading) {
-                            return ConstrainedBox(
-                              constraints: BoxConstraints(
-                                  minHeight: constraints.maxHeight),
-                              child: const Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Center(
-                                    child: Text(
-                                      "승인한 예약이 없어요",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16),
-                                    ),
+                            return Column(
+                              children: [
+                                const BannerAdWidget(),
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                      minHeight: constraints.maxHeight - 50),
+                                  child: const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Center(
+                                        child: Text(
+                                          "승인한 예약이 없어요",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             );
                           } else if (snapshot.hasError) {
                             return ErrorPage(constraints: constraints);
@@ -123,54 +129,60 @@ class _ClubReservationListTab2PageState
                               snapshot.hasData == false) {
                             return LoadingPage(constraints: constraints);
                           } else {
-                            return Padding(
-                              padding: const EdgeInsets.all(24),
-                              child: Column(
-                                children: List.generate(
-                                  snapshot.data!.length,
-                                  (index) => Column(
-                                    children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 12.0),
-                                        child: ReservationAdminCard(
-                                          type: 2,
-                                          reservation: snapshot.data![index],
-                                          onTap: () async {
-                                            setState(() {
-                                              _currentPage = 0;
-                                            });
-                                            _fetchConfirmedReservations();
-                                          },
-                                        ),
-                                      ),
-                                      if (DateTime.parse(
-                                              snapshot.data![index].endDateTime)
-                                          .isBefore(DateTime.now()))
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 12.0),
-                                          child: Row(
-                                            children: [
-                                              const Padding(
-                                                padding: EdgeInsets.only(
-                                                    left: 5, right: 5),
-                                                child: Icon(
-                                                    SFSymbols
-                                                        .arrow_turn_down_right,
-                                                    color: AppColor.subColor3),
-                                              ),
-                                              Expanded(
-                                                  child: ReservationReturnCard(
-                                                      reservation: snapshot
-                                                          .data![index]))
-                                            ],
+                            return Column(
+                              children: [
+                                const BannerAdWidget(),
+                                const SizedBox(height: 8),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 24),
+                                  child: Column(
+                                    children: List.generate(
+                                      snapshot.data!.length,
+                                      (index) => Column(
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(bottom: 12.0),
+                                            child: ReservationAdminCard(
+                                              type: 2,
+                                              reservation: snapshot.data![index],
+                                              onTap: () async {
+                                                setState(() {
+                                                  _currentPage = 0;
+                                                });
+                                                _fetchConfirmedReservations();
+                                              },
+                                            ),
                                           ),
-                                        )
-                                    ],
+                                          if (DateTime.parse(
+                                                  snapshot.data![index].endDateTime)
+                                              .isBefore(DateTime.now()))
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 12.0),
+                                              child: Row(
+                                                children: [
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 5, right: 5),
+                                                    child: Icon(
+                                                        SFSymbols
+                                                            .arrow_turn_down_right,
+                                                        color: AppColor.subColor3),
+                                                  ),
+                                                  Expanded(
+                                                      child: ReservationReturnCard(
+                                                          reservation: snapshot
+                                                              .data![index]))
+                                                ],
+                                              ),
+                                            )
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                              ],
                             );
                           }
                         }),

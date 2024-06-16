@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 import '../controllers/club.dart';
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 
 class ClubCreateSuccessPage extends StatefulWidget {
   const ClubCreateSuccessPage({super.key});

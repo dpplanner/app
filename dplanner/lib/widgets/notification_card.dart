@@ -1,7 +1,7 @@
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/club_member_model.dart';
 import 'package:dplanner/pages/post_page.dart';
-import 'package:dplanner/style.dart';
+import 'package:dplanner/const/style.dart';
 import 'package:flutter/material.dart';
 import 'package:dplanner/services/club_alert_api_service.dart';
 import 'package:flutter_svg/svg.dart';
@@ -20,6 +20,7 @@ class NotificationCard extends StatefulWidget {
   final String redirectUrl;
   final AlertMessageInfoType infoType;
   final String? info;
+  final bool isSelected;
 
   const NotificationCard({
     super.key,
@@ -30,7 +31,8 @@ class NotificationCard extends StatefulWidget {
     required this.isRead,
     required this.redirectUrl,
     required this.infoType,
-    required this.info
+    required this.info,
+    required this.isSelected
   });
 
   @override
@@ -39,32 +41,20 @@ class NotificationCard extends StatefulWidget {
 
 class _NotificationCardState extends State<NotificationCard> {
   late bool isRead = widget.isRead;
-  
+  late bool isSelected = widget.isSelected;
+
   @override
   Widget build(BuildContext context) {
+    if (isSelected) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _handleMessage());
+      Get.parameters.clear();
+      setState(() {
+        isSelected = false;
+      });
+    }
+
     return GestureDetector(
-      onTap: () async {
-        await ClubAlertApiService.markAsRead(widget.id);
-
-        setState(() {
-          isRead = true;
-        });
-
-        switch(widget.infoType) {
-          case AlertMessageInfoType.MEMBER:
-            _handleMemberNotification();
-
-          case AlertMessageInfoType.POST:
-            _handlePostNotification();
-
-          case AlertMessageInfoType.RESERVATION:
-            await _handleReservationNotification();
-
-          default:
-            // 데이터가 잘못된 케이스(NOTHING)
-            print("[Error] infoType = ${widget.infoType}");
-        }
-      },
+      onTap: _handleMessage,
       child: Container(
         color: (!isRead)
             ? AppColor.markColor.withOpacity(0.15)
@@ -90,13 +80,13 @@ class _NotificationCardState extends State<NotificationCard> {
                       child: Text(
                         widget.title,
                         style: const TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 18),
+                            fontWeight: FontWeight.w600, fontSize: 16),
                       ),
                     ),
                     Text(
                       widget.content,
                       style: const TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 15),
+                          fontWeight: FontWeight.w500, fontSize: 14),
                     ),
                   ],
                 ),
@@ -107,6 +97,29 @@ class _NotificationCardState extends State<NotificationCard> {
       ),
     );
   }
+
+  void _handleMessage() async {
+      await ClubAlertApiService.markAsRead(widget.id);
+
+      setState(() {
+        isRead = true;
+      });
+
+      switch(widget.infoType) {
+        case AlertMessageInfoType.MEMBER:
+          _handleMemberNotification();
+
+        case AlertMessageInfoType.POST:
+          _handlePostNotification();
+
+        case AlertMessageInfoType.RESERVATION:
+          await _handleReservationNotification();
+
+        default:
+          // 데이터가 잘못된 케이스(NOTHING)
+          print("[Error] infoType = ${widget.infoType}");
+      }
+    }
 
   bool hasAuthority(String authority) {
     ClubMemberModel user = MemberController.to.clubMember();
@@ -179,7 +192,7 @@ class _NotificationCardState extends State<NotificationCard> {
       _toMyReservationPage(reservationId: reservationId, isPast: true, rejected: null);
     } else if (hasAuthority("SCHEDULE_ALL")) { // 권한 변경 후에도 들어가는거 방지
       // 예약 요청 -> 예약 관리 - 승인된 이후에도 동일하게
-      Get.toNamed("/reservation_list", parameters: {"reservationId": reservationId});
+      _toReservationManagePage(reservationId: reservationId);
     }
 
   }
@@ -207,6 +220,16 @@ class _NotificationCardState extends State<NotificationCard> {
       String reservationId = widget.info!;
       await _toMyReservationPage(reservationId: reservationId, isPast: (await _isPastReservation(reservationId)), rejected: null);
     }
+  }
+
+  Future<void> _toReservationManagePage({required String reservationId}) async {
+    ReservationModel reservation = await ReservationApiService.getReservation(reservationId: int.parse(reservationId));
+
+    Map<String, String>? params = {};
+    params.putIfAbsent("reservationId", () => reservationId);
+    params.putIfAbsent("status", () => reservation.status);
+
+    Get.toNamed("/reservation_list", parameters: params);
   }
 
   Future<void> _toMyReservationPage({

@@ -15,9 +15,9 @@ import '../controllers/size.dart';
 import '../models/club_member_model.dart';
 import '../services/club_manager_api_service.dart';
 import '../services/club_member_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/nextpage_button.dart';
-import '../widgets/outline_textform.dart';
 import 'error_page.dart';
 import 'loading_page.dart';
 
@@ -29,9 +29,9 @@ class ClubMemberListPage extends StatefulWidget {
 }
 
 class _ClubMemberListPageState extends State<ClubMemberListPage> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController searchPost = TextEditingController();
-  bool _isFocused = false;
+  // final _formKey = GlobalKey<FormState>();
+  // final TextEditingController searchPost = TextEditingController();
+  // bool _isFocused = false;
   final Map<String, String?> params = Get.parameters;
 
   final StreamController<List<ClubMemberModel>> streamController =
@@ -47,7 +47,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
 
   @override
   void dispose() {
-    searchPost.dispose();
+    // searchPost.dispose();
     streamController.close();
     streamController2.close();
     super.dispose();
@@ -90,30 +90,31 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              color: AppColor.backgroundColor,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 6, 24, 12),
-                child: Form(
-                    key: _formKey,
-                    child: OutlineTextForm(
-                      hintText: '클럽 회원 닉네임을 검색해보세요',
-                      controller: searchPost,
-                      isColored: true,
-                      icon: Icon(
-                        SFSymbols.search,
-                        color: _isFocused
-                            ? AppColor.objectColor
-                            : AppColor.textColor2,
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          _isFocused = value.isNotEmpty;
-                        });
-                      },
-                    )),
-              ),
-            ),
+            // todo 검색 생기면 주석 해제
+            // Container(
+            //   color: AppColor.backgroundColor,
+            //   child: Padding(
+            //     padding: const EdgeInsets.fromLTRB(24, 6, 24, 12),
+            //     child: Form(
+            //         key: _formKey,
+            //         child: OutlineTextForm(
+            //           hintText: '클럽 회원 닉네임을 검색해보세요',
+            //           controller: searchPost,
+            //           isColored: true,
+            //           icon: Icon(
+            //             SFSymbols.search,
+            //             color: _isFocused
+            //                 ? AppColor.objectColor
+            //                 : AppColor.textColor2,
+            //           ),
+            //           onChanged: (value) {
+            //             setState(() {
+            //               _isFocused = value.isNotEmpty;
+            //             });
+            //           },
+            //         )),
+            //   ),
+            // ),
             Flexible(
                 child: LayoutBuilder(
               builder: (context, constraints) => RefreshIndicator(
@@ -122,6 +123,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
                       children: [
+                        const BannerAdWidget(),
                         if (MemberController.to.clubMember().role == "ADMIN" ||
                             (MemberController.to
                                         .clubMember()
@@ -754,7 +756,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                           buttonColor: AppColor.objectColor,
                           onPressed: () async {
                             try {
-                              await ClubMemberApiService.patchMemberToClub(
+                              await ClubMemberApiService.confirmMemberToClub(
                                   clubMemberId: member.id,
                                   clubId: ClubController.to.club().id);
                               ClubController.to.club.value =
@@ -780,7 +782,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                             buttonColor: AppColor.markColor,
                             onPressed: () async {
                               try {
-                                await ClubMemberApiService.deleteClubMember(
+                                await ClubMemberApiService.rejectMemberToClub(
                                     clubMemberId: member.id,
                                     clubId: ClubController.to.club().id);
                                 getClubMemberList();

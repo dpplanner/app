@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../style.dart';
+import '../const/style.dart';
 
 void snackBar({required String title, required String content}) {
   // 기존 스낵바 닫기
@@ -10,11 +10,12 @@ void snackBar({required String title, required String content}) {
   }
 
   Get.snackbar(title, content,
-      borderRadius: 24,
+      borderRadius: 8,
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
-      colorText: AppColor.backgroundColor,
-      backgroundColor: AppColor.subColor3,
+      colorText: AppColor.textColor,
+      backgroundColor: AppColor.subColor2.withOpacity(0.85),
       snackPosition: SnackPosition.TOP,
-      animationDuration: const Duration(milliseconds: 200),
+      animationDuration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 1500),
       isDismissible: true);
 }

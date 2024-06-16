@@ -1,12 +1,13 @@
-import 'package:dplanner/const.dart';
+import 'package:dplanner/const/const.dart';
 import 'package:dplanner/pages/error_page.dart';
+import 'package:dplanner/pages/simple_info_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 
 class AppSettingPage extends StatefulWidget {
   const AppSettingPage({super.key});
@@ -63,7 +64,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
       body: SafeArea(
         child: Column(
           children: [
-            selectButton("가입 정보", () {}, false),
+            infoRow(title: "가입 정보", value: ""),
             FutureBuilder<String>(
                 future: findLoginInfo(),
                 builder:
@@ -72,7 +73,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
                     return const ErrorPage(constraints: BoxConstraints());
                   } else {
                     return Padding(
-                      padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 32),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -98,7 +99,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
 
                           ///TODO: 가입 날짜 받기
                           const Text(
-                            "23.09.10",
+                            "",
                             style: TextStyle(
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
@@ -109,53 +110,59 @@ class _AppSettingPageState extends State<AppSettingPage> {
                     );
                   }
                 }),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                selectButton("앱 버전 정보", () async {
-                  String? a = await storage.read(key: loginInfo);
-                  print(a);
-                }, false),
-                const Padding(
-                  padding: EdgeInsets.only(right: 32.0),
-                  child: Text(
-                    "v1.0.2",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                        color: AppColor.textColor2),
-                  ),
-                ),
-              ],
+            infoRow(title: "앱 버전", value: appVersion),
+            // buttonRow(title: "푸시 알림 설정", onTap: () {}),
+            buttonRow(title: "개인정보 처리방침",
+                onTap: () => Get.to(const SimpleInfoPage(title: "개인정보 처리방침", filePath: "assets/texts/privacy_info.txt"))
             ),
-            selectButton("푸시 알림 설정", () {}, false),
-            selectButton("뭔가 설정", () {}, false),
+            buttonRow(title: "서비스 이용약관",
+                onTap: () => Get.to(const SimpleInfoPage(title: "서비스 이용약관", filePath: "assets/texts/service_term_info.txt"))
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget selectButton(
-    String title,
-    void Function()? onTap,
-    bool isIcon,
-  ) {
+  Widget buttonRow({
+    required String title,
+    required void Function()? onTap,}) {
     return TextButton(
       style: TextButton.styleFrom(
         foregroundColor: AppColor.textColor,
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
         backgroundColor: AppColor.backgroundColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(0),
         ),
       ),
       onPressed: onTap,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 4, 8, 4),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColor.textColor),
+          ),
+          const Icon(
+            SFSymbols.chevron_right,
+            size: 20,
+            color: AppColor.textColor,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget infoRow({required String title, required String value}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
             Text(
               title,
               style: const TextStyle(
@@ -163,14 +170,14 @@ class _AppSettingPageState extends State<AppSettingPage> {
                   fontWeight: FontWeight.w600,
                   color: AppColor.textColor),
             ),
-            if (isIcon)
-              const Icon(
-                SFSymbols.chevron_right,
-                size: 20,
-                color: AppColor.textColor,
-              ),
-          ],
-        ),
+          Text(
+            value,
+            style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppColor.textColor2),
+          ),
+        ],
       ),
     );
   }

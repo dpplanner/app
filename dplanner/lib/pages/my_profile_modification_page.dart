@@ -11,7 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import '../controllers/size.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/underline_textform.dart';
@@ -266,9 +266,7 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                                   image: file);
                         } catch (e) {
                           print(e.toString());
-                          snackBar(
-                              title: "프로필 편집하는데 오류가 발생하였습니다.",
-                              content: e.toString());
+                          snackBar(title: "프로필을 편집하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                         }
                       }
                       if ((myName.text !=
@@ -284,9 +282,7 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                                   info: myContent.text);
                         } catch (e) {
                           print(e.toString());
-                          snackBar(
-                              title: "프로필 편집하는데 오류가 발생하였습니다.",
-                              content: e.toString());
+                          snackBar(title: "프로필을 편집하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                         }
                       }
                       Get.offAllNamed('/tab3', arguments: 2);

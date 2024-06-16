@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../services/club_api_service.dart';
-import '../style.dart';
+import '../const/style.dart';
 import '../widgets/image_button.dart';
 import '../widgets/nextpage_button.dart';
 
