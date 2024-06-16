@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import '../controllers/posts.dart';
 import '../pages/loading_page.dart';
 import '../const/style.dart';
+import 'banner_ad_widget.dart';
 
 class MyActivityPosts extends StatefulWidget {
   final Future<void> Function(int clubMemberID, int page) fetchPosts;
@@ -62,48 +63,59 @@ class _MyActivityPostsState extends State<MyActivityPosts> {
                     if (_isLoading.value) {
                       return LoadingPage(constraints: constraints);
                     } else if (PostController.to.posts.isEmpty) {
-                      return ConstrainedBox(
-                        constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight),
-                        child: Container(
-                          color: AppColor.backgroundColor2,
-                          child: const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Center(
-                                child: Text(
-                                  "게시글이 없어요",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16),
-                                ),
+                      return Column(
+                        children: [
+                          const BannerAdWidget(),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                                minHeight: constraints.maxHeight),
+                            child: Container(
+                              color: AppColor.backgroundColor2,
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Center(
+                                    child: Text(
+                                      "게시글이 없어요",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
                       );
                     } else {
                       return ConstrainedBox(
                         constraints: BoxConstraints(minHeight: constraints.maxHeight),
                         child: Container(
                             color: AppColor.backgroundColor2,
-                            child: Padding(
-                                padding: const EdgeInsets.fromLTRB(18, 24, 24, 24),
-                                child: Column(
-                                  children: List.generate(
-                                      PostController.to.posts.length,
-                                          (index) => Padding(
-                                        padding: const EdgeInsets.only(bottom: 12.0),
-                                        child: PostMiniCard(
-                                          id: PostController.to.posts[index].value.id,
-                                          title: PostController.to.posts[index].value.title ?? '제목 없음',
-                                          content: PostController.to.posts[index].value.content,
-                                          dateTime: PostController.to.posts[index].value.createdTime,
-                                          isPhoto: PostController.to.posts[index].value.attachmentsUrl.isNotEmpty,
-                                        ),
-                                      )
-                                  ),
-                                )
+                            child: Column(
+                              children: [
+                                const BannerAdWidget(),
+                                const SizedBox(height: 8,),
+                                Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 24),
+                                    child: Column(
+                                      children: List.generate(
+                                          PostController.to.posts.length,
+                                              (index) => Padding(
+                                            padding: const EdgeInsets.only(bottom: 12.0),
+                                            child: PostMiniCard(
+                                              id: PostController.to.posts[index].value.id,
+                                              title: PostController.to.posts[index].value.title ?? '제목 없음',
+                                              content: PostController.to.posts[index].value.content,
+                                              dateTime: PostController.to.posts[index].value.createdTime,
+                                              isPhoto: PostController.to.posts[index].value.attachmentsUrl.isNotEmpty,
+                                            ),
+                                          )
+                                      ),
+                                    )
+                                ),
+                              ],
                             )
                         ),
                       );

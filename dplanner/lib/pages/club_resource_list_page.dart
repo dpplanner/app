@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../const/style.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/underline_textform.dart';
@@ -104,139 +105,146 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
           ),
         ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                Expanded(
-                    child: LayoutBuilder(
-                  builder: (context, constraints) => SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
-                          child: Text(
-                            "공간",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 18),
+          child: Column(
+            children: [
+              const BannerAdWidget(),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 24),
+                  child: Column(
+                    children: [
+                      Expanded(
+                          child: LayoutBuilder(
+                        builder: (context, constraints) => SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.only(top: 16.0, bottom: 16.0),
+                                child: Text(
+                                  "공간",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600, fontSize: 18),
+                                ),
+                              ),
+                              StreamBuilder(
+                                  stream: _streamController.stream,
+                                  builder:
+                                      (BuildContext context, AsyncSnapshot snapshot) {
+                                    if (snapshot.connectionState ==
+                                            ConnectionState.waiting ||
+                                        snapshot.hasData == false) {
+                                      return LoadingPage(constraints: constraints);
+                                    } else if (snapshot.hasError) {
+                                      return ErrorPage(constraints: constraints);
+                                    } else if (snapshot.data[0].length == 0) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: SizedBox(
+                                          width: SizeController.to.screenWidth,
+                                          child: const Text(
+                                            "아직 아무것도 없어요",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 15,
+                                                color: AppColor.textColor2),
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return Column(
+                                          children: List.generate(
+                                              snapshot.data[0].length, (index) {
+                                        return resourceCard(
+                                            resource: snapshot.data[0][index]);
+                                      }));
+                                    }
+                                  }),
+                              const Padding(
+                                padding: EdgeInsets.only(top: 32.0, bottom: 16.0),
+                                child: Text(
+                                  "물건",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600, fontSize: 18),
+                                ),
+                              ),
+                              StreamBuilder(
+                                  stream: _streamController.stream,
+                                  builder:
+                                      (BuildContext context, AsyncSnapshot snapshot) {
+                                    if (snapshot.connectionState ==
+                                            ConnectionState.waiting ||
+                                        snapshot.hasData == false) {
+                                      return LoadingPage(constraints: constraints);
+                                    } else if (snapshot.hasError) {
+                                      return ErrorPage(constraints: constraints);
+                                    } else if (snapshot.data[1].length == 0) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: SizedBox(
+                                          width: SizeController.to.screenWidth,
+                                          child: const Text(
+                                            "아직 아무것도 없어요",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 15,
+                                                color: AppColor.textColor2),
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return Column(
+                                          children: List.generate(
+                                              snapshot.data[1].length, (index) {
+                                        return resourceCard(
+                                            resource: snapshot.data[1][index]);
+                                      }));
+                                    }
+                                  }),
+                            ],
                           ),
                         ),
-                        StreamBuilder(
-                            stream: _streamController.stream,
-                            builder:
-                                (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.connectionState ==
-                                      ConnectionState.waiting ||
-                                  snapshot.hasData == false) {
-                                return LoadingPage(constraints: constraints);
-                              } else if (snapshot.hasError) {
-                                return ErrorPage(constraints: constraints);
-                              } else if (snapshot.data[0].length == 0) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: SizedBox(
-                                    width: SizeController.to.screenWidth,
-                                    child: const Text(
-                                      "아직 아무것도 없어요",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 15,
-                                          color: AppColor.textColor2),
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                return Column(
-                                    children: List.generate(
-                                        snapshot.data[0].length, (index) {
-                                  return resourceCard(
-                                      resource: snapshot.data[0][index]);
-                                }));
-                              }
-                            }),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 32.0, bottom: 16.0),
-                          child: Text(
-                            "물건",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 18),
-                          ),
-                        ),
-                        StreamBuilder(
-                            stream: _streamController.stream,
-                            builder:
-                                (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.connectionState ==
-                                      ConnectionState.waiting ||
-                                  snapshot.hasData == false) {
-                                return LoadingPage(constraints: constraints);
-                              } else if (snapshot.hasError) {
-                                return ErrorPage(constraints: constraints);
-                              } else if (snapshot.data[1].length == 0) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: SizedBox(
-                                    width: SizeController.to.screenWidth,
-                                    child: const Text(
-                                      "아직 아무것도 없어요",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 15,
-                                          color: AppColor.textColor2),
-                                    ),
-                                  ),
-                                );
-                              } else {
-                                return Column(
-                                    children: List.generate(
-                                        snapshot.data[1].length, (index) {
-                                  return resourceCard(
-                                      resource: snapshot.data[1][index]);
-                                }));
-                              }
-                            }),
-                      ],
-                    ),
+                      )),
+                      (MemberController.to.clubMember().role == "ADMIN" ||
+                              (MemberController.to.clubMember().clubAuthorityTypes !=
+                                      null &&
+                                  MemberController.to
+                                      .clubMember()
+                                      .clubAuthorityTypes!
+                                      .contains("RESOURCE_ALL")))
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                              child: NextPageButton(
+                                text: const Text(
+                                  "공유 물품 추가하기",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColor.backgroundColor),
+                                ),
+                                buttonColor: AppColor.objectColor,
+                                onPressed: () {
+                                  addResource(
+                                      types: 0,
+                                      resource: ResourceModel(
+                                          id: 0,
+                                          name: "",
+                                          info: "",
+                                          returnMessageRequired: false,
+                                          resourceType: "",
+                                          notice: "",
+                                          clubId: 0,
+                                          bookableSpan: 0));
+                                },
+                              ),
+                            )
+                          : Container()
+                    ],
                   ),
-                )),
-                (MemberController.to.clubMember().role == "ADMIN" ||
-                        (MemberController.to.clubMember().clubAuthorityTypes !=
-                                null &&
-                            MemberController.to
-                                .clubMember()
-                                .clubAuthorityTypes!
-                                .contains("RESOURCE_ALL")))
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                        child: NextPageButton(
-                          text: const Text(
-                            "공유 물품 추가하기",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColor.backgroundColor),
-                          ),
-                          buttonColor: AppColor.objectColor,
-                          onPressed: () {
-                            addResource(
-                                types: 0,
-                                resource: ResourceModel(
-                                    id: 0,
-                                    name: "",
-                                    info: "",
-                                    returnMessageRequired: false,
-                                    resourceType: "",
-                                    notice: "",
-                                    clubId: 0,
-                                    bookableSpan: 0));
-                          },
-                        ),
-                      )
-                    : Container()
-              ],
-            ),
+                ),
+              ),
+            ],
           ),
         ));
   }

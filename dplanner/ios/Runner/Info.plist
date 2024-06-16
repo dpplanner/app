@@ -120,5 +120,7 @@
 	<string>dplanner</string>
 	<key>naverServiceAppUrlScheme</key>
 	<string>dplanner</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-8322251544420951~8757451984</string>
 </dict>
 </plist>

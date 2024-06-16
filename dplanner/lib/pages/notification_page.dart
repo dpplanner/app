@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../const/style.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/bottom_bar.dart';
 import 'package:dplanner/services/club_alert_api_service.dart';
 import 'package:dplanner/models/club_alert_message_model.dart';
@@ -60,19 +61,24 @@ class _NotificationPageState extends State<NotificationPage> {
               } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                 final alerts = snapshot.data!;
                 return Column(
-                  children: alerts
-                      .map((alert) => NotificationCard(
-                            id: alert.id,
-                            type: alert.type,
-                            title: alert.title,
-                            content: alert.content,
-                            isRead: alert.isRead,
-                            redirectUrl: alert.redirectUrl,
-                            infoType: alert.infoType,
-                            info: alert.info,
-                            isSelected: params.containsKey("id") && int.parse(params["id"]!) == alert.id
-                          ))
-                      .toList(),
+                  children: [
+                    const BannerAdWidget(),
+                    Column(
+                      children: alerts
+                          .map((alert) => NotificationCard(
+                                id: alert.id,
+                                type: alert.type,
+                                title: alert.title,
+                                content: alert.content,
+                                isRead: alert.isRead,
+                                redirectUrl: alert.redirectUrl,
+                                infoType: alert.infoType,
+                                info: alert.info,
+                                isSelected: params.containsKey("id") && int.parse(params["id"]!) == alert.id
+                              ))
+                          .toList(),
+                    ),
+                  ],
                 );
               } else {
                 return const Center(child: Text("알림이 없습니다."));

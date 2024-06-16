@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../models/reservation_model.dart';
 import '../const/style.dart';
+import '../widgets/banner_ad_widget.dart';
 import 'error_page.dart';
 import 'loading_page.dart';
 
@@ -87,22 +88,27 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                           builder: (BuildContext context,
                               AsyncSnapshot<List<ReservationModel>> snapshot) {
                             if (snapshot.data == null) {
-                              return ConstrainedBox(
-                                constraints: BoxConstraints(
-                                    minHeight: constraints.maxHeight),
-                                child: const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Center(
-                                      child: Text(
-                                        "다가오는 예약이 없어요",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 16),
-                                      ),
+                              return Column(
+                                children: [
+                                  const BannerAdWidget(),
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                        minHeight: constraints.maxHeight - 50),
+                                    child: const Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Center(
+                                          child: Text(
+                                            "다가오는 예약이 없어요",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               );
                             } else if (snapshot.hasError) {
                               return ErrorPage(constraints: constraints);
@@ -112,80 +118,86 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                               return LoadingPage(constraints: constraints);
                             } else {
                               List<ReservationModel> data = _addEmptyReservation(snapshot.data!);
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(24, 24, 24, 24),
-                                child: Column(
-                                  children: List.generate(data.length,
-                                      (index) {
+                              return Column(
+                                children: [
+                                  const BannerAdWidget(),
+                                  const SizedBox(height: 8,),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 0, horizontal: 24),
+                                    child: Column(
+                                      children: List.generate(data.length,
+                                          (index) {
 
-                                    final difference = _getDateDiffFromNow(data[index]);
+                                        final difference = _getDateDiffFromNow(data[index]);
 
-                                    String dateText;
-                                    bool isWritten = false;
-                                    if (difference == 0) {
-                                      dateText = "오늘";
-                                    } else if (difference == 1) {
-                                      dateText = "내일";
-                                    } else {
-                                      dateText = "그외";
-                                    }
+                                        String dateText;
+                                        bool isWritten = false;
+                                        if (difference == 0) {
+                                          dateText = "오늘";
+                                        } else if (difference == 1) {
+                                          dateText = "내일";
+                                        } else {
+                                          dateText = "그외";
+                                        }
 
-                                    if (index != 0 && lastDay == dateText) {
-                                      isWritten = true;
-                                    }
-                                    lastDay = dateText;
+                                        if (index != 0 && lastDay == dateText) {
+                                          isWritten = true;
+                                        }
+                                        lastDay = dateText;
 
-                                    var endTime = DateFormat.H().format(
-                                        DateTime.parse(
-                                            data[index].endDateTime));
-                                    if (endTime == "00") {
-                                      endTime = "24";
-                                    }
-                                    if (endTime.startsWith("0")) {
-                                      endTime = endTime.substring(1);
-                                    }
+                                        var endTime = DateFormat.H().format(
+                                            DateTime.parse(
+                                                data[index].endDateTime));
+                                        if (endTime == "00") {
+                                          endTime = "24";
+                                        }
+                                        if (endTime.startsWith("0")) {
+                                          endTime = endTime.substring(1);
+                                        }
 
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 12.0),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                0, 5, 18, 0),
-                                            child: Text(
-                                              dateText,
-                                              style: TextStyle(
-                                                  color: isWritten
-                                                      ? AppColor
-                                                          .backgroundColor2
-                                                      : AppColor.textColor,
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 16),
-                                            ),
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 12.0),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.fromLTRB(
+                                                    0, 5, 18, 0),
+                                                child: Text(
+                                                  dateText,
+                                                  style: TextStyle(
+                                                      color: isWritten
+                                                          ? AppColor
+                                                              .backgroundColor2
+                                                          : AppColor.textColor,
+                                                      fontWeight: FontWeight.w700,
+                                                      fontSize: 16),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                child: ReservationBigCard(
+                                                  onTap: () async {
+                                                    setState(() {
+                                                      _currentPage = 0;
+                                                      lastDay = '';
+                                                    });
+                                                    _fetchUpcomingReservations();
+                                                  },
+                                                  reservation: data[index],
+                                                  isRecent: dateText == "오늘",
+                                                  endTime: endTime,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          Expanded(
-                                            child: ReservationBigCard(
-                                              onTap: () async {
-                                                setState(() {
-                                                  _currentPage = 0;
-                                                  lastDay = '';
-                                                });
-                                                _fetchUpcomingReservations();
-                                              },
-                                              reservation: data[index],
-                                              isRecent: dateText == "오늘",
-                                              endTime: endTime,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }),
-                                ),
+                                        );
+                                      }),
+                                    ),
+                                  ),
+                                ],
                               );
                             }
                           }),

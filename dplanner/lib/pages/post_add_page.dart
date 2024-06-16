@@ -8,6 +8,7 @@ import 'dart:io';
 
 import '../controllers/size.dart';
 import '../const/style.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/underline_textform.dart';
 import 'package:dplanner/models/post_model.dart';
@@ -121,6 +122,7 @@ class _PostAddPageState extends State<PostAddPage> {
       body: SafeArea(
         child: Column(
           children: [
+            const BannerAdWidget(),
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 0),
               child: Form(

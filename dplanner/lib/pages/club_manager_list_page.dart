@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/widgets/snack_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -12,6 +13,7 @@ import '../controllers/size.dart';
 import '../models/club_manager_model.dart';
 import '../services/club_manager_api_service.dart';
 import '../const/style.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/underline_textform.dart';
 import 'error_page.dart';
@@ -81,74 +83,81 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
           ),
         ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) => RefreshIndicator(
-                        onRefresh: getClubManagerList,
-                        child: SingleChildScrollView(
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          child: StreamBuilder(
-                              stream: _streamController.stream,
-                              builder: (BuildContext context,
-                                  AsyncSnapshot snapshot) {
-                                if (snapshot.connectionState ==
-                                        ConnectionState.waiting ||
-                                    snapshot.hasData == false) {
-                                  return LoadingPage(constraints: constraints);
-                                } else if (snapshot.hasError) {
-                                  return ErrorPage(constraints: constraints);
-                                } else if (snapshot.data.length == 0) {
-                                  return SizedBox(
-                                    width: SizeController.to.screenWidth,
-                                    child: const Text(
-                                      "아직 아무것도 없어요",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 15,
-                                          color: AppColor.textColor2),
-                                    ),
-                                  );
-                                } else {
-                                  return Column(
-                                      children: List.generate(
-                                          snapshot.data.length, (index) {
-                                    return managerCard(
-                                        manager: snapshot.data[index]);
-                                  }));
-                                }
-                              }),
-                        )),
+          child: Column(
+            children: [
+              const BannerAdWidget(),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 24),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: LayoutBuilder(
+                          builder: (context, constraints) => RefreshIndicator(
+                              onRefresh: getClubManagerList,
+                              child: SingleChildScrollView(
+                                physics: const AlwaysScrollableScrollPhysics(),
+                                child: StreamBuilder(
+                                    stream: _streamController.stream,
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot snapshot) {
+                                      if (snapshot.connectionState ==
+                                              ConnectionState.waiting ||
+                                          snapshot.hasData == false) {
+                                        return LoadingPage(constraints: constraints);
+                                      } else if (snapshot.hasError) {
+                                        return ErrorPage(constraints: constraints);
+                                      } else if (snapshot.data.length == 0) {
+                                        return SizedBox(
+                                          width: SizeController.to.screenWidth,
+                                          child: const Text(
+                                            "아직 아무것도 없어요",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 15,
+                                                color: AppColor.textColor2),
+                                          ),
+                                        );
+                                      } else {
+                                        return Column(
+                                            children: List.generate(
+                                                snapshot.data.length, (index) {
+                                          return managerCard(
+                                              manager: snapshot.data[index]);
+                                        }));
+                                      }
+                                    }),
+                              )),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                        child: NextPageButton(
+                          text: const Text(
+                            "매니저 추가하기",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColor.backgroundColor),
+                          ),
+                          buttonColor: AppColor.objectColor,
+                          onPressed: () {
+                            addManager(
+                                types: 0,
+                                manager: ClubManagerModel(
+                                    id: 0,
+                                    clubId: ClubController.to.club().id,
+                                    name: "",
+                                    description: '',
+                                    authorities: []));
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                  child: NextPageButton(
-                    text: const Text(
-                      "매니저 추가하기",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: AppColor.backgroundColor),
-                    ),
-                    buttonColor: AppColor.objectColor,
-                    onPressed: () {
-                      addManager(
-                          types: 0,
-                          manager: ClubManagerModel(
-                              id: 0,
-                              clubId: ClubController.to.club().id,
-                              name: "",
-                              description: '',
-                              authorities: []));
-                    },
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ));
   }
