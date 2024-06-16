@@ -68,7 +68,25 @@ class _ClubReservationListPageState extends State<ClubReservationListPage> {
           ClubReservationListTab2Page(),
           ClubReservationListTab3Page(),
         ],
+        initialIndex: getInitialTab(),
       ),
     );
+  }
+
+  int getInitialTab() {
+    Map<String, String?> params = Get.parameters;
+
+    if (params.containsKey("status") && params["status"] != null) {
+      if (params["status"] == "REJECTED") {
+        // 거절한 예약
+        return 2;
+      } else if (params["status"] == "CONFIRMED") {
+        // 승인한 예약
+        return 1;
+      }
+    }
+
+    // 승인 대기중(default)
+    return 0;
   }
 }

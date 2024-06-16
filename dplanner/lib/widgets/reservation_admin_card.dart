@@ -29,15 +29,17 @@ class ReservationAdminCard extends StatelessWidget {
     Map<String, String?> params = Get.parameters;
     return params.containsKey("reservationId")
         && params["reservationId"] != null
-        && int.parse(params["reservationId"]!) == reservation.reservationId
-        && reservation.status == "REQUEST";
+        && int.parse(params["reservationId"]!) == reservation.reservationId;
   }
 
   @override
   Widget build(BuildContext context) {
     // 예약 요청 알림 메시지 눌러서 온거면 바텀시트 열기
     if (isFromNotification()) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getRequestInfo(reservation: reservation, types: 0));
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getRequestInfo(
+          reservation: reservation,
+          types: reservation.status != "REQUEST" ? reservation.status == "REJECTED" ? 3 : 2 : 1)
+      );
       Get.parameters.clear();
     }
     return GestureDetector(
@@ -485,6 +487,7 @@ class ReservationAdminCard extends StatelessWidget {
                               }
                               onTap();
                               Get.back();
+                              snackBar(title: "예약이 승인되었습니다", content: "예약 시간표를 확인해 주세요");
                             },
                           ),
                         ),
@@ -600,6 +603,7 @@ class ReservationAdminCard extends StatelessWidget {
                       onTap();
                       Get.back(); // 거절 사유 다이얼로그 닫기
                       Get.back(); // 바텀시트 닫기
+                      snackBar(title: "예약이 거절되었습니다", content: "예약 시간표를 확인해 주세요");
                     },
                   ),
                 ),

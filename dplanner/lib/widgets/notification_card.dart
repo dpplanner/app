@@ -41,12 +41,16 @@ class NotificationCard extends StatefulWidget {
 
 class _NotificationCardState extends State<NotificationCard> {
   late bool isRead = widget.isRead;
+  late bool isSelected = widget.isSelected;
 
   @override
   Widget build(BuildContext context) {
-    if (widget.isSelected) {
+    if (isSelected) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) => _handleMessage());
       Get.parameters.clear();
+      setState(() {
+        isSelected = false;
+      });
     }
 
     return GestureDetector(
@@ -188,7 +192,7 @@ class _NotificationCardState extends State<NotificationCard> {
       _toMyReservationPage(reservationId: reservationId, isPast: true, rejected: null);
     } else if (hasAuthority("SCHEDULE_ALL")) { // 권한 변경 후에도 들어가는거 방지
       // 예약 요청 -> 예약 관리 - 승인된 이후에도 동일하게
-      Get.toNamed("/reservation_list", parameters: {"reservationId": reservationId});
+      _toReservationManagePage(reservationId: reservationId);
     }
 
   }
@@ -216,6 +220,16 @@ class _NotificationCardState extends State<NotificationCard> {
       String reservationId = widget.info!;
       await _toMyReservationPage(reservationId: reservationId, isPast: (await _isPastReservation(reservationId)), rejected: null);
     }
+  }
+
+  Future<void> _toReservationManagePage({required String reservationId}) async {
+    ReservationModel reservation = await ReservationApiService.getReservation(reservationId: int.parse(reservationId));
+
+    Map<String, String>? params = {};
+    params.putIfAbsent("reservationId", () => reservationId);
+    params.putIfAbsent("status", () => reservation.status);
+
+    Get.toNamed("/reservation_list", parameters: params);
   }
 
   Future<void> _toMyReservationPage({
