@@ -34,11 +34,21 @@
 				<string>com.googleusercontent.apps.440122903298-gc2oikv36m4srpou58td5je36d3cpumv</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kakao32f8bf31b072c577a63d09db9d16ab5d://oauth</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>GIDClientID</key>
 	<string>440122903298-gc2oikv36m4srpou58td5je36d3cpumv.apps.googleusercontent.com</string>
+	<key>KAKAO_API_KEY</key>
+	<string>32f8bf31b072c577a63d09db9d16ab5d</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>naversearchapp</string>
