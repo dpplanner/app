@@ -16,7 +16,7 @@ flutter_native_splash:
   # size of the app. Only one parameter can be used, color and background_image cannot both be set.
   color: "#FFFFFF"
   image: assets/images/splash/dplanner_logo_512.png
-  branding: assets/images/splash/dplanner_text_splash.png
+  branding: assets/images/splash/dplanner_branding.png
   branding_mode: bottom
   fullscreen: true
   #background_image: "assets/background.png"
@@ -52,8 +52,8 @@ flutter_native_splash:
   # Following are Android 12 specific parameter.
   android_12:
     color: "#FFFFFF"
-    image: assets/images/splash/dplanner_logo_splash_android12.png
-    branding: assets/images/splash/dplanner_text_splash.png
+    image: assets/images/splash/dplanner_logo_512.png
+    branding: assets/images/splash/dplanner_branding.png
     branding_mode: bottom
     fullscreen: true
   # The image parameter sets the splash screen icon image.  If this parameter is not specified,

@@ -11,7 +11,7 @@
 
     <application
         android:requestLegacyExternalStorage="true"
-        android:label="Dplanner"
+        android:label="DPlanner"
         android:name="${applicationName}"
         android:icon="@mipmap/dplanner_logo">
         <activity

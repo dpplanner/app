@@ -95,6 +95,7 @@ Future<void> main() async {
 
   KakaoSdk.init(nativeAppKey: '32f8bf31b072c577a63d09db9d16ab5d');
 
+  FlutterNativeSplash.remove();
   runApp(const MyApp());
 }
 
