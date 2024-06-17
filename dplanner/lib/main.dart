@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:calendar_view/calendar_view.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/routes.dart';
@@ -8,6 +9,7 @@ import 'package:dplanner/services/club_api_service.dart';
 import 'package:dplanner/services/club_member_api_service.dart';
 import 'package:dplanner/services/token_api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -33,6 +35,9 @@ Future<void> main() async {
   final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  await _initAppTrackingPlugin();
+
   MobileAds.instance.initialize();
 
   await Firebase.initializeApp(
@@ -90,6 +95,7 @@ Future<void> main() async {
 
   KakaoSdk.init(nativeAppKey: '32f8bf31b072c577a63d09db9d16ab5d');
 
+  FlutterNativeSplash.remove();
   runApp(const MyApp());
 }
 
@@ -138,6 +144,19 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> _initAppTrackingPlugin() async {
+  try {
+    final TrackingStatus status = await AppTrackingTransparency.trackingAuthorizationStatus;
+    if (status == TrackingStatus.notDetermined) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      final TrackingStatus status = await AppTrackingTransparency.requestTrackingAuthorization();
+    }
+  } on PlatformException {
+    print("transparency setting fail");
+  }
+  final uuid = await AppTrackingTransparency.getAdvertisingIdentifier();
 }
 
 Future<void> _initLocalNotification() async {
