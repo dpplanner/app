@@ -34,6 +34,11 @@ final FlutterLocalNotificationsPlugin _localNotification = FlutterLocalNotificat
 Future<void> main() async {
   final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await _initAppTrackingPlugin();
@@ -95,7 +100,6 @@ Future<void> main() async {
 
   KakaoSdk.init(nativeAppKey: '32f8bf31b072c577a63d09db9d16ab5d');
 
-  FlutterNativeSplash.remove();
   runApp(const MyApp());
 }
 
