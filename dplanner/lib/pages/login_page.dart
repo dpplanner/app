@@ -4,10 +4,12 @@ import 'dart:io';
 import 'package:dplanner/decode_token.dart';
 import 'package:dplanner/widgets/image_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import '../const/const.dart';
 import '../controllers/club.dart';
 import '../controllers/member.dart';
@@ -16,10 +18,10 @@ import '../services/club_member_api_service.dart';
 import '../services/token_api_service.dart';
 import '../const/style.dart';
 
-import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+// import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_naver_login/flutter_naver_login.dart';
+// import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../widgets/snack_bar.dart';
@@ -144,25 +146,44 @@ class _LoginPageState extends State<LoginPage> {
 
   // 카카오 로그인
   Future<void> signInWithKakao() async {
+    // 카카오 로그인 구현 예제
+
+    // 카카오톡 실행 가능 여부 확인
+    // 카카오톡 실행이 가능하면 카카오톡으로 로그인, 아니면 카카오계정으로 로그인
+    if (await isKakaoTalkInstalled()) {
+      try {
+        OAuthToken token = await UserApi.instance.loginWithKakaoTalk();
+        await _onKakaoLoginSuccess(token);
+
+      } catch (error) {
+        print('카카오톡으로 로그인 실패 $error');
+
+        // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
+        // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
+        if (error is PlatformException && error.code == 'CANCELED') {
+          snackBar(title: "카카오 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
+          return;
+        }
+        // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
+        try {
+          OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
+          await _onKakaoLoginSuccess(token);
+        } catch (error) {
+          snackBar(title: "카카오 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
+        }
+      }
+    } else {
+      try {
+        OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
+        await _onKakaoLoginSuccess(token);
+      } catch (error) {
+        snackBar(title: "카카오 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
+      }
+    }
+  }
+
+  Future<void> _onKakaoLoginSuccess(OAuthToken token) async {
     try {
-      bool isInstalled = await isKakaoTalkInstalled();
-
-      OAuthToken token = isInstalled
-          ? await UserApi.instance.loginWithKakaoTalk()
-          : await UserApi.instance.loginWithKakaoAccount();
-
-      final url = Uri.https('kapi.kakao.com', '/v2/user/me');
-
-      final response = await http.get(
-        url,
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}'
-        },
-      );
-
-      final profileInfo = json.decode(response.body);
-      print(profileInfo.toString());
-
       User user = await UserApi.instance.me();
 
       String email = user.kakaoAccount!.email ?? ".";
@@ -173,27 +194,27 @@ class _LoginPageState extends State<LoginPage> {
       Get.offNamed('/club_list');
     } catch (e) {
       print(e.toString());
-      snackBar(title: "카카오 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
+      snackBar(title: "로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
   // 네이버 로그인
   Future<void> signInWithNaver() async {
-    final NaverLoginResult result = await FlutterNaverLogin.logIn();
-
-    if (result.status == NaverLoginStatus.loggedIn) {
-      try {
-        String email = result.account.email;
-        String name = result.account.name;
-        await TokenApiService.postToken(email: email, name: name);
-        await storage.write(key: loginInfo, value: '$email $name naver');
-
-        Get.offNamed('/club_list');
-      } catch (e) {
-        print(e.toString());
-        snackBar(title: "네이버 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
-      }
-    }
+    // final NaverLoginResult result = await FlutterNaverLogin.logIn();
+    //
+    // if (result.status == NaverLoginStatus.loggedIn) {
+    //   try {
+    //     String email = result.account.email;
+    //     String name = result.account.name;
+    //     await TokenApiService.postToken(email: email, name: name);
+    //     await storage.write(key: loginInfo, value: '$email $name naver');
+    //
+    //     Get.offNamed('/club_list');
+    //   } catch (e) {
+    //     print(e.toString());
+    //     snackBar(title: "네이버 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
+    //   }
+    // }
   }
 
   @override
@@ -230,14 +251,14 @@ class _LoginPageState extends State<LoginPage> {
                         ),
 
                         //네이버 로그인 버튼
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
-                          child: ImageButton(
-                              image: 'assets/images/login/login_naver.png',
-                              onTap: () async {
-                                await signInWithNaver();
-                              }),
-                        ),
+                        // Padding(
+                        //   padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
+                        //   child: ImageButton(
+                        //       image: 'assets/images/login/login_naver.png',
+                        //       onTap: () async {
+                        //         await signInWithNaver();
+                        //       }),
+                        // ),
 
                         //구글 로그인 버튼
                         Padding(
