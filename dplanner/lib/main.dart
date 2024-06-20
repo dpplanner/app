@@ -16,6 +16,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import 'const/const.dart';
 import 'controllers/club.dart';
@@ -27,7 +28,7 @@ import 'decode_token.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+// import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 final FlutterLocalNotificationsPlugin _localNotification = FlutterLocalNotificationsPlugin();
 
@@ -99,7 +100,6 @@ Future<void> main() async {
   FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) => _handleFirebaseNotification(message));
 
   KakaoSdk.init(nativeAppKey: '32f8bf31b072c577a63d09db9d16ab5d');
-
   runApp(const MyApp());
 }
 
