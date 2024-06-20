@@ -6,6 +6,7 @@ import 'package:dplanner/widgets/image_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -18,10 +19,7 @@ import '../services/club_member_api_service.dart';
 import '../services/token_api_service.dart';
 import '../const/style.dart';
 
-// import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
-// import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../widgets/snack_bar.dart';
@@ -200,21 +198,21 @@ class _LoginPageState extends State<LoginPage> {
 
   // 네이버 로그인
   Future<void> signInWithNaver() async {
-    // final NaverLoginResult result = await FlutterNaverLogin.logIn();
-    //
-    // if (result.status == NaverLoginStatus.loggedIn) {
-    //   try {
-    //     String email = result.account.email;
-    //     String name = result.account.name;
-    //     await TokenApiService.postToken(email: email, name: name);
-    //     await storage.write(key: loginInfo, value: '$email $name naver');
-    //
-    //     Get.offNamed('/club_list');
-    //   } catch (e) {
-    //     print(e.toString());
-    //     snackBar(title: "네이버 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
-    //   }
-    // }
+    final NaverLoginResult result = await FlutterNaverLogin.logIn();
+
+    if (result.status == NaverLoginStatus.loggedIn) {
+      try {
+        String email = result.account.email;
+        String name = result.account.name;
+        await TokenApiService.postToken(email: email, name: name);
+        await storage.write(key: loginInfo, value: '$email $name naver');
+
+        Get.offNamed('/club_list');
+      } catch (e) {
+        print(e.toString());
+        snackBar(title: "네이버 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
+      }
+    }
   }
 
   @override
@@ -250,15 +248,15 @@ class _LoginPageState extends State<LoginPage> {
                               }),
                         ),
 
-                        //네이버 로그인 버튼
-                        // Padding(
-                        //   padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
-                        //   child: ImageButton(
-                        //       image: 'assets/images/login/login_naver.png',
-                        //       onTap: () async {
-                        //         await signInWithNaver();
-                        //       }),
-                        // ),
+                        // 네이버 로그인 버튼
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
+                          child: ImageButton(
+                              image: 'assets/images/login/login_naver.png',
+                              onTap: () async {
+                                await signInWithNaver();
+                              }),
+                        ),
 
                         //구글 로그인 버튼
                         Padding(
