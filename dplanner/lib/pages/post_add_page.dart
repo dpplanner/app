@@ -37,6 +37,7 @@ class _PostAddPageState extends State<PostAddPage> {
   List<XFile> selectedImages = []; // 이미지를 저장할 리스트
   int maxImageCount = 10; // 최대 선택 가능한 이미지 수
 
+  // todo 이미지 다중선택 및 영상업로드
   Future<void> pickImage() async {
     try {
       XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -111,7 +112,7 @@ class _PostAddPageState extends State<PostAddPage> {
                 style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 18,
-                    color: AppColor.markColor),
+                    color: AppColor.objectColor),
               ),
             ),
             SizedBox(width: SizeController.to.screenWidth * 0.03)
@@ -236,12 +237,15 @@ class _PostAddPageState extends State<PostAddPage> {
                     ),
                   ),
                 ),
-                Text(
-                  '${selectedImages.length + (widget.post != null ? widget.post!.attachmentsUrl.length : 0)}/$maxImageCount',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: AppColor.textColor2,
+                Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Text(
+                    '${selectedImages.length + (widget.post != null ? widget.post!.attachmentsUrl.length : 0)}/$maxImageCount',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      color: AppColor.textColor2,
+                    ),
                   ),
                 ),
               ],
