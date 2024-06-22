@@ -161,23 +161,23 @@ class _ClubInfoPageState extends State<ClubInfoPage> {
                     ),
                   ],
                 ),
-                const Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(bottom: 24.0),
-                      child: Text(
-                        "게시글",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 18),
-                      ),
-                    ),
-                    Text(
-                      "12",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                    ),
-                  ],
-                ),
+                // const Column(
+                //   children: [
+                //     Padding(
+                //       padding: EdgeInsets.only(bottom: 24.0),
+                //       child: Text(
+                //         "게시글",
+                //         style: TextStyle(
+                //             fontWeight: FontWeight.w700, fontSize: 18),
+                //       ),
+                //     ),
+                //     Text(
+                //       "12",
+                //       style:
+                //           TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                //     ),
+                //   ],
+                // ),
                 Column(
                   children: [
                     const Padding(

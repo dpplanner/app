@@ -7,8 +7,8 @@ import 'package:get/get.dart';
 import '../controllers/size.dart';
 import '../services/club_api_service.dart';
 import '../const/style.dart';
-import '../widgets/image_button.dart';
 import '../widgets/nextpage_button.dart';
+import '../widgets/snack_bar.dart';
 
 class ClubCreateSuccessNextPage extends StatefulWidget {
   const ClubCreateSuccessNextPage({super.key});
@@ -70,8 +70,10 @@ class _ClubCreateSuccessNextPageState extends State<ClubCreateSuccessNextPage> {
                             Clipboard.setData(ClipboardData(
                                 text: await ClubApiService.postClubCode(
                                     clubId: ClubController.to.club().id)));
+                            snackBar(title: "초대코드가 복사되었습니다", content: "클럽에 초대할 사람에게 공유해주세요");
                           } catch (e) {
                             print(e.toString());
+                            snackBar(title: "초대코드를 복사하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                           }
                         },
                         child: Container(
@@ -92,30 +94,30 @@ class _ClubCreateSuccessNextPageState extends State<ClubCreateSuccessNextPage> {
                     ),
                   ],
                 ),
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColor.subColor4,
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          padding: const EdgeInsets.all(30.0),
-                          child: const Icon(SFSymbols.qrcode,
-                              color: AppColor.textColor),
-                        ),
-                      ),
-                    ),
-                    const Text(
-                      "QR코드 저장하기",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
-                    ),
-                  ],
-                ),
+                // Column(
+                //   children: [
+                //     Padding(
+                //       padding: const EdgeInsets.only(bottom: 8.0),
+                //       child: GestureDetector(
+                //         onTap: () {},
+                //         child: Container(
+                //           decoration: BoxDecoration(
+                //             color: AppColor.subColor4,
+                //             borderRadius: BorderRadius.circular(12.0),
+                //           ),
+                //           padding: const EdgeInsets.all(30.0),
+                //           child: const Icon(SFSymbols.qrcode,
+                //               color: AppColor.textColor),
+                //         ),
+                //       ),
+                //     ),
+                //     const Text(
+                //       "QR코드 저장하기",
+                //       style:
+                //           TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+                //     ),
+                //   ],
+                // ),
               ],
             ),
             const Expanded(child: SizedBox()),
