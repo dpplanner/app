@@ -152,7 +152,6 @@ class _LoginPageState extends State<LoginPage> {
       try {
         OAuthToken token = await UserApi.instance.loginWithKakaoTalk();
         await _onKakaoLoginSuccess(token);
-
       } catch (error) {
         print('카카오톡으로 로그인 실패 $error');
 
@@ -232,7 +231,7 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Padding(
                           padding:
-                              const EdgeInsets.only(top: 128.0, bottom: 256.0),
+                              const EdgeInsets.only(top: 128.0, bottom: 128.0),
                           child: SvgPicture.asset(
                             'assets/images/login/dplanner_logo_login.svg',
                           ),

@@ -1,5 +1,4 @@
 {
-  "originHash" : "0a9a0565c23645eacdcd0d177a036429567ab510b257a7f2538ea8bb318bf8d2",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -16,9 +15,9 @@
       "location" : "https://github.com/kakao/kakao-ios-sdk",
       "state" : {
         "branch" : "master",
-        "revision" : "9f9b830dfd7ee66607c6fddcfeb1a6bc07e48714"
+        "revision" : "e9e649d3ba823c3673867d3d09010fc77005a940"
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }
