@@ -1,6 +1,6 @@
-
 class ReportMessage {
-  static const String commonWarningMessage = "모든 신고는 철저히 검토되며, 허위 신고는 계정 제재로 이어질 수 있습니다. \n신고는 해당 콘텐츠가 앱의 가이드라인을 위반하는 경우에만 제출해 주세요.";
+  static const String commonWarningMessage =
+      "모든 신고는 철저히 검토되며, 허위 신고는 계정 제재로 이어질 수 있습니다. \n신고는 해당 콘텐츠가 앱의 가이드라인을 위반하는 경우에만 제출해 주세요. \n\n신고 내용은 24시간 이내에 조치됩니다";
   static const Map<String, String> _map = {
     "스팸 및 광고": "상업적 목적의 불필요한 광고, \n반복적인 메시지 등",
     "혐오 발언 및 차별": "인종, 성별, 성적 지향, \n종교 등에 기반한 혐오 발언",
