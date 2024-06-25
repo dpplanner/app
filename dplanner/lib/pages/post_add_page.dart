@@ -89,13 +89,13 @@ class _PostAddPageState extends State<PostAddPage> {
             TextButton(
               onPressed: widget.isEdit
                   ? () {
-                PostController.to.updatePost(
-                    postId: widget.post!.id,
-                    title: postSubject.text,
-                    content: postContent.text,
-                    imageFileList: selectedImages,
-                    previousImageFileList: widget.post!.attachmentsUrl);
-              }
+                      PostController.to.updatePost(
+                          postId: widget.post!.id,
+                          title: postSubject.text,
+                          content: postContent.text,
+                          imageFileList: selectedImages,
+                          previousImageFileList: widget.post!.attachmentsUrl);
+                    }
                   : () {
                       if (_formKey1.currentState!.validate() &&
                           _formKey2.currentState!.validate()) {
@@ -154,7 +154,9 @@ class _PostAddPageState extends State<PostAddPage> {
                 child: Form(
                     key: _formKey2,
                     child: OutlineTextForm(
-                      hintText: widget.isEdit ? postContent.text : '내용을 입력하세요',
+                      hintText: widget.isEdit
+                          ? postContent.text
+                          : '부적절하거나 불쾌감을 줄 수 있는 컨텐츠를 게시할 경우 제재를 받습니다. 본인이 작성한 게시글이 타인에 의해 신고당할 경우 활동이 제한될 수 있습니다.',
                       controller: postContent,
                       isFocused: _isFocused2,
                       noLine: true,
