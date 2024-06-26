@@ -2,12 +2,14 @@ import 'package:dplanner/const/const.dart';
 import 'package:dplanner/pages/error_page.dart';
 import 'package:dplanner/pages/simple_info_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../const/style.dart';
+import '../widgets/snack_bar.dart';
 
 class AppSettingPage extends StatefulWidget {
   const AppSettingPage({super.key});
@@ -73,7 +75,8 @@ class _AppSettingPageState extends State<AppSettingPage> {
                     return const ErrorPage(constraints: BoxConstraints());
                   } else {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 32),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 32),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -112,21 +115,52 @@ class _AppSettingPageState extends State<AppSettingPage> {
                 }),
             infoRow(title: "앱 버전", value: appVersion),
             // buttonRow(title: "푸시 알림 설정", onTap: () {}),
-            buttonRow(title: "개인정보 처리방침",
-                onTap: () => Get.to(const SimpleInfoPage(title: "개인정보 처리방침", filePath: "assets/texts/privacy_info.txt"))
-            ),
-            buttonRow(title: "서비스 이용약관",
-                onTap: () => Get.to(const SimpleInfoPage(title: "서비스 이용약관", filePath: "assets/texts/service_term_info.txt"))
-            ),
+            buttonRow(
+                title: "개인정보 처리방침",
+                onTap: () => Get.to(const SimpleInfoPage(
+                    title: "개인정보 처리방침",
+                    filePath: "assets/texts/privacy_info.txt"))),
+            buttonRow(
+                title: "서비스 이용약관",
+                onTap: () => Get.to(const SimpleInfoPage(
+                    title: "서비스 이용약관",
+                    filePath: "assets/texts/service_term_info.txt"))),
+            buttonRow(
+                title: "문의하기",
+                onTap: () {
+                  _sendEmail();
+                }),
           ],
         ),
       ),
     );
   }
 
+  void _sendEmail() async {
+    final Email email = Email(
+      body: '',
+      subject: '[양파가족 문의]',
+      recipients: ['onionfamily.official@gmail.com'],
+      cc: [],
+      bcc: [],
+      attachmentPaths: [],
+      isHTML: false,
+    );
+
+    try {
+      await FlutterEmailSender.send(email);
+    } catch (error) {
+      String title =
+          "기본 메일 앱을 사용할 수 없기 때문에 앱에서 바로 문의를 전송하기 어려운 상황입니다.\n\n아래 이메일로 연락주시면 친절하게 답변해드릴게요 :)\n\ndplanner2233@gmail.com";
+      String message = "";
+      snackBar(title: title, content: message);
+    }
+  }
+
   Widget buttonRow({
     required String title,
-    required void Function()? onTap,}) {
+    required void Function()? onTap,
+  }) {
     return TextButton(
       style: TextButton.styleFrom(
         foregroundColor: AppColor.textColor,
@@ -163,13 +197,13 @@ class _AppSettingPageState extends State<AppSettingPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-            Text(
-              title,
-              style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColor.textColor),
-            ),
+          Text(
+            title,
+            style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColor.textColor),
+          ),
           Text(
             value,
             style: const TextStyle(
