@@ -96,6 +96,9 @@
 	<key>NSUserTrackingUsageDescription</key>
 	<string>개인 맞춤형 광고를 전달하기 위해 필요한 권한들을 허용합니다.</string>
 	<key>SKAdNetworkItems</key>
+    <key>NSAppleMusicUsageDescription</key>
+    <string>App needs access to music library for email attachments</string>
+
 	<array>
 		<dict>
 			<key>SKAdNetworkIdentifier</key>
