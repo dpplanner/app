@@ -99,7 +99,7 @@ Future<void> main() async {
   // 앱이 완전히 종료된 상태에서 알림을 클릭했을 때 처리
   FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) => _handleFirebaseNotification(message));
 
-  KakaoSdk.init(nativeAppKey: '32f8bf31b072c577a63d09db9d16ab5d');
+  KakaoSdk.init(nativeAppKey: '2b20483f38041a509dfaab39ab801eb0');
   runApp(const MyApp());
 }
 
