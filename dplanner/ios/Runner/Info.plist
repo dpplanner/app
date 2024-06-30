@@ -324,12 +324,12 @@
 	<false/>
 
 	<key>naverConsumerKey</key>
-	<string>tiMirLbsetoZ7Zh0gBj9</string>
+	<string>ZID4vaD8GzH0M8ynfHA7</string>
 	<key>naverConsumerSecret</key>
-	<string>n_2wIZwhh8</string>
+	<string>5otRIFDs0R</string>
 	<key>naverServiceAppName</key>
-	<string>dplanner</string>
+	<string>DPlanner</string>
 	<key>naverServiceAppUrlScheme</key>
-	<string>dplanner</string>
+	<string>DPlanner</string>
 </dict>
 </plist>

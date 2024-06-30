@@ -1,5 +1,6 @@
 import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_naver_login/flutter_naver_login.dart';
 // import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -34,7 +35,7 @@ class _SettingPageState extends State<SettingPage> {
         await UserApi.instance.logout();
         break;
       case "naver":
-        // await FlutterNaverLogin.logOut();
+        await FlutterNaverLogin.logOut();
         break;
       case "none":
         break;
