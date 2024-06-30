@@ -5,6 +5,7 @@ import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/models/club_manager_model.dart';
 import 'package:dplanner/services/club_api_service.dart';
+import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -125,14 +126,8 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                       children: [
                         const BannerAdWidget(),
                         if (MemberController.to.clubMember().role == "ADMIN" ||
-                            (MemberController.to
-                                        .clubMember()
-                                        .clubAuthorityTypes !=
-                                    null &&
-                                MemberController.to
-                                    .clubMember()
-                                    .clubAuthorityTypes!
-                                    .contains("Member_ALL")))
+                            (MemberController.to.clubMember().clubAuthorityTypes != null
+                                && MemberController.to.clubMember().clubAuthorityTypes!.contains("Member_ALL")))
                           StreamBuilder<List<ClubMemberModel>>(
                               stream: streamController2.stream,
                               builder: (BuildContext context,
@@ -314,17 +309,9 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                           size: 20,
                         ),
                       ),
-                    if ((MemberController.to.clubMember().role == "ADMIN" ||
-                            (MemberController.to
-                                        .clubMember()
-                                        .clubAuthorityTypes !=
-                                    null &&
-                                MemberController.to
-                                    .clubMember()
-                                    .clubAuthorityTypes!
-                                    .contains("MEMBER_ALL"))) &&
-                        member.role != "ADMIN" &&
-                        member.id != MemberController.to.clubMember().id)
+                    if ((MemberController.to.clubMember().role == "ADMIN" || (MemberController.to.clubMember().clubAuthorityTypes != null && MemberController.to.clubMember().clubAuthorityTypes!.contains("MEMBER_ALL")))
+                        && member.role != "ADMIN"
+                        && member.id != MemberController.to.clubMember().id)
                       Visibility(
                         visible: member.isConfirmed,
                         replacement: IconButton(
@@ -361,7 +348,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
   //types: 0-승인 대기중, 1-회원 정보, 2-등급 수정
   Future<void> _clubMemberInfo(
       {required int types, required ClubMemberModel member}) async {
-    List<String> grade = ['일반'];
+    List<String> grade = ['일반', '관리자'];
     String selectedValue = grade[0];
     List<ClubManagerModel> managers = [];
 
@@ -737,8 +724,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                   ),
                 ),
               ),
-              if (!(member.id == MemberController.to.clubMember().id ||
-                  member.role == "ADMIN"))
+              if (member.id != MemberController.to.clubMember().id)
                 Visibility(
                   visible: types != 0,
                   replacement: Padding(
@@ -828,16 +814,17 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                             }
                           }
                           try {
-                            ClubMemberModel temp =
-                                await ClubMemberApiService.patchAuthorities(
-                                    clubMemberId: member.id,
-                                    clubId: ClubController.to.club().id,
-                                    role: role,
-                                    clubAuthorityId: clubAuthorityId);
+                            await ClubMemberApiService.patchAuthorities(
+                                clubMemberId: member.id,
+                                clubId: ClubController.to.club().id,
+                                role: role,
+                                clubAuthorityId: clubAuthorityId);
                             getClubMemberList();
                             Get.back();
+                            snackBar(title: "회원 등급을 변경했습니다", content: "회원 정보를 확인해주세요");
                           } catch (e) {
                             print(e.toString());
+                            snackBar(title: "회원 등급을 변경하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                           }
                         },
                       ),
