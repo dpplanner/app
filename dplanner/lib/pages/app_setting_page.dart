@@ -20,12 +20,15 @@ class AppSettingPage extends StatefulWidget {
 
 class _AppSettingPageState extends State<AppSettingPage> {
   static const storage = FlutterSecureStorage();
+  String userMail = "";
+  String userLogin = "";
 
   Future<String> findLoginInfo() async {
     return await storage.read(key: loginInfo) ?? ". . none";
   }
 
   String findLoginPlatform(String login) {
+    userLogin = login;
     print(login);
     switch (login) {
       case "kakao":
@@ -71,6 +74,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
                 future: findLoginInfo(),
                 builder:
                     (BuildContext context, AsyncSnapshot<String> snapshot) {
+                  userMail = snapshot.data?.split(" ")[0] ?? "";
                   if (snapshot.hasError) {
                     return const ErrorPage(constraints: BoxConstraints());
                   } else {
@@ -91,7 +95,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
                               Padding(
                                 padding: const EdgeInsets.only(left: 12),
                                 child: Text(
-                                  snapshot.data?.split(" ")[0] ?? "",
+                                  userMail,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 16),
@@ -136,11 +140,48 @@ class _AppSettingPageState extends State<AppSettingPage> {
     );
   }
 
+  Map<String, dynamic> _getUserInfo() {
+    return {
+      '로그인 정보': userLogin,
+      '로그인 계정': userMail,
+    };
+  }
+
+  Future<String> _getEmailBody() async {
+    Map<String, dynamic> userInfo = _getUserInfo();
+    // Map<String, dynamic> appInfo = await _getAppInfo();
+    // Map<String, dynamic> deviceInfo = await _getDeviceInfo();
+
+    String body = "";
+
+    body += "==============\n";
+    body += "아래 내용을 함께 보내주시면 큰 도움이 됩니다!\n";
+
+    userInfo.forEach((key, value) {
+      body += "$key: $value\n";
+    });
+
+    // appInfo.forEach((key, value) {
+    //   body += "$key: $value\n";
+    // });
+    //
+    // deviceInfo.forEach((key, value) {
+    //   body += "$key: $value\n";
+    // });
+
+    body += "==============\n\n";
+    body += "문의할 내용을 적어주세요.\n";
+
+    return body;
+  }
+
   void _sendEmail() async {
+    String body = await _getEmailBody();
+
     final Email email = Email(
-      body: '',
-      subject: '[양파가족 문의]',
-      recipients: ['onionfamily.official@gmail.com'],
+      body: body,
+      subject: '[DPlanner 문의]',
+      recipients: ['dplanner2233@gmail.com'],
       cc: [],
       bcc: [],
       attachmentPaths: [],
