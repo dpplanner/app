@@ -76,7 +76,7 @@ class _MyReservationPageState extends State<MyReservationPage> {
     Map<String, String?> params = Get.parameters;
 
     // 거절된 예약
-    if (params.containsKey("rejected") && params["rejected"] != null && bool.parse(params["rejected"]!) == true) {
+    if (params.containsKey("isRejected") && params["isRejected"] != null && bool.parse(params["isRejected"]!) == true) {
       return 2;
     }
 

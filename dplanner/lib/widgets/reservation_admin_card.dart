@@ -27,7 +27,8 @@ class ReservationAdminCard extends StatelessWidget {
 
   bool isFromNotification() {
     Map<String, String?> params = Get.parameters;
-    return params.containsKey("reservationId")
+    return !params.containsKey("isReturned")
+        && params.containsKey("reservationId")
         && params["reservationId"] != null
         && int.parse(params["reservationId"]!) == reservation.reservationId;
   }

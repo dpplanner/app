@@ -14,8 +14,25 @@ class ReservationReturnCard extends StatelessWidget {
 
   const ReservationReturnCard({super.key, required this.reservation});
 
+  bool isFromNotification() {
+    Map<String, String?> params = Get.parameters;
+    return params.containsKey("isReturned")
+        && params["isReturned"] != null
+        && bool.parse(params["isReturned"]!) == true
+        && params.containsKey("reservationId")
+        && params["reservationId"] != null
+        && int.parse(params["reservationId"]!) == reservation.reservationId;
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 반납 알림 메시지 눌러서 온거면 바텀시트 열기
+    if (isFromNotification()) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) => getReturnInfo(reservation: reservation)
+      );
+      Get.parameters.clear();
+    }
+
     return InkWell(
       splashColor: AppColor.subColor2.withOpacity(0.5),
       highlightColor: AppColor.subColor2.withOpacity(0.5),

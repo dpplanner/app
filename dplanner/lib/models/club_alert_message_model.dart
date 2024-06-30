@@ -61,7 +61,7 @@ enum AlertMessageType {
 }
 
 enum AlertMessageInfoType {
-  MEMBER, POST, RESERVATION, NOTHING;
+  MEMBER, POST, RESERVATION, RETURN, NOTHING;
 
   static AlertMessageInfoType fromString(String? infoType) {
     switch(infoType) {
@@ -71,6 +71,8 @@ enum AlertMessageInfoType {
         return AlertMessageInfoType.POST;
       case 'RESERVATION':
         return AlertMessageInfoType.RESERVATION;
+      case 'RETURN':
+        return AlertMessageInfoType.RETURN;
       default:
         return AlertMessageInfoType.NOTHING;
     }

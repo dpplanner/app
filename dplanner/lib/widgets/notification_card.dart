@@ -115,6 +115,9 @@ class _NotificationCardState extends State<NotificationCard> {
         case AlertMessageInfoType.RESERVATION:
           await _handleReservationNotification();
 
+        case AlertMessageInfoType.RETURN:
+          await _handleReturnNotification();
+
         default:
           // 데이터가 잘못된 케이스(NOTHING)
           print("[Error] infoType = ${widget.infoType}");
@@ -184,15 +187,24 @@ class _NotificationCardState extends State<NotificationCard> {
     }
   }
 
+  Future<void> _handleReturnNotification() async {
+    switch(widget.type) {
+      case AlertMessageType.REQUEST:
+        await _handleReturnRequestNotification();
+      case AlertMessageType.INFO:
+        await _handleReturnInfoNotification();
+      default:
+        // 데이터가 잘못된 케이스(REPORT, NOTICE)
+        print("[Error] type = ${widget.type}");
+    }
+  }
+
   Future<void> _handleReservationRequestNotification() async {
     String reservationId = widget.info!;
 
-    // 반납 메시지 리마인드 -> 내 예약 목록
-    if (!await _isReservationRequest(reservationId)) {
-      _toMyReservationPage(reservationId: reservationId, isPast: true, rejected: null);
-    } else if (hasAuthority("SCHEDULE_ALL")) { // 권한 변경 후에도 들어가는거 방지
+    if (hasAuthority("SCHEDULE_ALL")) { // 권한 변경 후에도 들어가는거 방지
       // 예약 요청 -> 예약 관리 - 승인된 이후에도 동일하게
-      _toReservationManagePage(reservationId: reservationId);
+      _toReservationManagePage(reservationId: reservationId, isReturned: null);
     }
 
   }
@@ -201,14 +213,14 @@ class _NotificationCardState extends State<NotificationCard> {
     // 관리자에 의한 삭제 -> 아무것도 안함
     // 예약 거절 -> 거절된 예약 > 예약 정보
     if (widget.info != null) {
-      _toMyReservationPage(reservationId: widget.info!, isPast: null, rejected: true);
+      _toMyReservationPage(reservationId: widget.info!, isPast: null, isRejected: true);
     }
   }
 
   Future<void> _handleReservationAcceptNotification() async {
     // 예약 승인
     String reservationId = widget.info!;
-    await _toMyReservationPage(reservationId: reservationId, isPast: (await _isPastReservation(reservationId)), rejected: null);
+    await _toMyReservationPage(reservationId: reservationId, isPast: (await _isPastReservation(reservationId)), isRejected: null);
   }
 
   Future<void> _handleReservationInfoNotification() async {
@@ -216,18 +228,31 @@ class _NotificationCardState extends State<NotificationCard> {
     if (widget.info == null) {
       Get.toNamed("/my_reservation");
     } else {
-      // 예약 초대됨, 예약 시작, 예약 종료, 반납 메시지 도착 -> 내 예약 목록 > 예약 정보
+      // 예약 초대됨, 예약 시작, 예약 종료 -> 내 예약 목록 > 예약 정보
       String reservationId = widget.info!;
-      await _toMyReservationPage(reservationId: reservationId, isPast: (await _isPastReservation(reservationId)), rejected: null);
+      await _toMyReservationPage(reservationId: reservationId, isPast: (await _isPastReservation(reservationId)), isRejected: null);
     }
   }
 
-  Future<void> _toReservationManagePage({required String reservationId}) async {
+  Future<void> _handleReturnRequestNotification() async {
+    // 반납 메시지 리마인드
+    String reservationId = widget.info!;
+    _toMyReservationPage(reservationId: reservationId, isPast: true, isRejected: null);
+  }
+
+  Future<void> _handleReturnInfoNotification() async {
+    // 반납 메시지 도착 -> 예약 요청 > 승인한 예약
+    String reservationId = widget.info!;
+    _toReservationManagePage(reservationId: reservationId, isReturned: true);
+  }
+
+  Future<void> _toReservationManagePage({required String reservationId, required bool? isReturned}) async {
     ReservationModel reservation = await ReservationApiService.getReservation(reservationId: int.parse(reservationId));
 
     Map<String, String>? params = {};
     params.putIfAbsent("reservationId", () => reservationId);
     params.putIfAbsent("status", () => reservation.status);
+    if (isReturned != null) params.putIfAbsent("isReturned", () => isReturned.toString());
 
     Get.toNamed("/reservation_list", parameters: params);
   }
@@ -235,12 +260,12 @@ class _NotificationCardState extends State<NotificationCard> {
   Future<void> _toMyReservationPage({
     required String? reservationId,
     required bool? isPast,
-    required bool? rejected}) async {
+    required bool? isRejected}) async {
 
     Map<String, String>? params = {};
     if (reservationId != null) params.putIfAbsent("reservationId", () => reservationId);
     if (isPast != null) params.putIfAbsent("isPast", () => isPast.toString());
-    if(rejected != null) params.putIfAbsent("rejected", () => rejected.toString());
+    if (isRejected != null) params.putIfAbsent("isRejected", () => isRejected.toString());
 
     Get.toNamed("/my_reservation", parameters: params);
   }
