@@ -51,10 +51,12 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-8322251544420951~8757451984</string>
 	<key>GIDClientID</key>
 	<string>440122903298-gc2oikv36m4srpou58td5je36d3cpumv.apps.googleusercontent.com</string>
+
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>kakaokompassauth</string>
@@ -63,6 +65,7 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -95,10 +98,10 @@
 	<string>게시글에 등록할 이미지를 선택, 공용 물품 반납 시 증빙 사진을 촬영, 내 프로필을 등록하는 기능 사용을 위해 사진 라이브러리에 접근하도록 허용합니다.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>개인 맞춤형 광고를 전달하기 위해 필요한 권한들을 허용합니다.</string>
-	<key>SKAdNetworkItems</key>
     <key>NSAppleMusicUsageDescription</key>
     <string>App needs access to music library for email attachments</string>
 
+	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>
 			<key>SKAdNetworkIdentifier</key>
@@ -297,6 +300,7 @@
 			<string>3qcr597p9d.skadnetwork</string>
 		</dict>
 	</array>
+
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
@@ -318,6 +322,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+
 	<key>naverConsumerKey</key>
 	<string>tiMirLbsetoZ7Zh0gBj9</string>
 	<key>naverConsumerSecret</key>
