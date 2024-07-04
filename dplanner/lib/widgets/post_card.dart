@@ -206,7 +206,14 @@ class PostCard extends StatelessWidget {
                       Row(
                         children: [
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Get.to(
+                                  () => PostPage(
+                                        postId: rxPost.value.id,
+                                        scrollToComments: true,
+                                      ),
+                                  arguments: 1);
+                            },
                             child: Container(
                               padding: const EdgeInsets.all(8.0),
                               color: Colors.transparent,
