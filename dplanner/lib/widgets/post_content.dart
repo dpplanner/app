@@ -239,16 +239,12 @@ class PostContent extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: EdgeInsets.only(
-                      bottom: SizeController.to.screenHeight * 0.01),
-                  child: SelectableText(
-                    post.title ?? "제목없음", //TODO: 제목 생기면 수정해야함
-                    style: const TextStyle(
-                      color: AppColor.textColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+                SelectableText(
+                  post.title ?? "제목 없음", //TODO: 제목 생기면 수정해야함
+                  style: const TextStyle(
+                    color: AppColor.textColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
                   ),
                 ),
                 SelectableText(
@@ -256,7 +252,7 @@ class PostContent extends StatelessWidget {
                   style: const TextStyle(
                     color: AppColor.textColor,
                     fontWeight: FontWeight.normal,
-                    fontSize: 16,
+                    fontSize: 15,
                   ),
                 ),
                 SingleChildScrollView(
@@ -294,87 +290,90 @@ class PostContent extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                post.isFixed
-                    ? const Expanded(
-                        flex: 1,
-                        child: Row(
-                          children: [
-                            Icon(
-                              SFSymbols.pin_fill,
-                              color: AppColor.objectColor,
-                              size: 14,
-                            ),
-                            Text(
-                              " 고정됨",
-                              style: TextStyle(
-                                color: AppColor.objectColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : Container(),
-                Expanded(
-                  flex: 1,
-                  child: Row(
+                if (post.isFixed)
+                  const Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Expanded(
-                        flex: 1,
-                        child: Icon(
-                          SFSymbols.text_bubble,
-                          color: AppColor.textColor2,
-                          size: 16,
-                        ),
+                      Icon(
+                        SFSymbols.pin_fill,
+                        color: AppColor.objectColor,
+                        size: 14,
                       ),
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          '${post.commentCount}',
-                          style: const TextStyle(
-                            color: AppColor.textColor2,
-                            fontWeight: FontWeight.normal,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: GestureDetector(
-                          onTap: _toggleLike,
-                          child: post.likeStatus
-                              ? const Icon(
-                                  SFSymbols.heart_fill,
-                                  color: AppColor.objectColor,
-                                  size: 16,
-                                )
-                              : const Icon(
-                                  SFSymbols.heart,
-                                  color: AppColor.textColor2,
-                                  size: 16,
-                                ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          '${post.likeCount}',
-                          style: post.likeStatus
-                              ? const TextStyle(
-                                  color: AppColor.objectColor,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 16,
-                                )
-                              : const TextStyle(
-                                  color: AppColor.textColor2,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 16,
-                                ),
+                      Text(
+                        '고정됨',
+                        style: TextStyle(
+                          color: AppColor.objectColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
                         ),
                       ),
                     ],
                   ),
+                const Expanded(child: SizedBox()),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        color: Colors.transparent,
+                        child: Row(
+                          children: [
+                            const Icon(
+                              SFSymbols.text_bubble,
+                              color: AppColor.textColor2,
+                              size: 16,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 16.0),
+                              child: Text(
+                                '${post.commentCount}',
+                                style: const TextStyle(
+                                  color: AppColor.textColor2,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: _toggleLike,
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        color: Colors.transparent,
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 16.0, right: 16.0),
+                              child: Icon(
+                                post.likeStatus
+                                    ? SFSymbols.heart_fill
+                                    : SFSymbols.heart,
+                                color: post.likeStatus
+                                    ? AppColor.objectColor
+                                    : AppColor.textColor2,
+                                size: 18,
+                              ),
+                            ),
+                            Text(
+                              '${post.likeCount}',
+                              style: TextStyle(
+                                color: post.likeStatus
+                                    ? AppColor.objectColor
+                                    : AppColor.textColor2,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
