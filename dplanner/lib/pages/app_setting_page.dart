@@ -1,5 +1,6 @@
 import 'package:dplanner/const/const.dart';
 import 'package:dplanner/pages/error_page.dart';
+import 'package:dplanner/pages/eula_consent_page.dart';
 import 'package:dplanner/pages/simple_info_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
@@ -125,7 +126,7 @@ class _AppSettingPageState extends State<AppSettingPage> {
                     title: "개인정보 처리방침",
                     filePath: "assets/texts/privacy_info.txt"))),
             buttonRow(
-                title: "서비스 이용약관",
+                title: "서비스 이용약관(EULA)",
                 onTap: () => Get.to(const SimpleInfoPage(
                     title: "서비스 이용약관",
                     filePath: "assets/texts/service_term_info.txt"))),
@@ -134,6 +135,8 @@ class _AppSettingPageState extends State<AppSettingPage> {
                 onTap: () {
                   _sendEmail();
                 }),
+            buttonRow(
+                title: "테스트 화면", onTap: () => Get.to(const EulaConsentPage())),
           ],
         ),
       ),

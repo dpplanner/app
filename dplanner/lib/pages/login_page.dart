@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dplanner/controllers/size.dart';
 import 'package:dplanner/decode_token.dart';
 import 'package:dplanner/widgets/image_button.dart';
 import 'package:flutter/material.dart';
@@ -236,6 +237,10 @@ class _LoginPageState extends State<LoginPage> {
                             'assets/images/login/dplanner_logo_login.svg',
                           ),
                         ),
+                        if (!Platform.isIOS)
+                          SizedBox(
+                            height: SizeController.to.screenHeight * 0.15,
+                          ),
 
                         //카카오 로그인 버튼
                         Padding(
