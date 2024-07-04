@@ -25,8 +25,11 @@ import 'package:dplanner/controllers/member.dart';
 
 class PostPage extends StatefulWidget {
   final int postId;
+  final bool scrollToComments;
 
-  const PostPage({Key? key, required this.postId}) : super(key: key);
+  const PostPage(
+      {Key? key, required this.postId, this.scrollToComments = false})
+      : super(key: key);
 
   @override
   State<PostPage> createState() => _PostPageState();
@@ -35,6 +38,8 @@ class PostPage extends StatefulWidget {
 class _PostPageState extends State<PostPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController addComment = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _commentsKey = GlobalKey(); // 댓글 섹션의 키
   bool _isFocused = false;
   bool _isReplying = false; //답글을 다는 중인지 체크
   int? _replyingCommentId; //답글을 달려고 클릭한 댓글의 ID
@@ -67,6 +72,19 @@ class _PostPageState extends State<PostPage> {
       setState(() {
         _comments = [];
       });
+    }
+    // 페이지가 로드된 후 댓글 섹션으로 스크롤
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.scrollToComments) {
+        _scrollToComments();
+      }
+    });
+  }
+
+  void _scrollToComments() {
+    final context = _commentsKey.currentContext;
+    if (context != null) {
+      Scrollable.ensureVisible(context, duration: Duration(milliseconds: 300));
     }
   }
 
@@ -110,28 +128,37 @@ class _PostPageState extends State<PostPage> {
             centerTitle: true,
           ),
         ),
-        body: SafeArea(
-            child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-              return PostController.to.getRxPost(widget.postId) == null
-                  ? const LoadingPage() // constraints 없어도 되나?
-                  : Column(
-                children: [
-                  Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () async { _fetchPost(); },
+        body: SafeArea(child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return PostController.to.getRxPost(widget.postId) == null
+                ? const LoadingPage() // constraints 없어도 되나?
+                : Column(
+                    children: [
+                      Expanded(
+                          child: RefreshIndicator(
+                        onRefresh: () async {
+                          _fetchPost();
+                        },
                         child: SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: ConstrainedBox(
-                            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                            constraints: BoxConstraints(
+                                minHeight: constraints.maxHeight),
                             child: Column(
                               children: [
                                 const BannerAdWidget(),
                                 Obx(() {
-                                  return PostController.to.getRxPost(widget.postId) == null
+                                  return PostController.to
+                                              .getRxPost(widget.postId) ==
+                                          null
                                       ? Container()
-                                      : PostContent(post: PostController.to.getRxPost(widget.postId)!.value);
+                                      : PostContent(
+                                          post: PostController.to
+                                              .getRxPost(widget.postId)!
+                                              .value);
                                 }),
                                 Container(
+                                  key: _commentsKey,
                                   color: AppColor.backgroundColor2,
                                   height: SizeController.to.screenHeight * 0.01,
                                 ),
@@ -139,101 +166,102 @@ class _PostPageState extends State<PostPage> {
                                     comments: _comments,
                                     selectedCommentId: _replyingCommentId,
                                     onCommentSelected: _handleCommentSelected,
-                                    onCommentDeleted: _handleCommentDeleted
-                                ),
+                                    onCommentDeleted: _handleCommentDeleted),
                               ],
                             ),
                           ),
                         ),
                       )),
-                  Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Row(
-                      children: [
-                        ClipOval(
-                          child: MemberController.to.clubMember().url !=
-                              null
-                              ? CachedNetworkImage(
-                              placeholder: (context, url) =>
-                                  Container(),
-                              imageUrl:
-                              "http://${MemberController.to.clubMember().url!}",
-                              errorWidget: (context, url, error) =>
-                                  SvgPicture.asset(
-                                    'assets/images/base_image/base_member_image.svg',
-                                  ),
-                              height:
-                              SizeController.to.screenWidth * 0.1,
-                              width:
-                              SizeController.to.screenWidth * 0.1,
-                              fit: BoxFit.cover)
-                              : SvgPicture.asset(
-                            'assets/images/base_image/base_member_image.svg',
-                            height:
-                            SizeController.to.screenWidth * 0.1,
-                            width:
-                            SizeController.to.screenWidth * 0.1,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
-                            child: Form(
-                              key: _formKey,
-                              child: OutlineTextForm(
-                                hintText: _replyingCommentId == null
-                                    ? '댓글을 남겨보세요'
-                                    : "답글을 남겨보세요",
-                                hintTextColor: _replyingCommentId == null
-                                    ? AppColor.textColor2
-                                    : AppColor.subColor1,
-                                controller: addComment,
-                                isColored: true,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isFocused = value.isNotEmpty;
-                                  });
-                                },
-                                icon: GestureDetector(
-                                  onTap: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      // 폼이 유효한 경우 댓글을 서버에 게시
-                                      print("==parentID: ${_replyingCommentId}");
-                                      await PostCommentApiService
-                                          .postComment(
-                                          postId: widget.postId,
-                                          content: addComment.text,
-                                          parentId: _replyingCommentId);
-                                      // 댓글 입력 필드 초기화
-                                      addComment.clear();
-                                      _isReplying = false;
-                                      _replyingCommentId = null;
-                                      FocusScope.of(context).requestFocus(
-                                          FocusNode()); //TODO: 체크해라 dismiss 되는지
-                                    }
-                                    _fetchPost(); // 댓글 단 후 게시글 새로고침
-                                  },
-                                  child: _isFocused
-                                      ? const Icon(
-                                    SFSymbols.paperplane_fill,
-                                    color: AppColor.objectColor,
-                                  )
-                                      : const Icon(
-                                    SFSymbols.paperplane,
-                                    color: AppColor.textColor2,
+                      Padding(
+                        padding: const EdgeInsets.all(18.0),
+                        child: Row(
+                          children: [
+                            ClipOval(
+                              child: MemberController.to.clubMember().url !=
+                                      null
+                                  ? CachedNetworkImage(
+                                      placeholder: (context, url) =>
+                                          Container(),
+                                      imageUrl:
+                                          "http://${MemberController.to.clubMember().url!}",
+                                      errorWidget: (context, url, error) =>
+                                          SvgPicture.asset(
+                                            'assets/images/base_image/base_member_image.svg',
+                                          ),
+                                      height:
+                                          SizeController.to.screenWidth * 0.1,
+                                      width:
+                                          SizeController.to.screenWidth * 0.1,
+                                      fit: BoxFit.cover)
+                                  : SvgPicture.asset(
+                                      'assets/images/base_image/base_member_image.svg',
+                                      height:
+                                          SizeController.to.screenWidth * 0.1,
+                                      width:
+                                          SizeController.to.screenWidth * 0.1,
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(12, 0, 0, 0),
+                                child: Form(
+                                  key: _formKey,
+                                  child: OutlineTextForm(
+                                    hintText: _replyingCommentId == null
+                                        ? '댓글을 남겨보세요'
+                                        : "답글을 남겨보세요",
+                                    hintTextColor: _replyingCommentId == null
+                                        ? AppColor.textColor2
+                                        : AppColor.subColor1,
+                                    controller: addComment,
+                                    isColored: true,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _isFocused = value.isNotEmpty;
+                                      });
+                                    },
+                                    icon: GestureDetector(
+                                      onTap: () async {
+                                        if (_formKey.currentState!.validate()) {
+                                          // 폼이 유효한 경우 댓글을 서버에 게시
+                                          print(
+                                              "==parentID: ${_replyingCommentId}");
+                                          await PostCommentApiService
+                                              .postComment(
+                                                  postId: widget.postId,
+                                                  content: addComment.text,
+                                                  parentId: _replyingCommentId);
+                                          // 댓글 입력 필드 초기화
+                                          addComment.clear();
+                                          _isReplying = false;
+                                          _replyingCommentId = null;
+                                          FocusScope.of(context).requestFocus(
+                                              FocusNode()); //TODO: 체크해라 dismiss 되는지
+                                        }
+                                        _fetchPost(); // 댓글 단 후 게시글 새로고침
+                                      },
+                                      child: _isFocused
+                                          ? const Icon(
+                                              SFSymbols.paperplane_fill,
+                                              color: AppColor.objectColor,
+                                            )
+                                          : const Icon(
+                                              SFSymbols.paperplane,
+                                              color: AppColor.textColor2,
+                                            ),
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },)),
+                      ),
+                    ],
+                  );
+          },
+        )),
         bottomNavigationBar: const BottomBar());
   }
 }
