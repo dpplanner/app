@@ -122,7 +122,7 @@ class PostApiService {
     final accessToken = await storage.read(key: accessTokenKey);
 
     final response = await http.post(
-      Uri.parse('$baseUrl/posts /$postID/block'),
+      Uri.parse('$baseUrl/posts/$postID/block'),
       headers: {'Authorization': 'Bearer $accessToken'},
     );
 

@@ -14,6 +14,7 @@ class PostController extends GetxController {
 
   Future<void> blockPost(int postId) async {
     await PostApiService.postBlock(postID: postId);
+    posts.removeWhere((post) => post.value.id == postId);
   }
 
   Future<void> fetchPosts(int clubId, int page) async {
