@@ -404,34 +404,59 @@ class PostContent extends StatelessWidget {
                   'assets/images/extra/showmodal_scrollcontrolbar.svg',
                 ),
               ),
-              if (post.clubMemberId == MemberController.to.clubMember().id)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                  child: NextPageButton(
-                    buttonColor: AppColor.backgroundColor2,
-                    text: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(SFSymbols.pencil_outline,
-                            color: AppColor.textColor, size: 18),
-                        Text(
-                          " 수정하기",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColor.textColor),
+              post.clubMemberId == MemberController.to.clubMember().id
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                      child: NextPageButton(
+                        buttonColor: AppColor.backgroundColor2,
+                        text: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(SFSymbols.pencil_outline,
+                                color: AppColor.textColor, size: 18),
+                            Text(
+                              " 수정하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.textColor),
+                            ),
+                          ],
                         ),
-                      ],
+                        onPressed: () {
+                          Get.to(PostAddPage(
+                            isEdit: true,
+                            post: post,
+                            clubID: post.clubId,
+                          ));
+                        },
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                      child: NextPageButton(
+                        buttonColor: AppColor.backgroundColor2,
+                        text: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              SFSymbols.xmark,
+                              color: AppColor.markColor,
+                            ),
+                            Text(
+                              " 이 게시글 보지 않기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.markColor),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          _showReportDialog(context, post.id);
+                        },
+                      ),
                     ),
-                    onPressed: () {
-                      Get.to(PostAddPage(
-                        isEdit: true,
-                        post: post,
-                        clubID: post.clubId,
-                      ));
-                    },
-                  ),
-                ),
               hasAuthority() ||
                       post.clubMemberId == MemberController.to.clubMember().id
                   ? Padding(
@@ -459,7 +484,7 @@ class PostContent extends StatelessWidget {
                       ),
                     )
                   : Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
                       child: NextPageButton(
                         buttonColor: AppColor.backgroundColor2,
                         text: const Row(
