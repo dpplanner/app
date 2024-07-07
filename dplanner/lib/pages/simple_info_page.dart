@@ -10,7 +10,8 @@ class SimpleInfoPage extends StatefulWidget {
   final String title;
   final String filePath;
 
-  const SimpleInfoPage({Key? key, required this.title, required this.filePath}) : super(key: key);
+  const SimpleInfoPage({Key? key, required this.title, required this.filePath})
+      : super(key: key);
 
   @override
   State<SimpleInfoPage> createState() => _SimpleInfoPageState();
@@ -56,20 +57,17 @@ class _SimpleInfoPageState extends State<SimpleInfoPage> {
       ),
       body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-            child: SingleChildScrollView(
-              child: Text(
-                info,
-                style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                    color: AppColor.textColor
-                ),
-              ),
-            ),
-          )
-      ),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+        child: SingleChildScrollView(
+          child: Text(
+            info,
+            style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 15,
+                color: AppColor.textColor),
+          ),
+        ),
+      )),
     );
   }
-
 }
