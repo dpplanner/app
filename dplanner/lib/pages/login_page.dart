@@ -37,6 +37,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   FlutterSecureStorage storage = const FlutterSecureStorage();
+  String? eulaValue;
 
   // refresh token 유효성 검사
   bool checkRefreshToken(String token) {
@@ -57,9 +58,11 @@ class _LoginPageState extends State<LoginPage> {
     ///TODO: fluttersecurestorage 일부 기종 문제 해결
     String? refreshToken;
     String? accessToken;
+
     try {
       refreshToken = await storage.read(key: refreshTokenKey);
       accessToken = await storage.read(key: accessTokenKey);
+      eulaValue = await storage.read(key: eula);
     } catch (e) {
       print(e.toString());
     }
@@ -69,6 +72,7 @@ class _LoginPageState extends State<LoginPage> {
       print("토큰");
       print(accessToken);
       print(refreshToken);
+      print(eulaValue);
       print(decodeToken(accessToken!));
       print(decodeToken(refreshToken));
       try {
@@ -78,10 +82,12 @@ class _LoginPageState extends State<LoginPage> {
             await ClubMemberApiService.getClubMember(
                 clubId: decodeToken(accessToken)['recent_club_id'],
                 clubMemberId: decodeToken(accessToken)['club_member_id']);
-        if (MemberController.to.clubMember().isConfirmed) {
-          Get.offNamed('/tab2', arguments: 1);
-        } else {
-          Get.offNamed('/club_list');
+        if (eulaValue == 'true') {
+          if (MemberController.to.clubMember().isConfirmed) {
+            Get.offNamed('/tab2', arguments: 1);
+          } else {
+            Get.offNamed('/club_list');
+          }
         }
       } catch (e) {
         print(e.toString());
@@ -116,8 +122,18 @@ class _LoginPageState extends State<LoginPage> {
       await TokenApiService.postToken(email: email, name: name);
       await storage.write(key: loginInfo, value: '$email $name apple');
 
-      // 로그인 성공 후 화면 전환
-      Get.offNamed('/club_list');
+      try {
+        eulaValue = await storage.read(key: eula);
+      } catch (e) {
+        print(e.toString());
+      }
+
+      // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
+      if (eulaValue == 'true') {
+        Get.offNamed('/club_list');
+      } else {
+        Get.offNamed('/eula');
+      }
     } catch (e) {
       print(e.toString());
       snackBar(title: "애플 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
@@ -135,7 +151,18 @@ class _LoginPageState extends State<LoginPage> {
         await TokenApiService.postToken(email: email, name: name);
         await storage.write(key: loginInfo, value: '$email $name google');
 
-        Get.offNamed('/club_list');
+        try {
+          eulaValue = await storage.read(key: eula);
+        } catch (e) {
+          print(e.toString());
+        }
+
+        // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
+        if (eulaValue == 'true') {
+          Get.offNamed('/club_list');
+        } else {
+          Get.offNamed('/eula');
+        }
       } catch (e) {
         print(e.toString());
         snackBar(title: "구글 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
@@ -189,7 +216,18 @@ class _LoginPageState extends State<LoginPage> {
       await TokenApiService.postToken(email: email, name: name);
       await storage.write(key: loginInfo, value: '$email $name kakao');
 
-      Get.offNamed('/club_list');
+      try {
+        eulaValue = await storage.read(key: eula);
+      } catch (e) {
+        print(e.toString());
+      }
+
+      // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
+      if (eulaValue == 'true') {
+        Get.offNamed('/club_list');
+      } else {
+        Get.offNamed('/eula');
+      }
     } catch (e) {
       print(e.toString());
       snackBar(title: "로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
@@ -207,7 +245,18 @@ class _LoginPageState extends State<LoginPage> {
         await TokenApiService.postToken(email: email, name: name);
         await storage.write(key: loginInfo, value: '$email $name naver');
 
-        Get.offNamed('/club_list');
+        try {
+          eulaValue = await storage.read(key: eula);
+        } catch (e) {
+          print(e.toString());
+        }
+
+        // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
+        if (eulaValue == 'true') {
+          Get.offNamed('/club_list');
+        } else {
+          Get.offNamed('/eula');
+        }
       } catch (e) {
         print(e.toString());
         snackBar(title: "네이버 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
@@ -228,23 +277,25 @@ class _LoginPageState extends State<LoginPage> {
                 return SafeArea(
                   child: Center(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Padding(
-                          padding:
-                              const EdgeInsets.only(top: 128.0, bottom: 128.0),
+                          padding: EdgeInsets.only(
+                              top: SizeController.to.screenHeight * 0.22,
+                              bottom: SizeController.to.screenHeight * 0.05),
                           child: SvgPicture.asset(
                             'assets/images/login/dplanner_logo_login.svg',
                           ),
                         ),
-                        if (!Platform.isIOS)
-                          SizedBox(
-                            height: SizeController.to.screenHeight * 0.15,
-                          ),
+
+                        const Expanded(child: SizedBox()),
 
                         //카카오 로그인 버튼
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
+                          padding: EdgeInsets.fromLTRB(
+                              SizeController.to.screenWidth * 0.07,
+                              0,
+                              SizeController.to.screenWidth * 0.07,
+                              SizeController.to.screenHeight * 0.01),
                           child: ImageButton(
                               image: 'assets/images/login/login_kakao.png',
                               onTap: () async {
@@ -254,7 +305,11 @@ class _LoginPageState extends State<LoginPage> {
 
                         // 네이버 로그인 버튼
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
+                          padding: EdgeInsets.fromLTRB(
+                              SizeController.to.screenWidth * 0.07,
+                              0,
+                              SizeController.to.screenWidth * 0.07,
+                              SizeController.to.screenHeight * 0.01),
                           child: ImageButton(
                               image: 'assets/images/login/login_naver.png',
                               onTap: () async {
@@ -264,7 +319,11 @@ class _LoginPageState extends State<LoginPage> {
 
                         //구글 로그인 버튼
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
+                          padding: EdgeInsets.fromLTRB(
+                              SizeController.to.screenWidth * 0.07,
+                              0,
+                              SizeController.to.screenWidth * 0.07,
+                              0),
                           child: ImageButton(
                               image: 'assets/images/login/login_google.png',
                               onTap: () async {
@@ -273,13 +332,20 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         if (Platform.isIOS)
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(24, 5, 24, 5),
+                            padding: EdgeInsets.fromLTRB(
+                                SizeController.to.screenWidth * 0.07,
+                                SizeController.to.screenHeight * 0.01,
+                                SizeController.to.screenWidth * 0.07,
+                                0),
                             child: SignInWithAppleButton(
                               onPressed: () async {
                                 await signInWithApple();
                               },
                             ),
                           ),
+                        SizedBox(
+                          height: SizeController.to.screenHeight * 0.1,
+                        ),
                       ],
                     ),
                   ),

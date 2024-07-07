@@ -135,8 +135,6 @@ class _AppSettingPageState extends State<AppSettingPage> {
                 onTap: () {
                   _sendEmail();
                 }),
-            buttonRow(
-                title: "테스트 화면", onTap: () => Get.to(const EulaConsentPage())),
           ],
         ),
       ),

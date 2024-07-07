@@ -16,6 +16,7 @@ import 'package:dplanner/pages/club_reservation_list_page.dart';
 import 'package:dplanner/pages/club_setting_page.dart';
 import 'package:dplanner/pages/club_timetable_page.dart';
 import 'package:dplanner/pages/error_page.dart';
+import 'package:dplanner/pages/eula_consent_page.dart';
 import 'package:dplanner/pages/login_page.dart';
 import 'package:dplanner/pages/my_activity_check_page.dart';
 import 'package:dplanner/pages/my_profile_modification_page.dart';
@@ -30,6 +31,7 @@ import 'package:get/get.dart';
 final page = [
   /// 로그인 페이지
   GetPage(name: '/', page: () => const LoginPage()),
+  GetPage(name: '/eula', page: () => const EulaConsentPage()),
 
   /// 클럽 목록
   GetPage(name: '/club_list', page: () => const ClubListPage()),

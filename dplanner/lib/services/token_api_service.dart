@@ -9,6 +9,31 @@ import '../const/const.dart';
 class TokenApiService {
   static const String baseUrl = 'http://3.39.102.31:8080';
 
+  /// POST: /eula [eula 동의] eula 동의하기
+  static Future<void> postEula() async {
+    final url = Uri.parse('$baseUrl/eula');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
   /// POST: /auth/login [client login] 로그인 후 JWT 토큰 발급
   static Future<void> postToken(
       {required String email, required String name}) async {
@@ -32,7 +57,9 @@ class TokenApiService {
       // secure storage에 Token 보관
       await storage.write(key: accessTokenKey, value: data['accessToken']);
       await storage.write(key: refreshTokenKey, value: data['refreshToken']);
+      await storage.write(key: eula, value: data['eula'].toString());
 
+      print(data['eula'].toString());
       print('new token saved');
       return;
     }

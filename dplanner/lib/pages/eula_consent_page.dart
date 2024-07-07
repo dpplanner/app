@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 
 import '../const/style.dart';
 import '../controllers/size.dart';
+import '../services/token_api_service.dart';
 import '../widgets/nextpage_button.dart';
 import 'error_page.dart';
 
@@ -66,8 +67,9 @@ class EulaConsentPage extends StatelessWidget {
                                 color: AppColor.backgroundColor),
                           ),
                           buttonColor: AppColor.objectColor,
-                          onPressed: () {
-                            // Get.offNamed('/tab2', arguments: 1);
+                          onPressed: () async {
+                            await TokenApiService.postEula();
+                            Get.offNamed('/club_list');
                           },
                         ),
                         Padding(
