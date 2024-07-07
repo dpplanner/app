@@ -12,23 +12,31 @@ class PostController extends GetxController {
     return posts.firstWhereOrNull((rxPost) => rxPost.value.id == postId);
   }
 
+  Future<void> blockPost(int postId) async {
+    await PostApiService.postBlock(postID: postId);
+  }
+
   Future<void> fetchPosts(int clubId, int page) async {
-    List<Post> fetchedPosts = await PostApiService.fetchPosts(clubID: clubId, page: page);
+    List<Post> fetchedPosts =
+        await PostApiService.fetchPosts(clubID: clubId, page: page);
     posts.value = fetchedPosts.map((post) => post.obs).toList();
   }
 
   Future<void> fetchMyPosts(int clubMemberId, int page) async {
-    List<Post> fetchedPosts = await PostApiService.fetchMyPosts(clubMemberID: clubMemberId, page: page);
+    List<Post> fetchedPosts = await PostApiService.fetchMyPosts(
+        clubMemberID: clubMemberId, page: page);
     posts.value = fetchedPosts.map((post) => post.obs).toList();
   }
 
   Future<void> fetchCommentedPosts(int clubMemberId, int page) async {
-    List<Post> fetchedPosts = await PostApiService.fetchCommentedPosts(clubMemberID: clubMemberId, page: page);
+    List<Post> fetchedPosts = await PostApiService.fetchCommentedPosts(
+        clubMemberID: clubMemberId, page: page);
     posts.value = fetchedPosts.map((post) => post.obs).toList();
   }
 
   Future<void> fetchLikedPosts(int clubMemberId, int page) async {
-    List<Post> fetchedPosts = await PostApiService.fetchLikedPosts(clubMemberID: clubMemberId, page: page);
+    List<Post> fetchedPosts = await PostApiService.fetchLikedPosts(
+        clubMemberID: clubMemberId, page: page);
     posts.value = fetchedPosts.map((post) => post.obs).toList();
   }
 
@@ -38,31 +46,28 @@ class PostController extends GetxController {
     posts.refresh();
   }
 
-  Future<void> createPost({
-    required int clubId,
-    required String title,
-    required String content,
-    List<XFile>? imageFileList}) async {
-
+  Future<void> createPost(
+      {required int clubId,
+      required String title,
+      required String content,
+      List<XFile>? imageFileList}) async {
     Post? post = await PostApiService.submitPost(
         clubId: clubId,
         title: title,
         content: content,
-        imageFileList: imageFileList
-    );
+        imageFileList: imageFileList);
 
     if (post != null) {
       await fetchPosts(post.clubId, 0);
     }
   }
 
-  Future<void> updatePost({
-    required int postId,
-    required String title,
-    required String content,
-    List<XFile>? imageFileList,
-    List<String>? previousImageFileList}) async {
-
+  Future<void> updatePost(
+      {required int postId,
+      required String title,
+      required String content,
+      List<XFile>? imageFileList,
+      List<String>? previousImageFileList}) async {
     Post? post = await PostApiService.editPost(
         postID: postId,
         title: title,

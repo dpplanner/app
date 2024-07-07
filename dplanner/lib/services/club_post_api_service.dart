@@ -97,9 +97,14 @@ class PostApiService {
 
       if (response.statusCode == 201) {
         // 요청이 성공한 경우
-        final post = Post.fromJson(jsonDecode(utf8.decode(responseBody.bodyBytes))['data']);
+        final post = Post.fromJson(
+            jsonDecode(utf8.decode(responseBody.bodyBytes))['data']);
         snackBar(title: "게시글이 작성되었습니다", content: "게시글을 확인해 주세요");
-        Get.off(() => PostPage(postId: post.id,), arguments: 1); // 게시글 등록 이후 바로 작성한 게시글로 이동
+        Get.off(
+            () => PostPage(
+                  postId: post.id,
+                ),
+            arguments: 1); // 게시글 등록 이후 바로 작성한 게시글로 이동
         return post;
       } else {
         // 요청이 실패한 경우
@@ -110,6 +115,24 @@ class PostApiService {
       snackBar(title: "게시글을 작성하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
     }
     return null;
+  }
+
+  static Future<void> postBlock({required int postID}) async {
+    const storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/posts /$postID/block'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+
+    if (response.statusCode == 200) {
+      return;
+    } else {
+      print(response.body);
+      print(response.statusCode);
+      throw Exception('Failed to block post');
+    }
   }
 
   static Future<List<Post>> fetchPosts(
@@ -135,7 +158,8 @@ class PostApiService {
 
   static Future<List<Post>> fetchMyPosts(
       //TODO: 포스트 없을때
-      {required int clubMemberID, required int page}) async {
+      {required int clubMemberID,
+      required int page}) async {
     final storage = FlutterSecureStorage();
     final accessToken = await storage.read(key: accessTokenKey);
 
@@ -160,7 +184,8 @@ class PostApiService {
 
     //todo api 나오면 uri 바꾸기
     final response = await http.get(
-      Uri.parse('$baseUrl/posts/clubMembers/$clubMemberID/commented?size=100&page=$page'),
+      Uri.parse(
+          '$baseUrl/posts/clubMembers/$clubMemberID/commented?size=100&page=$page'),
       headers: {'Authorization': 'Bearer $accessToken'},
     );
 
@@ -179,7 +204,8 @@ class PostApiService {
     final accessToken = await storage.read(key: accessTokenKey);
 
     final response = await http.get(
-      Uri.parse('$baseUrl/posts/clubMembers/$clubMemberID/like?size=100&page=$page'),
+      Uri.parse(
+          '$baseUrl/posts/clubMembers/$clubMemberID/like?size=100&page=$page'),
       headers: {'Authorization': 'Bearer $accessToken'},
     );
 
@@ -264,7 +290,8 @@ class PostApiService {
         Get.back(); // 게시글 수정 페이지 나가기
         Get.back(); // 바텀 시트 닫기
         snackBar(title: "게시글이 수정되었습니다", content: "게시글을 확인해 주세요");
-        return Post.fromJson(jsonDecode(utf8.decode(responseBody.bodyBytes))['data']);
+        return Post.fromJson(
+            jsonDecode(utf8.decode(responseBody.bodyBytes))['data']);
       } else {
         // 요청이 실패한 경우
         snackBar(title: "게시글을 수정하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
@@ -354,8 +381,10 @@ class PostApiService {
     }
   }
 
-  static Future<void> reportPost({
-    required int postId, required int clubMemberId, required String reportMessage}) async {
+  static Future<void> reportPost(
+      {required int postId,
+      required int clubMemberId,
+      required String reportMessage}) async {
     try {
       // AccessToken 가져오기
       final storage = FlutterSecureStorage();
@@ -519,8 +548,10 @@ class PostCommentApiService {
     }
   }
 
-  static Future<void> reportComment({
-    required int commentId, required int clubMemberId, required String reportMessage}) async {
+  static Future<void> reportComment(
+      {required int commentId,
+      required int clubMemberId,
+      required String reportMessage}) async {
     try {
       // AccessToken 가져오기
       final storage = FlutterSecureStorage();

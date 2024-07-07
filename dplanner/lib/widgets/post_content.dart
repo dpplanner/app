@@ -112,6 +112,92 @@ class PostContent extends StatelessWidget {
     );
   }
 
+  Future<void> _showBlockDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: const Padding(
+              padding: EdgeInsets.only(top: 16.0),
+              child: Center(
+                child: Text(
+                  "게시글 차단",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+            backgroundColor: AppColor.backgroundColor,
+            elevation: 0,
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Center(
+                        child: Text(
+                          '정말로 이 게시글을 차단하시겠습니까?',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w500),
+                        ),
+                      )
+                    ]);
+              },
+            ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                    child: TextButton(
+                      onPressed: Get.back,
+                      child: const Text(
+                        "취소",
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppColor.textColor2),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                    child: TextButton(
+                      child: const Text(
+                        "차단하기",
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColor.markColor),
+                      ),
+                      // buttonColor: AppColor.markColor,
+                      onPressed: () async {
+                        try {
+                          await PostController.to.blockPost(post.id);
+                          Get.back(); // 경고창 닫기
+                          Get.back(); // 바텀 시트 닫기
+                          Get.back(); // 차단된 게시글 나가기
+                          snackBar(
+                              title: "게시글이 차단되었습니다",
+                              content: "더이상 해당 게시글이 노출되지 않습니다");
+                        } catch (e) {
+                          snackBar(
+                              title: "게시글을 차단하지 못헸습니다",
+                              content: "잠시 후 다시 시도해 주세요");
+                          // print('게시글 삭제 중 오류: $e');
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ]);
+      },
+    );
+  }
+
   Future<void> _showReportDialog(BuildContext context, int postId) async {
     return showDialog<void>(
       context: context,
@@ -404,34 +490,59 @@ class PostContent extends StatelessWidget {
                   'assets/images/extra/showmodal_scrollcontrolbar.svg',
                 ),
               ),
-              if (post.clubMemberId == MemberController.to.clubMember().id)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-                  child: NextPageButton(
-                    buttonColor: AppColor.backgroundColor2,
-                    text: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(SFSymbols.pencil_outline,
-                            color: AppColor.textColor, size: 18),
-                        Text(
-                          " 수정하기",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColor.textColor),
+              post.clubMemberId == MemberController.to.clubMember().id
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                      child: NextPageButton(
+                        buttonColor: AppColor.backgroundColor2,
+                        text: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(SFSymbols.pencil_outline,
+                                color: AppColor.textColor, size: 18),
+                            Text(
+                              " 수정하기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.textColor),
+                            ),
+                          ],
                         ),
-                      ],
+                        onPressed: () {
+                          Get.to(PostAddPage(
+                            isEdit: true,
+                            post: post,
+                            clubID: post.clubId,
+                          ));
+                        },
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+                      child: NextPageButton(
+                        buttonColor: AppColor.backgroundColor2,
+                        text: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              SFSymbols.xmark,
+                              color: AppColor.markColor,
+                            ),
+                            Text(
+                              " 이 게시글 보지 않기",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColor.markColor),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          _showBlockDialog(context);
+                        },
+                      ),
                     ),
-                    onPressed: () {
-                      Get.to(PostAddPage(
-                        isEdit: true,
-                        post: post,
-                        clubID: post.clubId,
-                      ));
-                    },
-                  ),
-                ),
               hasAuthority() ||
                       post.clubMemberId == MemberController.to.clubMember().id
                   ? Padding(
@@ -459,7 +570,7 @@ class PostContent extends StatelessWidget {
                       ),
                     )
                   : Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
                       child: NextPageButton(
                         buttonColor: AppColor.backgroundColor2,
                         text: const Row(
