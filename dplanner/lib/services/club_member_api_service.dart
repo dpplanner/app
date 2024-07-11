@@ -77,6 +77,30 @@ class ClubMemberApiService {
     throw ErrorDescription(errorMessage);
   }
 
+  /// POST: /clubs/{club id}/club-members/{club member id}/block [클럽 멤버 차단] 클럽 멤버 차단하기
+  static Future<void> postBlockClubMember(
+      {required int clubId, required int clubMemberId}) async {
+    final url =
+        Uri.parse('$baseUrl/clubs/$clubId/club-members/$clubMemberId/block');
+    const storage = FlutterSecureStorage();
+
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.post(url, headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $accessToken',
+    });
+
+    if (response.statusCode == 200) {
+      return;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
   /// GET: /clubs/(_.club_id)/club-members [클럽 멤버 목록] 클럽 멤버 목록 불러오기
   static Future<List<ClubMemberModel>> getClubMemberList(
       {required int clubId, required bool confirmed}) async {
@@ -215,7 +239,6 @@ class ClubMemberApiService {
     print(errorMessage);
     throw ErrorDescription(errorMessage);
   }
-
 
   /// PATCH: /clubs/(_.club_id)/club-members/(_.club_member_id)/role [클럽 멤버 권한 및 롤 변경] 클럽 멤버 등급 변경하기
   static Future<ClubMemberModel> patchAuthorities(
