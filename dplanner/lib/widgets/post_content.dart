@@ -7,6 +7,7 @@ import 'package:dplanner/widgets/report_dialog.dart';
 import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -116,7 +117,7 @@ class PostContent extends StatelessWidget {
     );
   }
 
-  Future<void> _showBlockDialog(BuildContext context) async {
+  Future<void> _showBlockPost(BuildContext context) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -275,12 +276,18 @@ class PostContent extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              post.clubMemberName,
-                              style: const TextStyle(
-                                color: AppColor.textColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                            GestureDetector(
+                              onTap: () async {
+                                await _clubMemberInfo(
+                                    memberId: post.clubMemberId);
+                              },
+                              child: Text(
+                                post.clubMemberName,
+                                style: const TextStyle(
+                                  color: AppColor.textColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                             SizedBox(
@@ -548,7 +555,7 @@ class PostContent extends StatelessWidget {
                           ],
                         ),
                         onPressed: () {
-                          _showBlockDialog(context);
+                          _showBlockPost(context);
                         },
                       ),
                     ),
@@ -832,14 +839,8 @@ class PostContent extends StatelessWidget {
                     ],
                   ),
                   buttonColor: AppColor.backgroundColor2,
-                  onPressed: () async {
-                    try {
-                      member = await ClubMemberApiService.getClubMember(
-                          clubId: ClubController.to.club.value.id,
-                          clubMemberId: memberId);
-                    } catch (e) {
-                      print(e.toString());
-                    }
+                  onPressed: () {
+                    _showBlockClubMember(context);
                   },
                 ),
               ),
@@ -855,6 +856,94 @@ class PostContent extends StatelessWidget {
           topRight: Radius.circular(30),
         ),
       ),
+    );
+  }
+
+  Future<void> _showBlockClubMember(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: const Padding(
+              padding: EdgeInsets.only(top: 16.0),
+              child: Center(
+                child: Text(
+                  "사용자 차단",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+            backgroundColor: AppColor.backgroundColor,
+            elevation: 0,
+            content: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Center(
+                        child: Text(
+                          '정말로 이 사용자를 차단하시겠습니까?',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w500),
+                        ),
+                      )
+                    ]);
+              },
+            ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                    child: TextButton(
+                      onPressed: Get.back,
+                      child: const Text(
+                        "취소",
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppColor.textColor2),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                    child: TextButton(
+                      child: const Text(
+                        "차단하기",
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColor.markColor),
+                      ),
+                      // buttonColor: AppColor.markColor,
+                      onPressed: () async {
+                        try {
+                          await ClubMemberApiService.postBlockClubMember(
+                              clubId: post.clubId,
+                              clubMemberId: post.clubMemberId);
+                          Get.back(); // 경고창 닫기
+                          Get.back(); // 바텀 시트 닫기
+                          Get.back(); // 차단된 사용자의 게시글 나가기
+                          snackBar(
+                              title: "사용자가 차단되었습니다",
+                              content: "더이상 해당 사용자의 활동이 노출되지 않습니다");
+                        } catch (e) {
+                          snackBar(
+                              title: "사용자를 차단하지 못헸습니다",
+                              content: "잠시 후 다시 시도해 주세요");
+                          // print('게시글 삭제 중 오류: $e');
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ]);
+      },
     );
   }
 }
