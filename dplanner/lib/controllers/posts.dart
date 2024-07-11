@@ -3,6 +3,8 @@ import 'package:dplanner/services/club_post_api_service.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 
+import '../services/club_member_api_service.dart';
+
 class PostController extends GetxController {
   static PostController get to => Get.find();
 
@@ -85,6 +87,13 @@ class PostController extends GetxController {
   Future<void> deletePost(int postId) async {
     await PostApiService.deletePost(postId);
     posts.removeWhere((rxPost) => rxPost.value.id == postId);
+    update();
+  }
+
+  Future<void> deleteClubMemberPosts(int clubId, int clubMemberId) async {
+    await ClubMemberApiService.postBlockClubMember(
+        clubId: clubId, clubMemberId: clubMemberId);
+    posts.removeWhere((rxPost) => rxPost.value.clubMemberId == clubMemberId);
     update();
   }
 

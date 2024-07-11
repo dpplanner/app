@@ -628,6 +628,7 @@ class _CommentBlockState extends State<CommentBlock> {
                           await ClubMemberApiService.postBlockClubMember(
                               clubId: ClubController.to.club.value.id,
                               clubMemberId: widget.comment.clubMemberId);
+                          widget.onCommentDeleted();
                           Get.back(); // 경고창 닫기
                           Get.back(); // 바텀 시트 닫기
                           snackBar(

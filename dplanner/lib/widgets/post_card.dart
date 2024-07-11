@@ -589,9 +589,8 @@ class PostCard extends StatelessWidget {
                       // buttonColor: AppColor.markColor,
                       onPressed: () async {
                         try {
-                          await ClubMemberApiService.postBlockClubMember(
-                              clubId: rxPost.value.clubId,
-                              clubMemberId: rxPost.value.clubMemberId);
+                          await PostController.to.deleteClubMemberPosts(
+                              rxPost.value.clubId, rxPost.value.clubMemberId);
                           Get.back(); // 경고창 닫기
                           Get.back(); // 바텀 시트 닫기
                           snackBar(

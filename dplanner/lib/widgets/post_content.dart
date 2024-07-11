@@ -922,9 +922,8 @@ class PostContent extends StatelessWidget {
                       // buttonColor: AppColor.markColor,
                       onPressed: () async {
                         try {
-                          await ClubMemberApiService.postBlockClubMember(
-                              clubId: post.clubId,
-                              clubMemberId: post.clubMemberId);
+                          await PostController.to.deleteClubMemberPosts(
+                              post.clubId, post.clubMemberId);
                           Get.back(); // 경고창 닫기
                           Get.back(); // 바텀 시트 닫기
                           Get.back(); // 차단된 사용자의 게시글 나가기
