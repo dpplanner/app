@@ -594,7 +594,6 @@ class PostCard extends StatelessWidget {
                               clubMemberId: rxPost.value.clubMemberId);
                           Get.back(); // 경고창 닫기
                           Get.back(); // 바텀 시트 닫기
-                          Get.back(); // 차단된 사용자의 게시글 나가기
                           snackBar(
                               title: "사용자가 차단되었습니다",
                               content: "더이상 해당 사용자의 활동이 노출되지 않습니다");
