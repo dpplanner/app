@@ -1,8 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/posts.dart';
 import 'package:dplanner/pages/post_add_page.dart';
+import 'package:dplanner/services/club_member_api_service.dart';
 import 'package:dplanner/widgets/report_dialog.dart';
 import 'package:dplanner/widgets/snack_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,6 +14,7 @@ import 'package:intl/intl.dart';
 
 import '../controllers/size.dart';
 import '../const/style.dart';
+import '../models/club_member_model.dart';
 import 'nextpage_button.dart';
 import 'package:dplanner/models/post_model.dart';
 import 'full_screen_image.dart';
@@ -240,24 +244,29 @@ class PostContent extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    ClipOval(
-                      child: post.profileUrl != null
-                          ? CachedNetworkImage(
-                              placeholder: (context, url) => Container(),
-                              imageUrl: post.profileUrl!,
-                              errorWidget: (context, url, error) =>
-                                  SvgPicture.asset(
-                                    'assets/images/base_image/base_member_image.svg',
-                                  ),
-                              height: SizeController.to.screenWidth * 0.1,
-                              width: SizeController.to.screenWidth * 0.1,
-                              fit: BoxFit.cover)
-                          : SvgPicture.asset(
-                              'assets/images/base_image/base_member_image.svg',
-                              height: SizeController.to.screenWidth * 0.1,
-                              width: SizeController.to.screenWidth * 0.1,
-                              fit: BoxFit.fill,
-                            ),
+                    GestureDetector(
+                      onTap: () async {
+                        await _clubMemberInfo(memberId: post.clubMemberId);
+                      },
+                      child: ClipOval(
+                        child: post.profileUrl != null
+                            ? CachedNetworkImage(
+                                placeholder: (context, url) => Container(),
+                                imageUrl: post.profileUrl!,
+                                errorWidget: (context, url, error) =>
+                                    SvgPicture.asset(
+                                      'assets/images/base_image/base_member_image.svg',
+                                    ),
+                                height: SizeController.to.screenWidth * 0.1,
+                                width: SizeController.to.screenWidth * 0.1,
+                                fit: BoxFit.cover)
+                            : SvgPicture.asset(
+                                'assets/images/base_image/base_member_image.svg',
+                                height: SizeController.to.screenWidth * 0.1,
+                                width: SizeController.to.screenWidth * 0.1,
+                                fit: BoxFit.fill,
+                              ),
+                      ),
                     ),
                     SizedBox(width: SizeController.to.screenWidth * 0.03),
                     Column(
@@ -625,6 +634,227 @@ class PostContent extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Future<void> _clubMemberInfo({required int memberId}) async {
+    ClubMemberModel member = ClubMemberModel(
+        id: 0, name: "error", role: "MANAGER", isConfirmed: true);
+
+    try {
+      member = await ClubMemberApiService.getClubMember(
+          clubId: ClubController.to.club.value.id, clubMemberId: memberId);
+    } catch (e) {
+      print(e.toString());
+    }
+
+    Get.bottomSheet(
+      isScrollControlled: true,
+      StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+        return SizedBox(
+          height: SizeController.to.screenHeight * 0.7,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                      child: SvgPicture.asset(
+                        'assets/images/extra/showmodal_scrollcontrolbar.svg',
+                      ),
+                    ),
+                    const Text(
+                      "회원 정보",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 24.0),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 24.0),
+                            child: ClipOval(
+                              child: Visibility(
+                                visible: (member.url == null),
+                                replacement: Image.network(
+                                  "https://${member.url}",
+                                  height: SizeController.to.screenWidth * 0.25,
+                                  width: SizeController.to.screenWidth * 0.25,
+                                  fit: BoxFit.fill,
+                                  errorBuilder: (BuildContext context,
+                                      Object error, StackTrace? stackTrace) {
+                                    return Container(
+                                      color: AppColor.backgroundColor,
+                                      height:
+                                          SizeController.to.screenWidth * 0.25,
+                                      width:
+                                          SizeController.to.screenWidth * 0.25,
+                                      child: const Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Image',
+                                            style: TextStyle(
+                                              color: AppColor.textColor,
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Failed',
+                                            style: TextStyle(
+                                              color: AppColor.textColor,
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                                child: SvgPicture.asset(
+                                  'assets/images/base_image/base_member_image.svg',
+                                  height: SizeController.to.screenWidth * 0.25,
+                                  width: SizeController.to.screenWidth * 0.25,
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "클럽 닉네임",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  "회원 등급",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  member.name,
+                                  style: const TextStyle(
+                                    color: AppColor.textColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  (member.role == "MANAGER")
+                                      ? member.clubAuthorityName ?? ""
+                                      : (member.role == "ADMIN")
+                                          ? "관리자"
+                                          : "일반",
+                                  style: const TextStyle(
+                                    color: AppColor.textColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(32, 32, 32, 16),
+                      child: Text(
+                        "소개글",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
+                        child: Text(
+                          member.info ?? "",
+                          style: const TextStyle(
+                            color: AppColor.textColor,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                child: NextPageButton(
+                  text: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        SFSymbols.xmark,
+                        color: AppColor.markColor,
+                      ),
+                      Text(
+                        " 이 사용자 보지 않기",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: AppColor.markColor),
+                      ),
+                    ],
+                  ),
+                  buttonColor: AppColor.backgroundColor2,
+                  onPressed: () async {
+                    try {
+                      member = await ClubMemberApiService.getClubMember(
+                          clubId: ClubController.to.club.value.id,
+                          clubMemberId: memberId);
+                    } catch (e) {
+                      print(e.toString());
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
+      backgroundColor: AppColor.backgroundColor,
+      elevation: 0,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+      ),
     );
   }
 }
