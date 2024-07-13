@@ -372,6 +372,17 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
     String selectedValue = grade[0];
     List<ClubManagerModel> managers = [];
 
+    bool checkGradeChange() {
+      if (selectedValue == "관리자" && "ADMIN" == member.role) {
+        return false;
+      } else if (selectedValue == "일반" && "USER" == member.role) {
+        return false;
+      } else if (selectedValue == member.clubAuthorityName) {
+        return false;
+      }
+      return true;
+    }
+
     try {
       managers = await ClubManagerApiService.getClubManager(
           clubId: ClubController.to.club().id);
@@ -821,44 +832,48 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                       padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
                       child: NextPageButton(
                         text: const Text(
-                          "변경사항 반영하기",
+                          "변경 사항 반영하기",
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: AppColor.backgroundColor),
                         ),
-                        buttonColor: AppColor.objectColor,
+                        buttonColor: checkGradeChange()
+                            ? AppColor.objectColor
+                            : AppColor.subColor3,
                         onPressed: () async {
-                          String role = "";
-                          int? clubAuthorityId;
-                          if (selectedValue == "관리자") {
-                            role = "ADMIN";
-                          } else if (selectedValue == "일반") {
-                            role = "USER";
-                          } else {
-                            role = "MANAGER";
-                            for (var i in managers) {
-                              if (i.name == selectedValue) {
-                                clubAuthorityId = i.id;
+                          if (checkGradeChange()) {
+                            String role = "";
+                            int? clubAuthorityId;
+                            if (selectedValue == "관리자") {
+                              role = "ADMIN";
+                            } else if (selectedValue == "일반") {
+                              role = "USER";
+                            } else {
+                              role = "MANAGER";
+                              for (var i in managers) {
+                                if (i.name == selectedValue) {
+                                  clubAuthorityId = i.id;
+                                }
                               }
                             }
-                          }
-                          try {
-                            await ClubMemberApiService.patchAuthorities(
-                                clubMemberId: member.id,
-                                clubId: ClubController.to.club().id,
-                                role: role,
-                                clubAuthorityId: clubAuthorityId);
-                            getClubMemberList();
-                            Get.back();
-                            snackBar(
-                                title: "회원 등급을 변경했습니다",
-                                content: "회원 정보를 확인해주세요");
-                          } catch (e) {
-                            print(e.toString());
-                            snackBar(
-                                title: "회원 등급을 변경하지 못했습니다",
-                                content: "잠시 후 다시 시도해 주세요");
+                            try {
+                              await ClubMemberApiService.patchAuthorities(
+                                  clubMemberId: member.id,
+                                  clubId: ClubController.to.club().id,
+                                  role: role,
+                                  clubAuthorityId: clubAuthorityId);
+                              getClubMemberList();
+                              Get.back();
+                              snackBar(
+                                  title: "회원 등급을 변경했습니다",
+                                  content: "회원 정보를 확인해주세요");
+                            } catch (e) {
+                              print(e.toString());
+                              snackBar(
+                                  title: "회원 등급을 변경하지 못했습니다",
+                                  content: "잠시 후 다시 시도해 주세요");
+                            }
                           }
                         },
                       ),
