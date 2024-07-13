@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../controllers/club.dart';
+import '../controllers/member.dart';
 import '../controllers/size.dart';
 import '../const/style.dart';
 import 'package:dplanner/models/post_model.dart';
@@ -486,31 +487,33 @@ class PostCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-                child: NextPageButton(
-                  text: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        SFSymbols.xmark,
-                        color: AppColor.markColor,
-                      ),
-                      Text(
-                        " 이 사용자 보지 않기",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.markColor),
-                      ),
-                    ],
+              if (MemberController.to.clubMember().id !=
+                  rxPost.value.clubMemberId)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                  child: NextPageButton(
+                    text: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          SFSymbols.xmark,
+                          color: AppColor.markColor,
+                        ),
+                        Text(
+                          " 이 사용자 보지 않기",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.markColor),
+                        ),
+                      ],
+                    ),
+                    buttonColor: AppColor.backgroundColor2,
+                    onPressed: () {
+                      _showBlockClubMember(context);
+                    },
                   ),
-                  buttonColor: AppColor.backgroundColor2,
-                  onPressed: () {
-                    _showBlockClubMember(context);
-                  },
                 ),
-              ),
             ],
           ),
         );
