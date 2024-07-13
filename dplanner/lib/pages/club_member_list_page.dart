@@ -126,8 +126,14 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                       children: [
                         const BannerAdWidget(),
                         if (MemberController.to.clubMember().role == "ADMIN" ||
-                            (MemberController.to.clubMember().clubAuthorityTypes != null
-                                && MemberController.to.clubMember().clubAuthorityTypes!.contains("Member_ALL")))
+                            (MemberController.to
+                                        .clubMember()
+                                        .clubAuthorityTypes !=
+                                    null &&
+                                MemberController.to
+                                    .clubMember()
+                                    .clubAuthorityTypes!
+                                    .contains("Member_ALL")))
                           StreamBuilder<List<ClubMemberModel>>(
                               stream: streamController2.stream,
                               builder: (BuildContext context,
@@ -142,9 +148,15 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                                 } else if (snapshot.data!.isEmpty) {
                                   return const SizedBox();
                                 } else {
-                                  if (params.containsKey("clubMemberId") && params["clubMemberId"] != null) {
-                                    int clubMemberId = int.parse(params["clubMemberId"]!);
-                                    _clubMemberInfo(types: 0, member: snapshot.data!.firstWhere((member) => member.id == clubMemberId));
+                                  if (params.containsKey("clubMemberId") &&
+                                      params["clubMemberId"] != null) {
+                                    int clubMemberId =
+                                        int.parse(params["clubMemberId"]!);
+                                    _clubMemberInfo(
+                                        types: 0,
+                                        member: snapshot.data!.firstWhere(
+                                            (member) =>
+                                                member.id == clubMemberId));
                                     Get.parameters.clear();
                                   }
 
@@ -309,9 +321,17 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                           size: 20,
                         ),
                       ),
-                    if ((MemberController.to.clubMember().role == "ADMIN" || (MemberController.to.clubMember().clubAuthorityTypes != null && MemberController.to.clubMember().clubAuthorityTypes!.contains("MEMBER_ALL")))
-                        && member.role != "ADMIN"
-                        && member.id != MemberController.to.clubMember().id)
+                    if ((MemberController.to.clubMember().role == "ADMIN" ||
+                            (MemberController.to
+                                        .clubMember()
+                                        .clubAuthorityTypes !=
+                                    null &&
+                                MemberController.to
+                                    .clubMember()
+                                    .clubAuthorityTypes!
+                                    .contains("MEMBER_ALL"))) &&
+                        member.role != "ADMIN" &&
+                        member.id != MemberController.to.clubMember().id)
                       Visibility(
                         visible: member.isConfirmed,
                         replacement: IconButton(
@@ -348,7 +368,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
   //types: 0-승인 대기중, 1-회원 정보, 2-등급 수정
   Future<void> _clubMemberInfo(
       {required int types, required ClubMemberModel member}) async {
-    List<String> grade = ['일반', '관리자'];
+    List<String> grade = ['관리자'];
     String selectedValue = grade[0];
     List<ClubManagerModel> managers = [];
 
@@ -356,10 +376,14 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
       managers = await ClubManagerApiService.getClubManager(
           clubId: ClubController.to.club().id);
       for (var i in managers) {
-        grade.insert(0, i.name);
+        grade.insert(grade.length, i.name);
       }
-      selectedValue =
-          (member.role == "MANAGER") ? member.clubAuthorityName ?? "" : "일반";
+      grade.insert(grade.length, '일반');
+      selectedValue = (member.role == "ADMIN")
+          ? "관리자"
+          : (member.role == "MANAGER")
+              ? member.clubAuthorityName ?? ""
+              : "일반";
     } catch (e) {
       print(e.toString());
     }
@@ -724,7 +748,13 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                   ),
                 ),
               ),
-              if (member.id != MemberController.to.clubMember().id)
+              if (member.id != MemberController.to.clubMember().id ||
+                  (MemberController.to.clubMember().clubAuthorityTypes !=
+                          null &&
+                      MemberController.to
+                          .clubMember()
+                          .clubAuthorityTypes!
+                          .contains("MEMBER_ALL")))
                 Visibility(
                   visible: types != 0,
                   replacement: Padding(
@@ -821,10 +851,14 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                                 clubAuthorityId: clubAuthorityId);
                             getClubMemberList();
                             Get.back();
-                            snackBar(title: "회원 등급을 변경했습니다", content: "회원 정보를 확인해주세요");
+                            snackBar(
+                                title: "회원 등급을 변경했습니다",
+                                content: "회원 정보를 확인해주세요");
                           } catch (e) {
                             print(e.toString());
-                            snackBar(title: "회원 등급을 변경하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
+                            snackBar(
+                                title: "회원 등급을 변경하지 못했습니다",
+                                content: "잠시 후 다시 시도해 주세요");
                           }
                         },
                       ),
