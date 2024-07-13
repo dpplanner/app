@@ -522,31 +522,33 @@ class _CommentBlockState extends State<CommentBlock> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-                child: NextPageButton(
-                  text: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        SFSymbols.xmark,
-                        color: AppColor.markColor,
-                      ),
-                      Text(
-                        " 이 사용자 보지 않기",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColor.markColor),
-                      ),
-                    ],
+              if (MemberController.to.clubMember().id !=
+                  widget.comment.clubMemberId)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+                  child: NextPageButton(
+                    text: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          SFSymbols.xmark,
+                          color: AppColor.markColor,
+                        ),
+                        Text(
+                          " 이 사용자 보지 않기",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColor.markColor),
+                        ),
+                      ],
+                    ),
+                    buttonColor: AppColor.backgroundColor2,
+                    onPressed: () {
+                      _showBlockClubMember(context);
+                    },
                   ),
-                  buttonColor: AppColor.backgroundColor2,
-                  onPressed: () {
-                    _showBlockClubMember(context);
-                  },
                 ),
-              ),
             ],
           ),
         );
