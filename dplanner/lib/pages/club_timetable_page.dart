@@ -107,10 +107,20 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       int weekday = standardDay.weekday;
       startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
       endOfWeek = standardDay.add(Duration(days: 7 - weekday));
-      DateTime endOfResource =
-          DateTime.now().add(Duration(days: selectedValue!.bookableSpan! + 1));
-      DateTime endDate = (endOfResource.isBefore(endOfWeek) &&
-              endOfResource.isAfter(startOfWeek))
+      DateTime endOfResource = DateTime.now();
+      endOfResource =
+          DateTime(endOfResource.year, endOfResource.month, endOfResource.day)
+              .add(Duration(days: selectedValue!.bookableSpan!));
+
+      DateTime endDate = !(MemberController.to.clubMember().role == "ADMIN" ||
+                  (MemberController.to.clubMember().clubAuthorityTypes !=
+                          null &&
+                      MemberController.to
+                          .clubMember()
+                          .clubAuthorityTypes!
+                          .contains("SCHEDULE_ALL"))) &&
+              ((endOfResource.isBefore(endOfWeek) ||
+                  endOfResource.isAfter(startOfWeek)))
           ? endOfResource
           : endOfWeek;
 
@@ -188,7 +198,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
         }
       }
 
-      if (endOfWeek.isAfter(endOfResource)) {
+      if (!(MemberController.to.clubMember().role == "ADMIN" ||
+              (MemberController.to.clubMember().clubAuthorityTypes != null &&
+                  MemberController.to
+                      .clubMember()
+                      .clubAuthorityTypes!
+                      .contains("SCHEDULE_ALL"))) &&
+          (endOfWeek.isAfter(endOfResource))) {
         for (DateTime j = endOfResource;
             j.isBefore(endOfWeek.add(const Duration(days: 1)));
             j = j.add(const Duration(days: 1))) {
@@ -259,7 +275,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 const Text(
                                   "아직 클럽 공유 물품이 없어요",
                                   style: TextStyle(
-                                      fontWeight: FontWeight.w600, fontSize: 16),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16),
                                 ),
                                 if (MemberController.to.clubMember().role ==
                                         "ADMIN" ||
@@ -325,13 +342,16 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                             children: [
                               Flexible(
                                   flex: 11,
-                                  child: Container(color: AppColor.backgroundColor)),
+                                  child: Container(
+                                      color: AppColor.backgroundColor)),
                               Flexible(
                                   flex: 85,
-                                  child: Container(color: AppColor.backgroundColor2)),
+                                  child: Container(
+                                      color: AppColor.backgroundColor2)),
                               Flexible(
                                   flex: 4,
-                                  child: Container(color: AppColor.backgroundColor)),
+                                  child: Container(
+                                      color: AppColor.backgroundColor)),
                             ],
                           ),
                           Center(
@@ -347,12 +367,15 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       child: Padding(
                                         padding: EdgeInsets.only(
                                             left:
-                                                SizeController.to.screenWidth * 0.05,
+                                                SizeController.to.screenWidth *
+                                                    0.05,
                                             right:
-                                                SizeController.to.screenWidth * 0.1),
+                                                SizeController.to.screenWidth *
+                                                    0.1),
                                         child: WeekPageHeader(
-                                          headerStringBuilder: (DateTime dateTime,
-                                              {DateTime? secondaryDate}) {
+                                          headerStringBuilder:
+                                              (DateTime dateTime,
+                                                  {DateTime? secondaryDate}) {
                                             return DateFormat(" MM월")
                                                 .format(dateTime);
                                           },
@@ -372,12 +395,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                       standardDay = now;
                                                     });
                                                     getReservations();
-                                                    weekViewStateKey.currentState
+                                                    weekViewStateKey
+                                                        .currentState
                                                         ?.jumpToWeek(now);
                                                   },
                                                   child: const Icon(
                                                       SFSymbols.calendar,
-                                                      color: AppColor.textColor)),
+                                                      color:
+                                                          AppColor.textColor)),
                                               titleAlign: TextAlign.start),
                                           startDate: startDate,
                                           endDate: endDate,
@@ -393,77 +418,100 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     Expanded(
                                         child: Padding(
                                             padding: EdgeInsets.only(
-                                                right: SizeController.to.screenWidth *
+                                                right: SizeController
+                                                        .to.screenWidth *
                                                     0.02),
                                             child: DropdownButtonHideUnderline(
-                                              child: DropdownButton2<ResourceModel>(
+                                              child: DropdownButton2<
+                                                  ResourceModel>(
                                                 isExpanded: true,
-                                                items: ClubController.to.resources
-                                                    .map((ResourceModel resource) =>
+                                                items: ClubController
+                                                    .to.resources
+                                                    .map((ResourceModel
+                                                            resource) =>
                                                         DropdownMenuItem<
                                                             ResourceModel>(
                                                           value: resource,
                                                           child: Align(
-                                                            alignment:
-                                                                Alignment.centerRight,
+                                                            alignment: Alignment
+                                                                .centerRight,
                                                             child: Text(
                                                               resource.name,
                                                               style: const TextStyle(
                                                                   fontSize: 14,
                                                                   fontWeight:
-                                                                      FontWeight.w500,
+                                                                      FontWeight
+                                                                          .w500,
                                                                   color: AppColor
                                                                       .textColor),
-                                                              overflow: TextOverflow
-                                                                  .ellipsis,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
                                                             ),
                                                           ),
                                                         ))
                                                     .toList(),
                                                 value: selectedValue,
-                                                onChanged: (ResourceModel? value) {
+                                                onChanged:
+                                                    (ResourceModel? value) {
                                                   setState(() {
                                                     selectedValue = value!;
                                                   });
                                                 },
-                                                buttonStyleData: ButtonStyleData(
+                                                buttonStyleData:
+                                                    ButtonStyleData(
                                                   height: 40,
-                                                  width:
-                                                      SizeController.to.screenWidth *
-                                                          0.1,
+                                                  width: SizeController
+                                                          .to.screenWidth *
+                                                      0.1,
                                                   decoration: BoxDecoration(
                                                     borderRadius:
-                                                        BorderRadius.circular(15),
-                                                    color: AppColor.backgroundColor,
+                                                        BorderRadius.circular(
+                                                            15),
+                                                    color: AppColor
+                                                        .backgroundColor,
                                                   ),
                                                 ),
-                                                iconStyleData: const IconStyleData(
-                                                    icon: Padding(
-                                                      padding: EdgeInsets.only(left: 8, right: 8),
-                                                      child: Icon(SFSymbols.chevron_down),
-                                                    ),
-                                                    iconSize: 15,
-                                                    iconEnabledColor:
-                                                        AppColor.textColor),
-                                                dropdownStyleData: DropdownStyleData(
+                                                iconStyleData:
+                                                    const IconStyleData(
+                                                        icon: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  left: 8,
+                                                                  right: 8),
+                                                          child: Icon(SFSymbols
+                                                              .chevron_down),
+                                                        ),
+                                                        iconSize: 15,
+                                                        iconEnabledColor:
+                                                            AppColor.textColor),
+                                                dropdownStyleData:
+                                                    DropdownStyleData(
                                                   maxHeight: 200,
-                                                  width:
-                                                      SizeController.to.screenWidth *
-                                                          0.3,
+                                                  width: SizeController
+                                                          .to.screenWidth *
+                                                      0.3,
                                                   decoration: BoxDecoration(
                                                     borderRadius:
-                                                        BorderRadius.circular(15),
-                                                    color: AppColor.backgroundColor,
+                                                        BorderRadius.circular(
+                                                            15),
+                                                    color: AppColor
+                                                        .backgroundColor,
                                                   ),
-                                                  direction: DropdownDirection.left,
+                                                  direction:
+                                                      DropdownDirection.left,
                                                   offset: const Offset(0, 40),
-                                                  scrollbarTheme: ScrollbarThemeData(
-                                                    radius: const Radius.circular(40),
-                                                    thickness: MaterialStateProperty
-                                                        .all<double>(6),
+                                                  scrollbarTheme:
+                                                      ScrollbarThemeData(
+                                                    radius:
+                                                        const Radius.circular(
+                                                            40),
+                                                    thickness:
+                                                        MaterialStateProperty
+                                                            .all<double>(6),
                                                     thumbVisibility:
-                                                        MaterialStateProperty.all<
-                                                            bool>(true),
+                                                        MaterialStateProperty
+                                                            .all<bool>(true),
                                                   ),
                                                 ),
                                                 menuItemStyleData:
@@ -480,8 +528,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     color: AppColor.backgroundColor,
                                     alignment: Alignment.center,
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: [
                                         (date.isAtSameMomentAs(
                                                 DateTime.now().withoutTime))
@@ -494,28 +544,33 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                               )
                                             : (date.day == 1)
                                                 ? Text(
-                                                    DateFormat("M/d").format(date),
+                                                    DateFormat("M/d")
+                                                        .format(date),
                                                     style: const TextStyle(
-                                                        fontWeight: FontWeight.w700,
+                                                        fontWeight:
+                                                            FontWeight.w700,
                                                         fontSize: 15),
                                                   )
                                                 : Text(
                                                     DateFormat.d().format(date),
                                                     style: const TextStyle(
-                                                        fontWeight: FontWeight.w700,
+                                                        fontWeight:
+                                                            FontWeight.w700,
                                                         fontSize: 15),
                                                   ),
                                         (date.isAtSameMomentAs(
                                                 DateTime.now().withoutTime))
                                             ? Text(
-                                                DateFormat('E', 'ko_KR').format(date),
+                                                DateFormat('E', 'ko_KR')
+                                                    .format(date),
                                                 style: const TextStyle(
                                                     color: AppColor.markColor,
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 12),
                                               )
                                             : Text(
-                                                DateFormat('E', 'ko_KR').format(date),
+                                                DateFormat('E', 'ko_KR')
+                                                    .format(date),
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 12),
@@ -523,7 +578,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       ],
                                     ));
                               },
-                              weekTitleHeight: SizeController.to.screenHeight * 0.06,
+                              weekTitleHeight:
+                                  SizeController.to.screenHeight * 0.06,
                               weekNumberBuilder: (DateTime date) {
                                 return Container(
                                   color: AppColor.backgroundColor,
@@ -531,7 +587,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               },
                               timeLineBuilder: (DateTime date) {
                                 return Text(
-                                  date.hour < 10 ? "0${date.hour}" : "${date.hour}",
+                                  date.hour < 10
+                                      ? "0${date.hour}"
+                                      : "${date.hour}",
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     color: AppColor.textColor2,
@@ -540,19 +598,22 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   ),
                                 );
                               },
-                              timeLineWidth: SizeController.to.screenWidth * 0.07,
+                              timeLineWidth:
+                                  SizeController.to.screenWidth * 0.07,
                               timeLineOffset: 10,
-                              hourIndicatorSettings: const HourIndicatorSettings(
-                                  height: 0.7,
-                                  color: AppColor.backgroundColor,
-                                  offset: 0),
+                              hourIndicatorSettings:
+                                  const HourIndicatorSettings(
+                                      height: 0.7,
+                                      color: AppColor.backgroundColor,
+                                      offset: 0),
                               liveTimeIndicatorSettings:
                                   const LiveTimeIndicatorSettings(
                                 color: AppColor.objectColor,
                                 height: 1,
                                 offset: 1,
                               ),
-                              eventTileBuilder: (date, events, boundry, start, end) {
+                              eventTileBuilder:
+                                  (date, events, boundry, start, end) {
                                 if (events.isNotEmpty) {
                                   return Container(
                                     decoration: BoxDecoration(
@@ -623,7 +684,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               fullDayEventBuilder: (events, date) {
                                 return FullDayEventView(
                                   events: events,
-                                  boxConstraints: const BoxConstraints(maxHeight: 65),
+                                  boxConstraints:
+                                      const BoxConstraints(maxHeight: 65),
                                   date: date,
                                 );
                               },
@@ -645,9 +707,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                 if (events[0].title != "") {
                                   try {
                                     ReservationModel reservation =
-                                        await ReservationApiService.getReservation(
-                                            reservationId: int.parse(
-                                                events[0].title.split(" ")[0]));
+                                        await ReservationApiService
+                                            .getReservation(
+                                                reservationId: int.parse(
+                                                    events[0]
+                                                        .title
+                                                        .split(" ")[0]));
                                     addReservation(
                                         types: 3, reservation: reservation);
                                   } catch (e) {
@@ -3128,7 +3193,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                           Get.back();
                                         } catch (e) {
                                           print(e.toString());
-                                          snackBar(title: "예약을 승인하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
+                                          snackBar(
+                                              title: "예약을 승인하지 못했습니다",
+                                              content: "잠시 후 다시 시도해 주세요");
                                         }
                                       },
                                     ),
@@ -3731,7 +3798,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       Get.back();
                     } catch (e) {
                       print(e.toString());
-                      snackBar(title: "예약을 거절하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
+                      snackBar(
+                          title: "예약을 거절하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                     }
                   },
                 ),
