@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/controllers/posts.dart';
@@ -8,10 +10,12 @@ import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/size.dart';
 import '../const/style.dart';
@@ -349,13 +353,26 @@ class PostContent extends StatelessWidget {
                     fontSize: 20,
                   ),
                 ),
-                SelectableText(
-                  post.content,
+                SelectableLinkify(
+                  onOpen: (link) async {
+                    if(!await launchUrl(Uri.parse(link.url))) {
+                      snackBar(title: "해당 링크로 이동하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
+                    }
+                  },
+                  text: post.content,
                   style: const TextStyle(
                     color: AppColor.textColor,
                     fontWeight: FontWeight.normal,
                     fontSize: 15,
                   ),
+                  linkStyle: const TextStyle(
+                    decorationColor: AppColor.hyperLink
+                  ),
+                  contextMenuBuilder: (BuildContext context, EditableTextState editableTextState) {
+                    return AdaptiveTextSelectionToolbar.editableText(
+                      editableTextState: editableTextState,
+                    );
+                  },
                 ),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
