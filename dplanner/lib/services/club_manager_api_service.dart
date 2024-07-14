@@ -127,7 +127,7 @@ class ClubManagerApiService {
       body: jsonEncode({"id": id}),
     );
 
-    if (response.statusCode == 204) {
+    if (response.statusCode == 200) {
       return;
     }
 
