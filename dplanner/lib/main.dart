@@ -28,8 +28,6 @@ import 'decode_token.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-// import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
-
 final FlutterLocalNotificationsPlugin _localNotification = FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
@@ -39,6 +37,7 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
