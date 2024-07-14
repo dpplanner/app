@@ -16,4 +16,5 @@ class AppColor extends Color {
   static const subColor5 = Color(0xFFBABABA);
   static const lockColor = Color(0xFFCDCDCD);
   static const markColor = Color(0xFFFF443D);
+  static const hyperLink = Colors.blueAccent;
 }

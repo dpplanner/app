@@ -2,13 +2,11 @@ import 'dart:async';
 
 import 'package:dplanner/controllers/club.dart';
 import 'package:dplanner/widgets/snack_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
-import '../controllers/member.dart';
 import '../controllers/size.dart';
 import '../models/club_manager_model.dart';
 import '../services/club_manager_api_service.dart';
@@ -110,12 +108,14 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                                       } else if (snapshot.data.length == 0) {
                                         return SizedBox(
                                           width: SizeController.to.screenWidth,
-                                          child: const Text(
-                                            "아직 아무것도 없어요",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 15,
-                                                color: AppColor.textColor2),
+                                          child: const Center(
+                                            child: Text(
+                                              "아직 아무것도 없어요",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 15,
+                                                  color: AppColor.textColor2),
+                                            ),
                                           ),
                                         );
                                       } else {
@@ -164,29 +164,10 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
 
   //types: 0-물품 추가, 1-물품 정보, 2-물품 수정
   void addManager({required int types, required ClubManagerModel manager}) {
-    bool isChecked1 =
-        (MemberController.to.clubMember().clubAuthorityTypes != null &&
-                MemberController.to
-                    .clubMember()
-                    .clubAuthorityTypes!
-                    .contains("SCHEDULE_ALL"))
-            ? true
-            : false;
-    bool isChecked2 =
-        (MemberController.to.clubMember().clubAuthorityTypes != null &&
-                manager.authorities.contains("POST_ALL"))
-            ? true
-            : false;
-    bool isChecked3 =
-        (MemberController.to.clubMember().clubAuthorityTypes != null &&
-                manager.authorities.contains("MEMBER_ALL"))
-            ? true
-            : false;
-    bool isChecked4 =
-        (MemberController.to.clubMember().clubAuthorityTypes != null &&
-                manager.authorities.contains("RESOURCE_ALL"))
-            ? true
-            : false;
+    bool isChecked1 = manager.authorities.contains("SCHEDULE_ALL") ? true : false;
+    bool isChecked2 = manager.authorities.contains("POST_ALL") ? true : false;
+    bool isChecked3 = manager.authorities.contains("MEMBER_ALL") ? true : false;
+    bool isChecked4 = manager.authorities.contains("RESOURCE_ALL") ? true : false;
 
     Get.bottomSheet(
       isScrollControlled: true,
@@ -245,7 +226,7 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                               child: Form(
                                   key: formKey1,
                                   child: UnderlineTextForm(
-                                    hintText: 'n글자 이내로 적어주세요',
+                                    hintText: '15글자 이내로 적어주세요',
                                     controller:
                                         (types == 0) ? name : updateName,
                                     isFocused: isFocused1,
@@ -260,6 +241,11 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                                             title: "작성이 끝나지 않았습니다",
                                             content: "매니저 이름을 작성해주세요");
                                         return '';
+                                      } else if (value.length > 15) {
+                                        snackBar(
+                                            title: "매니저 이름이 너무 깁니다",
+                                            content: "15자 이내로 작성해주세요");
+                                        return value;
                                       }
                                       return null;
                                     },
@@ -295,9 +281,9 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                                 });
                               },
                               icon: const Icon(SFSymbols.square),
-                              selectedIcon: const Icon(
+                              selectedIcon: Icon(
                                 SFSymbols.checkmark_square_fill,
-                                color: AppColor.objectColor,
+                                color: types == 1 ? AppColor.subColor5 : AppColor.objectColor,
                               ),
                               isSelected: isChecked1 ? true : false,
                             ),
@@ -323,9 +309,9 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                                 });
                               },
                               icon: const Icon(SFSymbols.square),
-                              selectedIcon: const Icon(
+                              selectedIcon: Icon(
                                 SFSymbols.checkmark_square_fill,
-                                color: AppColor.objectColor,
+                                color: types == 1 ? AppColor.subColor5 : AppColor.objectColor,
                               ),
                               isSelected: isChecked2 ? true : false,
                             ),
@@ -351,9 +337,9 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                                 });
                               },
                               icon: const Icon(SFSymbols.square),
-                              selectedIcon: const Icon(
+                              selectedIcon: Icon(
                                 SFSymbols.checkmark_square_fill,
-                                color: AppColor.objectColor,
+                                color: types == 1 ? AppColor.subColor5 : AppColor.objectColor,
                               ),
                               isSelected: isChecked3 ? true : false,
                             ),
@@ -379,9 +365,9 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                                 });
                               },
                               icon: const Icon(SFSymbols.square),
-                              selectedIcon: const Icon(
+                              selectedIcon: Icon(
                                 SFSymbols.checkmark_square_fill,
-                                color: AppColor.objectColor,
+                                color: types == 1 ? AppColor.subColor5 : AppColor.objectColor,
                               ),
                               isSelected: isChecked4 ? true : false,
                             ),
@@ -438,8 +424,10 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                           name.text = "";
                           getClubManagerList();
                           Get.back();
+                          snackBar(title: "매니저 권한이 추가되었습니다", content: "매니저 정보를 확인해 주세요");
                         } catch (e) {
                           print(e.toString());
+                          snackBar(title: "매니저 권한을 추가하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                         }
                       }
                     },
@@ -502,8 +490,10 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                                     authorities: authorities);
                             getClubManagerList();
                             Get.back();
+                            snackBar(title: "매니저 권한이 수정되었습니다", content: "매니저 정보를 확인해 주세요");
                           } catch (e) {
                             print(e.toString());
+                            snackBar(title: "매니저 권한을 수정하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                           }
                         }
                       },
@@ -535,7 +525,7 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
           padding: EdgeInsets.only(top: 16.0),
           child: Center(
             child: Text(
-              "물품 삭제",
+              "매니저 삭제",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             ),
           ),
@@ -580,8 +570,10 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                           clubId: ClubController.to.club().id, id: id);
                       getClubManagerList();
                       Get.back();
+                      snackBar(title: "매니저 권한을 삭제했습니다", content: "매니저 정보를 확인해 주세요");
                     } catch (e) {
                       print(e.toString());
+                      snackBar(title: "매니저 권한을 삭제하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
                     }
                   },
                 ),

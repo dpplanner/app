@@ -4,10 +4,12 @@ import 'package:dplanner/widgets/report_dialog.dart';
 import 'package:dplanner/widgets/snack_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/club.dart';
 import '../controllers/member.dart';
@@ -146,14 +148,27 @@ class _CommentBlockState extends State<CommentBlock> {
                             ],
                           ),
                           !widget.comment.isDeleted
-                              ? Text(
-                                  widget.comment.content,
-                                  style: const TextStyle(
-                                    color: AppColor.textColor,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 14,
-                                  ),
-                                )
+                              ? SelectableLinkify(
+                            onOpen: (link) async {
+                              if(!await launchUrl(Uri.parse(link.url))) {
+                                snackBar(title: "해당 링크로 이동하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
+                              }
+                            },
+                            text: widget.comment.content,
+                            style: const TextStyle(
+                              color: AppColor.textColor,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14,
+                            ),
+                            linkStyle: const TextStyle(
+                                decorationColor: AppColor.hyperLink
+                            ),
+                            contextMenuBuilder: (BuildContext context, EditableTextState editableTextState) {
+                              return AdaptiveTextSelectionToolbar.editableText(
+                                editableTextState: editableTextState,
+                              );
+                            },
+                          )
                               : const Text(
                                   "삭제된 댓글입니다.",
                                   style: TextStyle(
