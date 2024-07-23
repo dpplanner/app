@@ -365,6 +365,32 @@ class ReservationApiService {
     throw ErrorDescription(errorMessage);
   }
 
+  /// PATCH: /reservations/(_.reservationId)/update-owner [예약자 변경 하기] 예약 주인 변경 하기
+  static Future<void> patchReservationOwner(
+      {required int reservationId, required int reservationOwnerId}) async {
+    final url = Uri.parse('$baseUrl/reservations/$reservationId/update-owner');
+    const storage = FlutterSecureStorage();
+    String? accessToken = await storage.read(key: accessTokenKey);
+
+    final response = await http.patch(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({"reservationOwnerId": reservationOwnerId}),
+    );
+
+    if (response.statusCode == 204) {
+      return;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
   /// DELETE: /reservations [예약 삭제하기] 클럽 예약 삭제하기
   static Future<void> deleteReservation({required int reservationId}) async {
     final url = Uri.parse('$baseUrl/reservations');
