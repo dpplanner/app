@@ -3257,162 +3257,191 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       child: Visibility(
                         visible: types != 3,
                         replacement: Visibility(
-                          visible: reservation?.clubMemberId ==
-                              MemberController.to.clubMember().id,
-                          replacement: Visibility(
-                            visible: (MemberController.to.clubMember().role ==
-                                    "ADMIN" ||
-                                (MemberController.to
-                                            .clubMember()
-                                            .clubAuthorityTypes !=
-                                        null &&
-                                    MemberController.to
-                                        .clubMember()
-                                        .clubAuthorityTypes!
-                                        .contains("SCHEDULE_ALL"))),
-                            child: Visibility(
-                              visible: reservation?.status == "REQUEST",
-                              replacement: NextPageButton(
-                                text: const Text(
-                                  "예약 삭제하기",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColor.backgroundColor),
+                          visible: ((MemberController.to.clubMember().role ==
+                                      "ADMIN" ||
+                                  (MemberController.to
+                                              .clubMember()
+                                              .clubAuthorityTypes !=
+                                          null &&
+                                      MemberController.to
+                                          .clubMember()
+                                          .clubAuthorityTypes!
+                                          .contains("SCHEDULE_ALL"))) &&
+                              reservation?.status == "REQUEST"),
+                          replacement: Column(
+                            children: [
+                              if ((reservation?.clubMemberId ==
+                                      MemberController.to.clubMember().id) &&
+                                  reservation != null &&
+                                  DateTime.parse(reservation.endDateTime)
+                                      .isBefore(now) &&
+                                  !reservation.returned)
+                                NextPageButton(
+                                  text: const Text(
+                                    "반납하기",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColor.backgroundColor),
+                                  ),
+                                  buttonColor: AppColor.objectColor,
+                                  onPressed: () {
+                                    setState(() {
+                                      lastPages.add(3);
+                                      types = 6;
+                                    });
+                                  },
                                 ),
-                                buttonColor: AppColor.markColor,
-                                onPressed: () async {
-                                  await checkDeleteReservation(
-                                      id: reservation!.reservationId, types: 0);
-                                },
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 24.0, right: 24.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: NextPageButton(
-                                        text: const Text(
-                                          "거절하기",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColor.backgroundColor),
+                              if (!((reservation != null &&
+                                          DateTime.parse(
+                                                  reservation.endDateTime)
+                                              .isBefore(now) ||
+                                      reservation?.clubMemberId !=
+                                          MemberController.to
+                                              .clubMember()
+                                              .id) &&
+                                  !(MemberController.to.clubMember().role ==
+                                          "ADMIN" ||
+                                      (MemberController.to
+                                                  .clubMember()
+                                                  .clubAuthorityTypes !=
+                                              null &&
+                                          MemberController.to
+                                              .clubMember()
+                                              .clubAuthorityTypes!
+                                              .contains("SCHEDULE_ALL")))))
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 16, left: 24.0, right: 24.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Visibility(
+                                          visible: reservation?.clubMemberId ==
+                                                  MemberController.to
+                                                      .clubMember()
+                                                      .id &&
+                                              reservation != null &&
+                                              DateTime.parse(
+                                                      reservation.endDateTime)
+                                                  .isAfter(now),
+                                          replacement: NextPageButton(
+                                            text: const Text(
+                                              "예약 삭제하기",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w700,
+                                                  color:
+                                                      AppColor.backgroundColor),
+                                            ),
+                                            buttonColor: AppColor.markColor,
+                                            onPressed: () async {
+                                              await checkDeleteReservation(
+                                                  id: reservation!
+                                                      .reservationId,
+                                                  types: 0);
+                                            },
+                                          ),
+                                          child: NextPageButton(
+                                            text: const Text(
+                                              "예약 취소하기",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w700,
+                                                  color:
+                                                      AppColor.backgroundColor),
+                                            ),
+                                            buttonColor: AppColor.subColor3,
+                                            onPressed: () async {
+                                              await checkDeleteReservation(
+                                                  id: reservation!
+                                                      .reservationId,
+                                                  types: 1);
+                                            },
+                                          ),
                                         ),
-                                        buttonColor: AppColor.subColor3,
-                                        onPressed: () {
-                                          rejectReservation(
-                                              id: reservation!.reservationId);
-                                        },
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Expanded(
-                                      child: NextPageButton(
-                                        text: const Text(
-                                          "승인하기",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColor.backgroundColor),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Expanded(
+                                        child: NextPageButton(
+                                          text: const Text(
+                                            "예약 수정하기",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                                color:
+                                                    AppColor.backgroundColor),
+                                          ),
+                                          buttonColor: AppColor.objectColor,
+                                          onPressed: () {
+                                            setState(() {
+                                              types = 4;
+                                            });
+                                          },
                                         ),
-                                        buttonColor: AppColor.objectColor,
-                                        onPressed: () async {
-                                          try {
-                                            await ReservationApiService
-                                                .patchReservation(
-                                                    reservationIds: [
-                                                  reservation?.reservationId
-                                                ],
-                                                    rejectMessages: [],
-                                                    isConfirmed: true);
-                                            getReservations();
-                                            Get.back();
-                                          } catch (e) {
-                                            print(e.toString());
-                                            snackBar(
-                                                title: "예약을 승인하지 못했습니다",
-                                                content: "잠시 후 다시 시도해 주세요");
-                                          }
-                                        },
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ),
+                            ],
                           ),
-                          child: Visibility(
-                            visible: reservation != null &&
-                                DateTime.parse(reservation.endDateTime)
-                                    .isAfter(now),
-                            replacement: Visibility(
-                              visible:
-                                  reservation != null && !reservation.returned,
-                              child: NextPageButton(
-                                text: const Text(
-                                  "반납하기",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColor.backgroundColor),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 24.0, right: 24.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: NextPageButton(
+                                    text: const Text(
+                                      "거절하기",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColor.backgroundColor),
+                                    ),
+                                    buttonColor: AppColor.subColor3,
+                                    onPressed: () {
+                                      rejectReservation(
+                                          id: reservation!.reservationId);
+                                    },
+                                  ),
                                 ),
-                                buttonColor: AppColor.objectColor,
-                                onPressed: () {
-                                  setState(() {
-                                    lastPages.add(3);
-                                    types = 6;
-                                  });
-                                },
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 24.0, right: 24.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: NextPageButton(
-                                      text: const Text(
-                                        "예약 취소하기",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColor.backgroundColor),
-                                      ),
-                                      buttonColor: AppColor.subColor3,
-                                      onPressed: () async {
-                                        await checkDeleteReservation(
-                                            id: reservation!.reservationId,
-                                            types: 1);
-                                      },
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  child: NextPageButton(
+                                    text: const Text(
+                                      "승인하기",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColor.backgroundColor),
                                     ),
+                                    buttonColor: AppColor.objectColor,
+                                    onPressed: () async {
+                                      try {
+                                        await ReservationApiService
+                                            .patchReservation(
+                                                reservationIds: [
+                                              reservation?.reservationId
+                                            ],
+                                                rejectMessages: [],
+                                                isConfirmed: true);
+                                        getReservations();
+                                        Get.back();
+                                      } catch (e) {
+                                        print(e.toString());
+                                        snackBar(
+                                            title: "예약을 승인하지 못했습니다",
+                                            content: "잠시 후 다시 시도해 주세요");
+                                      }
+                                    },
                                   ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: NextPageButton(
-                                      text: const Text(
-                                        "예약 수정하기",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColor.backgroundColor),
-                                      ),
-                                      buttonColor: AppColor.objectColor,
-                                      onPressed: () {
-                                        setState(() {
-                                          types = 4;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
