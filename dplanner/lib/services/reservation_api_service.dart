@@ -42,7 +42,8 @@ class ReservationApiService {
 
   /// POST: /reservations [예약하기] 예약하기
   static Future<ReservationModel> postReservation(
-      {required int resourceId,
+      {required int reservationOwnerId,
+      required int resourceId,
       required String title,
       required String usage,
       required bool sharing,
@@ -61,6 +62,7 @@ class ReservationApiService {
         'Authorization': 'Bearer $accessToken',
       },
       body: jsonEncode({
+        "reservationOwnerId": reservationOwnerId,
         "resourceId": resourceId,
         "title": title,
         "usage": usage,
