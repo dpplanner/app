@@ -673,10 +673,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             .sublist(1)
                                             .join(" "),
                                         titleStyle: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColor.backgroundColor,
-                                          fontSize: 12,
-                                        ),
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColor.backgroundColor,
+                                            fontSize: 12,
+                                            wordSpacing: 20),
                                         description: events[0].description,
                                         descriptionStyle: const TextStyle(
                                           fontWeight: FontWeight.w500,
