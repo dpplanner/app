@@ -124,8 +124,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
           ? endOfResource
           : endOfWeek;
 
-      print(endOfWeek.toString());
-
       if (startOfWeek.isBefore(endDate)) {
         List<ReservationModel> reservations =
             await ReservationApiService.getReservations(
@@ -673,10 +671,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                             .sublist(1)
                                             .join(" "),
                                         titleStyle: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColor.backgroundColor,
-                                          fontSize: 12,
-                                        ),
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColor.backgroundColor,
+                                            fontSize: 12,
+                                            wordSpacing: 20),
                                         description: events[0].description,
                                         descriptionStyle: const TextStyle(
                                           fontWeight: FontWeight.w500,
@@ -861,6 +859,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   /// types == 7 : 잠금 정보
   /// types == 8 : 잠금 수정
   /// types == 9 : 멤버 선택
+  /// types == 10 : 예약자 선택
 
   Future<void> addReservation(
       {required int types,
@@ -872,6 +871,14 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
 
     List<Map<String, dynamic>> invitees = [];
     List<Map<String, dynamic>> updateInvitees = [];
+    Map<String, dynamic> owner = {
+      'clubMemberName': MemberController.to.clubMember().name,
+      'clubMemberId': MemberController.to.clubMember().id
+    };
+    Map<String, dynamic> updateOwner = {
+      'clubMemberName': MemberController.to.clubMember().name,
+      'clubMemberId': MemberController.to.clubMember().id
+    };
     List<bool> isChecked = [];
 
     int startTime = -1;
@@ -927,6 +934,18 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
       isChecked2 = true;
       if (!reservation.sharing) {
         open = Open.no;
+      }
+      try {
+        ClubMemberModel reservationOwner =
+            await ClubMemberApiService.getClubMember(
+                clubId: ClubController.to.club().id,
+                clubMemberId: reservation.clubMemberId);
+        owner = {
+          'clubMemberName': reservationOwner.name,
+          'clubMemberId': reservationOwner.id
+        };
+      } catch (e) {
+        snackBar(title: "예약 정보를 불러오는데 오류가 발생하였습니다.", content: "개발자에게 문의해주세요");
       }
     }
     if (types == 5) {
@@ -989,9 +1008,13 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
         List<ClubMemberModel> members =
             await ClubMemberApiService.getClubMemberList(
                 clubId: ClubController.to.club().id, confirmed: true);
-        List<ClubMemberModel> removeMeMembers = members
-            .where((member) => member.id != MemberController.to.clubMember().id)
-            .toList();
+        List<ClubMemberModel> removeMeMembers = members;
+        if (types == 9) {
+          removeMeMembers = members
+              .where(
+                  (member) => member.id != MemberController.to.clubMember().id)
+              .toList();
+        }
 
         return removeMeMembers;
       } catch (e) {
@@ -1072,9 +1095,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                                                     ? "예약 잠금"
                                                                                     : (types == 8 && lock == null)
                                                                                         ? "예약 잠금 추가"
-                                                                                        : (types != 9)
-                                                                                            ? "예약 잠금 정보"
-                                                                                            : "함께 사용하는 사람",
+                                                                                        : (types == 9)
+                                                                                            ? "함께 사용하는 사람"
+                                                                                            : (types == 10)
+                                                                                                ? "예약자"
+                                                                                                : "예약 잠금 정보",
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700,
@@ -1140,60 +1165,87 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     ),
                                   ],
                                 ),
-                                child: Visibility(
-                                  visible: reservation?.clubMemberId ==
-                                      MemberController.to.clubMember().id,
-                                  replacement: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text(
-                                        "예약자",
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "예약 상태",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16),
+                                    ),
+                                    Text(
+                                      reservation?.status == "REQUEST"
+                                          ? "승인 대기중"
+                                          : reservation?.status ==
+                                                      "CONFIRMED" &&
+                                                  !reservation!.returned
+                                              ? "승인 완료"
+                                              : reservation?.status ==
+                                                          "CONFIRMED" &&
+                                                      reservation!.returned
+                                                  ? "승인 및 반납 완료"
+                                                  : "거절됨",
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 15),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 32.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      "예약자",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        if ((MemberController.to
+                                                        .clubMember()
+                                                        .role ==
+                                                    "ADMIN" ||
+                                                (MemberController.to
+                                                            .clubMember()
+                                                            .clubAuthorityTypes !=
+                                                        null &&
+                                                    MemberController.to
+                                                        .clubMember()
+                                                        .clubAuthorityTypes!
+                                                        .contains(
+                                                            "SCHEDULE_ALL"))) &&
+                                            (types == 0 || types == 4)) {
+                                          setState(() {
+                                            isChecked.clear();
+                                            updateOwner = owner;
+                                            lastPages.add(types);
+                                            types = 10;
+                                          });
+                                        }
+                                      },
+                                      child: Text(
+                                        (types == 0 || types == 4) &&
+                                                owner.isEmpty
+                                            ? "선택하기"
+                                            : "${owner["clubMemberName"]}",
                                         style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 16),
-                                      ),
-                                      Text(
-                                        types == 0 ||
-                                                types == 1 ||
-                                                types == 2 ||
-                                                reservation == null
-                                            ? ""
-                                            : reservation.clubMemberName,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
+                                            color: owner.isNotEmpty
+                                                ? AppColor.textColor
+                                                : AppColor.textColor2,
+                                            fontWeight: owner.isNotEmpty
+                                                ? FontWeight.w500
+                                                : FontWeight.w400,
                                             fontSize: 15),
                                       ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      const Text(
-                                        "예약 상태",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 16),
-                                      ),
-                                      Text(
-                                        reservation?.status == "REQUEST"
-                                            ? "승인 대기중"
-                                            : reservation?.status ==
-                                                        "CONFIRMED" &&
-                                                    !reservation!.returned
-                                                ? "승인 완료"
-                                                : reservation?.status ==
-                                                            "CONFIRMED" &&
-                                                        reservation!.returned
-                                                    ? "승인 및 반납 완료"
-                                                    : "거절됨",
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 15),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               Padding(
@@ -2917,19 +2969,40 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                   children: List.generate(
                                                       snapshot.data!.length,
                                                       (index) {
-                                                    if (updateInvitees.any((element) =>
-                                                        element["clubMemberId"] ==
-                                                            snapshot
-                                                                .data![index]
-                                                                .id &&
-                                                        element["clubMemberName"] ==
-                                                            snapshot
-                                                                .data![index]
-                                                                .name)) {
-                                                      isChecked.add(true);
-                                                    } else {
-                                                      isChecked.add(false);
+                                                    if (types == 9) {
+                                                      if (updateInvitees.any(
+                                                          (element) =>
+                                                              element["clubMemberId"] ==
+                                                                  snapshot
+                                                                      .data![
+                                                                          index]
+                                                                      .id &&
+                                                              element["clubMemberName"] ==
+                                                                  snapshot
+                                                                      .data![
+                                                                          index]
+                                                                      .name)) {
+                                                        isChecked.add(true);
+                                                      } else {
+                                                        isChecked.add(false);
+                                                      }
+                                                    } else if (types == 10) {
+                                                      if (updateOwner[
+                                                                  "clubMemberId"] ==
+                                                              snapshot
+                                                                  .data![index]
+                                                                  .id &&
+                                                          updateOwner[
+                                                                  "clubMemberName"] ==
+                                                              snapshot
+                                                                  .data![index]
+                                                                  .name) {
+                                                        isChecked.add(true);
+                                                      } else {
+                                                        isChecked.add(false);
+                                                      }
                                                     }
+
                                                     return Container(
                                                       width: SizeController
                                                           .to.screenWidth,
@@ -3035,29 +3108,51 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                                           index],
                                                                   onChanged:
                                                                       (value) {
-                                                                    setState(
-                                                                        () {
-                                                                      isChecked[
-                                                                              index] =
-                                                                          value!;
-                                                                      if (value ==
-                                                                          true) {
-                                                                        updateInvitees
-                                                                            .add({
+                                                                    if (types ==
+                                                                        9) {
+                                                                      setState(
+                                                                          () {
+                                                                        isChecked[index] =
+                                                                            value!;
+                                                                        if (value ==
+                                                                            true) {
+                                                                          updateInvitees
+                                                                              .add({
+                                                                            "clubMemberId":
+                                                                                snapshot.data![index].id,
+                                                                            "clubMemberName":
+                                                                                snapshot.data![index].name
+                                                                          });
+                                                                        } else {
+                                                                          updateInvitees.removeWhere((element) =>
+                                                                              element["clubMemberId"] == snapshot.data![index].id &&
+                                                                              element["clubMemberName"] == snapshot.data![index].name);
+                                                                        }
+                                                                      });
+                                                                    } else if (types ==
+                                                                        10) {
+                                                                      setState(
+                                                                          () {
+                                                                        for (int i =
+                                                                                0;
+                                                                            i < isChecked.length;
+                                                                            i++) {
+                                                                          isChecked[i] =
+                                                                              false;
+                                                                        }
+                                                                        isChecked[index] =
+                                                                            value!;
+                                                                        updateOwner =
+                                                                            {
                                                                           "clubMemberId": snapshot
                                                                               .data![index]
                                                                               .id,
                                                                           "clubMemberName": snapshot
                                                                               .data![index]
                                                                               .name
-                                                                        });
-                                                                      } else {
-                                                                        updateInvitees.removeWhere((element) =>
-                                                                            element["clubMemberId"] == snapshot.data![index].id &&
-                                                                            element["clubMemberName"] ==
-                                                                                snapshot.data![index].name);
-                                                                      }
-                                                                    });
+                                                                        };
+                                                                      });
+                                                                    }
                                                                   },
                                                                 ),
                                                               ],
@@ -3121,6 +3216,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                   .toList();
                               if (types == 0) {
                                 await ReservationApiService.postReservation(
+                                    reservationOwnerId: owner['clubMemberId'],
                                     resourceId: selectedValue!.id,
                                     title: title.text,
                                     usage: usage.text,
@@ -3138,6 +3234,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     startDateTime: startDateTime,
                                     endDateTime: endDateTime,
                                     reservationInvitees: clubMemberIds);
+                                await ReservationApiService
+                                    .patchReservationOwner(
+                                        reservationId:
+                                            reservation.reservationId,
+                                        reservationOwnerId:
+                                            owner['clubMemberId']);
                               }
                               getReservations();
                               Get.back();
@@ -3159,162 +3261,191 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       child: Visibility(
                         visible: types != 3,
                         replacement: Visibility(
-                          visible: reservation?.clubMemberId ==
-                              MemberController.to.clubMember().id,
-                          replacement: Visibility(
-                            visible: (MemberController.to.clubMember().role ==
-                                    "ADMIN" ||
-                                (MemberController.to
-                                            .clubMember()
-                                            .clubAuthorityTypes !=
-                                        null &&
-                                    MemberController.to
-                                        .clubMember()
-                                        .clubAuthorityTypes!
-                                        .contains("SCHEDULE_ALL"))),
-                            child: Visibility(
-                              visible: reservation?.status == "REQUEST",
-                              replacement: NextPageButton(
-                                text: const Text(
-                                  "예약 삭제하기",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColor.backgroundColor),
+                          visible: ((MemberController.to.clubMember().role ==
+                                      "ADMIN" ||
+                                  (MemberController.to
+                                              .clubMember()
+                                              .clubAuthorityTypes !=
+                                          null &&
+                                      MemberController.to
+                                          .clubMember()
+                                          .clubAuthorityTypes!
+                                          .contains("SCHEDULE_ALL"))) &&
+                              reservation?.status == "REQUEST"),
+                          replacement: Column(
+                            children: [
+                              if ((reservation?.clubMemberId ==
+                                      MemberController.to.clubMember().id) &&
+                                  reservation != null &&
+                                  DateTime.parse(reservation.endDateTime)
+                                      .isBefore(now) &&
+                                  !reservation.returned)
+                                NextPageButton(
+                                  text: const Text(
+                                    "반납하기",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColor.backgroundColor),
+                                  ),
+                                  buttonColor: AppColor.objectColor,
+                                  onPressed: () {
+                                    setState(() {
+                                      lastPages.add(3);
+                                      types = 6;
+                                    });
+                                  },
                                 ),
-                                buttonColor: AppColor.markColor,
-                                onPressed: () async {
-                                  await checkDeleteReservation(
-                                      id: reservation!.reservationId, types: 0);
-                                },
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 24.0, right: 24.0),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: NextPageButton(
-                                        text: const Text(
-                                          "거절하기",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColor.backgroundColor),
+                              if (!((reservation != null &&
+                                          DateTime.parse(
+                                                  reservation.endDateTime)
+                                              .isBefore(now) ||
+                                      reservation?.clubMemberId !=
+                                          MemberController.to
+                                              .clubMember()
+                                              .id) &&
+                                  !(MemberController.to.clubMember().role ==
+                                          "ADMIN" ||
+                                      (MemberController.to
+                                                  .clubMember()
+                                                  .clubAuthorityTypes !=
+                                              null &&
+                                          MemberController.to
+                                              .clubMember()
+                                              .clubAuthorityTypes!
+                                              .contains("SCHEDULE_ALL")))))
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 16, left: 24.0, right: 24.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Visibility(
+                                          visible: reservation?.clubMemberId ==
+                                                  MemberController.to
+                                                      .clubMember()
+                                                      .id &&
+                                              reservation != null &&
+                                              DateTime.parse(
+                                                      reservation.endDateTime)
+                                                  .isAfter(now),
+                                          replacement: NextPageButton(
+                                            text: const Text(
+                                              "예약 삭제하기",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w700,
+                                                  color:
+                                                      AppColor.backgroundColor),
+                                            ),
+                                            buttonColor: AppColor.markColor,
+                                            onPressed: () async {
+                                              await checkDeleteReservation(
+                                                  id: reservation!
+                                                      .reservationId,
+                                                  types: 0);
+                                            },
+                                          ),
+                                          child: NextPageButton(
+                                            text: const Text(
+                                              "예약 취소하기",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w700,
+                                                  color:
+                                                      AppColor.backgroundColor),
+                                            ),
+                                            buttonColor: AppColor.subColor3,
+                                            onPressed: () async {
+                                              await checkDeleteReservation(
+                                                  id: reservation!
+                                                      .reservationId,
+                                                  types: 1);
+                                            },
+                                          ),
                                         ),
-                                        buttonColor: AppColor.subColor3,
-                                        onPressed: () {
-                                          rejectReservation(
-                                              id: reservation!.reservationId);
-                                        },
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Expanded(
-                                      child: NextPageButton(
-                                        text: const Text(
-                                          "승인하기",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColor.backgroundColor),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Expanded(
+                                        child: NextPageButton(
+                                          text: const Text(
+                                            "예약 수정하기",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w700,
+                                                color:
+                                                    AppColor.backgroundColor),
+                                          ),
+                                          buttonColor: AppColor.objectColor,
+                                          onPressed: () {
+                                            setState(() {
+                                              types = 4;
+                                            });
+                                          },
                                         ),
-                                        buttonColor: AppColor.objectColor,
-                                        onPressed: () async {
-                                          try {
-                                            await ReservationApiService
-                                                .patchReservation(
-                                                    reservationIds: [
-                                                  reservation?.reservationId
-                                                ],
-                                                    rejectMessages: [],
-                                                    isConfirmed: true);
-                                            getReservations();
-                                            Get.back();
-                                          } catch (e) {
-                                            print(e.toString());
-                                            snackBar(
-                                                title: "예약을 승인하지 못했습니다",
-                                                content: "잠시 후 다시 시도해 주세요");
-                                          }
-                                        },
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ),
+                            ],
                           ),
-                          child: Visibility(
-                            visible: reservation != null &&
-                                DateTime.parse(reservation.endDateTime)
-                                    .isAfter(now),
-                            replacement: Visibility(
-                              visible:
-                                  reservation != null && !reservation.returned,
-                              child: NextPageButton(
-                                text: const Text(
-                                  "반납하기",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColor.backgroundColor),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 24.0, right: 24.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: NextPageButton(
+                                    text: const Text(
+                                      "거절하기",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColor.backgroundColor),
+                                    ),
+                                    buttonColor: AppColor.subColor3,
+                                    onPressed: () {
+                                      rejectReservation(
+                                          id: reservation!.reservationId);
+                                    },
+                                  ),
                                 ),
-                                buttonColor: AppColor.objectColor,
-                                onPressed: () {
-                                  setState(() {
-                                    lastPages.add(3);
-                                    types = 6;
-                                  });
-                                },
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 24.0, right: 24.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: NextPageButton(
-                                      text: const Text(
-                                        "예약 취소하기",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColor.backgroundColor),
-                                      ),
-                                      buttonColor: AppColor.subColor3,
-                                      onPressed: () async {
-                                        await checkDeleteReservation(
-                                            id: reservation!.reservationId,
-                                            types: 1);
-                                      },
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  child: NextPageButton(
+                                    text: const Text(
+                                      "승인하기",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: AppColor.backgroundColor),
                                     ),
+                                    buttonColor: AppColor.objectColor,
+                                    onPressed: () async {
+                                      try {
+                                        await ReservationApiService
+                                            .patchReservation(
+                                                reservationIds: [
+                                              reservation?.reservationId
+                                            ],
+                                                rejectMessages: [],
+                                                isConfirmed: true);
+                                        getReservations();
+                                        Get.back();
+                                      } catch (e) {
+                                        print(e.toString());
+                                        snackBar(
+                                            title: "예약을 승인하지 못했습니다",
+                                            content: "잠시 후 다시 시도해 주세요");
+                                      }
+                                    },
                                   ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: NextPageButton(
-                                      text: const Text(
-                                        "예약 수정하기",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppColor.backgroundColor),
-                                      ),
-                                      buttonColor: AppColor.objectColor,
-                                      onPressed: () {
-                                        setState(() {
-                                          types = 4;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -3488,11 +3619,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       fontWeight: FontWeight.w700,
                                       color: AppColor.backgroundColor),
                                 ),
-                                buttonColor: types == 1 || types == 9
-                                    ? AppColor.objectColor
-                                    : isChecked2
+                                buttonColor:
+                                    types == 1 || types == 9 || types == 10
                                         ? AppColor.objectColor
-                                        : AppColor.subColor3,
+                                        : isChecked2
+                                            ? AppColor.objectColor
+                                            : AppColor.subColor3,
                                 onPressed: () {
                                   if (types == 1) {
                                     if (lastPages.last == 0) {
@@ -3578,6 +3710,11 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       invitees.clear();
                                       invitees.addAll(updateInvitees);
                                       updateInvitees.clear();
+                                      types = lastPages.removeLast();
+                                    });
+                                  } else if (types == 10) {
+                                    setState(() {
+                                      owner = updateOwner;
                                       types = lastPages.removeLast();
                                     });
                                   } else {
