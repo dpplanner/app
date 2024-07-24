@@ -124,8 +124,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
           ? endOfResource
           : endOfWeek;
 
-      print(endOfWeek.toString());
-
       if (startOfWeek.isBefore(endDate)) {
         List<ReservationModel> reservations =
             await ReservationApiService.getReservations(
@@ -3236,6 +3234,12 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     startDateTime: startDateTime,
                                     endDateTime: endDateTime,
                                     reservationInvitees: clubMemberIds);
+                                await ReservationApiService
+                                    .patchReservationOwner(
+                                        reservationId:
+                                            reservation.reservationId,
+                                        reservationOwnerId:
+                                            owner['clubMemberId']);
                               }
                               getReservations();
                               Get.back();

@@ -381,7 +381,7 @@ class ReservationApiService {
       body: jsonEncode({"reservationOwnerId": reservationOwnerId}),
     );
 
-    if (response.statusCode == 204) {
+    if (response.statusCode == 200) {
       return;
     }
 
