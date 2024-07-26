@@ -155,8 +155,7 @@ class PostCard extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                DateFormat('M월 d일')
-                                    .add_jm()
+                                DateFormat('M월 d일 HH:mm')
                                     .format(rxPost.value.createdTime),
                                 style: const TextStyle(
                                   color: AppColor.textColor,
