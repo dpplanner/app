@@ -17,4 +17,17 @@ class AppColor extends Color {
   static const lockColor = Color(0xFFCDCDCD);
   static const markColor = Color(0xFFFF443D);
   static const hyperLink = Colors.blueAccent;
+
+  static const List<Color> reservationColors = [
+    Color(0xFFFF443D),
+    Color(0xFFFFAE3D),
+    Color(0xFF46D878),
+    Color(0xFF3DDFFF),
+    Color(0xFF3DA2FF),
+    Color(0xFF6168AA),
+    Color(0xFF80785E),
+    Color(0xFFD9458C),
+    Color(0xFFD9908D),
+    Color(0xFF961E1E),
+  ];
 }
