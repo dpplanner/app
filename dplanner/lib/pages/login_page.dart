@@ -53,8 +53,6 @@ class _LoginPageState extends State<LoginPage> {
   ///TODO: 와이파이 상태 확인 에러 알려주기
   // 로그인 상태 확인
   Future<void> checkUserLogin() async {
-    await Future.delayed(const Duration(milliseconds: 1000));
-
     ///TODO: fluttersecurestorage 일부 기종 문제 해결
     String? refreshToken;
     String? accessToken;

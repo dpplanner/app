@@ -51,9 +51,7 @@ Future<void> main() async {
 
   await _initLocalNotification();
 
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-  NotificationSettings notificationSettings = await messaging.requestPermission(
+  await FirebaseMessaging.instance.requestPermission(
       alert: true,
       announcement: true,
       badge: true,
@@ -61,9 +59,7 @@ Future<void> main() async {
       criticalAlert: false,
       provisional: false,
       sound: true
-    );
-
-  print("User granted permissions:${notificationSettings.authorizationStatus}");
+  );
 
   // 앱이 켜진 상태에서 사용자가 알림이 왔을 때 -> 로컬 푸시알림 전송
   FirebaseMessaging.onMessage.listen((RemoteMessage? message) async {
@@ -186,11 +182,11 @@ void _handleLocalNotification(NotificationResponse details) async {
       await _handleNotificationData(data);
   }
 
-Future<void> _handleFirebaseNotification(RemoteMessage? message) async {
+void _handleFirebaseNotification(RemoteMessage? message) {
   if (message == null) return;
   Map<String, dynamic> data = message.data;
 
-  await _handleNotificationData(data);
+  WidgetsBinding.instance.addPostFrameCallback((_) => _handleNotificationData(data));
 }
 
 Future<void> _handleNotificationData(Map<String, dynamic> data) async {
