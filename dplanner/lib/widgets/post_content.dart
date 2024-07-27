@@ -319,7 +319,7 @@ class PostContent extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          DateFormat('M월 d일').add_jm().format(post.createdTime),
+                          DateFormat('M월 d일 HH:mm').format(post.createdTime),
                           style: const TextStyle(
                             color: AppColor.textColor,
                             fontWeight: FontWeight.normal,
@@ -355,8 +355,10 @@ class PostContent extends StatelessWidget {
                 ),
                 SelectableLinkify(
                   onOpen: (link) async {
-                    if(!await launchUrl(Uri.parse(link.url))) {
-                      snackBar(title: "해당 링크로 이동하지 못했습니다", content: "잠시 후 다시 시도해 주세요");
+                    if (!await launchUrl(Uri.parse(link.url))) {
+                      snackBar(
+                          title: "해당 링크로 이동하지 못했습니다",
+                          content: "잠시 후 다시 시도해 주세요");
                     }
                   },
                   text: post.content,
@@ -365,10 +367,10 @@ class PostContent extends StatelessWidget {
                     fontWeight: FontWeight.normal,
                     fontSize: 15,
                   ),
-                  linkStyle: const TextStyle(
-                    decorationColor: AppColor.hyperLink
-                  ),
-                  contextMenuBuilder: (BuildContext context, EditableTextState editableTextState) {
+                  linkStyle:
+                      const TextStyle(decorationColor: AppColor.hyperLink),
+                  contextMenuBuilder: (BuildContext context,
+                      EditableTextState editableTextState) {
                     return AdaptiveTextSelectionToolbar.editableText(
                       editableTextState: editableTextState,
                     );
