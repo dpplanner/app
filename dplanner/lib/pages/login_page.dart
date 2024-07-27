@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
   String? eulaValue;
 
   // refresh token 유효성 검사
-  bool checkRefreshToken(String token) {
+  bool validateToken(String token) {
     final payloadMap = decodeToken(token);
 
     if (payloadMap['exp'] * 1000 > DateTime.now().millisecondsSinceEpoch) {
@@ -54,44 +54,47 @@ class _LoginPageState extends State<LoginPage> {
   // 로그인 상태 확인
   Future<void> checkUserLogin() async {
     ///TODO: fluttersecurestorage 일부 기종 문제 해결
-    String? refreshToken;
-    String? accessToken;
-
     try {
-      refreshToken = await storage.read(key: refreshTokenKey);
-      accessToken = await storage.read(key: accessTokenKey);
+      String? accessToken = await storage.read(key: accessTokenKey);
+      if (accessToken != null && validateToken(accessToken)) {
+        // accessToken이 유효하면 통과
+        return await processAutoLogin(accessToken);
+      }
+
+      String? refreshToken = await storage.read(key: refreshTokenKey);
+      if (refreshToken != null && validateToken(refreshToken)) {
+        // accessToken이 만료됨 & refreshToken이 유효함 -> 토큰 갱신 후 통과
+        await TokenApiService.postUpdateToken();
+        accessToken = await storage.read(key: accessTokenKey);
+        return await processAutoLogin(accessToken!);
+      }
+    } catch(e) {
+      print(e);
+    } finally {
+      FlutterNativeSplash.remove();
+    }
+  }
+
+  Future<void> processAutoLogin(String accessToken) async {
+    try {
+      ClubController.to.club.value = await ClubApiService.getClub(
+          clubID: decodeToken(accessToken)['recent_club_id']);
+
+      MemberController.to.clubMember.value = await ClubMemberApiService.getClubMember(
+          clubId: decodeToken(accessToken)['recent_club_id'],
+          clubMemberId: decodeToken(accessToken)['club_member_id']);
+
       eulaValue = await storage.read(key: eula);
+      if (eulaValue == 'true') {
+        if (MemberController.to.clubMember().isConfirmed) {
+          Get.offNamed('/tab2', arguments: 1);
+        } else {
+          Get.offNamed('/club_list');
+        }
+      }
     } catch (e) {
       print(e.toString());
     }
-
-    // refreshToken 으로 로그인 상태 확인
-    if (refreshToken != null && checkRefreshToken(refreshToken)) {
-      print("토큰");
-      print(accessToken);
-      print(refreshToken);
-      print(eulaValue);
-      print(decodeToken(accessToken!));
-      print(decodeToken(refreshToken));
-      try {
-        ClubController.to.club.value = await ClubApiService.getClub(
-            clubID: decodeToken(accessToken)['recent_club_id']);
-        MemberController.to.clubMember.value =
-            await ClubMemberApiService.getClubMember(
-                clubId: decodeToken(accessToken)['recent_club_id'],
-                clubMemberId: decodeToken(accessToken)['club_member_id']);
-        if (eulaValue == 'true') {
-          if (MemberController.to.clubMember().isConfirmed) {
-            Get.offNamed('/tab2', arguments: 1);
-          } else {
-            Get.offNamed('/club_list');
-          }
-        }
-      } catch (e) {
-        print(e.toString());
-      }
-    }
-    FlutterNativeSplash.remove();
   }
 
   Future<void> signInWithApple() async {
