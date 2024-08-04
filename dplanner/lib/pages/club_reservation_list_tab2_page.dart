@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 
+import '../controllers/member.dart';
 import '../models/reservation_model.dart';
 import '../const/style.dart';
 import '../widgets/banner_ad_widget.dart';
@@ -154,9 +155,9 @@ class _ClubReservationListTab2PageState
                                               },
                                             ),
                                           ),
-                                          if (DateTime.parse(
-                                                  snapshot.data![index].endDateTime)
-                                              .isBefore(DateTime.now()))
+                                          if (MemberController.to.clubMember().clubAuthorityTypes != null
+                                              && MemberController.to.clubMember().clubAuthorityTypes!.contains("RETURN_MSG_READ")
+                                              && DateTime.parse(snapshot.data![index].endDateTime).isBefore(DateTime.now()))
                                             Padding(
                                               padding: const EdgeInsets.only(
                                                   bottom: 12.0),

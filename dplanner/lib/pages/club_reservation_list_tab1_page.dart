@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dplanner/controllers/club.dart';
+import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/services/reservation_api_service.dart';
 import 'package:flutter/material.dart';
 
@@ -95,7 +96,33 @@ class _ClubReservationListTab1PageState
                         stream: _requestRController.stream,
                         builder: (BuildContext context,
                             AsyncSnapshot<List<ReservationModel>> snapshot) {
-                          if (snapshot.data == null && !_isLoading) {
+                          if (!(MemberController.to.clubMember().role == "ADMIN"
+                              || (MemberController.to.clubMember().clubAuthorityTypes != null
+                                  && MemberController.to.clubMember().clubAuthorityTypes!.contains("SCHEDULE_ALL")))
+                          ) {
+                            return Column(
+                              children: [
+                                const BannerAdWidget(),
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                      minHeight: constraints.maxHeight - 50),
+                                  child: const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Center(
+                                        child: Text(
+                                          "권한이 없습니다",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 16),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else if (snapshot.data == null && !_isLoading) {
                             return Column(
                               children: [
                                 const BannerAdWidget(),

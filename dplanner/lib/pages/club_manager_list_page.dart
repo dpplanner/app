@@ -168,6 +168,7 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
     bool isChecked2 = manager.authorities.contains("POST_ALL") ? true : false;
     bool isChecked3 = manager.authorities.contains("MEMBER_ALL") ? true : false;
     bool isChecked4 = manager.authorities.contains("RESOURCE_ALL") ? true : false;
+    bool isChecked5 = manager.authorities.contains("RETURN_MSG_READ") ? true : false;
 
     Get.bottomSheet(
       isScrollControlled: true,
@@ -380,6 +381,34 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                             ),
                           ],
                         ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                if (types == 1) {
+                                  return;
+                                }
+                                setState(() {
+                                  isChecked5 = !isChecked5;
+                                });
+                              },
+                              icon: const Icon(SFSymbols.square),
+                              selectedIcon: Icon(
+                                SFSymbols.checkmark_square_fill,
+                                color: types == 1 ? AppColor.subColor5 : AppColor.objectColor,
+                              ),
+                              isSelected: isChecked5 ? true : false,
+                            ),
+                            const Text(
+                              "반납 메시지 열람 권한",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -414,6 +443,9 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                           }
                           if (isChecked4) {
                             authorities.add("RESOURCE_ALL");
+                          }
+                          if (isChecked5) {
+                            authorities.add("RETURN_MSG_READ");
                           }
                           ClubManagerModel temp =
                               await ClubManagerApiService.postClubManager(
@@ -480,6 +512,9 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
                             }
                             if (isChecked4) {
                               authorities.add("RESOURCE_ALL");
+                            }
+                            if (isChecked5) {
+                              authorities.add("RETURN_MSG_READ");
                             }
                             ClubManagerModel temp =
                                 await ClubManagerApiService.putClubManager(

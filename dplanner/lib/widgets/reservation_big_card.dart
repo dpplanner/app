@@ -777,9 +777,7 @@ class ReservationBigCard extends StatelessWidget {
                                         ],
                                       ),
                                     ),
-                                  if (reservation.returned &&
-                                      MemberController.to.clubMember().role ==
-                                          "ADMIN")
+                                  if (reservation.returned)
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,

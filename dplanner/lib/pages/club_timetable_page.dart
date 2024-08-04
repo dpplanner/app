@@ -1812,7 +1812,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                     .clubMember()
                                                     .clubAuthorityTypes!
                                                     .contains(
-                                                        "SCHEDULE_ALL")) ||
+                                                        "RETURN_MSG_READ")) ||
                                             reservation.clubMemberId ==
                                                 MemberController.to
                                                     .clubMember()

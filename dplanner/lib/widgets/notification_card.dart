@@ -130,18 +130,6 @@ class _NotificationCardState extends State<NotificationCard> {
         || (user.clubAuthorityTypes != null && user.clubAuthorityTypes!.contains(authority));
   }
 
-  Future<bool> _isReservationRequest(String reservationId) async {
-    ReservationModel reservation = await ReservationApiService.getReservation(reservationId: int.parse(reservationId));
-
-    // 승인된 예약(status = CONFIRMED)인데 내 예약이 아닌 경우
-    if (reservation.status == "REQUEST"
-        || reservation.clubMemberId != MemberController.to.clubMember().id) {
-      return true;
-    }
-
-    return false;
-  }
-
   Future<bool> _isPastReservation(String reservationId) async {
     ReservationModel reservation = await ReservationApiService.getReservation(reservationId: int.parse(reservationId));
 
@@ -200,13 +188,11 @@ class _NotificationCardState extends State<NotificationCard> {
   }
 
   Future<void> _handleReservationRequestNotification() async {
-    String reservationId = widget.info!;
-
     if (hasAuthority("SCHEDULE_ALL")) { // 권한 변경 후에도 들어가는거 방지
       // 예약 요청 -> 예약 관리 - 승인된 이후에도 동일하게
+      String reservationId = widget.info!;
       _toReservationManagePage(reservationId: reservationId, isReturned: null);
     }
-
   }
 
   void _handleReservationRejectNotification() {
@@ -241,9 +227,11 @@ class _NotificationCardState extends State<NotificationCard> {
   }
 
   Future<void> _handleReturnInfoNotification() async {
-    // 반납 메시지 도착 -> 예약 요청 > 승인한 예약
-    String reservationId = widget.info!;
-    _toReservationManagePage(reservationId: reservationId, isReturned: true);
+    if(hasAuthority("RETURN_MSG_READ")) {
+      // 반납 메시지 도착 -> 예약 요청 > 승인한 예약
+      String reservationId = widget.info!;
+      _toReservationManagePage(reservationId: reservationId, isReturned: true);
+    }
   }
 
   Future<void> _toReservationManagePage({required String reservationId, required bool? isReturned}) async {
