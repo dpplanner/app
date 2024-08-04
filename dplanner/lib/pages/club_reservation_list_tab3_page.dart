@@ -96,8 +96,9 @@ class _ClubReservationListTab3PageState
                         stream: _rejectedRController.stream,
                         builder: (BuildContext context,
                             AsyncSnapshot<List<ReservationModel>> snapshot) {
-                          if (MemberController.to.clubMember().clubAuthorityTypes != null
-                              && MemberController.to.clubMember().clubAuthorityTypes!.contains("RETURN_MSG_READ")
+                          if (!(MemberController.to.clubMember().role == "ADMIN"
+                              || (MemberController.to.clubMember().clubAuthorityTypes != null
+                                  && MemberController.to.clubMember().clubAuthorityTypes!.contains("SCHEDULE_ALL")))
                           ) {
                             return Column(
                               children: [

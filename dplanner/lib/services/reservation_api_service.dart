@@ -221,7 +221,7 @@ class ReservationApiService {
 
     // 예외 처리; 메시지를 포함한 예외를 던짐
     String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
-    print(errorMessage);
+    print(response.statusCode);
     throw ErrorDescription(errorMessage);
   }
 
