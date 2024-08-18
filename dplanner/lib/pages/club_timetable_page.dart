@@ -8,6 +8,7 @@ import 'package:dplanner/models/reservation_model.dart';
 import 'package:dplanner/pages/loading_page.dart';
 import 'package:dplanner/services/lock_api_service.dart';
 import 'package:dplanner/const/style.dart';
+import 'package:dplanner/widgets/color_unit_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
@@ -27,6 +28,7 @@ import '../services/reservation_api_service.dart';
 import '../services/resource_api_service.dart';
 import '../widgets/banner_ad_widget.dart';
 import '../widgets/bottom_bar.dart';
+import '../widgets/color_scroll_widget.dart';
 import '../widgets/full_screen_image.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
@@ -158,14 +160,18 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                   ? (i.clubMemberId == MemberController.to.clubMember().id
                       ? AppColor.subColor2
                       : AppColor.subColor4)
-                  : (i.clubMemberId == MemberController.to.clubMember().id ||
-                          i.invitees.any((element) =>
-                              element["clubMemberId"] ==
-                                  MemberController.to.clubMember().id &&
-                              element["clubMemberName"] ==
-                                  MemberController.to.clubMember().name))
-                      ? AppColor.subColor1
-                      : AppColor.subColor3));
+                  : AppColor.ofHex(i.color) // 승인된 예약만 설정한대로
+
+                  // 나중에 쓸수도 있어서 남겨둠(나와 관련된 예약 하이라이트 같은 기능)
+                  // : (i.clubMemberId == MemberController.to.clubMember().id ||
+                  //         i.invitees.any((element) =>
+                  //             element["clubMemberId"] ==
+                  //                 MemberController.to.clubMember().id &&
+                  //             element["clubMemberName"] ==
+                  //                 MemberController.to.clubMember().name))
+                  //     ? AppColor.subColor1
+                  //     : AppColor.subColor3
+          ));
         }
 
         for (var i in locks) {
@@ -914,6 +920,10 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
     String dateOfLock = DateFormat('yyyy년 MM월').format(startOfWeek);
 
+    Color selectedColor = reservation == null
+        ? AppColor.reservationColors[0]
+        : AppColor.ofHex(reservation.color);
+
     if (types == 3) {
       reservationTime = DateTime.parse(reservation!.startDateTime);
       focusedDay = reservationTime;
@@ -1442,6 +1452,33 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 fontSize: 15)),
                                       )),
                                 ],
+                              ),
+                              Padding(
+                                  padding: const EdgeInsets.only(top: 32.0),
+                                  child : Row(
+                                      mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "예약 색상",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16),
+                                        ),
+                                        types == 3
+                                            ? ColorUnitWidget(
+                                            color: selectedColor,
+                                            showBorder: true,
+                                            borderWidth: 5.0)
+                                            : ColorScrollWidget(
+                                            defaultColor: selectedColor,
+                                            availableColors: AppColor.reservationColors,
+                                            onColorChanged: (color) {
+                                              setState(() {
+                                                selectedColor = color;
+                                              });
+                                            })
+                                      ]
+                                  )
                               ),
                               Visibility(
                                 visible: types == 3,
@@ -3219,6 +3256,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     reservationOwnerId: owner['clubMemberId'],
                                     resourceId: selectedValue!.id,
                                     title: title.text,
+                                    color: AppColor.getColorHex(selectedColor),
                                     usage: usage.text,
                                     sharing: (open == Open.yes) ? true : false,
                                     startDateTime: startDateTime,
@@ -3229,6 +3267,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     reservationId: reservation!.reservationId,
                                     resourceId: selectedValue!.id,
                                     title: title.text,
+                                    color: AppColor.getColorHex(selectedColor),
                                     usage: usage.text,
                                     sharing: (open == Open.yes) ? true : false,
                                     startDateTime: startDateTime,
