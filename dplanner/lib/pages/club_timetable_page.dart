@@ -27,6 +27,7 @@ import '../services/reservation_api_service.dart';
 import '../services/resource_api_service.dart';
 import '../widgets/banner_ad_widget.dart';
 import '../widgets/bottom_bar.dart';
+import '../widgets/color_scroll_widget.dart';
 import '../widgets/full_screen_image.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
@@ -71,6 +72,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   DateTime startOfWeek = DateTime.now();
   DateTime endOfWeek = DateTime.now();
   DateTime selectedDate = DateTime.now();
+
+  late final Color pickerColor;
+  late final ValueChanged<Color> onColorChanged;
 
   @override
   void initState() {
@@ -914,6 +918,8 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
     String dateOfLock = DateFormat('yyyy년 MM월').format(startOfWeek);
 
+    Color selectedColor = AppColor.reservationColors[0];
+
     if (types == 3) {
       reservationTime = DateTime.parse(reservation!.startDateTime);
       focusedDay = reservationTime;
@@ -1442,6 +1448,28 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                                 fontSize: 15)),
                                       )),
                                 ],
+                              ),
+                              Padding(
+                                  padding: const EdgeInsets.only(top: 32.0),
+                                  child : Row(
+                                      mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "예약 색상",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16),
+                                        ),
+                                        ColorScrollWidget(
+                                            availableColors: AppColor.reservationColors,
+                                            onColorChanged: (color) {
+                                              setState(() {
+                                                selectedColor = color;
+                                              });
+                                            }
+                                          ),
+                                      ]
+                                  )
                               ),
                               Visibility(
                                 visible: types == 3,
