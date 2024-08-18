@@ -160,14 +160,18 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                   ? (i.clubMemberId == MemberController.to.clubMember().id
                       ? AppColor.subColor2
                       : AppColor.subColor4)
-                  : (i.clubMemberId == MemberController.to.clubMember().id ||
-                          i.invitees.any((element) =>
-                              element["clubMemberId"] ==
-                                  MemberController.to.clubMember().id &&
-                              element["clubMemberName"] ==
-                                  MemberController.to.clubMember().name))
-                      ? AppColor.subColor1
-                      : AppColor.subColor3));
+                  : AppColor.ofHex(i.color) // 승인된 예약만 설정한대로
+
+                  // 나중에 쓸수도 있어서 남겨둠(나와 관련된 예약 하이라이트 같은 기능)
+                  // : (i.clubMemberId == MemberController.to.clubMember().id ||
+                  //         i.invitees.any((element) =>
+                  //             element["clubMemberId"] ==
+                  //                 MemberController.to.clubMember().id &&
+                  //             element["clubMemberName"] ==
+                  //                 MemberController.to.clubMember().name))
+                  //     ? AppColor.subColor1
+                  //     : AppColor.subColor3
+          ));
         }
 
         for (var i in locks) {
