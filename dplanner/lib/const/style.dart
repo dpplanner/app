@@ -19,6 +19,7 @@ class AppColor extends Color {
   static const hyperLink = Colors.blueAccent;
 
   static const List<Color> reservationColors = [
+    Color(0xFFA294DB),
     Color(0xFFFF443D),
     Color(0xFFFFAE3D),
     Color(0xFF46D878),
