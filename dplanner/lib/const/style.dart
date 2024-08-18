@@ -31,4 +31,25 @@ class AppColor extends Color {
     Color(0xFFD9908D),
     Color(0xFF961E1E),
   ];
+
+  static String getColorHex(Color color) {
+    // 색상의 ARGB 값을 16진수 문자열로 변환
+    final hexColor = color.value.toRadixString(16).padLeft(8, '0').toUpperCase();
+
+    // '0xFF'를 제외한 6자리 색상 코드만 추출
+    return hexColor.substring(2);
+  }
+
+  static Color ofHex(String hexCode) {
+    // 입력 색상 코드가 6자리인지 확인
+    if (hexCode.length != 6) {
+      throw ArgumentError('색상 코드는 6자리여야 합니다.');
+    }
+
+    // '0xFF'를 붙여서 ARGB 형식으로 변환
+    final colorString = 'FF$hexCode';
+
+    // 16진수 문자열을 정수로 변환하고 Color 객체를 생성
+    return reservationColors.firstWhere((color) => color == Color(int.parse(colorString, radix: 16)));
+  }
 }

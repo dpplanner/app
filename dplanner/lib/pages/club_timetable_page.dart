@@ -8,6 +8,7 @@ import 'package:dplanner/models/reservation_model.dart';
 import 'package:dplanner/pages/loading_page.dart';
 import 'package:dplanner/services/lock_api_service.dart';
 import 'package:dplanner/const/style.dart';
+import 'package:dplanner/widgets/color_unit_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_view/calendar_view.dart';
@@ -72,9 +73,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
   DateTime startOfWeek = DateTime.now();
   DateTime endOfWeek = DateTime.now();
   DateTime selectedDate = DateTime.now();
-
-  late final Color pickerColor;
-  late final ValueChanged<Color> onColorChanged;
 
   @override
   void initState() {
@@ -918,7 +916,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
     startOfWeek = standardDay.subtract(Duration(days: weekday - 1));
     String dateOfLock = DateFormat('yyyy년 MM월').format(startOfWeek);
 
-    Color selectedColor = AppColor.reservationColors[0];
+    Color selectedColor = reservation == null
+        ? AppColor.reservationColors[0]
+        : AppColor.ofHex(reservation.color);
 
     if (types == 3) {
       reservationTime = DateTime.parse(reservation!.startDateTime);
@@ -1460,14 +1460,19 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                               fontWeight: FontWeight.w700,
                                               fontSize: 16),
                                         ),
-                                        ColorScrollWidget(
+                                        types == 3
+                                            ? ColorUnitWidget(
+                                            color: selectedColor,
+                                            showBorder: true,
+                                            borderWidth: 5.0)
+                                            : ColorScrollWidget(
+                                            defaultColor: selectedColor,
                                             availableColors: AppColor.reservationColors,
                                             onColorChanged: (color) {
                                               setState(() {
                                                 selectedColor = color;
                                               });
-                                            }
-                                          ),
+                                            })
                                       ]
                                   )
                               ),
@@ -3247,6 +3252,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     reservationOwnerId: owner['clubMemberId'],
                                     resourceId: selectedValue!.id,
                                     title: title.text,
+                                    color: AppColor.getColorHex(selectedColor),
                                     usage: usage.text,
                                     sharing: (open == Open.yes) ? true : false,
                                     startDateTime: startDateTime,
@@ -3257,6 +3263,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                     reservationId: reservation!.reservationId,
                                     resourceId: selectedValue!.id,
                                     title: title.text,
+                                    color: AppColor.getColorHex(selectedColor),
                                     usage: usage.text,
                                     sharing: (open == Open.yes) ? true : false,
                                     startDateTime: startDateTime,

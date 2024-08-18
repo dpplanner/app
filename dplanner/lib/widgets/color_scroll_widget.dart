@@ -1,14 +1,17 @@
+import 'package:dplanner/widgets/color_unit_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../const/style.dart';
 
 class ColorScrollWidget extends StatefulWidget {
+  final Color defaultColor;
   final List<Color> availableColors;
   final ValueChanged<Color> onColorChanged; // 색상이 변경될 때 호출될 콜백
 
   const ColorScrollWidget({
     super.key,
+    required this.defaultColor,
     required this.availableColors,
     required this.onColorChanged, // 초기 색상 설정은 필요 없으므로 제거
   });
@@ -18,7 +21,7 @@ class ColorScrollWidget extends StatefulWidget {
 }
 
 class _ColorScrollWidgetState extends State<ColorScrollWidget> {
-  static const double circleSize = 24.0;
+  static const double circleSize = ColorUnitWidget.circleSize;
   static const double circlePadding = 16.0;
   static const double indicatorWidth = 180.0; // 5개의 원이 보여질 정도의 가로 길이
   static const double scrollBarHeight = 4.0; // 스크롤바 높이
@@ -41,6 +44,7 @@ class _ColorScrollWidgetState extends State<ColorScrollWidget> {
           Colors.transparent,
           Colors.transparent]);
       });
+      selectedIndex = _getColorIndex(widget.defaultColor); // 기본 색상 인덱스 설정
       _centerScrollOnSelected();
     });
   }
@@ -49,6 +53,16 @@ class _ColorScrollWidgetState extends State<ColorScrollWidget> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  int _getColorIndex(Color color) {
+    // 기본 색상에 대한 인덱스를 반환합니다.
+    int index = colors.indexOf(color);
+    if (index == -1) {
+      // 색상이 colors 목록에 없으면 기본 색상 인덱스를 설정하지 않습니다.
+      return 2; // 기본 색상 인덱스
+    }
+    return index;
   }
 
   void _centerScrollOnSelected() {
@@ -141,19 +155,11 @@ class _ColorScrollWidgetState extends State<ColorScrollWidget> {
                       onTap: () => _onColorTap(index),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: circlePadding / 2),
-                        child: Container(
-                          width: circleSize,
-                          height: circleSize,
-                          decoration: BoxDecoration(
-                              color: colors[index],
-                              shape: BoxShape.circle,
-                              border: index >= 2 && index < 2 + widget.availableColors.length
-                                  ? Border.all(
-                                  color: AppColor.backgroundColor2,
-                                  width: selectedIndex == index ? 0 : 5)
-                                  : null
-                          ),
-                        ),
+                        child: ColorUnitWidget(
+                          color: colors[index],
+                          showBorder: index >= 2 && index < 2 + widget.availableColors.length,
+                          borderWidth: selectedIndex == index ? 0 : 5,
+                        )
                       ),
                     );
                   },

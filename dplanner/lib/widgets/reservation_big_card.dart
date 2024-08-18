@@ -19,6 +19,8 @@ import '../pages/error_page.dart';
 import '../services/club_member_api_service.dart';
 import '../services/reservation_api_service.dart';
 import '../const/style.dart';
+import 'color_scroll_widget.dart';
+import 'color_unit_widget.dart';
 import 'full_screen_image.dart';
 import 'nextpage_button.dart';
 import 'outline_textform.dart';
@@ -182,6 +184,8 @@ class ReservationBigCard extends StatelessWidget {
 
     List<XFile> selectedImages = [];
     int maxImageCount = 5;
+
+    Color selectedColor = AppColor.ofHex(reservation.color);
 
     Future<void> pickImage(StateSetter setState) async {
       try {
@@ -393,6 +397,33 @@ class ReservationBigCard extends StatelessWidget {
                                   ),
                                 ],
                               ),
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.only(top: 32.0),
+                                child : Row(
+                                    mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "예약 색상",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16),
+                                      ),
+                                      types == 0
+                                          ? ColorUnitWidget(
+                                          color: selectedColor,
+                                          showBorder: true,
+                                          borderWidth: 5.0)
+                                          : ColorScrollWidget(
+                                          defaultColor: selectedColor,
+                                          availableColors: AppColor.reservationColors,
+                                          onColorChanged: (color) {
+                                            setState(() {
+                                              selectedColor = color;
+                                            });
+                                          })
+                                    ]
+                                )
                             ),
                             if (reservation.status == "REJECTED")
                               Padding(
@@ -1472,6 +1503,7 @@ class ReservationBigCard extends StatelessWidget {
                                               resourceId:
                                                   reservation.resourceId,
                                               title: title.text,
+                                              color: AppColor.getColorHex(selectedColor),
                                               usage: usage.text,
                                               sharing: (open == Open.yes)
                                                   ? true
