@@ -1,6 +1,7 @@
+import '../json_serializable.dart';
 import 'resource_type.dart';
 
-class Resource {
+class Resource extends JsonSerializable {
   int id;
   int clubId;
   String name;
@@ -37,4 +38,18 @@ class Resource {
 
   @override
   int get hashCode => id.hashCode;
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "clubId": clubId,
+      "name": name,
+      "info": info,
+      "returnMessageRequired": returnMessageRequired,
+      "resourceType": resourceType,
+      "notice": notice,
+      "bookableSpan": bookableSpan
+    };
+  }
 }

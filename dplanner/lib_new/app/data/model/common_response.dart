@@ -1,7 +1,7 @@
 class CommonResponse {
   String status;
   String message;
-  dynamic data;
+  Map<String, dynamic> data;
 
   CommonResponse({
     required this.status,

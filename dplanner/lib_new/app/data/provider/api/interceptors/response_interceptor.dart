@@ -36,9 +36,9 @@ void _handleErrorStatus(Response response) {
     case 403:
       break;
     case 500:
-      break;
+      throw Exception();
     default:
-      break;
+      throw Exception();
   }
-  return;
+  throw Exception();
 }
