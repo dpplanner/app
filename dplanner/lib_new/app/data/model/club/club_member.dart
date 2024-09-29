@@ -1,9 +1,10 @@
-import '../authority/club_authority_type.dart';
+import 'club_authority_type.dart';
+import 'club_member_role_type.dart';
 
 class ClubMember {
   int id;
   String name;
-  String role;
+  ClubMemberRoleType role;
   bool isConfirmed;
   String? info;
   String? url;
@@ -25,7 +26,7 @@ class ClubMember {
   ClubMember.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         name = json['name'],
-        role = json['role'],
+        role = ClubMemberRoleType.fromString(json['role']),
         isConfirmed = json['isConfirmed'],
         info = json['info'],
         url = json['url'],

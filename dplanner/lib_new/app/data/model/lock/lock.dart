@@ -1,7 +1,4 @@
-import '../../../utils/datetime_utils.dart';
-import '../json_serializable.dart';
-
-class Lock extends JsonSerializable {
+class Lock {
   int id;
   int resourceId;
   String message;
@@ -22,15 +19,4 @@ class Lock extends JsonSerializable {
         message = json['message'],
         startDateTime = DateTime.parse(json['startDateTime']),
         endDateTime = DateTime.parse(json['endDateTime']);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "resourceId": resourceId,
-      "message": message,
-      "startDateTime": DateTimeUtils.toFormattedString(startDateTime),
-      "endDateTime": DateTimeUtils.toFormattedString(endDateTime)
-    };
-  }
 }

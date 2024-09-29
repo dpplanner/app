@@ -12,4 +12,20 @@ class BaseApiProvider extends GetConnect {
     httpClient.addAuthenticator(authInterceptor);
     httpClient.addResponseModifier(responseInterceptor);
   }
+
+  Future<Response<T>> deleteWithBody<T>(
+    String url,
+    dynamic body, {
+    Map<String, String>? headers,
+    String? contentType,
+    Map<String, dynamic>? query,
+    Decoder<T>? decoder,
+  }) {
+    return request(url, "DELETE",
+        body: body,
+        contentType: contentType,
+        headers: headers,
+        query: query,
+        decoder: decoder);
+  }
 }

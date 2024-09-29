@@ -12,28 +12,25 @@ class MemberService extends GetxService {
   final MemberApiProvider memberApiProvider = Get.find<MemberApiProvider>();
   final SecureStorageService secureStorageService = Get.find<SecureStorageService>();
 
+  Future<int> getMemberId() async {
+    String? accessToken = await secureStorageService.getAccessToken();
+    return TokenUtils.getMemberId(accessToken: accessToken!);
+  }
+
   void postEula() {
     memberApiProvider.postEula();
   }
 
   void changeClub ({required int clubId}) async {
-    int memberId = await _getMemberId();
+    int memberId = await getMemberId();
     var request = ClubChangeRequest(clubId: clubId);
     await memberApiProvider.changeClub(memberId: memberId, request: request);
     tokenService.refreshToken();
   }
 
   void quit() async {
-    int memberId = await _getMemberId();
+    int memberId = await getMemberId();
     await memberApiProvider.deleteMember(memberId: memberId);
     await secureStorageService.deleteAll();
-  }
-
-  /*
-  * private methods
-  */
-  Future<int> _getMemberId() async {
-    String? accessToken = await secureStorageService.getAccessToken();
-    return TokenUtils.getMemberId(accessToken: accessToken!);
   }
 }

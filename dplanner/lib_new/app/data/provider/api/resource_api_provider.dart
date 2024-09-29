@@ -1,5 +1,5 @@
 import '../../model/common_response.dart';
-import '../../model/resource/request/resource_create_request.dart';
+import '../../model/resource/request/resource_request.dart';
 import '../../model/resource/resource.dart';
 import 'base_api_provider.dart';
 
@@ -13,7 +13,7 @@ class ResourceApiProvider extends BaseApiProvider {
   }
 
   Future<Resource> createResourceInCurrentClub(
-      {required ResourceCreateRequest request}) async {
+      {required ResourceRequest request}) async {
     var response = await post("/resources", request.toJson()) as CommonResponse;
     return Resource.fromJson(response.data);
   }
@@ -24,7 +24,7 @@ class ResourceApiProvider extends BaseApiProvider {
   }
 
   Future<Resource> updateResource(
-      {required int resourceId, required Resource request}) async {
+      {required int resourceId, required ResourceRequest request}) async {
     var response =
         await put("/resources/$resourceId", request.toJson()) as CommonResponse;
     return Resource.fromJson(response.data);
