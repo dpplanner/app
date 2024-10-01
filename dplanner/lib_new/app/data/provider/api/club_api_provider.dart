@@ -2,6 +2,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get_connect/http/src/multipart/form_data.dart';
 import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 
+import '../../../utils/url_utils.dart';
 import '../../model/club/club.dart';
 import '../../model/club/request/club_request.dart';
 import '../../model/common_response.dart';
@@ -9,28 +10,29 @@ import 'base_api_provider.dart';
 
 class ClubApiProvider extends BaseApiProvider {
   Future<List<Club>> getClubsByMemberId({required int memberId}) async {
-    var response =
-        await get("/clubs", query: {"memberId": memberId}) as CommonResponse;
-    var jsonList = response.data as List<Map<String, dynamic>>;
+    var queryString = UrlUtils.toQueryString({"memberId": memberId});
+
+    var response = await get("/clubs$queryString") as CommonResponse;
+    var jsonList = response.body!.data as List<dynamic>;
 
     return jsonList.map((message) => Club.fromJson(message)).toList();
   }
 
   Future<Club> createClub({required ClubRequest request}) async {
     var response = await post("/clubs", request.toJson()) as CommonResponse;
-    return Club.fromJson(response.data);
+    return Club.fromJson(response.body!.data!);
   }
 
   Future<Club> getClub({required int clubId}) async {
     var response = await get("/clubs/$clubId") as CommonResponse;
-    return Club.fromJson(response.data);
+    return Club.fromJson(response.body!.data!);
   }
 
   Future<Club> updateClubInfo(
       {required int clubId, required ClubRequest request}) async {
     var response =
         await patch("/clubs/$clubId", request.toJson()) as CommonResponse;
-    return Club.fromJson(response.data);
+    return Club.fromJson(response.body!.data!);
   }
 
   Future<Club> updateClubImage(
@@ -40,6 +42,6 @@ class ClubApiProvider extends BaseApiProvider {
 
     var response = await post("/clubs/$clubId/update-club-image", formData)
         as CommonResponse;
-    return Club.fromJson(response.data);
+    return Club.fromJson(response.body!.data!);
   }
 }

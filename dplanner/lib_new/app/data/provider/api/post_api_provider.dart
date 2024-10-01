@@ -2,6 +2,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get_connect/http/src/multipart/form_data.dart';
 import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 
+import '../../../utils/url_utils.dart';
 import '../../model/common_response.dart';
 import '../../model/paging_request.dart';
 import '../../model/paging_response.dart';
@@ -14,7 +15,7 @@ import 'base_api_provider.dart';
 class PostApiProvider extends BaseApiProvider {
   Future<Post> getPost({required int postId}) async {
     var response = await get("/posts/$postId") as CommonResponse;
-    return Post.fromJson(response.data);
+    return Post.fromJson(response.body!.data!!);
   }
 
   Future<Post> createPost(
@@ -33,7 +34,7 @@ class PostApiProvider extends BaseApiProvider {
         .toList());
 
     var response = await post("/posts", formData) as CommonResponse;
-    return Post.fromJson(response.data);
+    return Post.fromJson(response.body!.data!!);
   }
 
   Future<Post> updatePost(
@@ -54,7 +55,7 @@ class PostApiProvider extends BaseApiProvider {
         .toList());
 
     var response = await put("/posts/$postId", formData) as CommonResponse;
-    return Post.fromJson(response.data);
+    return Post.fromJson(response.body!.data!);
   }
 
   void deletePost({required int postId}) async {
@@ -63,53 +64,62 @@ class PostApiProvider extends BaseApiProvider {
 
   Future<List<Post>> getPostsByClubId(
       {required int clubId, required PagingRequest paging}) async {
-    var response = await get("/posts/clubs/$clubId", query: paging.toJson())
-        as CommonResponse;
-    var pagingResponse = response.data as PagingResponse;
-    var jsonList = pagingResponse.content as List<Map<String, dynamic>>;
+    var queryString = UrlUtils.toQueryString(paging.toJson());
+    var response =
+        await get("/posts/clubs/$clubId$queryString") as CommonResponse;
+    var pagingResponse = response.body!.data as PagingResponse;
 
-    return jsonList.map((message) => Post.fromJson(message)).toList();
+    return pagingResponse.content
+        .map((message) => Post.fromJson(message))
+        .toList();
   }
 
   Future<List<Post>> getPostsByClubMemberId(
       {required int clubMemberId, required PagingRequest paging}) async {
-    var response =
-        await get("/posts/clubMembers/$clubMemberId", query: paging.toJson())
-            as CommonResponse;
-    var pagingResponse = response.data as PagingResponse;
-    var jsonList = pagingResponse.content as List<Map<String, dynamic>>;
+    var queryString = UrlUtils.toQueryString(paging.toJson());
+    var response = await get("/posts/clubMembers/$clubMemberId$queryString")
+        as CommonResponse;
+    var pagingResponse = response.body!.data as PagingResponse;
 
-    return jsonList.map((message) => Post.fromJson(message)).toList();
+    return pagingResponse.content
+        .map((message) => Post.fromJson(message))
+        .toList();
   }
 
   Future<List<Post>> getCommentedPostsByClubMemberId(
       {required int clubMemberId, required PagingRequest paging}) async {
-    var response = await get("/posts/clubMembers/$clubMemberId/commented",
-        query: paging.toJson()) as CommonResponse;
-    var pagingResponse = response.data as PagingResponse;
-    var jsonList = pagingResponse.content as List<Map<String, dynamic>>;
+    var queryString = UrlUtils.toQueryString(paging.toJson());
+    var response =
+        await get("/posts/clubMembers/$clubMemberId/commented$queryString")
+            as CommonResponse;
+    var pagingResponse = response.body!.data as PagingResponse;
 
-    return jsonList.map((message) => Post.fromJson(message)).toList();
+    return pagingResponse.content
+        .map((message) => Post.fromJson(message))
+        .toList();
   }
 
   Future<List<Post>> getLikedPostsByClubMemberId(
       {required int clubMemberId, required PagingRequest paging}) async {
-    var response = await get("/posts/clubMembers/$clubMemberId/like",
-        query: paging.toJson()) as CommonResponse;
-    var pagingResponse = response.data as PagingResponse;
-    var jsonList = pagingResponse.content as List<Map<String, dynamic>>;
+    var queryString = UrlUtils.toQueryString(paging.toJson());
+    var response =
+        await get("/posts/clubMembers/$clubMemberId/like$queryString")
+            as CommonResponse;
+    var pagingResponse = response.body!.data as PagingResponse;
 
-    return jsonList.map((message) => Post.fromJson(message)).toList();
+    return pagingResponse.content
+        .map((message) => Post.fromJson(message))
+        .toList();
   }
 
   Future<Post> fixPostToggle({required int postId}) async {
     var response = await put("/posts/$postId/fix", null) as CommonResponse;
-    return Post.fromJson(response.data);
+    return Post.fromJson(response.body!.data!);
   }
 
   Future<PostLike> likePostToggle({required int postId}) async {
     var response = await put("/posts/$postId/like", null) as CommonResponse;
-    return PostLike.fromJson(response.data);
+    return PostLike.fromJson(response.body!.data!);
   }
 
   void blockPost({required int postId}) async {

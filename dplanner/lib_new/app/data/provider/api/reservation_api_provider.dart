@@ -3,6 +3,7 @@ import 'package:get/get_connect/http/src/multipart/form_data.dart';
 import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 
 import '../../../utils/datetime_utils.dart';
+import '../../../utils/url_utils.dart';
 import '../../model/common_response.dart';
 import '../../model/paging_request.dart';
 import '../../model/paging_response.dart';
@@ -13,14 +14,14 @@ import 'base_api_provider.dart';
 class ReservationApiProvider extends BaseApiProvider {
   Future<Reservation> getReservation({required int reservationId}) async {
     var response = await get("/reservations/$reservationId") as CommonResponse;
-    return Reservation.fromJson(response.data);
+    return Reservation.fromJson(response.body!.data!);
   }
 
   Future<Reservation> createReservation(
       {required ReservationRequest request}) async {
     var response =
         await post("/reservations", request.toJson()) as CommonResponse;
-    return Reservation.fromJson(response.data);
+    return Reservation.fromJson(response.body!.data!);
   }
 
   Future<Reservation> updateReservation(
@@ -28,7 +29,7 @@ class ReservationApiProvider extends BaseApiProvider {
     var response =
         await put("/reservations/$reservationId/update", request.toJson())
             as CommonResponse;
-    return Reservation.fromJson(response.data);
+    return Reservation.fromJson(response.body!.data!);
   }
 
   void cancelReservation(
@@ -59,19 +60,22 @@ class ReservationApiProvider extends BaseApiProvider {
 
     var response = await post("/reservations/$reservationId/return", formData)
         as CommonResponse;
-    return Reservation.fromJson(response.data);
+    return Reservation.fromJson(response.body!.data!);
   }
 
   Future<List<Reservation>> getReservations(
       {required int resourceId,
       required DateTime startDateTime,
       required DateTime endDateTime}) async {
-    var response = await get("/reservations/scheduler", query: {
+    var queryString = UrlUtils.toQueryString({
       "resourceId": resourceId,
       "start": DateTimeUtils.toFormattedString(startDateTime),
       "end": DateTimeUtils.toFormattedString(endDateTime)
-    }) as CommonResponse;
-    var jsonList = response.data as List<Map<String, dynamic>>;
+    });
+
+    var response =
+        await get("/reservations/scheduler$queryString") as CommonResponse;
+    var jsonList = response.body!.data as List<dynamic>;
 
     return jsonList.map((message) => Reservation.fromJson(message)).toList();
   }
@@ -80,19 +84,22 @@ class ReservationApiProvider extends BaseApiProvider {
       {required String status, required PagingRequest paging}) async {
     var query = paging.toJson();
     query.addAll({"status": status});
+    var queryString = UrlUtils.toQueryString(query);
 
-    var response = await get("/reservations/my-reservations", query: query)
+    var response = await get("/reservations/my-reservations$queryString")
         as CommonResponse;
-    var pagingResponse = response.data as PagingResponse;
-    var jsonList = pagingResponse.content as List<Map<String, dynamic>>;
+    var pagingResponse = response.body!.data as PagingResponse;
 
-    return jsonList.map((message) => Reservation.fromJson(message)).toList();
+    return pagingResponse.content
+        .map((message) => Reservation.fromJson(message))
+        .toList();
   }
 
   /// Admin
   void confirmReservation(
       {required ReservationRequest request, required bool confirm}) async {
-    await patch("/reservations", request.toJson(), query: {"confirm": confirm});
+    var queryString = UrlUtils.toQueryString({"confirm": confirm});
+    await patch("/reservations$queryString", request.toJson());
   }
 
   Future<Reservation> updateReservationOwner(
@@ -100,7 +107,7 @@ class ReservationApiProvider extends BaseApiProvider {
     var response = await patch(
             "/reservations/$reservationId/update-owner", request.toJson())
         as CommonResponse;
-    return Reservation.fromJson(response.data);
+    return Reservation.fromJson(response.body!.data!);
   }
 
   Future<List<Reservation>> getReservationsForAdmin(
@@ -109,12 +116,14 @@ class ReservationApiProvider extends BaseApiProvider {
       required PagingRequest paging}) async {
     var query = paging.toJson();
     query.addAll({"clubId": clubId, "status": status});
+    var queryString = UrlUtils.toQueryString(query);
 
     var response =
-        await get("/reservations/admin", query: query) as CommonResponse;
-    var pagingResponse = response.data as PagingResponse;
-    var jsonList = pagingResponse.content as List<Map<String, dynamic>>;
+        await get("/reservations/admin$queryString") as CommonResponse;
+    var pagingResponse = response.body!.data as PagingResponse;
 
-    return jsonList.map((message) => Reservation.fromJson(message)).toList();
+    return pagingResponse.content
+        .map((message) => Reservation.fromJson(message))
+        .toList();
   }
 }

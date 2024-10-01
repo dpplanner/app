@@ -1,3 +1,4 @@
+// todo 제너릭 타입 기반으로 변경
 class PagingResponse {
   List<dynamic> content;
   int page;

@@ -7,21 +7,21 @@ import 'base_api_provider.dart';
 class CommentApiProvider extends BaseApiProvider {
   Future<List<Comment>> getComments({required int postId}) async {
     var response = await get("/posts/$postId/comments") as CommonResponse;
-    var jsonList = response.data as List<Map<String, dynamic>>;
+    var jsonList = response.body!.data as List<dynamic>;
 
     return jsonList.map((message) => Comment.fromJson(message)).toList();
   }
 
   Future<Comment> createComment({required CommentRequest request}) async {
     var response = await post("/comments", request.toJson()) as CommonResponse;
-    return Comment.fromJson(response.data);
+    return Comment.fromJson(response.body!.data!);
   }
 
   Future<Comment> updateComment(
       {required int commentId, required CommentRequest request}) async {
     var response =
         await put("/comments/$commentId", request.toJson()) as CommonResponse;
-    return Comment.fromJson(response.data);
+    return Comment.fromJson(response.body!.data!);
   }
 
   void deleteComment({required int commentId}) async {

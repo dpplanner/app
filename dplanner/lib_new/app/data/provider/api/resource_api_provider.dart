@@ -7,7 +7,7 @@ class ResourceApiProvider extends BaseApiProvider {
 
   Future<List<Resource>> getResourcesOfCurrentClub() async {
     var response = get("/resources") as CommonResponse;
-    var jsonList = response.data as List<Map<String, dynamic>>;
+    var jsonList = response.body!.data as List<dynamic>;
 
     return jsonList.map((json) => Resource.fromJson(json)).toList();
   }
@@ -15,19 +15,19 @@ class ResourceApiProvider extends BaseApiProvider {
   Future<Resource> createResourceInCurrentClub(
       {required ResourceRequest request}) async {
     var response = await post("/resources", request.toJson()) as CommonResponse;
-    return Resource.fromJson(response.data);
+    return Resource.fromJson(response.body!.data!);
   }
 
   Future<Resource> getResource({required int resourceId}) async {
     var response = await get("/resources/$resourceId") as CommonResponse;
-    return Resource.fromJson(response.data);
+    return Resource.fromJson(response.body!.data!);
   }
 
   Future<Resource> updateResource(
       {required int resourceId, required ResourceRequest request}) async {
     var response =
         await put("/resources/$resourceId", request.toJson()) as CommonResponse;
-    return Resource.fromJson(response.data);
+    return Resource.fromJson(response.body!.data!);
   }
 
   void deleteResource({required int resourceId}) async {

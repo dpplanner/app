@@ -1,6 +1,5 @@
 import 'json_serializable.dart';
 
-// todo
 class PagingRequest extends JsonSerializable {
   int page;
   int size;

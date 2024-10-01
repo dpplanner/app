@@ -17,7 +17,7 @@ class TokenService extends GetxService {
 
     secureStorageService.writeAccessToken(response.accessToken);
     secureStorageService.writeRefreshToken(response.refreshToken);
-    secureStorageService.writeEulaAgreed(response.eulaAgreed);
+    secureStorageService.writeEulaAgreed(response.eulaAgreed!);
   }
 
   void refreshToken() async {
@@ -26,7 +26,6 @@ class TokenService extends GetxService {
 
     var request = TokenRefreshRequest(accessToken: accessToken!, refreshToken: refreshToken!);
     TokenResponse response = await tokenApiProvider.refreshToken(request: request);
-
     await secureStorageService.updateAccessToken(response.accessToken);
     await secureStorageService.updateRefreshToken(response.refreshToken);
   }

@@ -1,7 +1,7 @@
 class TokenResponse {
   String accessToken;
   String refreshToken;
-  bool eulaAgreed;
+  bool? eulaAgreed;
 
   TokenResponse(
       {required this.accessToken,

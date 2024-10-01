@@ -2,6 +2,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get_connect/http/src/multipart/form_data.dart';
 import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 
+import '../../../utils/url_utils.dart';
 import '../../model/club/club_member.dart';
 import '../../model/club/request/club_member_request.dart';
 import '../../model/club/request/club_member_role_update_request.dart';
@@ -13,14 +14,15 @@ class ClubMemberApiProvider extends BaseApiProvider {
       {required int clubId, required ClubMemberRequest request}) async {
     var response =
         await post("/clubs/$clubId", request.toJson()) as CommonResponse;
-    return ClubMember.fromJson(response.data);
+    return ClubMember.fromJson(response.body!.data!);
   }
 
   Future<List<ClubMember>> getClubMembers(
       {required int clubId, required bool confirmed}) async {
-    var response = await get("/clubs/$clubId/club-members",
-        query: {"confirmed": confirmed}) as CommonResponse;
-    var jsonList = response.data as List<Map<String, dynamic>>;
+    var queryString = UrlUtils.toQueryString({"confirmed": confirmed});
+    var response =
+        await get("/clubs/$clubId/club-members$queryString") as CommonResponse;
+    var jsonList = response.body!.data as List<dynamic>;
 
     return jsonList.map((message) => ClubMember.fromJson(message)).toList();
   }
@@ -29,7 +31,7 @@ class ClubMemberApiProvider extends BaseApiProvider {
       {required int clubId, required int clubMemberId}) async {
     var response = await get("/clubs/$clubId/club-members/$clubMemberId")
         as CommonResponse;
-    return ClubMember.fromJson(response.data);
+    return ClubMember.fromJson(response.body!.data!);
   }
 
   Future<ClubMember> updateClubMemberInfo(
@@ -39,7 +41,7 @@ class ClubMemberApiProvider extends BaseApiProvider {
     var response = await patch(
             "/clubs/$clubId/club-members/$clubMemberId", request.toJson())
         as CommonResponse;
-    return ClubMember.fromJson(response.data);
+    return ClubMember.fromJson(response.body!.data!);
   }
 
   Future<ClubMember> updateClubMemberProfileImage(
@@ -52,7 +54,7 @@ class ClubMemberApiProvider extends BaseApiProvider {
     var response = await patch(
         "/clubs/$clubId/club-members/$clubMemberId/update-profile-image",
         formData) as CommonResponse;
-    return ClubMember.fromJson(response.data);
+    return ClubMember.fromJson(response.body!.data!);
   }
 
   Future<ClubMember> updateClubMemberRole(
@@ -62,7 +64,7 @@ class ClubMemberApiProvider extends BaseApiProvider {
     var response = await patch(
             "/clubs/$clubId/club-members/$clubMemberId/role", request.toJson())
         as CommonResponse;
-    return ClubMember.fromJson(response.data);
+    return ClubMember.fromJson(response.body!.data!);
   }
 
   void leaveClub({required int clubId, required int clubMemberId}) async {

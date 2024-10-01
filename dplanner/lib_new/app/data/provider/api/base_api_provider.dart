@@ -1,16 +1,20 @@
 import 'package:get/get.dart';
 
-import 'interceptors/auth_interceptor.dart';
+import '../../../utils/url_utils.dart';
+import 'interceptors/authenticator.dart';
+import 'interceptors/request_interceptor.dart';
 import 'interceptors/response_interceptor.dart';
 
 class BaseApiProvider extends GetConnect {
-  static const String _baseUrl = 'http://3.39.102.31:8080';
+  // static const String _baseUrl = 'http://3.39.102.31:8080'; // real-server
+  static const String _baseUrl = 'http://43.202.106.212:8080'; // dev-server
 
   @override
   void onInit() {
     httpClient.baseUrl = _baseUrl;
-    httpClient.addAuthenticator(authInterceptor);
-    httpClient.addResponseModifier(responseInterceptor);
+    httpClient.addRequestModifier(authorizationHeaderRequestInterceptor);
+    httpClient.addAuthenticator(refreshTokenAuthenticator);
+    httpClient.addResponseModifier(commonResponseBodyBindingInterceptor);
   }
 
   Future<Response<T>> deleteWithBody<T>(
@@ -21,11 +25,11 @@ class BaseApiProvider extends GetConnect {
     Map<String, dynamic>? query,
     Decoder<T>? decoder,
   }) {
-    return request(url, "DELETE",
+    var queryString = UrlUtils.toQueryString(query);
+    return request(url + queryString, "DELETE",
         body: body,
         contentType: contentType,
         headers: headers,
-        query: query,
         decoder: decoder);
   }
 }
