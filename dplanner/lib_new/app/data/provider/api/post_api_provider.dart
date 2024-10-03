@@ -58,7 +58,7 @@ class PostApiProvider extends BaseApiProvider {
     return Post.fromJson(response.body!.data!);
   }
 
-  void deletePost({required int postId}) async {
+  Future<void> deletePost({required int postId}) async {
     await delete("/posts/$postId");
   }
 
@@ -122,11 +122,11 @@ class PostApiProvider extends BaseApiProvider {
     return PostLike.fromJson(response.body!.data!);
   }
 
-  void blockPost({required int postId}) async {
+  Future<void> blockPost({required int postId}) async {
     await post("/posts/$postId/block", null);
   }
 
-  void reportPost(
+  Future<void> reportPost(
       {required int postId, required PostReportRequest request}) async {
     await post("/posts/$postId/report", request.toJson());
   }

@@ -10,7 +10,7 @@ class FirebaseMessagingService extends GetxService {
   final MemberApiProvider memberApiProvider = Get.find<MemberApiProvider>();
   final MemberService memberService = Get.find<MemberService>();
 
-  void refreshFcmToken() async {
+  Future<void> refreshFcmToken() async {
     int memberId = await memberService.getMemberId();
 
     await _requestPermission();

@@ -67,26 +67,26 @@ class ClubMemberApiProvider extends BaseApiProvider {
     return ClubMember.fromJson(response.body!.data!);
   }
 
-  void leaveClub({required int clubId, required int clubMemberId}) async {
+  Future<void> leaveClub({required int clubId, required int clubMemberId}) async {
     await delete("/clubs/$clubId/club-members/$clubMemberId");
   }
 
-  void blockClubMember(
+  Future<void> blockClubMember(
       {required int clubId, required int blockedClubMemberId}) async {
     await post("/clubs/$clubId/club-members/$blockedClubMemberId/block", null);
   }
 
-  void confirmClubMember(
+  Future<void> confirmClubMember(
       {required int clubId, required ClubMemberRequest request}) async {
     await patch("/clubs/$clubId/club-members/confirm", request.toJson());
   }
 
-  void rejectClubMember(
+  Future<void> rejectClubMember(
       {required int clubId, required ClubMemberRequest request}) async {
     await patch("/clubs/$clubId/club-members/reject", request.toJson());
   }
 
-  void kickOutClubMember(
+  Future<void> kickOutClubMember(
       {required int clubId, required int clubMemberId}) async {
     await delete("/clubs/$clubId/club-members/$clubMemberId/kickout");
   }

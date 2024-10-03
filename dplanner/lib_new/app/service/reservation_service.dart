@@ -21,9 +21,26 @@ class ReservationService extends GetxService {
   }
 
   Future<Reservation> createReservation(
-      {required Reservation reservation}) async {
+      {required int reservationOwnerId,
+      required int resourceId,
+      required DateTime startDateTime,
+      required DateTime endDateTime,
+      required String color,
+      String? title,
+      String? usage,
+      List<int>? reservationInvitees,
+      bool sharing = true}) async {
     return await reservationApiProvider.createReservation(
-        request: ReservationRequest.forCreate(reservation: reservation));
+        request: ReservationRequest.forCreate(
+            reservationOwnerId: reservationOwnerId,
+            resourceId: resourceId,
+            title: title,
+            color: color,
+            usage: usage,
+            sharing: sharing,
+            startDateTime: startDateTime,
+            endDateTime: endDateTime,
+            reservationInvitees: reservationInvitees));
   }
 
   Future<Reservation> updateReservation(
@@ -33,14 +50,14 @@ class ReservationService extends GetxService {
         request: ReservationRequest.forUpdate(reservation: reservation));
   }
 
-  void cancelReservation({required Reservation reservation}) async {
-    reservationApiProvider.cancelReservation(
+  Future<void> cancelReservation({required Reservation reservation}) async {
+    await reservationApiProvider.cancelReservation(
         reservationId: reservation.reservationId,
         request: ReservationRequest.forCancel(reservation: reservation));
   }
 
-  void deleteReservation({required Reservation reservation}) async {
-    reservationApiProvider.deleteReservation(
+  Future<void> deleteReservation({required Reservation reservation}) async {
+    await reservationApiProvider.deleteReservation(
         request: ReservationRequest.forDelete(reservation: reservation));
   }
 
@@ -75,14 +92,14 @@ class ReservationService extends GetxService {
   }
 
   /// Admin
-  void confirmReservation({required Reservation reservation}) {
-    reservationApiProvider.confirmReservation(
+  Future<void> confirmReservation({required Reservation reservation}) async {
+    await reservationApiProvider.confirmReservation(
         request: ReservationRequest.forConfirm(reservation: reservation),
         confirm: true);
   }
 
-  void rejectReservation({required Reservation reservation}) {
-    reservationApiProvider.confirmReservation(
+  Future<void> rejectReservation({required Reservation reservation}) async {
+    await reservationApiProvider.confirmReservation(
         request: ReservationRequest.forReject(reservation: reservation),
         confirm: false);
   }

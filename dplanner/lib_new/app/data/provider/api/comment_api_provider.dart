@@ -24,11 +24,11 @@ class CommentApiProvider extends BaseApiProvider {
     return Comment.fromJson(response.body!.data!);
   }
 
-  void deleteComment({required int commentId}) async {
+  Future<void> deleteComment({required int commentId}) async {
     await delete("/comments/$commentId");
   }
 
-  void reportComment(
+  Future<void> reportComment(
       {required int commentId, required CommentReportRequest request}) async {
     await put("/comments/$commentId/report", request.toJson())
         as CommonResponse;

@@ -16,7 +16,6 @@ class TokenApiProvider extends BaseApiProvider {
       {required TokenRefreshRequest request}) async {
     var response =
         await post('/auth/refresh', request.toJson()) as CommonResponse;
-
     return TokenResponse.fromJson(response.body!.data!);
   }
 }

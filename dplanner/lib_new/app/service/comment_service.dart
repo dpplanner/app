@@ -12,9 +12,11 @@ class CommentService extends GetxService {
     return await commentApiProvider.getComments(postId: postId);
   }
 
-  Future<Comment> createComment({required Comment comment}) async {
+  Future<Comment> createComment(
+      {required int postId, required String content, int? parentId}) async {
     return await commentApiProvider.createComment(
-        request: CommentRequest.forCreate(comment: comment));
+        request: CommentRequest.forCreate(
+            postId: postId, parentId: parentId, content: content));
   }
 
   Future<Comment> updateComment(
@@ -24,13 +26,13 @@ class CommentService extends GetxService {
         request: CommentRequest.forUpdate(comment: comment));
   }
 
-  void deleteComment({required int commentId}) async {
-    return commentApiProvider.deleteComment(commentId: commentId);
+  Future<void> deleteComment({required int commentId}) async {
+    await commentApiProvider.deleteComment(commentId: commentId);
   }
 
-  void reportComment(
+  Future<void> reportComment(
       {required int commentId, required CommentReportRequest request}) async {
-    return commentApiProvider.reportComment(
+    await commentApiProvider.reportComment(
         commentId: commentId, request: request);
   }
 }

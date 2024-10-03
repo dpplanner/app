@@ -11,9 +11,18 @@ class LockService extends GetxService {
     return await lockApiProvider.getLocks(resourceId: resourceId);
   }
 
-  Future<Lock> createLock({required int resourceId, required Lock lock}) async {
+  Future<Lock> createLock(
+      {required int resourceId,
+      required DateTime startDateTime,
+      required DateTime endDateTime,
+      String? message}) async {
     return await lockApiProvider.createLock(
-        resourceId: resourceId, request: LockRequest.forCreate(lock: lock));
+        resourceId: resourceId,
+        request: LockRequest.forCreate(
+            resourceId: resourceId,
+            message: message,
+            startDateTime: startDateTime,
+            endDateTime: endDateTime));
   }
 
   Future<Lock> getLock({required int lockId}) async {
@@ -25,7 +34,7 @@ class LockService extends GetxService {
         lockId: lockId, request: LockRequest.forUpdate(lock: lock));
   }
 
-  void deleteLock({required int lockId}) async {
-    return lockApiProvider.deleteLock(lockId: lockId);
+  Future<void> deleteLock({required int lockId}) async {
+    await lockApiProvider.deleteLock(lockId: lockId);
   }
 }

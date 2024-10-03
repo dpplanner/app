@@ -36,15 +36,22 @@ class ResourceRequest extends JsonSerializable {
     };
   }
 
-  static ResourceRequest forCreate({required Resource resource}) {
+  static ResourceRequest forCreate(
+      {required int clubId,
+      required String name,
+      required ResourceType resourceType,
+      required String info,
+      required int bookableSpan,
+      required String? notice,
+      required bool returnMessageRequired}) {
     return ResourceRequest._(
-        clubId: resource.clubId,
-        name: resource.name,
-        info: resource.info,
-        returnMessageRequired: resource.returnMessageRequired,
-        resourceType: resource.resourceType,
-        notice: resource.notice,
-        bookableSpan: resource.bookableSpan);
+        clubId: clubId,
+        name: name,
+        info: info,
+        returnMessageRequired: returnMessageRequired,
+        resourceType: resourceType,
+        notice: notice,
+        bookableSpan: bookableSpan);
   }
 
   static ResourceRequest forUpdate({required Resource resource}) {

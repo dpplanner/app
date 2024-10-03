@@ -22,7 +22,10 @@ class PostService extends GetxService {
   }
 
   Future<Post> createPost(
-      {required Post post, required List<XFile>? images}) async {
+      {required int clubId,
+      required String title,
+      required String content,
+      List<XFile>? images}) async {
     List<XFile> compressedImages = [];
     images?.forEach((image) async {
       var compressedImage = await CompressUtils.compressImageFile(image);
@@ -30,7 +33,9 @@ class PostService extends GetxService {
     });
 
     return await postApiProvider.createPost(
-        request: PostRequest.forCreate(post: post), images: compressedImages);
+        request: PostRequest.forCreate(
+            clubId: clubId, title: title, content: content),
+        images: compressedImages);
   }
 
   Future<Post> updatePost(
@@ -47,8 +52,8 @@ class PostService extends GetxService {
         images: compressedImages);
   }
 
-  void deletePost({required int postId}) async {
-    return postApiProvider.deletePost(postId: postId);
+  Future<void> deletePost({required int postId}) async {
+    await postApiProvider.deletePost(postId: postId);
   }
 
   Future<List<Post>> getPosts({required PagingRequest paging}) async {
@@ -75,13 +80,13 @@ class PostService extends GetxService {
         clubMemberId: currentClubMemberId, paging: paging);
   }
 
-  void blockPost({required int postId}) async {
-    postApiProvider.blockPost(postId: postId);
+  Future<void> blockPost({required int postId}) async {
+    await postApiProvider.blockPost(postId: postId);
   }
 
-  void reportPost(
+  Future<void> reportPost(
       {required int postId, required PostReportRequest request}) async {
-    postApiProvider.reportPost(postId: postId, request: request);
+    await postApiProvider.reportPost(postId: postId, request: request);
   }
 
   /// Admin

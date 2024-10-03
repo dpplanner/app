@@ -26,7 +26,7 @@ class ClubManagerApiProvider extends BaseApiProvider {
     return ClubManager.fromJson(response.body!.data!);
   }
 
-  void deleteClubManager(
+  Future<void> deleteClubManager(
       {required int clubId, required ClubManagerRequest request}) async {
     await deleteWithBody("/clubs/$clubId/authorities", request.toJson());
   }

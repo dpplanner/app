@@ -24,10 +24,10 @@ class ClubMemberService extends GetxService {
 
   /// ClubMember
   Future<ClubMember> joinClub(
-      {required int clubId, required ClubMember clubMember}) async {
+      {required int clubId, required String name, required String info}) async {
     return clubMemberApiProvider.joinClub(
         clubId: clubId,
-        request: ClubMemberRequest.forCreate(clubMember: clubMember));
+        request: ClubMemberRequest.forCreate(name: name, info: info));
   }
 
   Future<List<ClubMember>> getConfirmedClubMembers() async {
@@ -65,16 +65,16 @@ class ClubMemberService extends GetxService {
         image: compressedImage!);
   }
 
-  void leaveClub() async {
+  Future<void> leaveClub() async {
     var currentClubId = await clubService.getCurrentClubId();
     var currentClubMemberId = await getCurrentClubMemberId();
-    clubMemberApiProvider.leaveClub(
+    await clubMemberApiProvider.leaveClub(
         clubId: currentClubId, clubMemberId: currentClubMemberId);
   }
 
-  void blockClubMember({required int blockedClubMemberId}) async {
+  Future<void> blockClubMember({required int blockedClubMemberId}) async {
     var currentClubId = await clubService.getCurrentClubId();
-    clubMemberApiProvider.blockClubMember(
+    await clubMemberApiProvider.blockClubMember(
         clubId: currentClubId, blockedClubMemberId: blockedClubMemberId);
   }
 
@@ -95,26 +95,26 @@ class ClubMemberService extends GetxService {
         clubId: currentClubId, clubMemberId: clubMemberId, request: request);
   }
 
-  void confirmClubMember({required ClubMember clubMember}) async {
+  Future<void> confirmClubMember({required ClubMember clubMember}) async {
     var currentClubId = await clubService.getCurrentClubId();
 
-    clubMemberApiProvider.confirmClubMember(
+    await clubMemberApiProvider.confirmClubMember(
         clubId: currentClubId,
         request: ClubMemberRequest.forConfirm(clubMember: clubMember));
   }
 
-  void rejectClubMember({required ClubMember clubMember}) async {
+  Future<void> rejectClubMember({required ClubMember clubMember}) async {
     var currentClubId = await clubService.getCurrentClubId();
 
-    clubMemberApiProvider.rejectClubMember(
+    await clubMemberApiProvider.rejectClubMember(
         clubId: currentClubId,
         request: ClubMemberRequest.forReject(clubMember: clubMember));
   }
 
-  void kickOutClubMember({required int clubMemberId}) async {
+  Future<void> kickOutClubMember({required int clubMemberId}) async {
     var currentClubId = await clubService.getCurrentClubId();
 
-    clubMemberApiProvider.kickOutClubMember(
+    await clubMemberApiProvider.kickOutClubMember(
         clubId: currentClubId, clubMemberId: clubMemberId);
   }
 }

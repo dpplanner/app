@@ -10,7 +10,7 @@ FutureOr<Request> refreshTokenAuthenticator(request) async {
   final tokenService = Get.find<TokenService>();
 
   try {
-    tokenService.refreshToken();
+    await tokenService.refreshToken();
   } catch(e) {
     throw UnAuthorizedException();
   }

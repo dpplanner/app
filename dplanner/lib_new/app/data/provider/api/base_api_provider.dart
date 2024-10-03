@@ -12,9 +12,15 @@ class BaseApiProvider extends GetConnect {
   @override
   void onInit() {
     httpClient.baseUrl = _baseUrl;
+    httpClient.errorSafety = false;
+
     httpClient.addRequestModifier(authorizationHeaderRequestInterceptor);
-    httpClient.addAuthenticator(refreshTokenAuthenticator);
+    httpClient.addRequestModifier(loggingRequestInterceptor);
+
+    httpClient.addResponseModifier(loggingResponseInterceptor);
     httpClient.addResponseModifier(commonResponseBodyBindingInterceptor);
+
+    httpClient.addAuthenticator(refreshTokenAuthenticator);
   }
 
   Future<Response<T>> deleteWithBody<T>(

@@ -31,7 +31,7 @@ class LockApiProvider extends BaseApiProvider {
     return Lock.fromJson(response.body!.data!);
   }
 
-  void deleteLock({required int lockId}) async {
+  Future<void> deleteLock({required int lockId}) async {
     await delete("/locks/$lockId");
   }
 }

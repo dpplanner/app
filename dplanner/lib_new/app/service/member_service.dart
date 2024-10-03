@@ -17,18 +17,18 @@ class MemberService extends GetxService {
     return TokenUtils.getMemberId(accessToken: accessToken!);
   }
 
-  void postEula() {
-    memberApiProvider.postEula();
+  Future<void> postEula() async {
+    await memberApiProvider.postEula();
   }
 
-  void changeClub ({required int clubId}) async {
+  Future<void> changeClub ({required int clubId}) async {
     int memberId = await getMemberId();
     var request = ClubChangeRequest(clubId: clubId);
     await memberApiProvider.changeClub(memberId: memberId, request: request);
-    tokenService.refreshToken();
+    await tokenService.refreshToken();
   }
 
-  void quit() async {
+  Future<void> quit() async {
     int memberId = await getMemberId();
     await memberApiProvider.deleteMember(memberId: memberId);
     await secureStorageService.deleteAll();

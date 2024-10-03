@@ -13,8 +13,8 @@ class ClubMemberRequest extends JsonSerializable {
     return {"id": id, "name": name, "info": info};
   }
 
-  static ClubMemberRequest forCreate({required ClubMember clubMember}) {
-    return ClubMemberRequest._(name: clubMember.name, info: clubMember.info);
+  static ClubMemberRequest forCreate({required String name, required String info}) {
+    return ClubMemberRequest._(name: name, info: info);
   }
 
   static ClubMemberRequest forUpdate({required ClubMember clubMember}) {

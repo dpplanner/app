@@ -14,7 +14,7 @@ class AlertMessageApiProvider extends BaseApiProvider {
     return jsonList.map((message) => AlertMessage.fromJson(message)).toList();
   }
 
-  void markAsRead({required int messageId}) async {
+  Future<void> markAsRead({required int messageId}) async {
     await patch("/messages/$messageId", null);
   }
 }

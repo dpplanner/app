@@ -19,11 +19,9 @@ class PostRequest extends JsonSerializable {
     };
   }
 
-  static PostRequest forCreate({required Post post}) {
-    return PostRequest._(
-        clubId: post.clubId,
-        title: post.title,
-        content: post.content);
+  static PostRequest forCreate(
+      {required int clubId, required String title, required String content}) {
+    return PostRequest._(clubId: clubId, title: title, content: content);
   }
 
   static PostRequest forUpdate({required Post post}) {

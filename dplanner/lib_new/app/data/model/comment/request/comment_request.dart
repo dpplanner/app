@@ -19,18 +19,13 @@ class CommentRequest extends JsonSerializable {
     };
   }
 
-  static CommentRequest forCreate({required Comment comment}) {
+  static CommentRequest forCreate(
+      {required int postId, required int? parentId, required String content}) {
     return CommentRequest._(
-      postId: comment.postId,
-      parentId: comment.parentId,
-      content: comment.content
-    );
+        postId: postId, parentId: parentId, content: content);
   }
 
   static CommentRequest forUpdate({required Comment comment}) {
-    return CommentRequest._(
-        id: comment.id,
-        content: comment.content
-    );
+    return CommentRequest._(id: comment.id, content: comment.content);
   }
 }

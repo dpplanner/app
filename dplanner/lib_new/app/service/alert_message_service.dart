@@ -11,7 +11,7 @@ class AlertMessageService extends GetxService {
     return await alertMessageApiProvider.getAlertMessages();
   }
 
-  void markAsRead({required int messageId}) {
-    alertMessageApiProvider.markAsRead(messageId: messageId);
+  Future<void> markAsRead({required int messageId}) async {
+    await alertMessageApiProvider.markAsRead(messageId: messageId);
   }
 }

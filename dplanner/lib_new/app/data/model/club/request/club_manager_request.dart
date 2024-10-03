@@ -20,16 +20,20 @@ class ClubManagerRequest extends JsonSerializable {
       "name": name,
       "description": description,
       "authorityTypes":
-          authorityTypes!.map((authority) => authority.name).toList()
+          authorityTypes?.map((authority) => authority.name).toList()
     };
   }
 
-  static ClubManagerRequest forCreate({required ClubManager clubManager}) {
+  static ClubManagerRequest forCreate(
+      {required int clubId,
+      required String name,
+      required String? description,
+      required List<ClubAuthorityType>? authorityTypes}) {
     return ClubManagerRequest._(
-        clubId: clubManager.clubId,
-        name: clubManager.name,
-        description: clubManager.description,
-        authorityTypes: clubManager.authorityTypes);
+        clubId: clubId,
+        name: name,
+        description: description,
+        authorityTypes: authorityTypes);
   }
 
   static ClubManagerRequest forUpdate({required ClubManager clubManager}) {

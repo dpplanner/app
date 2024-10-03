@@ -26,12 +26,16 @@ class LockRequest extends JsonSerializable {
     };
   }
 
-  static LockRequest forCreate({required Lock lock}) {
+  static LockRequest forCreate(
+      {required int resourceId,
+      required DateTime startDateTime,
+      required DateTime endDateTime,
+      required String? message}) {
     return LockRequest._(
-        resourceId: lock.resourceId,
-        message: lock.message,
-        startDateTime: lock.startDateTime,
-        endDateTime: lock.endDateTime);
+        resourceId: resourceId,
+        message: message,
+        startDateTime: startDateTime,
+        endDateTime: endDateTime);
   }
 
   static LockRequest forUpdate({required Lock lock}) {

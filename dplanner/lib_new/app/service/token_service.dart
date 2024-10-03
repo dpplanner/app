@@ -20,7 +20,7 @@ class TokenService extends GetxService {
     secureStorageService.writeEulaAgreed(response.eulaAgreed!);
   }
 
-  void refreshToken() async {
+  Future<void> refreshToken() async {
     String? accessToken = await secureStorageService.getAccessToken();
     String? refreshToken = await secureStorageService.getRefreshToken();
 

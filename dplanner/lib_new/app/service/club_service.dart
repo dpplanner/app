@@ -2,6 +2,7 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 
 import '../data/model/club/club.dart';
+import '../data/model/club/club_authority_type.dart';
 import '../data/model/club/club_invite_code.dart';
 import '../data/model/club/club_manager.dart';
 import '../data/model/club/request/club_manager_request.dart';
@@ -25,7 +26,7 @@ class ClubService extends GetxService {
   final ClubMemberApiProvider clubMemberApiProvider =
       Get.find<ClubMemberApiProvider>();
   final SecureStorageService secureStorageService =
-  Get.find<SecureStorageService>();
+      Get.find<SecureStorageService>();
 
   Future<int> getCurrentClubId() async {
     var accessToken = await secureStorageService.getAccessToken();
@@ -38,9 +39,10 @@ class ClubService extends GetxService {
     return await clubApiProvider.getClubsByMemberId(memberId: memberId);
   }
 
-  Future<Club> createClub({required Club club}) async {
+  Future<Club> createClub(
+      {required String clubName, required String info}) async {
     return await clubApiProvider.createClub(
-        request: ClubRequest.forCreate(club: club));
+        request: ClubRequest.forCreate(clubName: clubName, info: info));
   }
 
   Future<Club> getClub({required int clubId}) async {
@@ -84,10 +86,17 @@ class ClubService extends GetxService {
   }
 
   Future<ClubManager> createClubManager(
-      {required int clubId, required ClubManager clubManager}) async {
+      {required int clubId,
+      required String name,
+      String? description,
+      List<ClubAuthorityType>? authorityTypes}) async {
     return clubManagerApiProvider.createClubManager(
         clubId: clubId,
-        request: ClubManagerRequest.forCreate(clubManager: clubManager));
+        request: ClubManagerRequest.forCreate(
+            clubId: clubId,
+            name: name,
+            description: description,
+            authorityTypes: authorityTypes));
   }
 
   Future<ClubManager> updateClubManager(
@@ -97,8 +106,8 @@ class ClubService extends GetxService {
         request: ClubManagerRequest.forUpdate(clubManager: clubManager));
   }
 
-  void deleteClubManager({required ClubManager clubManager}) async {
-    clubManagerApiProvider.deleteClubManager(
+  Future<void> deleteClubManager({required ClubManager clubManager}) async {
+    return await clubManagerApiProvider.deleteClubManager(
         clubId: clubManager.clubId,
         request: ClubManagerRequest.forDelete(clubManager: clubManager));
   }

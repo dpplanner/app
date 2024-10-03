@@ -30,7 +30,7 @@ class ResourceApiProvider extends BaseApiProvider {
     return Resource.fromJson(response.body!.data!);
   }
 
-  void deleteResource({required int resourceId}) async {
+  Future<void> deleteResource({required int resourceId}) async {
     await delete("/resources/$resourceId");
   }
 }

@@ -32,12 +32,12 @@ class ReservationApiProvider extends BaseApiProvider {
     return Reservation.fromJson(response.body!.data!);
   }
 
-  void cancelReservation(
+  Future<void> cancelReservation(
       {required int reservationId, required ReservationRequest request}) async {
     await patch("/reservations/$reservationId/cancel", request.toJson());
   }
 
-  void deleteReservation({required ReservationRequest request}) async {
+  Future<void> deleteReservation({required ReservationRequest request}) async {
     await deleteWithBody("/reservations", request.toJson());
   }
 
@@ -96,7 +96,7 @@ class ReservationApiProvider extends BaseApiProvider {
   }
 
   /// Admin
-  void confirmReservation(
+  Future<void> confirmReservation(
       {required ReservationRequest request, required bool confirm}) async {
     var queryString = UrlUtils.toQueryString({"confirm": confirm});
     await patch("/reservations$queryString", request.toJson());
