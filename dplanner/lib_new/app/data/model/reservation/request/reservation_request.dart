@@ -47,18 +47,26 @@ class ReservationRequest extends JsonSerializable {
     };
   }
 
-  static ReservationRequest forCreate({required Reservation reservation}) {
+  static ReservationRequest forCreate(
+      {required int reservationOwnerId,
+      required int resourceId,
+      required DateTime startDateTime,
+      required DateTime endDateTime,
+      required String color,
+      required String? title,
+      required String? usage,
+      required List<int>? reservationInvitees,
+      required bool sharing}) {
     return ReservationRequest._(
-        reservationOwnerId: reservation.clubMemberId,
-        resourceId: reservation.resourceId,
-        title: reservation.title,
-        color: reservation.color,
-        usage: reservation.usage,
-        sharing: reservation.sharing,
-        startDateTime: reservation.startDateTime,
-        endDateTime: reservation.endDateTime,
-        reservationInvitees:
-            reservation.invitees.map((invitee) => invitee.id).toList());
+        reservationOwnerId: reservationOwnerId,
+        resourceId: resourceId,
+        title: title,
+        color: color,
+        usage: usage,
+        sharing: sharing,
+        startDateTime: startDateTime,
+        endDateTime: endDateTime,
+        reservationInvitees: reservationInvitees);
   }
 
   static ReservationRequest forUpdate({required Reservation reservation}) {
@@ -71,7 +79,7 @@ class ReservationRequest extends JsonSerializable {
         startDateTime: reservation.startDateTime,
         endDateTime: reservation.endDateTime,
         reservationInvitees:
-        reservation.invitees.map((invitee) => invitee.id).toList());
+            reservation.invitees.map((invitee) => invitee.id).toList());
   }
 
   static ReservationRequest forUpdateOwner({required Reservation reservation}) {

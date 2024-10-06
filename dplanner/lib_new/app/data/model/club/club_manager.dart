@@ -4,8 +4,8 @@ class ClubManager {
   int id;
   int clubId;
   String name;
-  String description;
   List<ClubAuthorityType> authorityTypes;
+  String? description;
 
   ClubManager(
       {required this.id,

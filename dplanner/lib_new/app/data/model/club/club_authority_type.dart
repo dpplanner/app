@@ -3,6 +3,7 @@ enum ClubAuthorityType {
   SCHEDULE_ALL,
   POST_ALL,
   RESOURCE_ALL,
+  RETURN_MSG_READ,
   NONE;
 
   static ClubAuthorityType fromString(String? type) {
@@ -13,6 +14,8 @@ enum ClubAuthorityType {
         return SCHEDULE_ALL;
       case 'POST_ALL':
         return POST_ALL;
+      case 'RETURN_MSG_READ':
+        return RETURN_MSG_READ;
       case 'RESOURCE_ALL':
         return RESOURCE_ALL;
       case 'NONE':

@@ -19,11 +19,14 @@ FutureOr<Request> authorizationHeaderRequestInterceptor(Request request) async {
 
 FutureOr<Request> loggingRequestInterceptor(Request request) async {
   if (kDebugMode) {
-    print(
-        "\n<<< REQUEST: ${request.method.toUpperCase()} ${request.url}"
+    var bodyString =
+        request.headers["content-type"]!.startsWith("multipart/form-data")
+            ? "multipart-file"
+            : await request.bodyBytes.bytesToString();
+
+    print("\n<<< REQUEST: ${request.method.toUpperCase()} ${request.url}"
         "\n  -H ${request.headers}"
-        "\n  -d ${await request.bodyBytes.bytesToString()}\n"
-    );
+        "\n  -d $bodyString\n");
   }
   return request;
 }

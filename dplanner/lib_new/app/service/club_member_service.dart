@@ -54,10 +54,10 @@ class ClubMemberService extends GetxService {
   }
 
   Future<ClubMember> updateClubMemberProfileImage(
-      {required XFile? image}) async {
+      {required XFile image}) async {
     var currentClubId = await clubService.getCurrentClubId();
     var currentClubMemberId = await getCurrentClubMemberId();
-    var compressedImage = await CompressUtils.compressImageFile(image!);
+    var compressedImage = await CompressUtils.compressImageFile(image);
 
     return await clubMemberApiProvider.updateClubMemberProfileImage(
         clubId: currentClubId,

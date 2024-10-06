@@ -11,6 +11,7 @@ import '../data/provider/api/club_api_provider.dart';
 import '../data/provider/api/club_invite_code_api_provider.dart';
 import '../data/provider/api/club_manager_api_provider.dart';
 import '../data/provider/api/club_member_api_provider.dart';
+import '../support/exceptions.dart';
 import '../utils/compress_utils.dart';
 import '../utils/token_utils.dart';
 import 'member_service.dart';
@@ -55,10 +56,15 @@ class ClubService extends GetxService {
   }
 
   Future<Club> updateClubImage(
-      {required int clubId, required XFile? image}) async {
-    var compressedImage = await CompressUtils.compressImageFile(image!);
+      {required int clubId, required XFile image}) async {
+    var compressedImage = await CompressUtils.compressImageFile(image);
+
+    if (compressedImage == null) {
+      throw ImageCompressionException();
+    }
+
     return await clubApiProvider.updateClubImage(
-        clubId: clubId, image: compressedImage!);
+        clubId: clubId, image: compressedImage);
   }
 
   /// ClubInviteCode
@@ -70,7 +76,7 @@ class ClubService extends GetxService {
     var inviteCodeDto = await clubInviteCodeApiProvider.findClubIdByInviteCode(
         inviteCode: inviteCode);
 
-    if (!inviteCodeDto.verify) {
+    if (!inviteCodeDto.verify!) {
       // 클럽 초대코드가 유효하지 않음
       // todo 커스텀 예외로 변경 -> view나 viewmodel에서 catch 하여 스낵바 노출
       throw Exception("클럽 초대코드가 유효하지 않음");
@@ -88,20 +94,20 @@ class ClubService extends GetxService {
   Future<ClubManager> createClubManager(
       {required int clubId,
       required String name,
-      String? description,
-      List<ClubAuthorityType>? authorityTypes}) async {
+      required List<ClubAuthorityType> authorityTypes,
+      String? description}) async {
     return clubManagerApiProvider.createClubManager(
         clubId: clubId,
         request: ClubManagerRequest.forCreate(
             clubId: clubId,
             name: name,
-            description: description,
-            authorityTypes: authorityTypes));
+            authorityTypes: authorityTypes,
+            description: description));
   }
 
   Future<ClubManager> updateClubManager(
       {required ClubManager clubManager}) async {
-    return clubManagerApiProvider.createClubManager(
+    return clubManagerApiProvider.updateClubManager(
         clubId: clubManager.clubId,
         request: ClubManagerRequest.forUpdate(clubManager: clubManager));
   }

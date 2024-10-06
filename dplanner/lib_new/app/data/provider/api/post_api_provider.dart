@@ -30,7 +30,7 @@ class PostApiProvider extends BaseApiProvider {
 
     formData.files.addAll(images!
         .map((image) =>
-            MapEntry("file", MultipartFile(image, filename: image.name)))
+            MapEntry("files", MultipartFile(image, filename: image.name)))
         .toList());
 
     var response = await post("/posts", formData) as CommonResponse;
@@ -51,7 +51,7 @@ class PostApiProvider extends BaseApiProvider {
 
     formData.files.addAll(images!
         .map((image) =>
-            MapEntry("file", MultipartFile(image, filename: image.name)))
+            MapEntry("files", MultipartFile(image, filename: image.name)))
         .toList());
 
     var response = await put("/posts/$postId", formData) as CommonResponse;

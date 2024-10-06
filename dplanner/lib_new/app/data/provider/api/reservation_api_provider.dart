@@ -55,7 +55,7 @@ class ReservationApiProvider extends BaseApiProvider {
 
     formData.files.addAll(images!
         .map((image) =>
-            MapEntry("file", MultipartFile(image, filename: image.name)))
+            MapEntry("files", MultipartFile(image, filename: image.name)))
         .toList());
 
     var response = await post("/reservations/$reservationId/return", formData)

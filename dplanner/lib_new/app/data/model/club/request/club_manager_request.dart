@@ -7,10 +7,10 @@ class ClubManagerRequest extends JsonSerializable {
   int? clubId;
   String? name;
   String? description;
-  List<ClubAuthorityType>? authorityTypes;
+  List<ClubAuthorityType>? authorities;
 
   ClubManagerRequest._(
-      {this.id, this.clubId, this.name, this.description, this.authorityTypes});
+      {this.id, this.clubId, this.name, this.description, this.authorities});
 
   @override
   Map<String, dynamic> toJson() {
@@ -19,21 +19,21 @@ class ClubManagerRequest extends JsonSerializable {
       "clubId": clubId,
       "name": name,
       "description": description,
-      "authorityTypes":
-          authorityTypes?.map((authority) => authority.name).toList()
+      "authorities":
+      authorities?.map((authority) => authority.name).toList()
     };
   }
 
   static ClubManagerRequest forCreate(
       {required int clubId,
       required String name,
-      required String? description,
-      required List<ClubAuthorityType>? authorityTypes}) {
+      required List<ClubAuthorityType> authorityTypes,
+      required String? description}) {
     return ClubManagerRequest._(
         clubId: clubId,
         name: name,
-        description: description,
-        authorityTypes: authorityTypes);
+        authorities: authorityTypes,
+        description: description);
   }
 
   static ClubManagerRequest forUpdate({required ClubManager clubManager}) {
@@ -42,7 +42,7 @@ class ClubManagerRequest extends JsonSerializable {
         clubId: clubManager.clubId,
         name: clubManager.name,
         description: clubManager.description,
-        authorityTypes: clubManager.authorityTypes);
+        authorities: clubManager.authorityTypes);
   }
 
   static ClubManagerRequest forDelete({required ClubManager clubManager}) {

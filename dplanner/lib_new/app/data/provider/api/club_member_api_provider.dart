@@ -49,7 +49,7 @@ class ClubMemberApiProvider extends BaseApiProvider {
       required int clubMemberId,
       required XFile image}) async {
     var formData =
-        FormData({"file": MultipartFile(image, filename: image.name)});
+        FormData({"image": MultipartFile(image, filename: image.name)});
 
     var response = await patch(
         "/clubs/$clubId/club-members/$clubMemberId/update-profile-image",

@@ -1,7 +1,7 @@
 class ClubInviteCode {
   int clubId;
   String inviteCode;
-  bool verify;
+  bool? verify;
 
   ClubInviteCode(
       {required this.clubId, required this.inviteCode, required this.verify});
