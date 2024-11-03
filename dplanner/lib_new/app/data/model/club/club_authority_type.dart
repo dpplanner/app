@@ -25,7 +25,7 @@ enum ClubAuthorityType {
     }
   }
 
-  static List<ClubAuthorityType> fromJsonList(List<dynamic> types) {
-    return types.map((type) => fromString(type)).toList();
+  static List<ClubAuthorityType> fromJsonList(List<dynamic>? types) {
+    return types != null ? types.map((type) => fromString(type)).toList() : [];
   }
 }

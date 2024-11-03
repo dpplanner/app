@@ -11,7 +11,7 @@ class TokenService extends GetxService {
   final TokenApiProvider tokenApiProvider = Get.find<TokenApiProvider>();
   final SecureStorageService secureStorageService = Get.find<SecureStorageService>();
 
-  void issueToken({required String email, required String name}) async {
+  Future<void> issueToken({required String email, required String name}) async {
     var request = TokenIssueRequest(email: email, name: name);
     TokenResponse response = await tokenApiProvider.issueToken(request);
 

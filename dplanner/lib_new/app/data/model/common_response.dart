@@ -43,7 +43,9 @@ class CommonResponse extends Response<dynamic> {
         bodyString = response.bodyString,
         statusText = response.statusText,
         headers = response.headers,
-        body = CommonResponseBody.fromJson(response.body);
+        body = response.body != null
+            ? CommonResponseBody.fromJson(response.body)
+            : null;
 }
 
 class CommonResponseBody {

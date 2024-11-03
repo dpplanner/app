@@ -13,7 +13,7 @@ class ClubMemberApiProvider extends BaseApiProvider {
   Future<ClubMember> joinClub(
       {required int clubId, required ClubMemberRequest request}) async {
     var response =
-        await post("/clubs/$clubId", request.toJson()) as CommonResponse;
+        await post("/clubs/$clubId/join", request.toJson()) as CommonResponse;
     return ClubMember.fromJson(response.body!.data!);
   }
 
@@ -48,10 +48,11 @@ class ClubMemberApiProvider extends BaseApiProvider {
       {required int clubId,
       required int clubMemberId,
       required XFile image}) async {
-    var formData =
-        FormData({"image": MultipartFile(image, filename: image.name)});
+    var formData = FormData({});
+    formData.files.add(MapEntry("image",
+        MultipartFile(await image.readAsBytes(), filename: image.name)));
 
-    var response = await patch(
+    var response = await post(
         "/clubs/$clubId/club-members/$clubMemberId/update-profile-image",
         formData) as CommonResponse;
     return ClubMember.fromJson(response.body!.data!);
@@ -68,7 +69,7 @@ class ClubMemberApiProvider extends BaseApiProvider {
   }
 
   Future<void> leaveClub({required int clubId, required int clubMemberId}) async {
-    await delete("/clubs/$clubId/club-members/$clubMemberId");
+    await delete("/clubs/$clubId/club-members/$clubMemberId/leave");
   }
 
   Future<void> blockClubMember(
