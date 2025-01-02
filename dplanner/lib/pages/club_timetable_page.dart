@@ -162,16 +162,16 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                       : AppColor.subColor4)
                   : AppColor.ofHex(i.color) // 승인된 예약만 설정한대로
 
-                  // 나중에 쓸수도 있어서 남겨둠(나와 관련된 예약 하이라이트 같은 기능)
-                  // : (i.clubMemberId == MemberController.to.clubMember().id ||
-                  //         i.invitees.any((element) =>
-                  //             element["clubMemberId"] ==
-                  //                 MemberController.to.clubMember().id &&
-                  //             element["clubMemberName"] ==
-                  //                 MemberController.to.clubMember().name))
-                  //     ? AppColor.subColor1
-                  //     : AppColor.subColor3
-          ));
+              // 나중에 쓸수도 있어서 남겨둠(나와 관련된 예약 하이라이트 같은 기능)
+              // : (i.clubMemberId == MemberController.to.clubMember().id ||
+              //         i.invitees.any((element) =>
+              //             element["clubMemberId"] ==
+              //                 MemberController.to.clubMember().id &&
+              //             element["clubMemberName"] ==
+              //                 MemberController.to.clubMember().name))
+              //     ? AppColor.subColor1
+              //     : AppColor.subColor3
+              ));
         }
 
         for (var i in locks) {
@@ -1455,8 +1455,9 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                               ),
                               Padding(
                                   padding: const EdgeInsets.only(top: 32.0),
-                                  child : Row(
-                                      mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                                  child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         const Text(
                                           "예약 색상",
@@ -1466,20 +1467,19 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                         ),
                                         types == 3
                                             ? ColorUnitWidget(
-                                            color: selectedColor,
-                                            showBorder: true,
-                                            borderWidth: 5.0)
+                                                color: selectedColor,
+                                                showBorder: true,
+                                                borderWidth: 5.0)
                                             : ColorScrollWidget(
-                                            defaultColor: selectedColor,
-                                            availableColors: AppColor.reservationColors,
-                                            onColorChanged: (color) {
-                                              setState(() {
-                                                selectedColor = color;
-                                              });
-                                            })
-                                      ]
-                                  )
-                              ),
+                                                defaultColor: selectedColor,
+                                                availableColors:
+                                                    AppColor.reservationColors,
+                                                onColorChanged: (color) {
+                                                  setState(() {
+                                                    selectedColor = color;
+                                                  });
+                                                })
+                                      ])),
                               Visibility(
                                 visible: types == 3,
                                 replacement: Column(
@@ -2104,7 +2104,7 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                                       titleCentered: true),
                                   focusedDay: focusedDay,
                                   firstDay: DateTime(2023, 1, 1),
-                                  lastDay: DateTime(2024, 12, 31),
+                                  lastDay: DateTime(2100, 12, 31),
                                   locale: 'ko-KR',
                                   selectedDayPredicate: (day) {
                                     return calendar.isSameDay(selectedDay, day);

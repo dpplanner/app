@@ -2,6 +2,12 @@
 
 DPlanner app frontend
 
+## requires
+- flutter 3.24.5
+- dart 3.5.4
+- kotlin 1.9.0
+- pod 1.16.2
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
