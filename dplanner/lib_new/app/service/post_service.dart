@@ -26,30 +26,18 @@ class PostService extends GetxService {
       required String title,
       required String content,
       List<XFile>? images}) async {
-    List<XFile> compressedImages = [];
-    images?.forEach((image) async {
-      var compressedImage = await CompressUtils.compressImageFile(image);
-      compressedImages.add(compressedImage!);
-    });
-
     return await postApiProvider.createPost(
         request: PostRequest.forCreate(
             clubId: clubId, title: title, content: content),
-        images: compressedImages);
+        images: await _compressImages(images));
   }
 
   Future<Post> updatePost(
       {required Post post, required List<XFile>? images}) async {
-    List<XFile> compressedImages = [];
-    images?.forEach((image) async {
-      var compressedImage = await CompressUtils.compressImageFile(image);
-      compressedImages.add(compressedImage!);
-    });
-
     return await postApiProvider.updatePost(
         postId: post.id,
         request: PostRequest.forUpdate(post: post),
-        images: compressedImages);
+        images: await _compressImages(images));
   }
 
   Future<void> deletePost({required int postId}) async {
@@ -89,14 +77,25 @@ class PostService extends GetxService {
     await postApiProvider.reportPost(postId: postId, request: request);
   }
 
+  Future<bool> likePostToggle({required int postId}) async {
+    PostLike postLikeDto = await postApiProvider.likePostToggle(postId: postId);
+    return postLikeDto.likeStatus == LikeStatusType.LIKE;
+  }
+
   /// Admin
   Future<bool> fixPostToggle({required int postId}) async {
     Post post = await postApiProvider.fixPostToggle(postId: postId);
     return post.isFixed;
   }
 
-  Future<bool> likePostToggle({required int postId}) async {
-    PostLike postLikeDto = await postApiProvider.likePostToggle(postId: postId);
-    return postLikeDto.likeStatus == LikeStatusType.LIKE;
+  /// private
+  Future<List<XFile>> _compressImages(List<XFile>? images) async {
+    List<XFile> compressedImages = [];
+    if (images != null) {
+      for (var image in images) {
+        compressedImages.add((await CompressUtils.compressImageFile(image))!);
+      }
+    }
+    return compressedImages;
   }
 }

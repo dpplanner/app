@@ -13,7 +13,7 @@ class PagingResponse {
 
   PagingResponse.fromJson(Map<String, dynamic> json)
       : content = json["content"],
-        page = json["page"],
-        size = json["size"],
+        page = json["pageable"]["pageNumber"],
+        size = json["pageable"]["pageSize"],
         hasNext = json["hasNext"];
 }

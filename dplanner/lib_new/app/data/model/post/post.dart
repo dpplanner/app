@@ -2,8 +2,8 @@ import '../../../utils/url_utils.dart';
 
 class Post {
   final int id;
-  final String? title;
-  final String content;
+  String? title;
+  String content;
   bool isFixed;
   final int clubId;
   final int clubMemberId;

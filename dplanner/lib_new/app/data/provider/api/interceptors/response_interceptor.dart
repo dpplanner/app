@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:get/get_connect/http/src/response/response.dart';
 
-import '../../../../support/exceptions.dart';
+import '../../../../base/exceptions.dart';
 import '../../../model/common_response.dart';
 
 FutureOr<dynamic> commonResponseBodyBindingInterceptor(

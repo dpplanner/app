@@ -8,7 +8,7 @@ class Comment {
   final String clubMemberName;
   final String? profileUrl;
   final int likeCount;
-  final String content;
+  String content;
   final bool isDeleted;
   final bool likeStatus;
   final List<Comment> children;
@@ -41,7 +41,7 @@ class Comment {
         likeCount = json['likeCount'] as int,
         content = json['content'] as String,
         isDeleted = json['isDeleted'] as bool,
-        likeStatus = json['likeStatus'] as bool,
+        likeStatus = json['likeStatus'] == true,
         children = fromJsonList(json['children']),
         createdTime = DateTime.parse(json['createdTime'] as String),
         lastModifiedTime = DateTime.tryParse(json['lastModifiedTime']);

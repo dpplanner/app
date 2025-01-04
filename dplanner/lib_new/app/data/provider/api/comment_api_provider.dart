@@ -30,7 +30,7 @@ class CommentApiProvider extends BaseApiProvider {
 
   Future<void> reportComment(
       {required int commentId, required CommentReportRequest request}) async {
-    await put("/comments/$commentId/report", request.toJson())
+    await post("/comments/$commentId/report", request.toJson())
         as CommonResponse;
   }
 }

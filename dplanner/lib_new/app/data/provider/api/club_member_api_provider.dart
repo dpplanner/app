@@ -1,12 +1,11 @@
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:get/get_connect/http/src/multipart/form_data.dart';
-import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 
 import '../../../utils/url_utils.dart';
 import '../../model/club/club_member.dart';
 import '../../model/club/request/club_member_request.dart';
 import '../../model/club/request/club_member_role_update_request.dart';
 import '../../model/common_response.dart';
+import 'support/form_data_factory.dart';
 import 'base_api_provider.dart';
 
 class ClubMemberApiProvider extends BaseApiProvider {
@@ -48,9 +47,7 @@ class ClubMemberApiProvider extends BaseApiProvider {
       {required int clubId,
       required int clubMemberId,
       required XFile image}) async {
-    var formData = FormData({});
-    formData.files.add(MapEntry("image",
-        MultipartFile(await image.readAsBytes(), filename: image.name)));
+    var formData = FormDataFactory.create({"image": image});
 
     var response = await post(
         "/clubs/$clubId/club-members/$clubMemberId/update-profile-image",

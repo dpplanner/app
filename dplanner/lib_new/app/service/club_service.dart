@@ -1,6 +1,7 @@
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 
+import '../base/exceptions.dart';
 import '../data/model/club/club.dart';
 import '../data/model/club/club_authority_type.dart';
 import '../data/model/club/club_invite_code.dart';
@@ -11,7 +12,6 @@ import '../data/provider/api/club_api_provider.dart';
 import '../data/provider/api/club_invite_code_api_provider.dart';
 import '../data/provider/api/club_manager_api_provider.dart';
 import '../data/provider/api/club_member_api_provider.dart';
-import '../support/exceptions.dart';
 import '../utils/compress_utils.dart';
 import '../utils/token_utils.dart';
 import 'member_service.dart';

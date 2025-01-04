@@ -1,6 +1,4 @@
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:get/get_connect/http/src/multipart/form_data.dart';
-import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 
 import '../../../utils/url_utils.dart';
 import '../../model/common_response.dart';
@@ -10,6 +8,7 @@ import '../../model/post/post.dart';
 import '../../model/post/post_like.dart';
 import '../../model/post/request/post_report_request.dart';
 import '../../model/post/request/post_request.dart';
+import 'support/form_data_factory.dart';
 import 'base_api_provider.dart';
 
 class PostApiProvider extends BaseApiProvider {
@@ -20,18 +19,10 @@ class PostApiProvider extends BaseApiProvider {
 
   Future<Post> createPost(
       {required PostRequest request, required List<XFile>? images}) async {
-    var formData = FormData({});
-
-    formData.fields.addAll(request
-        .toJson()
-        .entries
-        .map((entry) => MapEntry(entry.key, entry.value.toString()))
-        .toList());
-
-    formData.files.addAll(images!
-        .map((image) =>
-            MapEntry("files", MultipartFile(image, filename: image.name)))
-        .toList());
+    var formData = await FormDataFactory.create({
+      "create": request,
+      "files": images
+    });
 
     var response = await post("/posts", formData) as CommonResponse;
     return Post.fromJson(response.body!.data!!);
@@ -41,18 +32,10 @@ class PostApiProvider extends BaseApiProvider {
       {required int postId,
       required PostRequest request,
       required List<XFile>? images}) async {
-    var formData = FormData({});
-
-    formData.fields.addAll(request
-        .toJson()
-        .entries
-        .map((entry) => MapEntry(entry.key, entry.value.toString()))
-        .toList());
-
-    formData.files.addAll(images!
-        .map((image) =>
-            MapEntry("files", MultipartFile(image, filename: image.name)))
-        .toList());
+    var formData = await FormDataFactory.create({
+      "update": request,
+      "files": images
+    });
 
     var response = await put("/posts/$postId", formData) as CommonResponse;
     return Post.fromJson(response.body!.data!);
@@ -67,7 +50,7 @@ class PostApiProvider extends BaseApiProvider {
     var queryString = UrlUtils.toQueryString(paging.toJson());
     var response =
         await get("/posts/clubs/$clubId$queryString") as CommonResponse;
-    var pagingResponse = response.body!.data as PagingResponse;
+    var pagingResponse = PagingResponse.fromJson(response.body!.data);
 
     return pagingResponse.content
         .map((message) => Post.fromJson(message))
@@ -79,7 +62,7 @@ class PostApiProvider extends BaseApiProvider {
     var queryString = UrlUtils.toQueryString(paging.toJson());
     var response = await get("/posts/clubMembers/$clubMemberId$queryString")
         as CommonResponse;
-    var pagingResponse = response.body!.data as PagingResponse;
+    var pagingResponse = PagingResponse.fromJson(response.body!.data);
 
     return pagingResponse.content
         .map((message) => Post.fromJson(message))
@@ -92,7 +75,7 @@ class PostApiProvider extends BaseApiProvider {
     var response =
         await get("/posts/clubMembers/$clubMemberId/commented$queryString")
             as CommonResponse;
-    var pagingResponse = response.body!.data as PagingResponse;
+    var pagingResponse = PagingResponse.fromJson(response.body!.data);
 
     return pagingResponse.content
         .map((message) => Post.fromJson(message))
@@ -105,7 +88,7 @@ class PostApiProvider extends BaseApiProvider {
     var response =
         await get("/posts/clubMembers/$clubMemberId/like$queryString")
             as CommonResponse;
-    var pagingResponse = response.body!.data as PagingResponse;
+    var pagingResponse = PagingResponse.fromJson(response.body!.data);
 
     return pagingResponse.content
         .map((message) => Post.fromJson(message))

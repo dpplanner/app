@@ -1,6 +1,4 @@
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:get/get_connect/http/src/multipart/form_data.dart';
-import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 
 import '../../../utils/datetime_utils.dart';
 import '../../../utils/url_utils.dart';
@@ -9,6 +7,7 @@ import '../../model/paging_request.dart';
 import '../../model/paging_response.dart';
 import '../../model/reservation/request/reservation_request.dart';
 import '../../model/reservation/reservation.dart';
+import 'support/form_data_factory.dart';
 import 'base_api_provider.dart';
 
 class ReservationApiProvider extends BaseApiProvider {
@@ -45,18 +44,8 @@ class ReservationApiProvider extends BaseApiProvider {
       {required int reservationId,
       required ReservationRequest request,
       required List<XFile>? images}) async {
-    var formData = FormData({});
-
-    formData.fields.addAll(request
-        .toJson()
-        .entries
-        .map((entry) => MapEntry(entry.key, entry.value.toString()))
-        .toList());
-
-    formData.files.addAll(images!
-        .map((image) =>
-            MapEntry("files", MultipartFile(image, filename: image.name)))
-        .toList());
+    var formData =
+        FormDataFactory.create({"returnDto": request, "files": images});
 
     var response = await post("/reservations/$reservationId/return", formData)
         as CommonResponse;
@@ -88,7 +77,7 @@ class ReservationApiProvider extends BaseApiProvider {
 
     var response = await get("/reservations/my-reservations$queryString")
         as CommonResponse;
-    var pagingResponse = response.body!.data as PagingResponse;
+    var pagingResponse = PagingResponse.fromJson(response.body!.data);
 
     return pagingResponse.content
         .map((message) => Reservation.fromJson(message))
@@ -120,7 +109,7 @@ class ReservationApiProvider extends BaseApiProvider {
 
     var response =
         await get("/reservations/admin$queryString") as CommonResponse;
-    var pagingResponse = response.body!.data as PagingResponse;
+    var pagingResponse = PagingResponse.fromJson(response.body!.data);
 
     return pagingResponse.content
         .map((message) => Reservation.fromJson(message))
