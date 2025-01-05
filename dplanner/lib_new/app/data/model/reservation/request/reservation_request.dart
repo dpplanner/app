@@ -1,3 +1,4 @@
+import '../../../../utils/datetime_utils.dart';
 import '../../json_serializable.dart';
 import '../reservation.dart';
 
@@ -39,8 +40,12 @@ class ReservationRequest extends JsonSerializable {
       "color": color,
       "usage": usage,
       "sharing": sharing,
-      "startDateTime": startDateTime,
-      "endDateTime": endDateTime,
+      "startDateTime": startDateTime != null
+          ? DateTimeUtils.toFormattedString(startDateTime!)
+          : null,
+      "endDateTime": endDateTime != null
+          ? DateTimeUtils.toFormattedString(endDateTime!)
+          : null,
       "reservationInvitees": reservationInvitees,
       "rejectMessage": rejectMessage,
       "returnMessage": returnMessage
@@ -66,7 +71,7 @@ class ReservationRequest extends JsonSerializable {
         sharing: sharing,
         startDateTime: startDateTime,
         endDateTime: endDateTime,
-        reservationInvitees: reservationInvitees);
+        reservationInvitees: reservationInvitees ?? []);
   }
 
   static ReservationRequest forUpdate({required Reservation reservation}) {
@@ -82,31 +87,32 @@ class ReservationRequest extends JsonSerializable {
             reservation.invitees.map((invitee) => invitee.id).toList());
   }
 
-  static ReservationRequest forUpdateOwner({required Reservation reservation}) {
-    return ReservationRequest._(reservationOwnerId: reservation.clubMemberId);
+  static ReservationRequest forUpdateOwner({required int reservationOwnerId}) {
+    return ReservationRequest._(reservationOwnerId: reservationOwnerId);
   }
 
   static ReservationRequest forCancel({required Reservation reservation}) {
-    return ReservationRequest._(reservationId: reservation.reservationId);
+    return ReservationRequest._(reservationId: reservation.id);
   }
 
   static ReservationRequest forDelete({required Reservation reservation}) {
-    return ReservationRequest._(reservationId: reservation.reservationId);
+    return ReservationRequest._(reservationId: reservation.id);
   }
 
   static ReservationRequest forConfirm({required Reservation reservation}) {
-    return ReservationRequest._(reservationId: reservation.reservationId);
+    return ReservationRequest._(reservationId: reservation.id);
   }
 
   static ReservationRequest forReject({required Reservation reservation}) {
     return ReservationRequest._(
-        reservationId: reservation.reservationId,
+        reservationId: reservation.id,
         rejectMessage: reservation.rejectMessage);
   }
 
-  static ReservationRequest forReturn({required Reservation reservation}) {
+  static ReservationRequest forReturn(
+      {required Reservation reservation, String? returnMessage}) {
     return ReservationRequest._(
-        reservationId: reservation.reservationId,
+        reservationId: reservation.id,
         returnMessage: reservation.returnMessage);
   }
 }

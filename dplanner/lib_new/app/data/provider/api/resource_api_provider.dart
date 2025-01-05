@@ -6,7 +6,7 @@ import 'base_api_provider.dart';
 class ResourceApiProvider extends BaseApiProvider {
 
   Future<List<Resource>> getResourcesOfCurrentClub() async {
-    var response = get("/resources") as CommonResponse;
+    var response = await get("/resources") as CommonResponse;
     var jsonList = response.body!.data as List<dynamic>;
 
     return jsonList.map((json) => Resource.fromJson(json)).toList();

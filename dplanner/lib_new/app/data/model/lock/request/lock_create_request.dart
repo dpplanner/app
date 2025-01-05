@@ -1,3 +1,4 @@
+import '../../../../utils/datetime_utils.dart';
 import '../../json_serializable.dart';
 import '../lock.dart';
 
@@ -21,8 +22,8 @@ class LockRequest extends JsonSerializable {
       "id": id,
       "resourceId": resourceId,
       "message": message,
-      "startDateTime": startDateTime,
-      "endDateTime": endDateTime
+      "startDateTime": DateTimeUtils.toFormattedString(startDateTime!),
+      "endDateTime": DateTimeUtils.toFormattedString(endDateTime!)
     };
   }
 

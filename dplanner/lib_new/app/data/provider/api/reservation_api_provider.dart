@@ -7,8 +7,8 @@ import '../../model/paging_request.dart';
 import '../../model/paging_response.dart';
 import '../../model/reservation/request/reservation_request.dart';
 import '../../model/reservation/reservation.dart';
-import 'support/form_data_factory.dart';
 import 'base_api_provider.dart';
+import 'support/form_data_factory.dart';
 
 class ReservationApiProvider extends BaseApiProvider {
   Future<Reservation> getReservation({required int reservationId}) async {
@@ -45,7 +45,7 @@ class ReservationApiProvider extends BaseApiProvider {
       required ReservationRequest request,
       required List<XFile>? images}) async {
     var formData =
-        FormDataFactory.create({"returnDto": request, "files": images});
+        await FormDataFactory.create({"returnDto": request, "files": images});
 
     var response = await post("/reservations/$reservationId/return", formData)
         as CommonResponse;

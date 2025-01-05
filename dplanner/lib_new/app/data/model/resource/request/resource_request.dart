@@ -30,7 +30,7 @@ class ResourceRequest extends JsonSerializable {
       "name": name,
       "info": info,
       "returnMessageRequired": returnMessageRequired,
-      "resourceType": resourceType,
+      "resourceType": resourceType?.name,
       "notice": notice,
       "bookableSpan": bookableSpan
     };

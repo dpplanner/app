@@ -1,6 +1,6 @@
 class Lock {
-  int id;
-  int resourceId;
+  final int id;
+  final int resourceId;
   String message;
   DateTime startDateTime;
   DateTime endDateTime;

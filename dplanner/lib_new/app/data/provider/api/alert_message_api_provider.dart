@@ -9,7 +9,7 @@ class AlertMessageApiProvider extends BaseApiProvider {
   Future<List<AlertMessage>> getAlertMessages() async {
     var queryString = UrlUtils.toQueryString({"months": _defaultSearchMonths});
     var response = await get("/messages$queryString") as CommonResponse;
-    var jsonList = response.body!.data as List<dynamic>;
+    var jsonList = response.body!.data["responseList"] as List<dynamic>;
 
     return jsonList.map((message) => AlertMessage.fromJson(message)).toList();
   }

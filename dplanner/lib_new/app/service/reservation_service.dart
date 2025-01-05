@@ -46,13 +46,13 @@ class ReservationService extends GetxService {
   Future<Reservation> updateReservation(
       {required Reservation reservation}) async {
     return await reservationApiProvider.updateReservation(
-        reservationId: reservation.reservationId,
+        reservationId: reservation.id,
         request: ReservationRequest.forUpdate(reservation: reservation));
   }
 
   Future<void> cancelReservation({required Reservation reservation}) async {
     await reservationApiProvider.cancelReservation(
-        reservationId: reservation.reservationId,
+        reservationId: reservation.id,
         request: ReservationRequest.forCancel(reservation: reservation));
   }
 
@@ -62,7 +62,9 @@ class ReservationService extends GetxService {
   }
 
   Future<Reservation> returnReservation(
-      {required Reservation reservation, required List<XFile>? images}) async {
+      {required Reservation reservation,
+      String? returnMessage,
+      List<XFile>? images}) async {
     List<XFile> compressedImages = [];
     images?.forEach((image) async {
       var compressedImage = await CompressUtils.compressImageFile(image);
@@ -70,8 +72,9 @@ class ReservationService extends GetxService {
     });
 
     return await reservationApiProvider.returnReservation(
-        reservationId: reservation.reservationId,
-        request: ReservationRequest.forReturn(reservation: reservation),
+        reservationId: reservation.id,
+        request: ReservationRequest.forReturn(
+            reservation: reservation, returnMessage: returnMessage),
         images: compressedImages);
   }
 
@@ -105,10 +108,12 @@ class ReservationService extends GetxService {
   }
 
   Future<Reservation> updateReservationOwner(
-      {required Reservation reservation}) async {
+      {required Reservation reservation,
+      required int reservationOwnerId}) async {
     return await reservationApiProvider.updateReservationOwner(
-        reservationId: reservation.reservationId,
-        request: ReservationRequest.forUpdateOwner(reservation: reservation));
+        reservationId: reservation.id,
+        request: ReservationRequest.forUpdateOwner(
+            reservationOwnerId: reservationOwnerId));
   }
 
   Future<List<Reservation>> getReservationsForAdmin(

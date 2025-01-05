@@ -2,35 +2,35 @@ import 'reservation_invitee.dart';
 import 'reservation_status_type.dart';
 
 class Reservation {
-  int reservationId;
+  final int id;
 
   int clubMemberId;
   String clubMemberName;
 
-  int resourceId;
-  String resourceName;
+  final int resourceId;
+  final String resourceName;
 
+  final DateTime startDateTime;
+  final DateTime endDateTime;
   String title;
   String usage;
-  DateTime startDateTime;
-  DateTime endDateTime;
   String color;
   bool sharing;
   List<ReservationInvitee> invitees;
 
-  ReservationStatusType status;
-  String? rejectMessage;
-  bool returned;
-  DateTime createDate;
-  DateTime? lastModifiedDate;
+  final ReservationStatusType status;
+  final String? rejectMessage;
+  final bool returned;
+  final DateTime createDate;
+  final DateTime? lastModifiedDate;
 
-  List<String> attachmentsUrl;
+  final List<String> attachmentsUrl;
   String? returnMessage;
 
-  bool isDummy;
+  final bool isDummy;
 
   Reservation(
-      {required this.reservationId,
+      {required this.id,
       required this.clubMemberId,
       required this.clubMemberName,
       required this.resourceId,
@@ -48,10 +48,11 @@ class Reservation {
       required this.createDate,
       required this.lastModifiedDate,
       required this.attachmentsUrl,
+      required this.returnMessage,
       this.isDummy = false});
 
   Reservation.fromJson(Map<String, dynamic> json)
-      : reservationId = json['reservationId'],
+      : id = json['reservationId'],
         clubMemberId = json['clubMemberId'],
         clubMemberName = json['clubMemberName'],
         resourceId = json['resourceId'],
@@ -60,9 +61,9 @@ class Reservation {
         color = json['color'],
         usage = json['usage'],
         sharing = json['sharing'],
-        status = json['status'],
+        status = ReservationStatusType.fromString(json['status']) ,
         returnMessage = json['returnMessage'],
-        attachmentsUrl = json['attachmentsUrl'],
+        attachmentsUrl = List<String>.from(json['attachmentsUrl']),
         invitees = ReservationInvitee.fromJsonList(json['invitees']),
         startDateTime = DateTime.parse(json['startDateTime']),
         endDateTime = DateTime.parse(json['endDateTime']),
@@ -74,24 +75,26 @@ class Reservation {
 
   static Reservation ofDummy(String startDateTime, String endDateTime) {
     return Reservation(
-        reservationId: -1,
-        clubMemberId: -1,
-        clubMemberName: "SYSTEM",
-        resourceId: -1,
-        resourceName: "",
-        title: "",
-        color: "",
-        usage: "",
-        sharing: false,
-        status: ReservationStatusType.REQUEST,
-        attachmentsUrl: [],
-        invitees: [],
-        startDateTime: DateTime.parse(startDateTime),
-        endDateTime: DateTime.parse(endDateTime),
-        createDate: DateTime.now(),
-        lastModifiedDate: DateTime.now(),
-        returned: false,
-        rejectMessage: null,
-        isDummy: true);
+      id: -1,
+      clubMemberId: -1,
+      clubMemberName: "SYSTEM",
+      resourceId: -1,
+      resourceName: "",
+      title: "",
+      color: "",
+      usage: "",
+      sharing: false,
+      status: ReservationStatusType.REQUEST,
+      attachmentsUrl: [],
+      invitees: [],
+      startDateTime: DateTime.parse(startDateTime),
+      endDateTime: DateTime.parse(endDateTime),
+      createDate: DateTime.now(),
+      lastModifiedDate: DateTime.now(),
+      returned: false,
+      rejectMessage: null,
+      returnMessage: null,
+      isDummy: true,
+    );
   }
 }

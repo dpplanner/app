@@ -47,7 +47,7 @@ class ClubMemberApiProvider extends BaseApiProvider {
       {required int clubId,
       required int clubMemberId,
       required XFile image}) async {
-    var formData = FormDataFactory.create({"image": image});
+    var formData = await FormDataFactory.create({"image": image});
 
     var response = await post(
         "/clubs/$clubId/club-members/$clubMemberId/update-profile-image",
@@ -65,7 +65,8 @@ class ClubMemberApiProvider extends BaseApiProvider {
     return ClubMember.fromJson(response.body!.data!);
   }
 
-  Future<void> leaveClub({required int clubId, required int clubMemberId}) async {
+  Future<void> leaveClub(
+      {required int clubId, required int clubMemberId}) async {
     await delete("/clubs/$clubId/club-members/$clubMemberId/leave");
   }
 

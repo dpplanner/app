@@ -36,7 +36,7 @@ class ClubApiProvider extends BaseApiProvider {
 
   Future<Club> updateClubImage(
       {required int clubId, required XFile image}) async {
-    var formData = FormDataFactory.create({"image": image});
+    var formData = await FormDataFactory.create({"image": image});
     var response = await post("/clubs/$clubId/update-club-image", formData)
         as CommonResponse;
     return Club.fromJson(response.body!.data!);

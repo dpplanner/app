@@ -7,8 +7,14 @@ import '../data/provider/api/lock_api_provider.dart';
 class LockService extends GetxService {
   final LockApiProvider lockApiProvider = Get.find<LockApiProvider>();
 
-  Future<List<Lock>> getLocks({required int resourceId}) async {
-    return await lockApiProvider.getLocks(resourceId: resourceId);
+  Future<List<Lock>> getLocks(
+      {required int resourceId,
+      required DateTime startDateTime,
+      required DateTime endDateTime}) async {
+    return await lockApiProvider.getLocks(
+        resourceId: resourceId,
+        startDateTime: startDateTime,
+        endDateTime: endDateTime);
   }
 
   Future<Lock> createLock(

@@ -1,8 +1,8 @@
 import 'resource_type.dart';
 
 class Resource {
-  int id;
-  int clubId;
+  final int id;
+  final int clubId;
   String name;
   String info;
   bool returnMessageRequired;
