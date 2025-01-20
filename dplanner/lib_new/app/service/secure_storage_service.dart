@@ -9,6 +9,7 @@ class SecureStorageService extends GetxService {
   static const String _accessTokenKey = "access_token";
   static const String _refreshTokenKey = "refresh_token";
   static const String _eulaAgreedKey = "eula";
+  static const String _loginInfoKey = "login_info";
 
   Future<String?> getAccessToken() async {
     return await _read(key: _accessTokenKey);
@@ -22,6 +23,10 @@ class SecureStorageService extends GetxService {
     return await _read(key: _eulaAgreedKey) == 'true';
   }
 
+  Future<String?> getLoginInfo() async {
+    return _read(key: _loginInfoKey);
+  }
+
   Future<void> writeAccessToken(String accessToken) async {
     await _write(key: _accessTokenKey, value: accessToken);
   }
@@ -32,6 +37,13 @@ class SecureStorageService extends GetxService {
 
   Future<void> writeEulaAgreed(bool eulaAgreed) async {
     await _write(key: _eulaAgreedKey, value: eulaAgreed.toString());
+  }
+
+  Future<void> writeLoginInfo(
+      {required String email,
+      required String name,
+      required String type}) async {
+    await _write(key: _loginInfoKey, value: '$email $name $type');
   }
 
   Future<void> updateAccessToken(String accessToken) async {
@@ -58,7 +70,8 @@ class SecureStorageService extends GetxService {
   }
 
   Future<void> _write({required String key, required String value}) {
-    return ExceptionUtils.doOrThrow(() => _storage.write(key: key, value: value));
+    return ExceptionUtils.doOrThrow(
+        () => _storage.write(key: key, value: value));
   }
 
   Future<void> _delete({required String key}) {

@@ -55,8 +55,6 @@ class AppBindings extends Bindings {
     Get.lazyPut<MemberService>(() => MemberService());
     Get.lazyPut<SecureStorageService>(() => SecureStorageService());
     Get.lazyPut<TokenService>(() => TokenService());
-
-    /// viewModels
   }
 
 }
