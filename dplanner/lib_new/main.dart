@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'config/bindings/app_binings.dart';
 import 'config/routings/app_pages.dart';
 import 'config/routings/routes.dart';
+import 'config/themes/app_themes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,11 +25,7 @@ class MyApp extends StatelessWidget {
             controller: EventController(),
             child: GetMaterialApp(
               title: 'DPlanner',
-              theme: ThemeData(
-                  primaryColor: Color(0xFF7646D8),
-                  fontFamily: 'Pretendard',
-                  useMaterial3: true,
-              ),
+              theme: AppTheme.lightTheme,
               debugShowCheckedModeBanner: false,
               initialRoute: Routes.LOGIN,
               getPages: appPages,
