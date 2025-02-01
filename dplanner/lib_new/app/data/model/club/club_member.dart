@@ -32,6 +32,10 @@ class ClubMember {
         url = json['url'],
         clubAuthorityId = json['clubAuthorityId'],
         clubAuthorityName = json['clubAuthorityName'],
-        clubAuthorityTypes =
-            ClubAuthorityType.fromJsonList(json['clubAuthorityTypes']);
+        clubAuthorityTypes = ClubAuthorityType.fromJsonList(json['clubAuthorityTypes']);
+
+  bool hasAuthority(ClubAuthorityType authority) {
+    return role == ClubMemberRoleType.ADMIN ||
+        (clubAuthorityTypes != null && clubAuthorityTypes!.contains(authority));
+  }
 }
