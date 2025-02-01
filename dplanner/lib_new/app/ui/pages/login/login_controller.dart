@@ -184,7 +184,7 @@ class LoginController extends GetxController {
     if (_isEulaAgreed(eulaAgreed)) {
       Get.offNamed(Routes.CLUB_LIST);
     } else {
-      Get.offNamed(Routes.EULA_AGREE);
+      Get.toNamed(Routes.EULA_AGREE);
     }
   }
 }

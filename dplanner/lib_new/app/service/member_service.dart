@@ -17,8 +17,8 @@ class MemberService extends GetxService {
     return TokenUtils.getMemberId(accessToken: accessToken!);
   }
 
-  Future<void> postEula() async {
-    await memberApiProvider.postEula();
+  Future<void> agreeEula() async {
+    await memberApiProvider.agreeEula();
   }
 
   Future<void> changeClub ({required int clubId}) async {

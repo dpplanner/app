@@ -39,8 +39,4 @@ class ClubCreateController extends GetxController {
       }
     }
   }
-
-  void back() {
-    Get.back();
-  }
 }

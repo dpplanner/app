@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:get/get.dart';
 
 import '../../../../config/constants/app_colors.dart';
 import '../../base/widgets/base_appbar.dart';
-import '../../base/widgets/full_button.dart';
+import '../../base/widgets/buttons/rounded_rectangle_full_button.dart';
 import '../../base/widgets/outline_textform.dart';
 import '../../base/widgets/padded_safe_area.dart';
 import '../../base/widgets/underline_textform.dart';
@@ -20,11 +19,7 @@ class ClubCreatePage extends GetView<ClubCreateController> {
       backgroundColor: AppColors.bgWhite,
       resizeToAvoidBottomInset: false,
       appBar: BaseAppBar(
-        leading: IconButton(
-            onPressed: controller.back,
-            padding: EdgeInsets.zero,
-            alignment: Alignment.centerLeft,
-            icon: const Icon(SFSymbols.chevron_left)),
+        leadingType: LeadingType.BACK,
         title: const Text("클럽 만들기"),
       ),
       body: PaddedSafeArea(
@@ -83,23 +78,10 @@ class ClubCreatePage extends GetView<ClubCreateController> {
                 ),
               ),
             ),
-            Obx(() => Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: FullButton(
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          backgroundColor: controller.isComplete.value
-                              ? AppColors.primaryColor
-                              : AppColors.subColor3,
-                        ),
-                        onPressed: controller.createClub,
-                        child: Text("클럽 만들기",
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelLarge!
-                                .copyWith(color: AppColors.textWhite))),
-                  ),
+            Obx(() => RoundedRectangleFullButton(
+                  title: "클럽 만들기",
+                  onTap: controller.createClub,
+                  color: controller.isComplete.value ? AppColors.primaryColor : AppColors.subColor3,
                 )),
           ],
         ),

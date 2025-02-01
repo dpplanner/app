@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 
 import '../../../../config/constants/app_colors.dart';
 import '../../base/widgets/base_appbar.dart';
-import '../../base/widgets/full_button.dart';
+import '../../base/widgets/buttons/rounded_rectangle_full_button.dart';
 import '../../base/widgets/padded_safe_area.dart';
 import 'club_create_success_controller.dart';
 
@@ -28,7 +28,7 @@ class ClubCreateSuccessPage extends GetView<ClubCreateSuccessController> {
                   children: [
                     Text("클럽", style: Theme.of(context).textTheme.displayMedium),
                     Text(
-                      " ${controller.club?.clubName ?? ''} ",
+                      " ${controller.club.clubName} ",
                       style: Theme.of(context)
                           .textTheme
                           .displayMedium!
@@ -93,21 +93,10 @@ class ClubCreateSuccessPage extends GetView<ClubCreateSuccessController> {
               ],
             ),
             const Expanded(child: SizedBox()),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: FullButton(
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        backgroundColor: AppColors.primaryColor),
-                    onPressed: controller.toPostListPage,
-                    child: Text("클럽 시작하기",
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelLarge!
-                            .copyWith(color: AppColors.textWhite))),
-              ),
-            ),
+            RoundedRectangleFullButton(
+              title: "클럽 시작하기",
+              onTap: controller.toPostListPage
+            )
           ],
         ),
       ),
