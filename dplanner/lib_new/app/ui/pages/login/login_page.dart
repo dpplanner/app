@@ -8,7 +8,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../../../config/constants/app_colors.dart';
 import '../../base/pages/error_page.dart';
-import '../../base/widgets/full_button.dart';
+import '../../base/widgets/buttons/full_button_frame.dart';
 import '../../base/widgets/padded_safe_area.dart';
 import 'login_controller.dart';
 
@@ -37,28 +37,28 @@ class LoginPage extends GetView<LoginController> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             //카카오 로그인 버튼
-                            FullButton(
+                            FullButtonFrame(
                                 child: ImageButton(
                                     image:
                                         'assets/images/login/login_kakao.png',
                                     onTap: controller.loginWithKakao)),
 
                             //네이버 로그인 버튼
-                            FullButton(
+                            FullButtonFrame(
                                 child: ImageButton(
                                     image:
                                         'assets/images/login/login_naver.png',
                                     onTap: controller.loginWithNaver)),
 
                             //구글 로그인 버튼
-                            FullButton(
+                            FullButtonFrame(
                                 child: ImageButton(
                                     image:
                                         'assets/images/login/login_google.png',
                                     onTap: controller.loginWithGoogle)),
 
                             if (Platform.isIOS)
-                              FullButton(
+                              FullButtonFrame(
                                   child: SignInWithAppleButton(
                                       onPressed: controller.loginWithApple)),
                           ],

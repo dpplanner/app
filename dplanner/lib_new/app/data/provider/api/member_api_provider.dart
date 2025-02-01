@@ -4,7 +4,7 @@ import 'base_api_provider.dart';
 
 class MemberApiProvider extends BaseApiProvider {
 
-  Future<void> postEula() async {
+  Future<void> agreeEula() async {
     await post('/eula', null);
   }
 
