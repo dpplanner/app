@@ -15,16 +15,18 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    actions?.last = Padding(
-        padding: EdgeInsets.only(right: 16.0), child: actions?.last);
+    actions?.last = Padding(padding: EdgeInsets.only(right: 16.0), child: actions?.last);
 
     return AppBar(
-      leadingWidth: MediaQuery.of(context).size.width * 0.25,
-      leading: leading ??
-          SvgPicture.asset(
-            'assets/images/base_image/dplanner_logo_mini.svg',
-            fit: BoxFit.none,
-          ),
+      leadingWidth: MediaQuery.of(context).size.width * 0.2,
+      leading: Padding(
+        padding: EdgeInsets.only(left: 24.0),
+        child: leading ??
+            SvgPicture.asset(
+              'assets/images/base_image/dplanner_logo_mini.svg',
+              fit: BoxFit.none,
+            ),
+      ),
       title: title,
       actions: actions,
     );

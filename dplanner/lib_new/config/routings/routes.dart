@@ -4,6 +4,7 @@ final class Routes {
   static String CLUB_LIST = "/club-list";
   static String CLUB_JOIN = "/club-join";
   static String CLUB_CREATE = "/club-create";
+  static String CLUB_CREATE_SUCCESS = "/club-create/success";
   static String APP_SETTING_MENU = "/app-setting-menu";
   static String POST_LIST = "/post-list";
 }
