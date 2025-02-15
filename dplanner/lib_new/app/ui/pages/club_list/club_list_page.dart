@@ -51,7 +51,7 @@ class ClubListPage extends GetView<ClubListController> {
                       splashColor: AppColors.subColor2.withOpacity(0.5),
                       highlightColor: AppColors.subColor2.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(16),
-                      onTap: controller.toClubJoinPage,
+                      onTap: controller.toClubFindPage,
                       child: Ink(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),

@@ -39,8 +39,8 @@ class ClubListController extends GetxController {
     Get.toNamed(Routes.APP_SETTING_MENU);
   }
 
-  void toClubJoinPage() {
-    Get.toNamed(Routes.CLUB_JOIN);
+  void toClubFindPage() {
+    Get.toNamed(Routes.CLUB_FIND);
   }
 
   void toClubCreatePage() {
