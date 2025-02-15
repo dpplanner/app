@@ -1,5 +1,7 @@
 export 'club_find/club_find_page.dart';
 export 'club_find/club_find_bindings.dart';
+export 'club_join_success/club_join_success_page.dart';
+export 'club_join_success/club_join_success_bindings.dart';
 export 'club_create/club_create_page.dart';
 export 'club_create/club_create_bindings.dart';
 export 'club_list/club_list_page.dart';

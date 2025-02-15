@@ -37,7 +37,7 @@ class ClubJoinController extends GetxController {
         var clubMember = await _clubMemberService.joinClub(
             clubId: club.id, name: clubMemberNameForm.text, info: clubMemberInfoForm.text);
         print(clubMember.name);
-        Get.offAllNamed(Routes.CLUB_JOIN_SUCCESS);
+        Get.offAllNamed(Routes.CLUB_JOIN_SUCCESS, arguments: {"club": club});
       } catch (e) {
         snackBar(title: "클럽 가입 신청에 실패했습니다.", content: "잠시 후 다시 시도해 주세요");
         print(e.toString());
