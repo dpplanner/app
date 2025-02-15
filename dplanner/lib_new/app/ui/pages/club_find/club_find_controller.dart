@@ -45,13 +45,13 @@ class ClubFindController extends GetxController {
     }
   }
 
-  Future<void> joinClub() async {
+  Future<void> toJoinClubPage() async {
     try {
       var myClubs = await _clubService.getMyClubs();
       if (myClubs.any((myClub) => myClub.id == club.value?.id)) {
         snackBar(title: "해당 클럽에 이미 참여 중입니다.", content: "다른 클럽 초대코드를 입력해주세요");
       } else {
-        Get.toNamed(Routes.CLUB_JOIN);
+        Get.toNamed(Routes.CLUB_JOIN, arguments: {"club": club.value});
       }
     } catch (e) {
       print(e.toString());

@@ -93,7 +93,7 @@ class ClubFindPage extends GetView<ClubFindController> {
                           visible: controller.club.value != null,
                           child: RoundedRectangleFullButton(
                             title: "네, 맞아요",
-                            onTap: controller.joinClub,
+                            onTap: controller.toJoinClubPage,
                             isLast: false,
                           )),
                       RoundedRectangleFullButton(
