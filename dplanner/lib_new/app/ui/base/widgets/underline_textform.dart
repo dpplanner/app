@@ -7,7 +7,7 @@ class UnderlineTextForm extends StatelessWidget {
   final TextEditingController controller;
   final TextInputType keyboardType;
   final bool isFocused;
-  final bool isWritten;
+  final bool isDisabled;
   final int maxLength;
   final bool noLine;
   final bool isRight;
@@ -23,7 +23,7 @@ class UnderlineTextForm extends StatelessWidget {
       required this.controller,
       this.keyboardType = TextInputType.text,
       this.isFocused = false,
-      this.isWritten = false,
+      this.isDisabled = false,
       this.maxLength = 0,
       this.noLine = false,
       this.isRight = false,
@@ -45,13 +45,16 @@ class UnderlineTextForm extends StatelessWidget {
     );
 
     return TextFormField(
-      style: Theme.of(context).textTheme.bodyLarge,
+      style: Theme.of(context)
+          .textTheme
+          .bodyLarge!
+          .copyWith(color: isDisabled ? AppColors.textGray : AppColors.textBlack),
       textInputAction: TextInputAction.done,
       textAlign: isRight ? TextAlign.end : TextAlign.start,
       keyboardType: keyboardType,
       controller: controller,
       maxLength: maxLength != 0 ? maxLength : null,
-      enabled: isWritten ? false : true,
+      enabled: !isDisabled,
       validator: validator,
       onSaved: onSaved,
       onChanged: onChanged,

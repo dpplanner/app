@@ -1,5 +1,5 @@
 class ClubInviteCode {
-  int clubId;
+  int? clubId;
   String inviteCode;
   bool? verify;
 

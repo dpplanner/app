@@ -77,12 +77,10 @@ class ClubService extends GetxService {
         inviteCode: inviteCode);
 
     if (!inviteCodeDto.verify!) {
-      // 클럽 초대코드가 유효하지 않음
-      // todo 커스텀 예외로 변경 -> view나 viewmodel에서 catch 하여 스낵바 노출
-      throw Exception("클럽 초대코드가 유효하지 않음");
+      throw ClubNotFoundException();
     }
 
-    return inviteCodeDto.clubId;
+    return inviteCodeDto.clubId!;
   }
 
   /// ClubManager
