@@ -12,7 +12,7 @@ import '../const/const.dart';
 import '../models/reservation_model.dart';
 
 class ReservationApiService {
-  static const String baseUrl = 'http://3.39.102.31:8080';
+  static const String baseUrl = 'http://api.dplanner.co.kr';
 
   static String basename(String filePath) {
     return filePath.split('/').last;

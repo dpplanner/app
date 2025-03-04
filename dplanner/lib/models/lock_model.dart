@@ -13,7 +13,7 @@ class LockModel {
   LockModel.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         resourceId = json['resourceId'],
-        message = json['message'],
+        message = json['message'] ?? "",
         startDateTime = json['startDateTime'],
         endDateTime = json['endDateTime'];
 }

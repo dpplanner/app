@@ -16,11 +16,11 @@ class ResourceModel {
 
   ResourceModel.fromJson(Map<String, dynamic> json)
       : id = json['id'],
-        name = json['name'],
-        info = json['info'],
+        name = json['name'] ?? "",
+        info = json['info'] ?? "",
         returnMessageRequired = json['returnMessageRequired'],
         resourceType = json['resourceType'],
-        notice = json['notice'],
+        notice = json['notice'] ?? "",
         clubId = json['clubId'],
         bookableSpan = json['bookableSpan'];
 

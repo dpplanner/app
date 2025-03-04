@@ -17,7 +17,7 @@ class ClubModel {
   ClubModel.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         clubName = json['clubName'],
-        info = json['info'],
+        info = json['info'] ?? "",
         memberCount = json['memberCount'],
         isConfirmed = json['isConfirmed'],
         url = json['url'];

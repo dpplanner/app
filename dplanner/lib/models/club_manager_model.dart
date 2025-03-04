@@ -14,6 +14,6 @@ class ClubManagerModel {
       : id = json['id'],
         clubId = json['clubId'],
         name = json['name'],
-        description = json['description'],
+        description = json['description'] ?? "",
         authorities = json['authorities'];
 }

@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import '../const/const.dart';
 
 class ClubManagerApiService {
-  static const String baseUrl = 'http://3.39.102.31:8080';
+  static const String baseUrl = 'http://api.dplanner.co.kr';
 
   /// POST: /clubs/(_.club_id)/authorities [클럽 매니저 권한 생성] 클럽 매니저 권한 생성하기
   static Future<ClubManagerModel> postClubManager(

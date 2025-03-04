@@ -11,7 +11,7 @@ import '../decode_token.dart';
 import '../models/club_model.dart';
 
 class ClubApiService {
-  static const String baseUrl = 'http://3.39.102.31:8080';
+  static const String baseUrl = 'http://api.dplanner.co.kr';
 
   /// POST: /clubs [클럽 생성] 클럽 생성
   static Future<ClubModel> postClub(

@@ -6,10 +6,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 import '../const/const.dart';
-import '../models/resource_model.dart';
 
 class LockApiService {
-  static const String baseUrl = 'http://3.39.102.31:8080';
+  static const String baseUrl = 'http://api.dplanner.co.kr';
 
   /// POST: /locks/resources/(_.resource_id) [락 생성하기] 예약 락 생성하기
   static Future<LockModel> postLock(

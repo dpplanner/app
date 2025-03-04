@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import '../const/const.dart';
 
 class TokenApiService {
-  static const String baseUrl = 'http://3.39.102.31:8080';
+  static const String baseUrl = 'http://api.dplanner.co.kr';
 
   /// POST: /eula [eula 동의] eula 동의하기
   static Future<void> postEula() async {

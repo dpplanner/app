@@ -8,7 +8,7 @@ import '../const/const.dart';
 import '../models/resource_model.dart';
 
 class ResourceApiService {
-  static const String baseUrl = 'http://3.39.102.31:8080';
+  static const String baseUrl = 'http://api.dplanner.co.kr';
 
   /// POST: /resources [자원 생성하기] 클럽 자원 생성하기
   static Future<ResourceModel> postResource(

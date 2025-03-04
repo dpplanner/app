@@ -9,7 +9,7 @@ import '../const/const.dart';
 import '../models/club_member_model.dart';
 
 class ClubMemberApiService {
-  static const String baseUrl = 'http://3.39.102.31:8080';
+  static const String baseUrl = 'http://api.dplanner.co.kr';
 
   /// POST: /clubs/(_.club_id)/join [클럽 가입하기] 클럽 멤버 가입하기
   static Future<ClubMemberModel> postClubMember(

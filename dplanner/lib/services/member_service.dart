@@ -8,7 +8,7 @@ import '../const/const.dart';
 import '../decode_token.dart';
 
 class MemberApiService {
-  static const String baseUrl = 'http://3.39.102.31:8080';
+  static const String baseUrl = 'http://api.dplanner.co.kr';
 
   /// DELETE: /members/(_.member_id) [앱 탈퇴] 앱 탈퇴하기
   static Future<void> deleteMember() async {

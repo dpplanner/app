@@ -16,7 +16,7 @@ import '../pages/post_page.dart';
 import '../widgets/snack_bar.dart';
 
 class PostApiService {
-  static const String baseUrl = 'http://3.39.102.31:8080';
+  static const String baseUrl = 'http://api.dplanner.co.kr';
 
   static String basename(String filePath) {
     return filePath.split('/').last;
@@ -422,7 +422,7 @@ class PostApiService {
 }
 
 class PostCommentApiService {
-  static const String baseUrl = 'http://3.39.102.31:8080';
+  static const String baseUrl = 'http://api.dplanner.co.kr';
 
   static Future<void> postComment(
       {required int postId, required String content, int? parentId}) async {
