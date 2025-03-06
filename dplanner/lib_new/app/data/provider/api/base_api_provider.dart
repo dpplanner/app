@@ -6,8 +6,7 @@ import 'interceptors/request_interceptor.dart';
 import 'interceptors/response_interceptor.dart';
 
 class BaseApiProvider extends GetConnect {
-  // static const String _baseUrl = 'http://3.39.102.31:8080'; // real-server
-  static const String _baseUrl = 'http://43.202.106.212:8080'; // dev-server
+  static const String _baseUrl = 'http://api.dplanner.co.kr';
 
   @override
   void onInit() {
