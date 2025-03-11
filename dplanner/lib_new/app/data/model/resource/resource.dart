@@ -22,11 +22,11 @@ class Resource {
 
   Resource.fromJson(Map<String, dynamic> json)
       : id = json['id'],
-        name = json['name'],
-        info = json['info'],
+        name = json['name'] ?? "",
+        info = json['info'] ?? "",
         returnMessageRequired = json['returnMessageRequired'],
         resourceType = ResourceType.fromString(json['resourceType']),
-        notice = json['notice'],
+        notice = json['notice'] ?? "",
         clubId = json['clubId'],
         bookableSpan = json['bookableSpan'];
 

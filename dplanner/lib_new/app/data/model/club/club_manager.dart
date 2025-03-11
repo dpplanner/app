@@ -18,6 +18,6 @@ class ClubManager {
       : id = json['id'],
         clubId = json['clubId'],
         name = json['name'],
-        description = json['description'],
+        description = json['description'] ?? "",
         authorityTypes = ClubAuthorityType.fromJsonList(json['authorities']);
 }

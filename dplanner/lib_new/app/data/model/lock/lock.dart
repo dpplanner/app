@@ -16,7 +16,7 @@ class Lock {
   Lock.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         resourceId = json['resourceId'],
-        message = json['message'],
+        message = json['message'] ?? "",
         startDateTime = DateTime.parse(json['startDateTime']),
         endDateTime = DateTime.parse(json['endDateTime']);
 }

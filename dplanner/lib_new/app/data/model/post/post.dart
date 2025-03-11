@@ -37,8 +37,8 @@ class Post {
 
   Post.fromJson(Map<String, dynamic> json)
       : id = json['id'],
-        title = json['title'],
-        content = json['content'],
+        title = json['title'] ?? "",
+        content = json['content'] ?? "",
         isFixed = json['isFixed'],
         clubId = json['clubId'],
         clubMemberId = json['clubMemberId'] as int,
