@@ -40,12 +40,9 @@ class ReservationRequest extends JsonSerializable {
       "color": color,
       "usage": usage,
       "sharing": sharing,
-      "startDateTime": startDateTime != null
-          ? DateTimeUtils.toFormattedString(startDateTime!)
-          : null,
-      "endDateTime": endDateTime != null
-          ? DateTimeUtils.toFormattedString(endDateTime!)
-          : null,
+      "startDateTime":
+          startDateTime != null ? DateTimeUtils.toFormattedString(startDateTime!) : null,
+      "endDateTime": endDateTime != null ? DateTimeUtils.toFormattedString(endDateTime!) : null,
       "reservationInvitees": reservationInvitees,
       "rejectMessage": rejectMessage,
       "returnMessage": returnMessage
@@ -83,8 +80,7 @@ class ReservationRequest extends JsonSerializable {
         sharing: reservation.sharing,
         startDateTime: reservation.startDateTime,
         endDateTime: reservation.endDateTime,
-        reservationInvitees:
-            reservation.invitees.map((invitee) => invitee.id).toList());
+        reservationInvitees: reservation.invitees.map((invitee) => invitee.id).toList());
   }
 
   static ReservationRequest forUpdateOwner({required int reservationOwnerId}) {
@@ -99,20 +95,17 @@ class ReservationRequest extends JsonSerializable {
     return ReservationRequest._(reservationId: reservation.id);
   }
 
-  static ReservationRequest forConfirm({required Reservation reservation}) {
-    return ReservationRequest._(reservationId: reservation.id);
+  static List<ReservationRequest> forConfirm({required List<Reservation> reservations}) {
+    return reservations.map((r) => ReservationRequest._(reservationId: r.id)).toList();
   }
 
-  static ReservationRequest forReject({required Reservation reservation}) {
-    return ReservationRequest._(
-        reservationId: reservation.id,
-        rejectMessage: reservation.rejectMessage);
+  static List<ReservationRequest> forReject({required List<Reservation> reservations}) {
+    return reservations
+        .map((r) => ReservationRequest._(reservationId: r.id, rejectMessage: r.rejectMessage))
+        .toList();
   }
 
-  static ReservationRequest forReturn(
-      {required Reservation reservation, String? returnMessage}) {
-    return ReservationRequest._(
-        reservationId: reservation.id,
-        returnMessage: reservation.returnMessage);
+  static ReservationRequest forReturn({required Reservation reservation, String? returnMessage}) {
+    return ReservationRequest._(reservationId: reservation.id, returnMessage: returnMessage);
   }
 }

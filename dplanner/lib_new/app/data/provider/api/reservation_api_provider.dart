@@ -86,9 +86,9 @@ class ReservationApiProvider extends BaseApiProvider {
 
   /// Admin
   Future<void> confirmReservation(
-      {required ReservationRequest request, required bool confirm}) async {
+      {required List<ReservationRequest> request, required bool confirm}) async {
     var queryString = UrlUtils.toQueryString({"confirm": confirm});
-    await patch("/reservations$queryString", request.toJson());
+    await patch("/reservations$queryString", request.map((r) => r.toJson()).toList());
   }
 
   Future<Reservation> updateReservationOwner(

@@ -14,13 +14,18 @@ class AppColors extends Color {
   static const subColor1 = Color(0xFFA294DB);
   static const subColor2 = Color(0xFFE5DFFB);
   static const subColor3 = Color(0xFF908F9C);
-  static const subColor4 = Color(0xFFE3E3F0);
   static const subColor5 = Color(0xFFBABABA);
-
   static const lockColor = Color(0xFFCDCDCD);
+
   static const markColor = Color(0xFFFF443D);
   static const hyperLink = Colors.blueAccent;
+  static const transparent = Colors.transparent;
+}
 
+class ReservationColors extends Color {
+  ReservationColors(super.value);
+
+  static const notConfirmed = Color(0xFFE3E3F0);
   static const List<Color> reservationColors = [
     Color(0xFFA294DB),
     Color(0xFFFF443D),
@@ -43,7 +48,7 @@ class AppColors extends Color {
     return hexColor.substring(2);
   }
 
-  static Color ofHex(String hexCode) {
+  static Color fromHexCode(String hexCode) {
     // 입력 색상 코드가 6자리인지 확인
     if (hexCode.length != 6) {
       throw ArgumentError('색상 코드는 6자리여야 합니다.');

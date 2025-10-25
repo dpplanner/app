@@ -9,4 +9,6 @@ final class Routes {
   static String CLUB_CREATE_SUCCESS = "/club-create/success";
   static String APP_SETTING_MENU = "/app-setting-menu";
   static String POST_LIST = "/post-list";
+  static String TIMETABLE = "/timetable";
+  static String MY_PAGE = "/my-page";
 }

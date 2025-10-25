@@ -26,7 +26,8 @@ class ClubListController extends GetxController {
     if (club.isConfirmed ?? false) {
       try {
         await _memberService.changeClub(clubId: club.id);
-        Get.toNamed(Routes.POST_LIST, arguments: ActiveTab.HOME);
+        // Get.toNamed(Routes.POST_LIST, parameters: ActiveTab.HOME);
+        Get.toNamed(Routes.TIMETABLE, parameters: ActiveTab.TIMETABLE.toParam());
       } catch (e) {
         print(e.toString());
       }

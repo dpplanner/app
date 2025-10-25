@@ -19,4 +19,14 @@ class Lock {
         message = json['message'] ?? "",
         startDateTime = DateTime.parse(json['startDateTime']),
         endDateTime = DateTime.parse(json['endDateTime']);
+
+  Lock copy() {
+    return Lock(
+      id: id,
+      resourceId: resourceId,
+      message: message,
+      startDateTime: startDateTime,
+      endDateTime: endDateTime,
+    );
+  }
 }

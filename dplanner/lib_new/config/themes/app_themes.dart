@@ -10,12 +10,16 @@ class AppTheme {
   }) {
     const textTheme = TextTheme(
       // AppBar, 클럽 이름 등 큰 글씨(볼드체)
-      displayLarge: TextStyle(fontWeight: FontWeight.w700, fontSize: 32, color: AppColors.textBlack),
-      displayMedium: TextStyle(fontWeight: FontWeight.w700, fontSize: 20, color: AppColors.textBlack),
-      displaySmall: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: AppColors.textBlack),
+      displayLarge:
+          TextStyle(fontWeight: FontWeight.w700, fontSize: 32, color: AppColors.textBlack),
+      displayMedium:
+          TextStyle(fontWeight: FontWeight.w700, fontSize: 20, color: AppColors.textBlack),
+      displaySmall:
+          TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: AppColors.textBlack),
 
       // 얇은 큰 글씨
-      headlineMedium: TextStyle(fontWeight: FontWeight.w400, fontSize: 18, color: AppColors.textBlack),
+      headlineMedium:
+          TextStyle(fontWeight: FontWeight.w400, fontSize: 18, color: AppColors.textBlack),
 
       // 게시글 제목, 메뉴명 등 중간 글씨
       titleLarge: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, color: AppColors.textBlack),
@@ -33,7 +37,6 @@ class AppTheme {
       // DO_NOT_USE - 나중에 필요하면 추가합시다
       headlineLarge: TextStyle(fontWeight: null, fontSize: 0),
       headlineSmall: TextStyle(fontWeight: null, fontSize: 0),
-      titleSmall: TextStyle(fontWeight: null, fontSize: 0),
       labelSmall: TextStyle(fontWeight: null, fontSize: 0),
     );
 
@@ -43,30 +46,24 @@ class AppTheme {
     return ThemeData(
       /// GENERAL
       useMaterial3: true,
-      extensions: [
-
-      ],
-      inputDecorationTheme: InputDecorationTheme(
-
-      ),
-      scrollbarTheme: ScrollbarThemeData(
-
-      ),
+      extensions: [],
+      inputDecorationTheme: InputDecorationTheme(),
+      scrollbarTheme: ScrollbarThemeData(),
 
       /// COLOR
       brightness: brightness,
       colorSchemeSeed: AppColors.primaryColor,
-    //   colorScheme: ColorScheme(
-    //     brightness: brightness,
-    //     primary: primary,
-    //     onPrimary: onPrimary,
-    //     secondary: secondary,
-    //     onSecondary: onSecondary,
-    //     error: error,
-    //     onError: onError,
-    //     surface: surface,
-    //     onSurface: onSurface
-    // ),
+      //   colorScheme: ColorScheme(
+      //     brightness: brightness,
+      //     primary: primary,
+      //     onPrimary: onPrimary,
+      //     secondary: secondary,
+      //     onSecondary: onSecondary,
+      //     error: error,
+      //     onError: onError,
+      //     surface: surface,
+      //     onSurface: onSurface
+      // ),
 
       // TYPOGRAPHY & ICONOGRAPHY
       fontFamily: "Pretendard",
@@ -96,22 +93,25 @@ class AppTheme {
       //   offset: ,
       // ),
 
-      // bottomNavigationBarTheme:BottomNavigationBarThemeData(
-      //   backgroundColor: ,
-      //   elevation: ,
-      //   selectedIconTheme: ,
-      //   unselectedIconTheme: ,
-      //   selectedItemColor: ,
-      //   unselectedItemColor: ,
-      //   selectedLabelStyle: ,
-      //   unselectedLabelStyle: ,
-      //   showSelectedLabels: ,
-      //   showUnselectedLabels: ,
-      //   type: ,
-      //   enableFeedback: ,
-      //   landscapeLayout: ,
-      //   mouseCursor: ,
-      // ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: AppColors.bgWhite,
+
+        selectedIconTheme: const IconThemeData(size: 25),
+        selectedLabelStyle: textTheme.bodySmall,
+        selectedItemColor: AppColors.textBlack,
+
+        unselectedIconTheme: const IconThemeData(size: 25),
+        unselectedLabelStyle: textTheme.bodySmall!.copyWith(color: AppColors.textGray),
+        unselectedItemColor: AppColors.textGray.withOpacity(0.7),
+
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        type: BottomNavigationBarType.fixed,
+        // elevation: ,
+        // enableFeedback: ,
+        // landscapeLayout: ,
+        // mouseCursor: ,
+      ),
 
       // navigationBarTheme: NavigationBarThemeData(
       //   height: ,
@@ -161,33 +161,18 @@ class AppTheme {
       //     dismissDirection:
       // ),
 
-      // dialogTheme: DialogTheme(
-      //   backgroundColor:,
-      //   elevation: ,
-      //   shadowColor: ,
-      //   surfaceTintColor: ,
-      //   shape: ,
-      //   alignment: ,
-      //   iconColor: ,
-      //   titleTextStyle: ,
-      //   contentTextStyle: ,
-      //   actionsPadding: ,
-      //   barrierColor: ,
-      //   insetPadding: ,
-      //   clipBehavior: ,
-      // ),
+      dialogTheme: DialogTheme(
+        elevation: 0,
+        backgroundColor: AppColors.bgWhite,
+        titleTextStyle: textTheme.titleMedium,
+        contentTextStyle: textTheme.bodyLarge,
+      ),
 
-      // checkboxTheme: CheckboxThemeData(
-      //   mouseCursor: ,
-      //   fillColor: ,
-      //   checkColor:,
-      //   overlayColor: ,
-      //   splashRadius:,
-      //   materialTapTargetSize: ,
-      //   visualDensity: ,
-      //   shape: ,
-      //   side: ,
-      // ),
+      checkboxTheme: CheckboxThemeData(
+        visualDensity: VisualDensity.compact,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        side: BorderSide(color: AppColors.textGray, width: 2.0),
+      ),
 
       // radioTheme: RadioThemeData(
       //   mouseCursor: ,
@@ -210,12 +195,6 @@ class AppTheme {
       //   thumbIcon:
       // ),
 
-      // dropdownMenuTheme: DropdownMenuThemeData(
-      //   textStyle: ,
-      //   inputDecorationTheme: ,
-      //   menuStyle: ,
-      // ),
-
       popupMenuTheme: PopupMenuThemeData(),
 
       // tabBarTheme: TabBarTheme(
@@ -236,10 +215,16 @@ class AppTheme {
       //   textScaler:
       // ),
 
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: AppColors.primaryColor,
+          shape: const CircleBorder(),
+          largeSizeConstraints: const BoxConstraints.tightFor(width: 60, height: 60),
+          smallSizeConstraints: const BoxConstraints.tightFor(width: 52, height: 52)
+      ),
+
       buttonTheme: ButtonThemeData(),
       elevatedButtonTheme: ElevatedButtonThemeData(),
       filledButtonTheme: FilledButtonThemeData(),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(),
       iconButtonTheme: IconButtonThemeData(),
       outlinedButtonTheme: OutlinedButtonThemeData(),
       segmentedButtonTheme: SegmentedButtonThemeData(),

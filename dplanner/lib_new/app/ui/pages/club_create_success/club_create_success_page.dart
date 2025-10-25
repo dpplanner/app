@@ -82,7 +82,7 @@ class ClubCreateSuccessPage extends GetView<ClubCreateSuccessController> {
                           padding: const EdgeInsets.all(24.0),
                           icon: const Icon(SFSymbols.link, color: AppColors.textBlack),
                           style: IconButton.styleFrom(
-                              backgroundColor: AppColors.subColor4,
+                              backgroundColor: AppColors.bgPrimary,
                               shape:
                                   RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0))),
                           onPressed: controller.copyInviteCode,

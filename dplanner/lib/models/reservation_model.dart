@@ -51,7 +51,7 @@ class ReservationModel {
         returnMessage = json['returnMessage'],
         attachmentsUrl = json['attachmentsUrl'],
         invitees = List<Map<String, dynamic>>.from(
-            json['invitees'].map((i) => Map<String, dynamic>.from(i))),
+            json['invitees']._indexMap((i) => Map<String, dynamic>.from(i))),
         startDateTime = json['startDateTime'],
         endDateTime = json['endDateTime'],
         createDate = json['createDate'],

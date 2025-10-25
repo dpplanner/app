@@ -1,0 +1,36 @@
+import 'package:flutter/cupertino.dart';
+
+import '../../../../../config/constants/app_colors.dart';
+
+class ColorCircle extends StatelessWidget {
+  static const double circleSize = 24.0;
+
+  final Color color;
+  final bool showBorder;
+  final double borderWidth;
+
+  const ColorCircle({
+    super.key,
+    required this.color,
+    required this.showBorder,
+    required this.borderWidth});
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: circleSize,
+      height: circleSize,
+      decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: showBorder
+              ? Border.all(
+              color: AppColors.bgPrimary,
+              width: borderWidth)
+              : null
+      ),
+    );
+  }
+
+}

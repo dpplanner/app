@@ -35,7 +35,14 @@ class ClubMember {
         clubAuthorityTypes = ClubAuthorityType.fromJsonList(json['clubAuthorityTypes']);
 
   bool hasAuthority(ClubAuthorityType authority) {
-    return role == ClubMemberRoleType.ADMIN ||
-        (clubAuthorityTypes != null && clubAuthorityTypes!.contains(authority));
+    return role == ClubMemberRoleType.ADMIN || clubAuthorityTypes?.contains(authority) == true;
+  }
+
+  bool isAdmin() {
+    return role == ClubMemberRoleType.ADMIN;
+  }
+
+  bool isManager() {
+    return clubAuthorityTypes?.isNotEmpty == true;
   }
 }

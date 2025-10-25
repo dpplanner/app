@@ -12,6 +12,7 @@ class UnderlineTextForm extends StatelessWidget {
   final bool noLine;
   final bool isRight;
   final bool noErrorSign;
+  final bool isDense;
   final double fontSize;
   final FormFieldValidator<String>? validator;
   final FormFieldSetter<String>? onSaved;
@@ -28,6 +29,7 @@ class UnderlineTextForm extends StatelessWidget {
       this.noLine = false,
       this.isRight = false,
       this.noErrorSign = false,
+      this.isDense = false,
       this.fontSize = 16.0,
       this.validator,
       this.onSaved,
@@ -59,6 +61,7 @@ class UnderlineTextForm extends StatelessWidget {
       onSaved: onSaved,
       onChanged: onChanged,
       decoration: InputDecoration(
+        isDense: isDense,
         hintText: hintText,
         hintStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(color: AppColors.textGray),
         errorStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(color: AppColors.markColor),
@@ -67,7 +70,9 @@ class UnderlineTextForm extends StatelessWidget {
         focusedBorder: defaultUnderline,
         errorBorder: markedUnderline,
         focusedErrorBorder: markedUnderline,
-        contentPadding: const EdgeInsets.fromLTRB(4.0, 12.0, 4.0, 0.0),
+        contentPadding: noLine
+            ? const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 0.0)
+            : const EdgeInsets.fromLTRB(4.0, 12.0, 4.0, 0.0),
       ),
     );
   }

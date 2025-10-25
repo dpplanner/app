@@ -1,3 +1,4 @@
+import '../../../../config/constants/app_colors.dart';
 import 'reservation_invitee.dart';
 import 'reservation_status_type.dart';
 
@@ -10,8 +11,8 @@ class Reservation {
   final int resourceId;
   final String resourceName;
 
-  final DateTime startDateTime;
-  final DateTime endDateTime;
+  DateTime startDateTime;
+  DateTime endDateTime;
   String title;
   String usage;
   String color;
@@ -19,7 +20,7 @@ class Reservation {
   List<ReservationInvitee> invitees;
 
   final ReservationStatusType status;
-  final String? rejectMessage;
+  String? rejectMessage;
   final bool returned;
   final DateTime createDate;
   final DateTime? lastModifiedDate;
@@ -51,6 +52,26 @@ class Reservation {
       required this.returnMessage,
       this.isDummy = false});
 
+  bool isRequest() => status == ReservationStatusType.REQUEST;
+
+  bool isConfirmed() => status == ReservationStatusType.CONFIRMED;
+
+  bool isRejected() => status == ReservationStatusType.REJECTED;
+
+  bool isOwner(int? id) => clubMemberId == id;
+
+  bool isStarted() => DateTime.now().isAfter(startDateTime);
+
+  bool hasTitle() => title.isNotEmpty;
+
+  bool hasUsage() => usage.isNotEmpty;
+
+  bool hasInvitees() => invitees.isNotEmpty;
+
+  bool hasReturnMessage() => returnMessage?.isNotEmpty == true;
+
+  bool hasReturnImages() => attachmentsUrl.isNotEmpty;
+
   Reservation.fromJson(Map<String, dynamic> json)
       : id = json['reservationId'],
         clubMemberId = json['clubMemberId'],
@@ -61,7 +82,7 @@ class Reservation {
         color = json['color'],
         usage = json['usage'] ?? "",
         sharing = json['sharing'],
-        status = ReservationStatusType.fromString(json['status']) ,
+        status = ReservationStatusType.fromString(json['status']),
         returnMessage = json['returnMessage'],
         attachmentsUrl = List<String>.from(json['attachmentsUrl']),
         invitees = ReservationInvitee.fromJsonList(json['invitees']),
@@ -73,7 +94,32 @@ class Reservation {
         rejectMessage = json['rejectMessage'],
         isDummy = false;
 
-  static Reservation ofDummy(String startDateTime, String endDateTime) {
+  Reservation copy() {
+    return Reservation(
+      id: id,
+      clubMemberId: clubMemberId,
+      clubMemberName: clubMemberName,
+      resourceId: resourceId,
+      resourceName: resourceName,
+      title: title,
+      usage: usage,
+      startDateTime: startDateTime,
+      endDateTime: endDateTime,
+      color: color,
+      sharing: sharing,
+      invitees: invitees.map((invitee) => invitee.copy()).toList(),
+      status: status,
+      rejectMessage: rejectMessage,
+      returned: returned,
+      createDate: createDate,
+      lastModifiedDate: lastModifiedDate,
+      attachmentsUrl: List<String>.from(attachmentsUrl),
+      returnMessage: returnMessage,
+      isDummy: isDummy,
+    );
+  }
+
+  static Reservation ofDummy({String? startDateTime, String? endDateTime}) {
     return Reservation(
       id: -1,
       clubMemberId: -1,
@@ -81,14 +127,14 @@ class Reservation {
       resourceId: -1,
       resourceName: "",
       title: "",
-      color: "",
+      color: ReservationColors.getColorHex(ReservationColors.reservationColors.first),
       usage: "",
       sharing: false,
       status: ReservationStatusType.REQUEST,
       attachmentsUrl: [],
       invitees: [],
-      startDateTime: DateTime.parse(startDateTime),
-      endDateTime: DateTime.parse(endDateTime),
+      startDateTime: DateTime.parse(startDateTime ?? "20250101T000000"),
+      endDateTime: DateTime.parse(endDateTime ?? "20250101T010000"),
       createDate: DateTime.now(),
       lastModifiedDate: DateTime.now(),
       returned: false,

@@ -12,5 +12,7 @@ export 'login/login_page.dart';
 export 'login/login_bindings.dart';
 export 'club_join/club_join_page.dart';
 export 'club_join/club_join_bindings.dart';
+export 'timetable/timetable_bindings.dart';
+export 'timetable/timetable_page.dart';
 export 'eula_agree/eula_agree_page.dart';
 export 'eula_agree/eula_agree_bindings.dart';

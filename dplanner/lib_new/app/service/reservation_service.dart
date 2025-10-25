@@ -10,14 +10,12 @@ import 'club_member_service.dart';
 import 'club_service.dart';
 
 class ReservationService extends GetxService {
-  final ReservationApiProvider reservationApiProvider =
-      Get.find<ReservationApiProvider>();
+  final ReservationApiProvider reservationApiProvider = Get.find<ReservationApiProvider>();
   final ClubService clubService = Get.find<ClubService>();
   final ClubMemberService clubMemberService = Get.find<ClubMemberService>();
 
   Future<Reservation> getReservation({required int reservationId}) async {
-    return await reservationApiProvider.getReservation(
-        reservationId: reservationId);
+    return await reservationApiProvider.getReservation(reservationId: reservationId);
   }
 
   Future<Reservation> createReservation(
@@ -43,8 +41,7 @@ class ReservationService extends GetxService {
             reservationInvitees: reservationInvitees));
   }
 
-  Future<Reservation> updateReservation(
-      {required Reservation reservation}) async {
+  Future<Reservation> updateReservation({required Reservation reservation}) async {
     return await reservationApiProvider.updateReservation(
         reservationId: reservation.id,
         request: ReservationRequest.forUpdate(reservation: reservation));
@@ -62,20 +59,12 @@ class ReservationService extends GetxService {
   }
 
   Future<Reservation> returnReservation(
-      {required Reservation reservation,
-      String? returnMessage,
-      List<XFile>? images}) async {
-    List<XFile> compressedImages = [];
-    images?.forEach((image) async {
-      var compressedImage = await CompressUtils.compressImageFile(image);
-      compressedImages.add(compressedImage!);
-    });
-
+      {required Reservation reservation, String? returnMessage, List<XFile>? images}) async {
     return await reservationApiProvider.returnReservation(
         reservationId: reservation.id,
-        request: ReservationRequest.forReturn(
-            reservation: reservation, returnMessage: returnMessage),
-        images: compressedImages);
+        request:
+            ReservationRequest.forReturn(reservation: reservation, returnMessage: returnMessage),
+        images: await _compressImages(images));
   }
 
   Future<List<Reservation>> getReservations(
@@ -83,37 +72,29 @@ class ReservationService extends GetxService {
       required DateTime startDateTime,
       required DateTime endDateTime}) async {
     return await reservationApiProvider.getReservations(
-        resourceId: resourceId,
-        startDateTime: startDateTime,
-        endDateTime: endDateTime);
+        resourceId: resourceId, startDateTime: startDateTime, endDateTime: endDateTime);
   }
 
   Future<List<Reservation>> getMyReservations(
       {required String status, required PagingRequest paging}) async {
-    return await reservationApiProvider.getMyReservations(
-        status: status, paging: paging);
+    return await reservationApiProvider.getMyReservations(status: status, paging: paging);
   }
 
   /// Admin
-  Future<void> confirmReservation({required Reservation reservation}) async {
+  Future<void> confirmReservation({required List<Reservation> reservations}) async {
     await reservationApiProvider.confirmReservation(
-        request: ReservationRequest.forConfirm(reservation: reservation),
-        confirm: true);
+        request: ReservationRequest.forConfirm(reservations: reservations), confirm: true);
   }
 
-  Future<void> rejectReservation({required Reservation reservation}) async {
+  Future<void> rejectReservation({required List<Reservation> reservations}) async {
     await reservationApiProvider.confirmReservation(
-        request: ReservationRequest.forReject(reservation: reservation),
-        confirm: false);
+        request: ReservationRequest.forReject(reservations: reservations), confirm: false);
   }
 
-  Future<Reservation> updateReservationOwner(
-      {required Reservation reservation,
-      required int reservationOwnerId}) async {
+  Future<Reservation> updateReservationOwner({required Reservation reservation}) async {
     return await reservationApiProvider.updateReservationOwner(
         reservationId: reservation.id,
-        request: ReservationRequest.forUpdateOwner(
-            reservationOwnerId: reservationOwnerId));
+        request: ReservationRequest.forUpdateOwner(reservationOwnerId: reservation.clubMemberId));
   }
 
   Future<List<Reservation>> getReservationsForAdmin(
@@ -121,5 +102,16 @@ class ReservationService extends GetxService {
     var currentClubId = await clubService.getCurrentClubId();
     return await reservationApiProvider.getReservationsForAdmin(
         clubId: currentClubId, status: status, paging: paging);
+  }
+
+  /// private
+  Future<List<XFile>> _compressImages(List<XFile>? images) async {
+    List<XFile> compressedImages = [];
+    if (images != null) {
+      for (var image in images) {
+        compressedImages.add((await CompressUtils.compressImageFile(image))!);
+      }
+    }
+    return compressedImages;
   }
 }

@@ -12,4 +12,5 @@ final appPages = [
   GetPage(name: Routes.CLUB_FIND, page: () => ClubFindPage(), binding: ClubFindBindings()),
   GetPage(name: Routes.CLUB_JOIN, page: () => ClubJoinPage(), binding: ClubJoinBindings()),
   GetPage(name: Routes.CLUB_JOIN_SUCCESS, page: () => ClubJoinSuccessPage(), binding: ClubJoinSuccessBindings()),
+  GetPage(name: Routes.TIMETABLE, page: () => TimetablePage(), binding: TimetableBindings()),
 ];

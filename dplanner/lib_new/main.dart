@@ -9,6 +9,7 @@ import 'config/routings/routes.dart';
 import 'config/themes/app_themes.dart';
 
 void main() {
+  Get.put(EventController(), permanent: true);
   runApp(const MyApp());
 }
 
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
           FocusManager.instance.primaryFocus?.unfocus(); // 키보드 닫기 이벤트
         },
         child: CalendarControllerProvider(
-            controller: EventController(),
+            controller: Get.find<EventController>(),
             child: GetMaterialApp(
               title: 'DPlanner',
               theme: AppTheme.lightTheme,
