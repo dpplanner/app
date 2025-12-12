@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import 'timetable_controller.dart';
 import 'views/date_picker/date_picker_view_controller.dart';
+import 'views/lock_manage/lock_manage_view_controller.dart';
 import 'views/member_picker/member_picker_view_controller.dart';
 import 'views/reservation_create/reservation_create_view_controller.dart';
 import 'views/reservation_info/reservation_info_view_controller.dart';
@@ -20,5 +21,6 @@ class TimetableBindings extends Bindings {
     Get.lazyPut<ReservationCreateViewController>(() => ReservationCreateViewController(), fenix: true);
     Get.lazyPut<MemberPickerViewController>(() => MemberPickerViewController(), fenix: true);
     Get.lazyPut<ReservationTimePickerViewController>(() => ReservationTimePickerViewController(), fenix: true);
+    Get.lazyPut<LockManageViewController>(() => LockManageViewController(), fenix: true);
   }
 }

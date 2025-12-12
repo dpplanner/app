@@ -17,6 +17,7 @@ import '../../base/widgets/bottom_sheet.dart';
 import '../../base/widgets/dialog.dart';
 import 'dialogs/notice_dialog_view.dart';
 import 'views/date_picker/date_picker_view.dart';
+import 'views/lock_manage/lock_manage_view.dart';
 import 'views/reservation_create/reservation_create_view.dart';
 import 'views/reservation_info/reservation_info_view.dart';
 
@@ -168,8 +169,15 @@ class TimetableController extends GetxController {
     // addReservation(types: 0, reservation: null);
   }
 
-  void lockResource() {
-    // addReservation(types: 7, reservation: null);
+  Future<void> lockResource() async {
+    var doRefresh = await bottomSheet(
+      view: LockManageView(),
+      arguments: {"resource": currentResource.value},
+    );
+
+    if (doRefresh == true) {
+      await loadCalendarEvents();
+    }
   }
 
   void toResourceListPage() {
@@ -213,7 +221,12 @@ class TimetableController extends GetxController {
 
   List<CalendarEventData<Object?>> _buildLockEventData(
       DateTime startDateTime, DateTime endDateTime) {
-    int days = endDateTime.difference(startDateTime).inDays + 1;
+    // endDateTime이 자정(00:00:00)이면 전날 끝으로 처리
+    final isMidnight = endDateTime.hour == 0 &&
+        endDateTime.minute == 0 &&
+        endDateTime.second == 0;
+    int days = endDateTime.difference(startDateTime).inDays + (isMidnight ? 0 : 1);
+    if (days < 1) days = 1;
     return List.generate(days, (index) {
       DateTime lockDate = startDateTime.add(Duration(days: index));
 
