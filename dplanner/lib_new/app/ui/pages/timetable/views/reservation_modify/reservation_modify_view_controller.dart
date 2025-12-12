@@ -8,12 +8,12 @@ import '../../../../../data/model/club/club_member.dart';
 import '../../../../../data/model/reservation/reservation.dart';
 import '../../../../../data/model/reservation/reservation_invitee.dart';
 import '../../../../../service/reservation_service.dart';
-import '../../../../base/widgets/bottom_sheet.dart';
-import '../bottom_sheet_view_controller.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_navigator.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view_controller.dart';
 import '../member_picker/member_picker_view.dart';
 
 class ReservationModifyViewController extends BottomSheetViewController {
-  final BottomSheetController _bottomSheetController = Get.find<BottomSheetController>();
+  final BottomSheetNavigator _navigator = Get.find<BottomSheetNavigator>();
   final ReservationService _reservationService = Get.find<ReservationService>();
 
   late Rx<Reservation> reservation = Rx<Reservation>(Reservation.ofDummy());
@@ -21,6 +21,12 @@ class ReservationModifyViewController extends BottomSheetViewController {
 
   TextEditingController reservationTitleForm = TextEditingController();
   TextEditingController reservationUsageForm = TextEditingController();
+
+  @override
+  void reset() {
+    reservationTitleForm.clear();
+    reservationUsageForm.clear();
+  }
 
   @override
   void init(Map<String, dynamic> arguments) {
@@ -64,15 +70,15 @@ class ReservationModifyViewController extends BottomSheetViewController {
       if (isManager) {
         await _reservationService.updateReservationOwner(reservation: reservation.value);
       }
-      Get.back(result: true);
+      _navigator.close(success: true);
     } catch (e) {
-      Get.back(result: false);
+      _navigator.close(success: false);
       snackBar(title: "예약을 수정하지 못했습니다.", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
   Future<void> changeReservationOwner() async {
-    _bottomSheetController.pushView(view: MemberPickerView(), arguments: {
+    _navigator.pushView(view: MemberPickerView(), arguments: {
       "title": "예약자",
       "initialMemberIds": [reservation.value.clubMemberId],
       "multipleSelect": false,
@@ -92,7 +98,7 @@ class ReservationModifyViewController extends BottomSheetViewController {
   }
 
   Future<void> changeReservationInvitees() async {
-    _bottomSheetController.pushView(view: MemberPickerView(), arguments: {
+    _navigator.pushView(view: MemberPickerView(), arguments: {
       "title": "함께 사용하는 사람",
       "initialMemberIds": reservation.value.invitees.map((invitee) => invitee.id).toList(),
       "multipleSelect": true,

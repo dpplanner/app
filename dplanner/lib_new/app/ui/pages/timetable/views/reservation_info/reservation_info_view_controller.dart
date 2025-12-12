@@ -11,10 +11,10 @@ import '../../../../../data/model/club/club_member.dart';
 import '../../../../../data/model/reservation/reservation.dart';
 import '../../../../../data/model/reservation/reservation_status_type.dart';
 import '../../../../../service/reservation_service.dart';
-import '../../../../base/widgets/bottom_sheet.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_navigator.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view_controller.dart';
 import '../../../../base/widgets/dialog.dart';
 import '../../../../base/widgets/snackbar.dart';
-import '../bottom_sheet_view_controller.dart';
 import '../reservation_modify/reservation_modify_view.dart';
 import '../reservation_return/reservation_return_view.dart';
 import 'dialogs/cancel_dialog_view.dart';
@@ -22,6 +22,7 @@ import 'dialogs/delete_dialog_view.dart';
 import 'dialogs/reject_dialog_view.dart';
 
 class ReservationInfoViewController extends BottomSheetViewController {
+  final BottomSheetNavigator _navigator = Get.find<BottomSheetNavigator>();
   final ReservationService _reservationService = Get.find<ReservationService>();
 
   late Reservation reservation;
@@ -128,9 +129,9 @@ class ReservationInfoViewController extends BottomSheetViewController {
   Future<void> confirmReservation() async {
     try {
       await _reservationService.confirmReservation(reservations: [reservation]);
-      Get.back(result: true);
+      _navigator.close(success: true);
     } catch (e) {
-      Get.back(result: false);
+      _navigator.close(success: false);
       snackBar(title: "예약을 승인하지 못했습니다.", content: "잠시 후 다시 시도해 주세요");
     }
   }
@@ -141,10 +142,10 @@ class ReservationInfoViewController extends BottomSheetViewController {
           await dialog(view: RejectDialogView(), arguments: {"reservation": reservation});
       if (doReject == true) {
         await _reservationService.rejectReservation(reservations: [reservation]);
-        Get.back(result: true);
+        _navigator.close(success: true);
       }
     } catch (e) {
-      Get.back(result: false);
+      _navigator.close(success: false);
       snackBar(title: "예약을 거절하지 못했습니다.", content: "잠시 후 다시 시도해 주세요");
     }
   }
@@ -154,10 +155,10 @@ class ReservationInfoViewController extends BottomSheetViewController {
       var doDelete = await dialog(view: DeleteDialogView());
       if (doDelete == true) {
         await _reservationService.deleteReservation(reservation: reservation);
-        Get.back(result: true);
+        _navigator.close(success: true);
       }
     } catch (e) {
-      Get.back(result: false);
+      _navigator.close(success: false);
       snackBar(title: "예약을 삭제하지 못했습니다.", content: "잠시 후 다시 시도해 주세요");
     }
   }
@@ -167,22 +168,21 @@ class ReservationInfoViewController extends BottomSheetViewController {
       var doCancel = await dialog(view: CancelDialogView());
       if (doCancel == true) {
         await _reservationService.cancelReservation(reservation: reservation);
-        Get.back(result: true);
+        _navigator.close(success: true);
       }
     } catch (e) {
-      Get.back(result: false);
+      _navigator.close(success: false);
       snackBar(title: "예약을 취소하지 못했습니다.", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
   Future<void> modifyReservation() async {
-    Get.find<BottomSheetController>().pushView(
+    _navigator.pushView(
         view: ReservationModifyView(),
         arguments: {"reservation": reservation.copy(), "isManager": isManager});
   }
 
   Future<void> toReturnReservationView() async {
-    return Get.find<BottomSheetController>()
-        .pushView(view: ReservationReturnView(), arguments: {"reservation": reservation});
+    _navigator.pushView(view: ReservationReturnView(), arguments: {"reservation": reservation});
   }
 }

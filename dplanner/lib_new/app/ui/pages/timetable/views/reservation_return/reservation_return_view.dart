@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
 
-import '../../../../base/widgets/base_bottom_sheet_view.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_layout.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view.dart';
 import '../../../../base/widgets/buttons/rounded_rectangle_full_button.dart';
 import '../../widgets/row/image_picker_row.dart';
 import '../../widgets/row/outline_textform_row.dart';
 import '../../widgets/row/text_info_row.dart';
-import '../bottom_sheet_view.dart';
 import 'reservation_return_view_controller.dart';
 
 class ReservationReturnView extends BottomSheetView<ReservationReturnViewController> {
@@ -14,7 +13,7 @@ class ReservationReturnView extends BottomSheetView<ReservationReturnViewControl
 
   @override
   Widget build(BuildContext context) {
-    return BaseBottomSheetView(
+    return BottomSheetLayout(
         title: "반납하기",
         content: Column(
           children: [

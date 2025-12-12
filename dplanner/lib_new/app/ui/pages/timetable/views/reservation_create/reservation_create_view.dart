@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
+import 'package:get/get.dart';
 
 import '../../../../../../config/constants/app_colors.dart';
-import '../../../../base/widgets/base_bottom_sheet_view.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_layout.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view.dart';
 import '../../../../base/widgets/buttons/rounded_rectangle_full_button.dart';
-import '../../../../base/widgets/buttons/rounded_rectangle_half_button.dart';
-import '../../widgets/row/accordian_row.dart';
 import '../../widgets/row/checkbox_row.dart';
-import '../../widgets/row/color_info_row.dart';
 import '../../widgets/row/color_selector_row.dart';
-import '../../widgets/row/half_button_row.dart';
-import '../../widgets/row/image_info_row.dart';
 import '../../widgets/row/invitees_row.dart';
-import '../../widgets/row/longtext_info_row.dart';
 import '../../widgets/row/text_info_row.dart';
 import '../../widgets/row/underline_textform_row.dart';
-import '../bottom_sheet_view.dart';
 import 'reservation_create_view_controller.dart';
 
 class ReservationCreateView extends BottomSheetView<ReservationCreateViewController> {
@@ -24,7 +17,7 @@ class ReservationCreateView extends BottomSheetView<ReservationCreateViewControl
 
   @override
   Widget build(BuildContext context) {
-    return BaseBottomSheetView(
+    return BottomSheetLayout(
       title: "예약하기",
       content: Obx(
         () => Column(

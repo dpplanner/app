@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
+import 'package:get/get.dart';
 
 import '../../../../../../config/constants/app_colors.dart';
-import '../../../../base/widgets/base_bottom_sheet_view.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_layout.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view.dart';
 import '../../../../base/widgets/buttons/rounded_rectangle_full_button.dart';
-import '../../../../base/widgets/overlapping_profile_images.dart';
 import '../../widgets/row/checkbox_row.dart';
 import '../../widgets/row/color_selector_row.dart';
 import '../../widgets/row/invitees_row.dart';
 import '../../widgets/row/text_info_row.dart';
 import '../../widgets/row/underline_textform_row.dart';
-import '../bottom_sheet_view.dart';
 import 'reservation_modify_view_controller.dart';
 
 class ReservationModifyView extends BottomSheetView<ReservationModifyViewController> {
@@ -19,7 +17,7 @@ class ReservationModifyView extends BottomSheetView<ReservationModifyViewControl
 
   @override
   Widget build(BuildContext context) {
-    return BaseBottomSheetView(
+    return BottomSheetLayout(
         title: "예약 수정",
         content: Obx(
           () => Column(children: [

@@ -7,15 +7,14 @@ import '../../../../../data/model/resource/resource.dart';
 import '../../../../../service/lock_service.dart';
 import '../../../../../service/reservation_service.dart';
 import '../../../../../utils/datetime_utils.dart';
-import '../../../../base/widgets/bottom_sheet.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_navigator.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view_controller.dart';
 import '../../widgets/time_picker_grid.dart';
-import '../bottom_sheet_view_controller.dart';
 import '../date_picker/date_picker_view.dart';
 import 'dialogs/date_change_confirm_dialog.dart';
 
 class LockManageViewController extends BottomSheetViewController {
-  final BottomSheetController _bottomSheetController =
-      Get.find<BottomSheetController>();
+  final BottomSheetNavigator _navigator = Get.find<BottomSheetNavigator>();
   final LockService _lockService = Get.find<LockService>();
   final ReservationService _reservationService =
       Get.find<ReservationService>();
@@ -56,10 +55,26 @@ class LockManageViewController extends BottomSheetViewController {
   }
 
   @override
+  void reset() {
+    originalLocks = [];
+    reservations = [];
+    isInitialLoading.value = true;
+    isLoading.value = false;
+    hasChanges.value = false;
+    for (int i = 0; i < timeSlots.length; i++) {
+      timeSlots[i].value = TimeSlot(
+        startTime: DateTime.now().copyWith(hour: i).withoutMinute,
+        status: TimeSlotStatus.available,
+        selected: false,
+      );
+    }
+  }
+
+  @override
   void init(Map<String, dynamic> arguments) {
     resource = arguments["resource"] as Resource;
     selectedDate.value = DateTime.now();
-    loadLocks(); // 초기 데이터 로드
+    loadLocks();
   }
 
   Future<void> loadLocks() async {
@@ -99,7 +114,7 @@ class LockManageViewController extends BottomSheetViewController {
       if (!confirmed) return;
     }
 
-    _bottomSheetController.pushView(
+    _navigator.pushView(
       view: DatePickerView(),
       arguments: {
         "selectedDate": selectedDate.value,
@@ -152,15 +167,15 @@ class LockManageViewController extends BottomSheetViewController {
         );
       }
 
-      Get.back(result: true);
+      _navigator.close(success: true);
     } catch (e) {
-      Get.back(result: false);
+      _navigator.close(success: false);
       snackBar(title: "오류 발생", content: "잠금 시간 수정에 실패했습니다. 다시 시도해주세요.");
     }
   }
 
   void cancel() {
-    _bottomSheetController.popView();
+    _navigator.popView();
   }
 
   /// Private methods
@@ -174,6 +189,7 @@ class LockManageViewController extends BottomSheetViewController {
         .copyWith(hour: index, minute: 0, second: 0)
         .withoutMinute;
     final slotEnd = slotStart.add(const Duration(hours: 1));
+
 
     return originalLocks.any((lock) =>
         slotStart.isBefore(lock.endDateTime.withoutMinute) &&

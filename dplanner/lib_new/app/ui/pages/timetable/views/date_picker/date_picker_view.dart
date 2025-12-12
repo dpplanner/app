@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../base/widgets/base_bottom_sheet_view.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_layout.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view.dart';
 import '../../../../base/widgets/buttons/rounded_rectangle_full_button.dart';
 import '../../widgets/date_picker.dart';
-import '../bottom_sheet_view.dart';
 import 'date_picker_view_controller.dart';
 
 class DatePickerView extends BottomSheetView<DatePickerViewController> {
@@ -14,7 +13,7 @@ class DatePickerView extends BottomSheetView<DatePickerViewController> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseBottomSheetView(
+    return BottomSheetLayout(
       title: "날짜 선택",
       content: Column(
         children: [

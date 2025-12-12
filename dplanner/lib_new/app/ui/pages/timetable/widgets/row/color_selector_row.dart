@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../../config/constants/app_colors.dart';
-import '../color_circle.dart';
 import '../color_selector.dart';
 
 class ColorSelectorRow extends StatelessWidget {

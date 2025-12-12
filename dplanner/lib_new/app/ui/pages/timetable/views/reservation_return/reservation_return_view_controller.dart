@@ -5,15 +5,23 @@ import 'package:get/get.dart';
 
 import '../../../../../data/model/reservation/reservation.dart';
 import '../../../../../service/reservation_service.dart';
-import '../bottom_sheet_view_controller.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_navigator.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view_controller.dart';
 
 class ReservationReturnViewController extends BottomSheetViewController {
+  final BottomSheetNavigator _navigator = Get.find<BottomSheetNavigator>();
   final ReservationService _reservationService = Get.find<ReservationService>();
 
   late Reservation reservation;
 
   RxList<XFile> returnImages = <XFile>[].obs;
   TextEditingController returnMessageForm = TextEditingController();
+
+  @override
+  void reset() {
+    returnImages.clear();
+    returnMessageForm.clear();
+  }
 
   @override
   void init(Map<String, dynamic> arguments) {
@@ -30,9 +38,9 @@ class ReservationReturnViewController extends BottomSheetViewController {
     try {
       await _reservationService.returnReservation(
           reservation: reservation, returnMessage: returnMessageForm.text, images: returnImages);
-      Get.back(result: true);
+      _navigator.close(success: true);
     } catch (e) {
-      Get.back(result: false);
+      _navigator.close(success: false);
       snackBar(title: "예약을 반납하지 못했습니다.", content: "잠시 후 다시 시도해 주세요");
     }
   }

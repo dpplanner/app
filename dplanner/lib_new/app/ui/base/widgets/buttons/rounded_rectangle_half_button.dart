@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../config/constants/app_colors.dart';
-import 'full_button_frame.dart';
 import 'half_button_frame.dart';
 
 class RoundedRectangleHalfButton extends StatelessWidget {

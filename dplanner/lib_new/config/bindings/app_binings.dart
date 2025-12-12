@@ -24,7 +24,7 @@ import '../../app/service/reservation_service.dart';
 import '../../app/service/resource_service.dart';
 import '../../app/service/secure_storage_service.dart';
 import '../../app/service/token_service.dart';
-import '../../app/ui/base/widgets/bottom_sheet.dart';
+import '../../app/ui/base/widgets/bottom_sheet/bottom_sheet_navigator.dart';
 
 class AppBindings extends Bindings {
   @override
@@ -57,7 +57,7 @@ class AppBindings extends Bindings {
     Get.lazyPut<SecureStorageService>(() => SecureStorageService());
     Get.lazyPut<TokenService>(() => TokenService());
 
-    /// controller
-    Get.lazyPut<BottomSheetController>(() => BottomSheetController(), fenix: true);
+    /// navigator
+    Get.lazyPut<BottomSheetNavigator>(() => BottomSheetNavigator(), fenix: true);
   }
 }

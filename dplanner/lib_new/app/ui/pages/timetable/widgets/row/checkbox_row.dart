@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../../../../config/constants/app_colors.dart';
 
 class CheckboxRow extends StatelessWidget {
   final String title;

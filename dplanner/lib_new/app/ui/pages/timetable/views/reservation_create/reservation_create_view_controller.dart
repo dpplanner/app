@@ -7,14 +7,14 @@ import '../../../../../data/model/club/club_member.dart';
 import '../../../../../data/model/reservation/reservation_invitee.dart';
 import '../../../../../data/model/resource/resource.dart';
 import '../../../../../service/reservation_service.dart';
-import '../../../../base/widgets/bottom_sheet.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_navigator.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view_controller.dart';
 import '../../../../base/widgets/snackbar.dart';
-import '../bottom_sheet_view_controller.dart';
 import '../member_picker/member_picker_view.dart';
 import '../reservation_time_picker/reservation_time_picker_view.dart';
 
 class ReservationCreateViewController extends BottomSheetViewController {
-  final BottomSheetController _bottomSheetController = Get.find<BottomSheetController>();
+  final BottomSheetNavigator _navigator = Get.find<BottomSheetNavigator>();
   final ReservationService _reservationService = Get.find<ReservationService>();
 
   late Resource resource;
@@ -29,6 +29,18 @@ class ReservationCreateViewController extends BottomSheetViewController {
   TextEditingController reservationUsageForm = TextEditingController();
   RxList<ReservationInvitee> reservationInvitees = RxList();
   RxBool reservationSharing = true.obs;
+
+  @override
+  void reset() {
+    reservationOwner = Rxn<ClubMember>();
+    reservationStartDateTime = DateTime.now().obs;
+    reservationEndDateTime = DateTime.now().obs;
+    reservationColor = ReservationColors.reservationColors.first.obs;
+    reservationTitleForm.clear();
+    reservationUsageForm.clear();
+    reservationInvitees.clear();
+    reservationSharing = true.obs;
+  }
 
   @override
   void init(Map<String, dynamic> arguments) {
@@ -56,7 +68,7 @@ class ReservationCreateViewController extends BottomSheetViewController {
   }
 
   Future<void> changeReservationOwner() async {
-    _bottomSheetController.pushView(view: MemberPickerView(), arguments: {
+    _navigator.pushView(view: MemberPickerView(), arguments: {
       "title": "예약자",
       "initialMemberIds": [reservationOwner.value!.id],
       "multipleSelect": false,
@@ -67,7 +79,7 @@ class ReservationCreateViewController extends BottomSheetViewController {
   }
 
   void changeReservationTime() {
-    _bottomSheetController.pushView(view: ReservationTimePickerView(), arguments: {
+    _navigator.pushView(view: ReservationTimePickerView(), arguments: {
       "resource": resource,
       "isManager": isManager,
       "onSelected": (startDateTime, endDateTime) {
@@ -87,7 +99,7 @@ class ReservationCreateViewController extends BottomSheetViewController {
   }
 
   Future<void> changeReservationInvitees() async {
-    _bottomSheetController.pushView(view: MemberPickerView(), arguments: {
+    _navigator.pushView(view: MemberPickerView(), arguments: {
       "title": "함께 사용하는 사람",
       "initialMemberIds": reservationInvitees.map((invitee) => invitee.id).toList(),
       "multipleSelect": true,
@@ -113,23 +125,10 @@ class ReservationCreateViewController extends BottomSheetViewController {
           startDateTime: reservationStartDateTime.value,
           endDateTime: reservationEndDateTime.value,
           color: ReservationColors.getColorHex(reservationColor.value));
-      Get.back(result: true);
+      _navigator.close(success: true);
     } catch (e) {
-      Get.back(result: false);
+      _navigator.close(success: false);
       snackBar(title: "예약을 신청하지 못했습니다.", content: "잠시 후 다시 시도해 주세요");
-    } finally {
-      _clearContext();
     }
-  }
-
-  void _clearContext() {
-    reservationOwner = Rxn<ClubMember>();
-    reservationStartDateTime = DateTime.now().obs;
-    reservationEndDateTime = DateTime.now().obs;
-    reservationColor = ReservationColors.reservationColors.first.obs;
-    reservationTitleForm.clear();
-    reservationUsageForm.clear();
-    reservationInvitees.clear();
-    reservationSharing = true.obs;
   }
 }

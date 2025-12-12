@@ -8,13 +8,13 @@ import '../../../../../data/model/resource/resource.dart';
 import '../../../../../service/lock_service.dart';
 import '../../../../../service/reservation_service.dart';
 import '../../../../../utils/datetime_utils.dart';
-import '../../../../base/widgets/bottom_sheet.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_navigator.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view_controller.dart';
 import '../../widgets/time_picker_grid.dart';
-import '../bottom_sheet_view_controller.dart';
 import '../date_picker/date_picker_view.dart';
 
 class ReservationTimePickerViewController extends BottomSheetViewController {
-  final BottomSheetController _bottomSheetController = Get.find<BottomSheetController>();
+  final BottomSheetNavigator _navigator = Get.find<BottomSheetNavigator>();
   final ReservationService _reservationService = Get.find<ReservationService>();
   final LockService _lockService = Get.find<LockService>();
 
@@ -29,6 +29,17 @@ class ReservationTimePickerViewController extends BottomSheetViewController {
       24, (idx) => TimeSlot(startTime: DateTime.now().copyWith(hour: idx).withoutMinute).obs);
 
   bool get isSelected => timeSlots.any((slot) => slot.value.selected);
+
+  @override
+  void reset() {
+    selectedDate.value = DateTime.now();
+    initialTime = null;
+    onSelected = null;
+    for (var slot in timeSlots) {
+      slot.value.status = TimeSlotStatus.available;
+      slot.value.selected = false;
+    }
+  }
 
   @override
   void init(Map<String, dynamic> arguments) {
@@ -77,7 +88,7 @@ class ReservationTimePickerViewController extends BottomSheetViewController {
   }
 
   void changeDate() {
-    _bottomSheetController.pushView(view: DatePickerView(), arguments: {
+    _navigator.pushView(view: DatePickerView(), arguments: {
       "selectedDate": selectedDate.value,
       "onSelected": (date) => selectedDate.value = date,
       if (!isManager) "availableRange": availableRange
@@ -96,7 +107,7 @@ class ReservationTimePickerViewController extends BottomSheetViewController {
     }
 
     onSelected?.call(_startDateTime, _endDateTime);
-    _bottomSheetController.popView();
+    _navigator.popView();
   }
 
   /// private methods

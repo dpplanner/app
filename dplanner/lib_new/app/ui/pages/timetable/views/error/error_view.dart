@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../../config/constants/app_colors.dart';
-import '../../../../base/widgets/base_bottom_sheet_view.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_layout.dart';
 
 class BottomSheetErrorView extends StatelessWidget {
   final String title;
@@ -10,7 +10,7 @@ class BottomSheetErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BaseBottomSheetView(
+    return BottomSheetLayout(
         title: title,
         content: Column(
           children: [

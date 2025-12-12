@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../../../config/constants/app_colors.dart';
-import '../../../../base/widgets/base_bottom_sheet_view.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_layout.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view.dart';
 import '../../../../base/widgets/buttons/rounded_rectangle_half_button.dart';
 import '../../widgets/legend_box.dart';
 import '../../widgets/time_picker_date_header.dart';
 import '../../widgets/time_picker_grid.dart';
 import '../../widgets/row/half_button_row.dart';
-import '../bottom_sheet_view.dart';
 import 'lock_manage_view_controller.dart';
 
 class LockManageView extends BottomSheetView<LockManageViewController> {
@@ -16,7 +16,7 @@ class LockManageView extends BottomSheetView<LockManageViewController> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseBottomSheetView(
+    return BottomSheetLayout(
       title: controller.title,
       content: Obx(() {
         // 초기 로딩 중일 때는 같은 레이아웃에 로딩 인디케이터만 표시

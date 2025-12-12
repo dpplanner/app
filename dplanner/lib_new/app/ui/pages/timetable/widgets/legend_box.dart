@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 
-import '../../../../../config/constants/app_colors.dart';
-
 class LegendBox extends StatelessWidget {
   final Color color;
   final String label;

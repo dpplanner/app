@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
-import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 
 import '../../../../../../config/constants/app_colors.dart';
-import '../../../../base/widgets/base_bottom_sheet_view.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_layout.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view.dart';
 import '../../../../base/widgets/buttons/rounded_rectangle_full_button.dart';
-import '../../widgets/date_picker.dart';
 import '../../widgets/legend_box.dart';
 import '../../widgets/time_picker_date_header.dart';
 import '../../widgets/time_picker_grid.dart';
-import '../bottom_sheet_view.dart';
 import '../error/error_view.dart';
 import '../loading/loading_view.dart';
 import 'reservation_time_picker_view_controller.dart';
@@ -24,12 +21,11 @@ class ReservationTimePickerView extends BottomSheetView<ReservationTimePickerVie
         future: controller.initSlots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            print(snapshot.error);
             return BottomSheetErrorView(title: controller.title);
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return BottomSheetLoadingView(title: controller.title);
           }
-          return BaseBottomSheetView(
+          return BottomSheetLayout(
             title: controller.title,
             content: Obx(() => Column(children: [
                   TimePickerDateHeader(

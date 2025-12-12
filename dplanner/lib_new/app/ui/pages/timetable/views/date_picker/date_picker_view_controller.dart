@@ -1,15 +1,24 @@
 import 'package:get/get.dart';
 
 import '../../../../../utils/datetime_utils.dart';
-import '../../../../base/widgets/bottom_sheet.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_navigator.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view_controller.dart';
 import '../../../../base/widgets/snackbar.dart';
-import '../bottom_sheet_view_controller.dart';
 
 class DatePickerViewController extends BottomSheetViewController {
+  final BottomSheetNavigator _navigator = Get.find<BottomSheetNavigator>();
   late Rx<DateTime> selectedDate = DateTime.now().obs;
   DateTime? rangeStartDate;
   DateTime? rangeEndDate;
   Function(DateTime)? onSelected;
+
+  @override
+  void reset() {
+    selectedDate.value = DateTime.now();
+    rangeStartDate = null;
+    rangeEndDate = null;
+    onSelected = null;
+  }
 
   @override
   void init(Map<String, dynamic> arguments) {
@@ -41,6 +50,6 @@ class DatePickerViewController extends BottomSheetViewController {
 
   void onTap() {
     onSelected?.call(selectedDate.value);
-    Get.find<BottomSheetController>().popView();
+    _navigator.popView();
   }
 }

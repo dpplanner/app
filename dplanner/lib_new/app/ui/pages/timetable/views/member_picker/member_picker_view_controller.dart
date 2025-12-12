@@ -2,10 +2,11 @@ import 'package:get/get.dart';
 
 import '../../../../../data/model/club/club_member.dart';
 import '../../../../../service/club_member_service.dart';
-import '../../../../base/widgets/bottom_sheet.dart';
-import '../bottom_sheet_view_controller.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_navigator.dart';
+import '../../../../base/widgets/bottom_sheet/bottom_sheet_view_controller.dart';
 
 class MemberPickerViewController extends BottomSheetViewController {
+  final BottomSheetNavigator _navigator = Get.find<BottomSheetNavigator>();
   final ClubMemberService _clubMemberService = Get.find<ClubMemberService>();
 
   late Rx<String> title = "회원 선택".obs;
@@ -15,6 +16,12 @@ class MemberPickerViewController extends BottomSheetViewController {
 
   List<ClubMember> clubMembers = [];
   RxList<ClubMember> selectedMembers = RxList();
+
+  @override
+  void reset() {
+    clubMembers = [];
+    selectedMembers.clear();
+  }
 
   @override
   void init(Map<String, dynamic> arguments) {
@@ -45,6 +52,6 @@ class MemberPickerViewController extends BottomSheetViewController {
 
   void selectMembers() {
     onSelected?.call(selectedMembers);
-    Get.find<BottomSheetController>().popView();
+    _navigator.popView();
   }
 }

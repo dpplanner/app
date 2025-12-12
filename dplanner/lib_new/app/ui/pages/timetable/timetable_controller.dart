@@ -13,7 +13,7 @@ import '../../../service/lock_service.dart';
 import '../../../service/reservation_service.dart';
 import '../../../service/resource_service.dart';
 import '../../../utils/datetime_utils.dart';
-import '../../base/widgets/bottom_sheet.dart';
+import '../../base/widgets/bottom_sheet/bottom_sheet_navigator.dart';
 import '../../base/widgets/dialog.dart';
 import 'dialogs/notice_dialog_view.dart';
 import 'views/date_picker/date_picker_view.dart';
@@ -22,6 +22,7 @@ import 'views/reservation_create/reservation_create_view.dart';
 import 'views/reservation_info/reservation_info_view.dart';
 
 class TimetableController extends GetxController {
+  final BottomSheetNavigator _navigator = Get.find<BottomSheetNavigator>();
   final ClubMemberService _clubMemberService = Get.find<ClubMemberService>();
   final ResourceService _resourceService = Get.find<ResourceService>();
   final ReservationService _reservationService = Get.find<ReservationService>();
@@ -106,7 +107,7 @@ class TimetableController extends GetxController {
   }
 
   Future<void> changeWeek() async {
-    await bottomSheet(view: DatePickerView(), arguments: {
+    await _navigator.open(view: DatePickerView(), arguments: {
       "selectedDate": selectedDate.value,
       "onSelected": (date) => selectedDate.value = date
     });
@@ -124,7 +125,7 @@ class TimetableController extends GetxController {
       try {
         var reservationId = int.parse(events[0].title.split(" ")[0]);
         var reservation = await _reservationService.getReservation(reservationId: reservationId);
-        var doRefresh = await bottomSheet(view: ReservationInfoView(), arguments: {
+        var doRefresh = await _navigator.open(view: ReservationInfoView(), arguments: {
           "reservation": reservation,
           "isManager": hasScheduleAuthority(),
           "me": me.value!
@@ -155,7 +156,7 @@ class TimetableController extends GetxController {
     }
 
     if (agreeNotice) {
-        var doRefresh = await bottomSheet(view: ReservationCreateView(), arguments: {
+        var doRefresh = await _navigator.open(view: ReservationCreateView(), arguments: {
           "resource": currentResource.value,
           "isManager": hasScheduleAuthority(),
           "me": me.value!
@@ -170,7 +171,7 @@ class TimetableController extends GetxController {
   }
 
   Future<void> lockResource() async {
-    var doRefresh = await bottomSheet(
+    var doRefresh = await _navigator.open(
       view: LockManageView(),
       arguments: {"resource": currentResource.value},
     );
