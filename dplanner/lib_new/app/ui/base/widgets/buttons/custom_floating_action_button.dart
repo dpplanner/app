@@ -57,7 +57,7 @@ class _CustomFloatingActionButton extends State<CustomFloatingActionButton> {
         if (isExpanded)
           ...widget.actions!.entries.map((entry) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.only(bottom: 16),
               child: FloatingActionButton.small(
                 onPressed: entry.value,
                 child: Icon(entry.key, size: 24, color: AppColors.bgWhite),
