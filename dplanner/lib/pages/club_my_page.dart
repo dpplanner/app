@@ -69,7 +69,7 @@ class _ClubMyPageState extends State<ClubMyPage> {
                                 ? CachedNetworkImage(
                                     placeholder: (context, url) => Container(),
                                     imageUrl:
-                                        "http://${MemberController.to.clubMember().url!}",
+                                        "https://${MemberController.to.clubMember().url!}",
                                     errorWidget: (context, url, error) =>
                                         SvgPicture.asset(
                                           'assets/images/base_image/base_member_image.svg',
