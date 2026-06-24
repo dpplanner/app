@@ -8,6 +8,7 @@ import 'package:dplanner/const/style.dart';
 import 'package:dplanner/services/club_api_service.dart';
 import 'package:dplanner/services/club_member_api_service.dart';
 import 'package:dplanner/services/token_api_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -39,62 +40,76 @@ Future<void> main() async {
   ]);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // 웹은 flutter_native_splash 설정(dart run flutter_native_splash:create)이 없어
+  // preserve/remove가 예외를 던지므로 모바일에서만 사용
+  if (!kIsWeb) {
+    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  }
 
-  await _initAppTrackingPlugin();
+  // 모바일 전용: 앱 추적 권한 + AdMob (웹 미지원)
+  if (!kIsWeb) {
+    await _initAppTrackingPlugin();
+    MobileAds.instance.initialize();
+  }
 
-  MobileAds.instance.initialize();
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  await _initLocalNotification();
-
-  await FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      announcement: true,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true
-  );
-
-  // 앱이 켜진 상태에서 사용자가 알림이 왔을 때 -> 로컬 푸시알림 전송
-  FirebaseMessaging.onMessage.listen((RemoteMessage? message) async {
-    if (message == null) return;
-    if (message.notification == null) return;
-
-    NotificationDetails details = const NotificationDetails(
-        iOS: DarwinNotificationDetails(
-            presentAlert: true,
-            presentBadge: true,
-            presentSound: true
-        ),
-        android: AndroidNotificationDetails(
-            "com.dancepozz.dplanner",
-            "dplanner",
-            importance: Importance.max,
-            priority: Priority.high
-        )
+  // 모바일 전용: Firebase + 로컬 알림 + FCM 푸시 처리
+  // (웹은 Firebase web 설정/Web Push 미구현 상태라 통째로 비활성화.
+  //  추후 Web Push 대응 시 flutterfire configure로 web 옵션 등록 후 활성화)
+  if (!kIsWeb) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    await _localNotification.show(
-      message.hashCode,
-      message.notification!.title,
-      message.notification!.body,
-      details,
-      payload: jsonEncode(message.data)
+    await _initLocalNotification();
+
+    await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        announcement: true,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true
     );
-  });
 
-  // 백그라운드 상태에서 사용자가 알림을 클릭했을 때 처리
-  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage? message) => _handleFirebaseNotification(message));
-  // 앱이 완전히 종료된 상태에서 알림을 클릭했을 때 처리
-  FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) => _handleFirebaseNotification(message));
+    // 앱이 켜진 상태에서 사용자가 알림이 왔을 때 -> 로컬 푸시알림 전송
+    FirebaseMessaging.onMessage.listen((RemoteMessage? message) async {
+      if (message == null) return;
+      if (message.notification == null) return;
 
-  KakaoSdk.init(nativeAppKey: '2b20483f38041a509dfaab39ab801eb0');
+      NotificationDetails details = const NotificationDetails(
+          iOS: DarwinNotificationDetails(
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true
+          ),
+          android: AndroidNotificationDetails(
+              "com.dancepozz.dplanner",
+              "dplanner",
+              importance: Importance.max,
+              priority: Priority.high
+          )
+      );
+
+      await _localNotification.show(
+        message.hashCode,
+        message.notification!.title,
+        message.notification!.body,
+        details,
+        payload: jsonEncode(message.data)
+      );
+    });
+
+    // 백그라운드 상태에서 사용자가 알림을 클릭했을 때 처리
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage? message) => _handleFirebaseNotification(message));
+    // 앱이 완전히 종료된 상태에서 알림을 클릭했을 때 처리
+    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) => _handleFirebaseNotification(message));
+  }
+
+  KakaoSdk.init(
+    nativeAppKey: '2b20483f38041a509dfaab39ab801eb0',
+    javaScriptAppKey: '13226a0e3bb2c76b8342a03f0df7c64d', // 웹 카카오 로그인용 JS 키
+  );
   runApp(const MyApp());
 }
 
