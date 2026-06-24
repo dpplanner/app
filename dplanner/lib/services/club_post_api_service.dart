@@ -1,12 +1,12 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../const/const.dart';
 import 'package:dplanner/models/post_model.dart';
@@ -16,32 +16,19 @@ import '../pages/post_page.dart';
 import '../widgets/snack_bar.dart';
 
 class PostApiService {
-  static const String baseUrl = 'http://api.dplanner.co.kr';
+  static const String baseUrl = 'https://api.dplanner.co.kr';
 
-  static String basename(String filePath) {
-    return filePath.split('/').last;
+  /// XFile -> 업로드용 바이트.
+  /// 모바일은 이미지 압축(quality 80), 웹은 flutter_image_compress 미지원이라 원본 바이트 사용.
+  static Future<Uint8List> _toUploadBytes(XFile file) async {
+    final bytes = await file.readAsBytes();
+    if (kIsWeb) return bytes;
+    return await FlutterImageCompress.compressWithList(bytes, quality: 80);
   }
 
-  Future<String> getTempDirectoryPath() async {
-    Directory tempDir = await getTemporaryDirectory();
-    return tempDir.path;
-  }
-
-  static Future<XFile?> compressImageFile(XFile file) async {
-    final tempDir = await getTemporaryDirectory();
-    final tempPath = tempDir.path;
-
-    // 압축된 파일의 새 경로를 지정합니다.
-    final outPath = "${tempPath}/${DateTime.now().millisecondsSinceEpoch}.jpg";
-
-    final compressedFile = await FlutterImageCompress.compressAndGetFile(
-      file.path,
-      outPath,
-      quality: 80, // 값을 조정하여 압축률을 제어할 수 있습니다.
-    );
-
-    // 'XFile' 객체로 변환하여 반환합니다.
-    return compressedFile != null ? XFile(compressedFile.path) : null;
+  static String _uploadFilename(XFile file) {
+    final name = file.name;
+    return name.isNotEmpty ? name : '${DateTime.now().millisecondsSinceEpoch}.jpg';
   }
 
   static Future<Post?> submitPost(
@@ -74,20 +61,13 @@ class PostApiService {
     // 이미지 파일이 있을 경우 멀티파트 파일로 추가
     if (imageFileList != null) {
       for (var imageFile in imageFileList) {
-        final compressedFile = await compressImageFile(imageFile); //이미지 압축~!
-        if (compressedFile != null) {
-          final stream = http.ByteStream(compressedFile.openRead());
-          stream.cast();
-          final length = await compressedFile.length();
-          final multipartFile = http.MultipartFile(
-            'files',
-            stream,
-            length,
-            filename: basename(compressedFile.path),
-          );
-          print("${basename(compressedFile.path)}");
-          formData.files.add(multipartFile);
-        }
+        final bytes = await _toUploadBytes(imageFile); //이미지 압축~! (웹은 원본)
+        final multipartFile = http.MultipartFile.fromBytes(
+          'files',
+          bytes,
+          filename: _uploadFilename(imageFile),
+        );
+        formData.files.add(multipartFile);
       }
     }
 
@@ -265,21 +245,13 @@ class PostApiService {
     // 이미지 파일이 있을 경우 멀티파트 파일로 추가
     if (imageFileList != null) {
       for (var imageFile in imageFileList) {
-        final compressedFile =
-            await compressImageFile(imageFile); //이미지 퀄리티를 떨어뜨려 용량을 줄임
-        if (compressedFile != null) {
-          final stream = http.ByteStream(compressedFile.openRead());
-          stream.cast();
-          final length = await compressedFile.length();
-          final multipartFile = http.MultipartFile(
-            'files',
-            stream,
-            length,
-            filename: basename(compressedFile.path),
-          );
-          print("${basename(compressedFile.path)}");
-          formData.files.add(multipartFile);
-        }
+        final bytes = await _toUploadBytes(imageFile); //이미지 퀄리티를 떨어뜨려 용량을 줄임 (웹은 원본)
+        final multipartFile = http.MultipartFile.fromBytes(
+          'files',
+          bytes,
+          filename: _uploadFilename(imageFile),
+        );
+        formData.files.add(multipartFile);
       }
     }
 
@@ -422,7 +394,7 @@ class PostApiService {
 }
 
 class PostCommentApiService {
-  static const String baseUrl = 'http://api.dplanner.co.kr';
+  static const String baseUrl = 'https://api.dplanner.co.kr';
 
   static Future<void> postComment(
       {required int postId, required String content, int? parentId}) async {

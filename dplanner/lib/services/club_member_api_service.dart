@@ -9,7 +9,7 @@ import '../const/const.dart';
 import '../models/club_member_model.dart';
 
 class ClubMemberApiService {
-  static const String baseUrl = 'http://api.dplanner.co.kr';
+  static const String baseUrl = 'https://api.dplanner.co.kr';
 
   /// POST: /clubs/(_.club_id)/join [클럽 가입하기] 클럽 멤버 가입하기
   static Future<ClubMemberModel> postClubMember(
@@ -60,7 +60,14 @@ class ClubMemberApiService {
     });
 
     if (image != null) {
-      var imageFile = await http.MultipartFile.fromPath('image', image.path);
+      // fromPath는 dart:io 기반이라 웹에서 실패 -> bytes 기반으로 업로드
+      var imageFile = http.MultipartFile.fromBytes(
+        'image',
+        await image.readAsBytes(),
+        filename: image.name.isNotEmpty
+            ? image.name
+            : '${DateTime.now().millisecondsSinceEpoch}.jpg',
+      );
       request.files.add(imageFile);
     }
 

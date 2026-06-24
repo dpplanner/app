@@ -11,7 +11,7 @@ import '../decode_token.dart';
 import '../models/club_model.dart';
 
 class ClubApiService {
-  static const String baseUrl = 'http://api.dplanner.co.kr';
+  static const String baseUrl = 'https://api.dplanner.co.kr';
 
   /// POST: /clubs [클럽 생성] 클럽 생성
   static Future<ClubModel> postClub(
@@ -81,7 +81,14 @@ class ClubApiService {
     });
 
     if (image != null) {
-      var imageFile = await http.MultipartFile.fromPath('image', image.path);
+      // fromPath는 dart:io 기반이라 웹에서 실패 -> bytes 기반으로 업로드
+      var imageFile = http.MultipartFile.fromBytes(
+        'image',
+        await image.readAsBytes(),
+        filename: image.name.isNotEmpty
+            ? image.name
+            : '${DateTime.now().millisecondsSinceEpoch}.jpg',
+      );
       request.files.add(imageFile);
     }
 
