@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 
 import 'package:dplanner/controllers/size.dart';
 import 'package:dplanner/decode_token.dart';
@@ -7,7 +8,7 @@ import 'package:dplanner/widgets/image_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:flutter_naver_login/flutter_naver_login.dart';
+import '../services/naver_login_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -71,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch(e) {
       print(e);
     } finally {
-      FlutterNativeSplash.remove();
+      if (!kIsWeb) FlutterNativeSplash.remove();
     }
   }
 
@@ -237,31 +238,30 @@ class _LoginPageState extends State<LoginPage> {
 
   // 네이버 로그인
   Future<void> signInWithNaver() async {
-    final NaverLoginResult result = await FlutterNaverLogin.logIn();
+    final account = await naverLogIn();
+    if (account == null) return;
 
-    if (result.status == NaverLoginStatus.loggedIn) {
+    try {
+      String email = account.email;
+      String name = account.name;
+      await TokenApiService.postToken(email: email, name: name);
+      await storage.write(key: loginInfo, value: '$email $name naver');
+
       try {
-        String email = result.account.email;
-        String name = result.account.name;
-        await TokenApiService.postToken(email: email, name: name);
-        await storage.write(key: loginInfo, value: '$email $name naver');
-
-        try {
-          eulaValue = await storage.read(key: eula);
-        } catch (e) {
-          print(e.toString());
-        }
-
-        // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
-        if (eulaValue == 'true') {
-          Get.offNamed('/club_list');
-        } else {
-          Get.offNamed('/eula');
-        }
+        eulaValue = await storage.read(key: eula);
       } catch (e) {
         print(e.toString());
-        snackBar(title: "네이버 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
       }
+
+      // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
+      if (eulaValue == 'true') {
+        Get.offNamed('/club_list');
+      } else {
+        Get.offNamed('/eula');
+      }
+    } catch (e) {
+      print(e.toString());
+      snackBar(title: "네이버 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
@@ -304,19 +304,20 @@ class _LoginPageState extends State<LoginPage> {
                               }),
                         ),
 
-                        // 네이버 로그인 버튼
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(
-                              SizeController.to.screenWidth * 0.07,
-                              0,
-                              SizeController.to.screenWidth * 0.07,
-                              SizeController.to.screenHeight * 0.01),
-                          child: ImageButton(
-                              image: 'assets/images/login/login_naver.png',
-                              onTap: () async {
-                                await signInWithNaver();
-                              }),
-                        ),
+                        // 네이버 로그인 버튼 (웹 미지원이라 모바일에서만 노출)
+                        if (!kIsWeb)
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(
+                                SizeController.to.screenWidth * 0.07,
+                                0,
+                                SizeController.to.screenWidth * 0.07,
+                                SizeController.to.screenHeight * 0.01),
+                            child: ImageButton(
+                                image: 'assets/images/login/login_naver.png',
+                                onTap: () async {
+                                  await signInWithNaver();
+                                }),
+                          ),
 
                         //구글 로그인 버튼
                         Padding(
@@ -331,7 +332,7 @@ class _LoginPageState extends State<LoginPage> {
                                 await signInWithGoogle();
                               }),
                         ),
-                        if (Platform.isIOS)
+                        if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS)
                           Padding(
                             padding: EdgeInsets.fromLTRB(
                                 SizeController.to.screenWidth * 0.07,
