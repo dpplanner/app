@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import '../widgets/preview_image.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/club.dart';
@@ -102,8 +102,8 @@ class _ClubSettingPageState extends State<ClubSettingPage> {
                                 return Padding(
                                     padding: const EdgeInsets.only(top: 16.0),
                                     child: (file != null)
-                                        ? Image.file(
-                                            File(file!.path),
+                                        ? previewImageFromPath(
+                                            file!.path,
                                             height:
                                                 SizeController.to.screenHeight *
                                                     0.28,

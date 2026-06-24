@@ -8,7 +8,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import '../widgets/preview_image.dart';
 
 import '../controllers/size.dart';
 import '../const/style.dart';
@@ -101,8 +101,8 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                             children: [
                               ClipOval(
                                 child: (file != null)
-                                    ? Image.file(
-                                        File(file!.path),
+                                    ? previewImageFromPath(
+                                        file!.path,
                                         height: SizeController.to.screenWidth *
                                             0.35,
                                         width: SizeController.to.screenWidth *
@@ -115,7 +115,7 @@ class _MyProfileModificationPageState extends State<MyProfileModificationPage> {
                                             placeholder: (context, url) =>
                                                 Container(),
                                             imageUrl:
-                                                "http://${MemberController.to.clubMember().url!}",
+                                                "https://${MemberController.to.clubMember().url!}",
                                             errorWidget:
                                                 (context, url, error) =>
                                                     SvgPicture.asset(

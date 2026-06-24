@@ -4,7 +4,7 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import '../widgets/preview_image.dart';
 
 import '../controllers/size.dart';
 import '../const/style.dart';
@@ -230,7 +230,7 @@ class _PostAddPageState extends State<PostAddPage> {
                             padding: const EdgeInsets.all(8.0),
                             child: AspectRatio(
                               aspectRatio: 1 / 1,
-                              child: Image.file(File(image.path),
+                              child: previewImageFromPath(image.path,
                                   fit: BoxFit.fill), // 로컬 이미지를 표시
                             ),
                           );
