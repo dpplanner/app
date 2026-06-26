@@ -69,6 +69,7 @@ dependencies:
 
   # google
   google_sign_in: ^6.2.1
+  google_sign_in_web: ^0.12.4 # 웹 구글 로그인(renderButton)용
   google_mobile_ads: ^5.1.0
 
   # apple

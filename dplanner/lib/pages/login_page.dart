@@ -25,6 +25,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../widgets/snack_bar.dart';
+import '../widgets/google_signin_button.dart';
 import 'error_page.dart';
 
 GoogleSignIn googleSignIn = GoogleSignIn();
@@ -39,6 +40,20 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   FlutterSecureStorage storage = const FlutterSecureStorage();
   String? eulaValue;
+
+  @override
+  void initState() {
+    super.initState();
+    // 웹 구글 로그인: signIn()이 미지원이라 renderButton/원탭을 사용하며,
+    // 로그인 결과는 onCurrentUserChanged 스트림으로 전달된다.
+    if (kIsWeb) {
+      googleSignIn.onCurrentUserChanged.listen((account) {
+        if (account != null) {
+          _onGoogleAccount(account);
+        }
+      });
+    }
+  }
 
   // refresh token 유효성 검사
   bool validateToken(String token) {
@@ -143,32 +158,37 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // 구글 로그인
+  // 구글 로그인 (모바일: signIn() 사용. 웹은 renderButton + onCurrentUserChanged로 처리)
   Future<void> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser != null) {
+      await _onGoogleAccount(googleUser);
+    }
+  }
+
+  // 구글 계정 로그인 처리 (모바일/웹 공통)
+  Future<void> _onGoogleAccount(GoogleSignInAccount googleUser) async {
+    try {
+      String email = googleUser.email;
+      String name = googleUser.displayName ?? ".";
+      await TokenApiService.postToken(email: email, name: name);
+      await storage.write(key: loginInfo, value: '$email $name google');
+
       try {
-        String email = googleUser.email;
-        String name = googleUser.displayName ?? ".";
-        await TokenApiService.postToken(email: email, name: name);
-        await storage.write(key: loginInfo, value: '$email $name google');
-
-        try {
-          eulaValue = await storage.read(key: eula);
-        } catch (e) {
-          print(e.toString());
-        }
-
-        // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
-        if (eulaValue == 'true') {
-          Get.offNamed('/club_list');
-        } else {
-          Get.offNamed('/eula');
-        }
+        eulaValue = await storage.read(key: eula);
       } catch (e) {
         print(e.toString());
-        snackBar(title: "구글 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
       }
+
+      // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
+      if (eulaValue == 'true') {
+        Get.offNamed('/club_list');
+      } else {
+        Get.offNamed('/eula');
+      }
+    } catch (e) {
+      print(e.toString());
+      snackBar(title: "구글 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
@@ -319,18 +339,20 @@ class _LoginPageState extends State<LoginPage> {
                                 }),
                           ),
 
-                        //구글 로그인 버튼
+                        //구글 로그인 버튼 (웹은 GIS renderButton, 모바일은 이미지 버튼)
                         Padding(
                           padding: EdgeInsets.fromLTRB(
                               SizeController.to.screenWidth * 0.07,
                               0,
                               SizeController.to.screenWidth * 0.07,
                               0),
-                          child: ImageButton(
-                              image: 'assets/images/login/login_google.png',
-                              onTap: () async {
-                                await signInWithGoogle();
-                              }),
+                          child: kIsWeb
+                              ? googleSignInButton()
+                              : ImageButton(
+                                  image: 'assets/images/login/login_google.png',
+                                  onTap: () async {
+                                    await signInWithGoogle();
+                                  }),
                         ),
                         if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS)
                           Padding(
