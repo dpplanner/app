@@ -137,6 +137,35 @@ class MyApp extends StatelessWidget {
               fontFamily: 'Pretendard',
               useMaterial3: true),
           debugShowCheckedModeBanner: false,
+          // 웹/데스크톱 등 넓은 화면에서는 모바일 폭(최대 480)으로 가운데 정렬.
+          // 제약된 폭을 SizeController와 MediaQuery 양쪽에 반영해
+          // screenWidth 기반 레이아웃이 정상 비율로 보이게 한다.
+          builder: (context, child) {
+            const maxWidth = 480.0;
+            final mq = MediaQuery.of(context);
+            final isWide = mq.size.width > maxWidth;
+            final appWidth = isWide ? maxWidth : mq.size.width;
+
+            sizeController.screenWidth = appWidth;
+            sizeController.screenHeight = mq.size.height;
+
+            if (!isWide) return child!;
+
+            return ColoredBox(
+              color: const Color(0xFFE9E9EC), // 양옆 레터박스 배경
+              child: Center(
+                child: ClipRect(
+                  child: SizedBox(
+                    width: maxWidth,
+                    child: MediaQuery(
+                      data: mq.copyWith(size: Size(maxWidth, mq.size.height)),
+                      child: child!,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
           initialRoute: '/',
           getPages: page,
           initialBinding: BindingsBuilder(() {
