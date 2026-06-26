@@ -28,7 +28,13 @@ import '../widgets/snack_bar.dart';
 import '../widgets/google_signin_button.dart';
 import 'error_page.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+
 GoogleSignIn googleSignIn = GoogleSignIn();
+
+/// 웹 카카오 로그인 authorize용 REST API 키.
+/// (백엔드의 토큰 교환에 쓰는 client_id와 동일한 키여야 함)
+const String kakaoRestApiKey = '1fce5b29a8c9f5556ba2418b9e35e2d6';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -52,6 +58,47 @@ class _LoginPageState extends State<LoginPage> {
           _onGoogleAccount(account);
         }
       });
+      // 카카오 redirect 복귀 시 URL의 인가 코드 처리
+      _handleKakaoRedirect();
+    }
+  }
+
+  // 웹 카카오 로그인 1단계: 인가 코드 요청을 위해 카카오 authorize로 리다이렉트
+  Future<void> _startKakaoWebLogin() async {
+    final redirectUri = Uri.base.origin; // 예: http://localhost:8099
+    final authUrl = Uri.https('kauth.kakao.com', '/oauth/authorize', {
+      'client_id': kakaoRestApiKey,
+      'redirect_uri': redirectUri,
+      'response_type': 'code',
+    });
+    await launchUrl(authUrl, webOnlyWindowName: '_self');
+  }
+
+  // 웹 카카오 로그인 2단계: redirect 복귀 URL의 인가 코드를 백엔드로 보내 로그인
+  Future<void> _handleKakaoRedirect() async {
+    final code = Uri.base.queryParameters['code'];
+    if (code == null) return;
+    try {
+      await TokenApiService.postKakaoWebToken(
+        authorizationCode: code,
+        redirectUri: Uri.base.origin,
+      );
+      await storage.write(key: loginInfo, value: '. . kakao');
+
+      try {
+        eulaValue = await storage.read(key: eula);
+      } catch (e) {
+        print(e.toString());
+      }
+
+      if (eulaValue == 'true') {
+        Get.offNamed('/club_list');
+      } else {
+        Get.offNamed('/eula');
+      }
+    } catch (e) {
+      print(e.toString());
+      snackBar(title: "카카오 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
@@ -320,7 +367,11 @@ class _LoginPageState extends State<LoginPage> {
                           child: ImageButton(
                               image: 'assets/images/login/login_kakao.png',
                               onTap: () async {
-                                await signInWithKakao();
+                                if (kIsWeb) {
+                                  await _startKakaoWebLogin();
+                                } else {
+                                  await signInWithKakao();
+                                }
                               }),
                         ),
 

@@ -70,6 +70,41 @@ class TokenApiService {
     throw ErrorDescription(errorMessage);
   }
 
+  /// POST: /auth/login/kakao/web [웹 카카오 로그인]
+  /// 프론트가 받은 인가 코드를 서버로 보내, 서버가 카카오와 토큰을 교환하고 JWT를 발급
+  static Future<void> postKakaoWebToken(
+      {required String authorizationCode, required String redirectUri}) async {
+    final url = Uri.parse('$baseUrl/auth/login/kakao/web');
+    const storage = FlutterSecureStorage();
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        "authorizationCode": authorizationCode,
+        "redirectUri": redirectUri,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body)['data'];
+
+      await storage.write(key: accessTokenKey, value: data['accessToken']);
+      await storage.write(key: refreshTokenKey, value: data['refreshToken']);
+      if (data['eula'] != null) {
+        await storage.write(key: eula, value: data['eula'].toString());
+      }
+      return;
+    }
+
+    // 예외 처리; 메시지를 포함한 예외를 던짐
+    String errorMessage = jsonDecode(response.body)['message'] ?? 'Error';
+    print(errorMessage);
+    throw ErrorDescription(errorMessage);
+  }
+
   /// POST: /auth/refresh [refresh token] JWT 토큰 재발급
   static Future<void> postUpdateToken() async {
     final url = Uri.parse('$baseUrl/auth/refresh');
