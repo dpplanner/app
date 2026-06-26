@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dplanner/services/club_api_service.dart';
 import 'package:dplanner/const/style.dart';
 import 'package:dplanner/widgets/club_card.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -40,7 +41,8 @@ class _ClubListPageState extends State<ClubListPage> {
   void initState() {
     super.initState();
     getClubList();
-    sendFCMtoken();
+    // 웹은 Firebase/FCM 미초기화이므로 토큰 전송 생략
+    if (!kIsWeb) sendFCMtoken();
   }
 
   @override
