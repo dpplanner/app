@@ -364,15 +364,24 @@ class _LoginPageState extends State<LoginPage> {
                               0,
                               SizeController.to.screenWidth * 0.07,
                               SizeController.to.screenHeight * 0.01),
-                          child: ImageButton(
-                              image: 'assets/images/login/login_kakao.png',
-                              onTap: () async {
-                                if (kIsWeb) {
-                                  await _startKakaoWebLogin();
-                                } else {
-                                  await signInWithKakao();
-                                }
-                              }),
+                          child: kIsWeb
+                              ? Center(
+                                  child: SizedBox(
+                                    width: 320,
+                                    child: ImageButton(
+                                      image:
+                                          'assets/images/login/login_kakao.png',
+                                      onTap: () async {
+                                        await _startKakaoWebLogin();
+                                      },
+                                    ),
+                                  ),
+                                )
+                              : ImageButton(
+                                  image: 'assets/images/login/login_kakao.png',
+                                  onTap: () async {
+                                    await signInWithKakao();
+                                  }),
                         ),
 
                         // 네이버 로그인 버튼 (웹 미지원이라 모바일에서만 노출)
@@ -398,7 +407,7 @@ class _LoginPageState extends State<LoginPage> {
                               SizeController.to.screenWidth * 0.07,
                               0),
                           child: kIsWeb
-                              ? googleSignInButton()
+                              ? Center(child: googleSignInButton())
                               : ImageButton(
                                   image: 'assets/images/login/login_google.png',
                                   onTap: () async {
