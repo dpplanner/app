@@ -26,6 +26,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../widgets/snack_bar.dart';
 import '../widgets/google_signin_button.dart';
+import '../widgets/clear_url_query.dart';
 import 'error_page.dart';
 
 import 'package:url_launcher/url_launcher.dart';
@@ -78,6 +79,8 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _handleKakaoRedirect() async {
     final code = Uri.base.queryParameters['code'];
     if (code == null) return;
+    // 소비한 인가 코드를 URL에서 제거
+    clearUrlQuery();
     try {
       await TokenApiService.postKakaoWebToken(
         authorizationCode: code,
