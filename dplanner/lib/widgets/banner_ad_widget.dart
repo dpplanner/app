@@ -57,6 +57,9 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // 웹은 광고 미지원 -> 영역을 완전히 접음
+    if (kIsWeb) return const SizedBox.shrink();
+
     if (_bannerAd != null) {
       return Align(
         alignment: Alignment.topCenter,
