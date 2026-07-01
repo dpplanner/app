@@ -31,8 +31,28 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 final FlutterLocalNotificationsPlugin _localNotification = FlutterLocalNotificationsPlugin();
 
+/// 웹은 폰트 weight를 화면에서 처음 쓸 때 lazy 로드해서 한글이 □로 깨졌다가
+/// 정상으로 바뀐다. 자주 쓰는 weight를 미리 로드해두고 첫 프레임을 그린다.
+/// (로딩 동안은 index.html 스플래시가 가려줌)
+Future<void> _preloadWebFonts() async {
+  if (!kIsWeb) return;
+  final fontLoader = FontLoader('Pretendard');
+  const paths = [
+    'assets/fonts/Pretendard-Regular.ttf',
+    'assets/fonts/Pretendard-Medium.ttf',
+    'assets/fonts/Pretendard-SemiBold.ttf',
+    'assets/fonts/Pretendard-Bold.ttf',
+  ];
+  for (final p in paths) {
+    fontLoader.addFont(rootBundle.load(p));
+  }
+  await fontLoader.load();
+}
+
 Future<void> main() async {
   final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  await _preloadWebFonts();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
