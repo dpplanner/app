@@ -48,8 +48,9 @@ class ClubCard extends StatelessWidget {
                       errorWidget: (context, url, error) => SvgPicture.asset(
                             'assets/images/base_image/base_club_image.svg',
                           ),
-                      height: SizeController.to.screenWidth * 0.2,
-                      width: SizeController.to.screenWidth * 0.2,
+                      // 기본 이미지(SVG 80x80)와 동일 크기로 고정 (웹에서 커지는 문제 방지)
+                      height: 80,
+                      width: 80,
                       fit: BoxFit.fill),
               const SizedBox(width: 15),
               SizedBox(
