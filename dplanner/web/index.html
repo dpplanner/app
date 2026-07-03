@@ -82,13 +82,18 @@
   </div>
   <script src="flutter_bootstrap.js" async></script>
   <script>
-    // Flutter 첫 프레임이 그려지면 스플래시 페이드아웃 후 제거
+    // Flutter 첫 프레임이 그려지면 스플래시 페이드아웃 후 제거.
+    // 단, 새로고침으로 딥 화면 재진입(dpWasDeepLink)한 경우엔 자동로그인+딥 화면
+    // 렌더(폰트 FOUT)까지 가리도록 잠깐 더 유지한다. 일반 로딩은 즉시 제거.
     window.addEventListener('flutter-first-frame', function () {
-      var s = document.getElementById('splash');
-      if (s) {
-        s.style.opacity = '0';
-        setTimeout(function () { s.remove(); }, 300);
-      }
+      var removeSplash = function () {
+        var s = document.getElementById('splash');
+        if (s) {
+          s.style.opacity = '0';
+          setTimeout(function () { s.remove(); }, 300);
+        }
+      };
+      setTimeout(removeSplash, window.dpWasDeepLink ? 1500 : 0);
     });
   </script>
 </body>

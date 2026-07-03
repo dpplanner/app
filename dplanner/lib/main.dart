@@ -39,10 +39,15 @@ Future<void> _preloadWebFonts() async {
   if (!kIsWeb) return;
   final fontLoader = FontLoader('Pretendard');
   const paths = [
+    'assets/fonts/Pretendard-Thin.ttf',
+    'assets/fonts/Pretendard-ExtraLight.ttf',
+    'assets/fonts/Pretendard-Light.ttf',
     'assets/fonts/Pretendard-Regular.ttf',
     'assets/fonts/Pretendard-Medium.ttf',
     'assets/fonts/Pretendard-SemiBold.ttf',
     'assets/fonts/Pretendard-Bold.ttf',
+    'assets/fonts/Pretendard-ExtraBold.ttf',
+    'assets/fonts/Pretendard-Black.ttf',
   ];
   for (final p in paths) {
     fontLoader.addFont(rootBundle.load(p));
