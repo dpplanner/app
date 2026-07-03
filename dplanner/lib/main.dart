@@ -20,6 +20,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import 'const/const.dart';
+import 'widgets/reset_deep_link.dart';
 import 'controllers/club.dart';
 import 'controllers/posts.dart';
 import 'controllers/size.dart';
@@ -51,6 +52,9 @@ Future<void> _preloadWebFonts() async {
 
 Future<void> main() async {
   final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  // 웹: 내부 라우트로 새로고침 시 상태 미로딩 크래시 방지 위해 루트에서 시작
+  resetDeepLinkToRoot();
 
   await _preloadWebFonts();
 
