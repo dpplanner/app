@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 
 import '../const/style.dart';
 import 'download_image.dart';
@@ -61,7 +61,7 @@ class FullScreenImage extends StatelessWidget {
                             'dplanner_${DateTime.now().millisecondsSinceEpoch}.jpg');
                         snackBar(title: "사진을 다운로드했습니다", content: "다운로드 폴더를 확인해 주세요");
                       } else {
-                        ImageGallerySaver.saveImage(bytes,
+                        ImageGallerySaverPlus.saveImage(bytes,
                             quality: 100, name: imageUrl);
                         Get.back();
                         snackBar(title: "사진이 저장되었습니다", content: "앨범을 확인해 주세요");

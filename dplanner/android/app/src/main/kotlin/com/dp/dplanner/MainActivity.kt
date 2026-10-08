@@ -1,6 +1,7 @@
 package com.dancepozz.dplanner
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity: FlutterActivity() {
+// flutter_naver_login 2.x는 FlutterFragmentActivity를 요구함
+class MainActivity: FlutterFragmentActivity() {
 }
