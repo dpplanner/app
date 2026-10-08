@@ -52,8 +52,7 @@ dependencies:
   get: ^4.6.6
   http: ^1.2.0
   http_parser: ^4.0.2
-  intl: ^0.19.0
-  image_gallery_saver: ^2.0.3
+  intl: ^0.20.2
   image_picker: ^1.0.7
   path_provider: ^2.1.2
   table_calendar: ^3.0.9
@@ -69,10 +68,12 @@ dependencies:
 
   # google
   google_sign_in: ^6.2.1
+  google_sign_in_web: ^0.12.4 # 웹 구글 로그인(renderButton)용
   google_mobile_ads: ^5.1.0
 
   # apple
   sign_in_with_apple: ^6.0.0
+  image_gallery_saver_plus: ^5.1.1
 
 dependency_overrides:
   calendar_view:

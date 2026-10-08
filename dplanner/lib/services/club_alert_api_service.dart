@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:dplanner/decode_token.dart';
 
 class ClubAlertApiService {
-  static const String baseUrl = 'http://api.dplanner.co.kr';
+  static const String baseUrl = 'https://api.dplanner.co.kr';
 
   static void refreshFCMToken(String? fcmToken) async {
     final storage = FlutterSecureStorage();

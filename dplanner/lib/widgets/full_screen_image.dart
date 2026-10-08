@@ -4,12 +4,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:dplanner/widgets/nextpage_button.dart';
 import 'package:dplanner/widgets/snack_bar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 
 import '../const/style.dart';
+import 'download_image.dart';
 
 class FullScreenImage extends StatelessWidget {
   final String imageUrl;
@@ -52,12 +54,18 @@ class FullScreenImage extends StatelessWidget {
                     try {
                       var response = await Dio().get(imageUrl,
                           options: Options(responseType: ResponseType.bytes));
-                      ImageGallerySaver.saveImage(
-                          Uint8List.fromList(response.data),
-                          quality: 100,
-                          name: imageUrl);
-                      Get.back();
-                      snackBar(title: "사진이 저장되었습니다", content: "앨범을 확인해 주세요");
+                      final bytes = Uint8List.fromList(response.data);
+                      if (kIsWeb) {
+                        // 웹: image_gallery_saver 미지원 -> 브라우저 다운로드
+                        await downloadImageWeb(bytes,
+                            'dplanner_${DateTime.now().millisecondsSinceEpoch}.jpg');
+                        snackBar(title: "사진을 다운로드했습니다", content: "다운로드 폴더를 확인해 주세요");
+                      } else {
+                        ImageGallerySaverPlus.saveImage(bytes,
+                            quality: 100, name: imageUrl);
+                        Get.back();
+                        snackBar(title: "사진이 저장되었습니다", content: "앨범을 확인해 주세요");
+                      }
                     } catch (e) {
                       print(e.toString());
                       snackBar(title: "사진이 저장되지 않았습니다", content: "잠시 후 다시 시도해 주세요");

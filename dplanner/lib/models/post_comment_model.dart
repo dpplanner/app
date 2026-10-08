@@ -41,18 +41,21 @@ class Comment {
       id: json['id'] as int,
       parentId: json['parentId'] as int?,
       postId: json['postId'] as int,
-      clubMemberId: json['clubMemberId'] as int,
-      clubMemberName: json['clubMemberName'] as String,
+      clubMemberId: (json['clubMemberId'] as int?) ?? 0,
+      // 삭제된 댓글 등에서 null이 올 수 있어 방어 (Null is not a subtype of String 방지)
+      clubMemberName: (json['clubMemberName'] as String?) ?? '',
       profileUrl: profileUrl,
-      likeCount: json['likeCount'] as int,
-      content: json['content'] as String,
-      isDeleted: json['isDeleted'] as bool,
-      likeStatus: json['likeStatus'] as bool,
-      children: (json['children'] as List<dynamic>)
+      likeCount: (json['likeCount'] as int?) ?? 0,
+      content: (json['content'] as String?) ?? '',
+      isDeleted: (json['isDeleted'] as bool?) ?? false,
+      likeStatus: (json['likeStatus'] as bool?) ?? false,
+      children: ((json['children'] as List<dynamic>?) ?? [])
           .map((childJson) =>
               Comment.fromJson(childJson as Map<String, dynamic>))
           .toList(),
-      createdTime: DateTime.parse(json['createdTime'] as String),
+      createdTime: json['createdTime'] != null
+          ? DateTime.parse(json['createdTime'] as String)
+          : DateTime.now(),
       lastModifiedTime: json['lastModifiedTime'] != null
           ? DateTime.parse(json['lastModifiedTime'] as String)
           : null,

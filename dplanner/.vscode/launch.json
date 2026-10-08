@@ -5,6 +5,12 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "dplanner (web :8099)",
+			"request": "launch",
+			"type": "dart",
+			"args": ["-d", "chrome", "--web-port=8099"]
+		},
+		{
 			"name": "dplanner",
 			"request": "launch",
 			"type": "dart"

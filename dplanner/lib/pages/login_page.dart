@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 
 import 'package:dplanner/controllers/size.dart';
 import 'package:dplanner/decode_token.dart';
@@ -7,7 +8,7 @@ import 'package:dplanner/widgets/image_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:flutter_naver_login/flutter_naver_login.dart';
+import '../services/naver_login_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -24,9 +25,17 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../widgets/snack_bar.dart';
+import '../widgets/google_signin_button.dart';
+import '../widgets/clear_url_query.dart';
 import 'error_page.dart';
 
+import 'package:url_launcher/url_launcher.dart';
+
 GoogleSignIn googleSignIn = GoogleSignIn();
+
+/// 웹 카카오 로그인 authorize용 REST API 키.
+/// (백엔드의 토큰 교환에 쓰는 client_id와 동일한 키여야 함)
+const String kakaoRestApiKey = '1fce5b29a8c9f5556ba2418b9e35e2d6';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -38,6 +47,63 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   FlutterSecureStorage storage = const FlutterSecureStorage();
   String? eulaValue;
+
+  @override
+  void initState() {
+    super.initState();
+    // 웹 구글 로그인: signIn()이 미지원이라 renderButton/원탭을 사용하며,
+    // 로그인 결과는 onCurrentUserChanged 스트림으로 전달된다.
+    if (kIsWeb) {
+      googleSignIn.onCurrentUserChanged.listen((account) {
+        if (account != null) {
+          _onGoogleAccount(account);
+        }
+      });
+      // 카카오 redirect 복귀 시 URL의 인가 코드 처리
+      _handleKakaoRedirect();
+    }
+  }
+
+  // 웹 카카오 로그인 1단계: 인가 코드 요청을 위해 카카오 authorize로 리다이렉트
+  Future<void> _startKakaoWebLogin() async {
+    final redirectUri = Uri.base.origin; // 예: http://localhost:8099
+    final authUrl = Uri.https('kauth.kakao.com', '/oauth/authorize', {
+      'client_id': kakaoRestApiKey,
+      'redirect_uri': redirectUri,
+      'response_type': 'code',
+    });
+    await launchUrl(authUrl, webOnlyWindowName: '_self');
+  }
+
+  // 웹 카카오 로그인 2단계: redirect 복귀 URL의 인가 코드를 백엔드로 보내 로그인
+  Future<void> _handleKakaoRedirect() async {
+    final code = Uri.base.queryParameters['code'];
+    if (code == null) return;
+    // 소비한 인가 코드를 URL에서 제거
+    clearUrlQuery();
+    try {
+      await TokenApiService.postKakaoWebToken(
+        authorizationCode: code,
+        redirectUri: Uri.base.origin,
+      );
+      await storage.write(key: loginInfo, value: '. . kakao');
+
+      try {
+        eulaValue = await storage.read(key: eula);
+      } catch (e) {
+        print(e.toString());
+      }
+
+      if (eulaValue == 'true') {
+        Get.offNamed('/club_list');
+      } else {
+        Get.offNamed('/eula');
+      }
+    } catch (e) {
+      print(e.toString());
+      snackBar(title: "카카오 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
+    }
+  }
 
   // refresh token 유효성 검사
   bool validateToken(String token) {
@@ -71,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch(e) {
       print(e);
     } finally {
-      FlutterNativeSplash.remove();
+      if (!kIsWeb) FlutterNativeSplash.remove();
     }
   }
 
@@ -142,32 +208,37 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // 구글 로그인
+  // 구글 로그인 (모바일: signIn() 사용. 웹은 renderButton + onCurrentUserChanged로 처리)
   Future<void> signInWithGoogle() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser != null) {
+      await _onGoogleAccount(googleUser);
+    }
+  }
+
+  // 구글 계정 로그인 처리 (모바일/웹 공통)
+  Future<void> _onGoogleAccount(GoogleSignInAccount googleUser) async {
+    try {
+      String email = googleUser.email;
+      String name = googleUser.displayName ?? ".";
+      await TokenApiService.postToken(email: email, name: name);
+      await storage.write(key: loginInfo, value: '$email $name google');
+
       try {
-        String email = googleUser.email;
-        String name = googleUser.displayName ?? ".";
-        await TokenApiService.postToken(email: email, name: name);
-        await storage.write(key: loginInfo, value: '$email $name google');
-
-        try {
-          eulaValue = await storage.read(key: eula);
-        } catch (e) {
-          print(e.toString());
-        }
-
-        // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
-        if (eulaValue == 'true') {
-          Get.offNamed('/club_list');
-        } else {
-          Get.offNamed('/eula');
-        }
+        eulaValue = await storage.read(key: eula);
       } catch (e) {
         print(e.toString());
-        snackBar(title: "구글 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
       }
+
+      // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
+      if (eulaValue == 'true') {
+        Get.offNamed('/club_list');
+      } else {
+        Get.offNamed('/eula');
+      }
+    } catch (e) {
+      print(e.toString());
+      snackBar(title: "구글 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
@@ -237,31 +308,30 @@ class _LoginPageState extends State<LoginPage> {
 
   // 네이버 로그인
   Future<void> signInWithNaver() async {
-    final NaverLoginResult result = await FlutterNaverLogin.logIn();
+    final account = await naverLogIn();
+    if (account == null) return;
 
-    if (result.status == NaverLoginStatus.loggedIn) {
+    try {
+      String email = account.email;
+      String name = account.name;
+      await TokenApiService.postToken(email: email, name: name);
+      await storage.write(key: loginInfo, value: '$email $name naver');
+
       try {
-        String email = result.account.email;
-        String name = result.account.name;
-        await TokenApiService.postToken(email: email, name: name);
-        await storage.write(key: loginInfo, value: '$email $name naver');
-
-        try {
-          eulaValue = await storage.read(key: eula);
-        } catch (e) {
-          print(e.toString());
-        }
-
-        // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
-        if (eulaValue == 'true') {
-          Get.offNamed('/club_list');
-        } else {
-          Get.offNamed('/eula');
-        }
+        eulaValue = await storage.read(key: eula);
       } catch (e) {
         print(e.toString());
-        snackBar(title: "네이버 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
       }
+
+      // 로그인 성공 후 eula 동의 여부 확인 후 화면 전환
+      if (eulaValue == 'true') {
+        Get.offNamed('/club_list');
+      } else {
+        Get.offNamed('/eula');
+      }
+    } catch (e) {
+      print(e.toString());
+      snackBar(title: "네이버 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
     }
   }
 
@@ -297,41 +367,57 @@ class _LoginPageState extends State<LoginPage> {
                               0,
                               SizeController.to.screenWidth * 0.07,
                               SizeController.to.screenHeight * 0.01),
-                          child: ImageButton(
-                              image: 'assets/images/login/login_kakao.png',
-                              onTap: () async {
-                                await signInWithKakao();
-                              }),
+                          child: kIsWeb
+                              ? Center(
+                                  child: SizedBox(
+                                    width: 320,
+                                    child: ImageButton(
+                                      image:
+                                          'assets/images/login/login_kakao.png',
+                                      onTap: () async {
+                                        await _startKakaoWebLogin();
+                                      },
+                                    ),
+                                  ),
+                                )
+                              : ImageButton(
+                                  image: 'assets/images/login/login_kakao.png',
+                                  onTap: () async {
+                                    await signInWithKakao();
+                                  }),
                         ),
 
-                        // 네이버 로그인 버튼
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(
-                              SizeController.to.screenWidth * 0.07,
-                              0,
-                              SizeController.to.screenWidth * 0.07,
-                              SizeController.to.screenHeight * 0.01),
-                          child: ImageButton(
-                              image: 'assets/images/login/login_naver.png',
-                              onTap: () async {
-                                await signInWithNaver();
-                              }),
-                        ),
+                        // 네이버 로그인 버튼 (웹 미지원이라 모바일에서만 노출)
+                        if (!kIsWeb)
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(
+                                SizeController.to.screenWidth * 0.07,
+                                0,
+                                SizeController.to.screenWidth * 0.07,
+                                SizeController.to.screenHeight * 0.01),
+                            child: ImageButton(
+                                image: 'assets/images/login/login_naver.png',
+                                onTap: () async {
+                                  await signInWithNaver();
+                                }),
+                          ),
 
-                        //구글 로그인 버튼
+                        //구글 로그인 버튼 (웹은 GIS renderButton, 모바일은 이미지 버튼)
                         Padding(
                           padding: EdgeInsets.fromLTRB(
                               SizeController.to.screenWidth * 0.07,
                               0,
                               SizeController.to.screenWidth * 0.07,
                               0),
-                          child: ImageButton(
-                              image: 'assets/images/login/login_google.png',
-                              onTap: () async {
-                                await signInWithGoogle();
-                              }),
+                          child: kIsWeb
+                              ? Center(child: googleSignInButton())
+                              : ImageButton(
+                                  image: 'assets/images/login/login_google.png',
+                                  onTap: () async {
+                                    await signInWithGoogle();
+                                  }),
                         ),
-                        if (Platform.isIOS)
+                        if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS)
                           Padding(
                             padding: EdgeInsets.fromLTRB(
                                 SizeController.to.screenWidth * 0.07,

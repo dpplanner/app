@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'preview_image.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dplanner/controllers/size.dart';
@@ -1081,7 +1081,7 @@ class ReservationBigCard extends StatelessWidget {
                                                                               null
                                                                           ? CachedNetworkImage(
                                                                               placeholder: (context, url) => Container(),
-                                                                              imageUrl: "http://${snapshot.data![index].url!}",
+                                                                              imageUrl: "https://${snapshot.data![index].url!}",
                                                                               errorWidget: (context, url, error) => SvgPicture.asset(
                                                                                     'assets/images/base_image/base_member_image.svg',
                                                                                   ),
@@ -1299,8 +1299,8 @@ class ReservationBigCard extends StatelessWidget {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             10),
-                                                    child: Image.file(
-                                                      File(image.path),
+                                                    child: previewImageFromPath(
+                                                      image.path,
                                                       fit: BoxFit.fill,
                                                     ),
                                                   ),

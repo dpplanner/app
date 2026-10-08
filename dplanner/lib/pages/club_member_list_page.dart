@@ -239,7 +239,7 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                             child: member.url != null
                                 ? CachedNetworkImage(
                                     placeholder: (context, url) => Container(),
-                                    imageUrl: "http://${member.url!}",
+                                    imageUrl: "https://${member.url!}",
                                     errorWidget: (context, url, error) =>
                                         SvgPicture.asset(
                                           'assets/images/base_image/base_member_image.svg',

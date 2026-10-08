@@ -49,10 +49,7 @@ class _PostPageState extends State<PostPage> {
   @override
   void initState() {
     super.initState();
-
-    setState(() {
-      _fetchComments();
-    });
+    _fetchComments();
   }
 
   Future<void> _fetchPost() async {
@@ -63,12 +60,17 @@ class _PostPageState extends State<PostPage> {
   }
 
   Future<void> _fetchComments() async {
-    final comments = await PostCommentApiService.fetchComments(widget.postId);
-    if (comments != null) {
+    try {
+      final comments =
+          await PostCommentApiService.fetchComments(widget.postId);
+      if (!mounted) return;
       setState(() {
-        _comments = comments;
+        _comments = comments ?? [];
       });
-    } else {
+    } catch (e) {
+      // 댓글 호출 실패가 게시글 페이지 전체를 깨뜨리지 않도록 방어
+      print('댓글 불러오기 실패: $e');
+      if (!mounted) return;
       setState(() {
         _comments = [];
       });
@@ -183,7 +185,7 @@ class _PostPageState extends State<PostPage> {
                                       placeholder: (context, url) =>
                                           Container(),
                                       imageUrl:
-                                          "http://${MemberController.to.clubMember().url!}",
+                                          "https://${MemberController.to.clubMember().url!}",
                                       errorWidget: (context, url, error) =>
                                           SvgPicture.asset(
                                             'assets/images/base_image/base_member_image.svg',

@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import '../const/const.dart';
 
 class LockApiService {
-  static const String baseUrl = 'http://api.dplanner.co.kr';
+  static const String baseUrl = 'https://api.dplanner.co.kr';
 
   /// POST: /locks/resources/(_.resource_id) [락 생성하기] 예약 락 생성하기
   static Future<LockModel> postLock(
