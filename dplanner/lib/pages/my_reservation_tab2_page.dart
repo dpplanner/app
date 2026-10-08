@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../models/reservation_model.dart';
-import '../widgets/banner_ad_widget.dart';
 import 'error_page.dart';
 import 'loading_page.dart';
 
@@ -89,7 +88,6 @@ class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
                             if (snapshot.data == null) {
                               return Column(
                                 children: [
-                                  const BannerAdWidget(),
                                   ConstrainedBox(
                                     constraints: BoxConstraints(
                                         minHeight: constraints.maxHeight - 50),
@@ -118,7 +116,6 @@ class _MyReservationTab2PageState extends State<MyReservationTab2Page> {
                             } else {
                               return Column(
                                 children: [
-                                  const BannerAdWidget(),
                                   const SizedBox(height: 8,),
                                   Padding(
                                     padding:

@@ -17,7 +17,6 @@ import '../models/club_member_model.dart';
 import '../services/club_manager_api_service.dart';
 import '../services/club_member_api_service.dart';
 import '../const/style.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../widgets/nextpage_button.dart';
 import 'error_page.dart';
 import 'loading_page.dart';
@@ -124,7 +123,6 @@ class _ClubMemberListPageState extends State<ClubMemberListPage> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
                       children: [
-                        const BannerAdWidget(),
                         if (MemberController.to.clubMember().role == "ADMIN" ||
                             (MemberController.to
                                         .clubMember()

@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 
 import '../models/reservation_model.dart';
 import '../const/style.dart';
-import '../widgets/banner_ad_widget.dart';
 import 'error_page.dart';
 import 'loading_page.dart';
 
@@ -90,7 +89,6 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                             if (snapshot.data == null) {
                               return Column(
                                 children: [
-                                  const BannerAdWidget(),
                                   ConstrainedBox(
                                     constraints: BoxConstraints(
                                         minHeight: constraints.maxHeight - 50),
@@ -120,7 +118,6 @@ class _MyReservationTab1PageState extends State<MyReservationTab1Page> {
                               List<ReservationModel> data = _addEmptyReservation(snapshot.data!);
                               return Column(
                                 children: [
-                                  const BannerAdWidget(),
                                   const SizedBox(height: 8,),
                                   Padding(
                                     padding:

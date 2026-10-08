@@ -9,7 +9,6 @@ import 'dart:async';
 
 import '../controllers/posts.dart';
 import '../const/style.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/post_card.dart';
 
@@ -133,7 +132,6 @@ class _ClubHomePageState extends State<ClubHomePage> {
                         },
                         child: Column(
                           children: [
-                            const BannerAdWidget(),
                             Obx(() {
                               if (_isLoading.value) {
                                 return LoadingPage(constraints: constraints);

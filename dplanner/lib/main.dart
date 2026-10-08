@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:calendar_view/calendar_view.dart';
 import 'package:dplanner/controllers/member.dart';
 import 'package:dplanner/routes.dart';
@@ -16,7 +15,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import 'const/const.dart';
@@ -73,12 +71,6 @@ Future<void> main() async {
   // preserve/remove가 예외를 던지므로 모바일에서만 사용
   if (!kIsWeb) {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  }
-
-  // 모바일 전용: 앱 추적 권한 + AdMob (웹 미지원)
-  if (!kIsWeb) {
-    await _initAppTrackingPlugin();
-    MobileAds.instance.initialize();
   }
 
   // 모바일 전용: Firebase + 로컬 알림 + FCM 푸시 처리
@@ -216,19 +208,6 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-}
-
-Future<void> _initAppTrackingPlugin() async {
-  try {
-    final TrackingStatus status = await AppTrackingTransparency.trackingAuthorizationStatus;
-    if (status == TrackingStatus.notDetermined) {
-      await Future.delayed(const Duration(milliseconds: 200));
-      final TrackingStatus status = await AppTrackingTransparency.requestTrackingAuthorization();
-    }
-  } on PlatformException {
-    print("transparency setting fail");
-  }
-  final uuid = await AppTrackingTransparency.getAdvertisingIdentifier();
 }
 
 Future<void> _initLocalNotification() async {

@@ -26,7 +26,6 @@ import '../models/resource_model.dart';
 import '../services/club_member_api_service.dart';
 import '../services/reservation_api_service.dart';
 import '../services/resource_api_service.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../widgets/bottom_bar.dart';
 import '../widgets/color_scroll_widget.dart';
 import '../widgets/full_screen_image.dart';
@@ -269,7 +268,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                         physics: const AlwaysScrollableScrollPhysics(),
                         child: Column(
                           children: [
-                            const BannerAdWidget(),
                             Container(
                               color: AppColor.backgroundColor,
                               height: constraints.maxHeight - 50,
@@ -338,7 +336,6 @@ class _ClubTimetablePageState extends State<ClubTimetablePage> {
                 } else {
                   return Column(
                     children: [
-                      const BannerAdWidget(),
                       const SizedBox(height: 8),
                       Expanded(
                         child: Stack(

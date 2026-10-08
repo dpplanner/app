@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import '../controllers/posts.dart';
 import '../pages/loading_page.dart';
 import '../const/style.dart';
-import 'banner_ad_widget.dart';
 
 class MyActivityPosts extends StatefulWidget {
   final Future<void> Function(int clubMemberID, int page) fetchPosts;
@@ -65,7 +64,6 @@ class _MyActivityPostsState extends State<MyActivityPosts> {
                     } else if (PostController.to.posts.isEmpty) {
                       return Column(
                         children: [
-                          const BannerAdWidget(),
                           ConstrainedBox(
                             constraints: BoxConstraints(
                                 minHeight: constraints.maxHeight),
@@ -95,7 +93,6 @@ class _MyActivityPostsState extends State<MyActivityPosts> {
                             color: AppColor.backgroundColor2,
                             child: Column(
                               children: [
-                                const BannerAdWidget(),
                                 const SizedBox(height: 8,),
                                 Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 24),
