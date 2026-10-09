@@ -2,9 +2,45 @@
   "project_info": {
     "project_number": "547095373091",
     "project_id": "dplanner-6a650",
-    "storage_bucket": "dplanner-6a650.appspot.com"
+    "storage_bucket": "dplanner-6a650.firebasestorage.app"
   },
   "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547095373091:android:7dcb8ca8acba54652d5896",
+        "android_client_info": {
+          "package_name": "com.baggytsk.dplanner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "547095373091-d663tdou7mhivsltgtfoesrti7j98knl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpHSaMlQSwKgLQU7xpPF02NbhxW60Ayt8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "547095373091-d663tdou7mhivsltgtfoesrti7j98knl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "547095373091-g01u6sh5re5g09cuu4c7b7hb54k4d46d.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dancepozz.dplanner"
+              }
+            }
+          ]
+        }
+      }
+    },
     {
       "client_info": {
         "mobilesdk_app_id": "1:547095373091:android:5065a2c8ab97a6272d5896",
@@ -18,8 +54,12 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.dancepozz.dplanner",
-            "certificate_hash": "56473f9b0fa1a6ea7aeda6138f01bb91f868749a"
+            "certificate_hash": "8c7dadb732705f1a6bc613cd61bd1bb73c214209"
           }
+        },
+        {
+          "client_id": "547095373091-d663tdou7mhivsltgtfoesrti7j98knl.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -30,6 +70,10 @@
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
+            {
+              "client_id": "547095373091-d663tdou7mhivsltgtfoesrti7j98knl.apps.googleusercontent.com",
+              "client_type": 3
+            },
             {
               "client_id": "547095373091-g01u6sh5re5g09cuu4c7b7hb54k4d46d.apps.googleusercontent.com",
               "client_type": 2,

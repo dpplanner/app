@@ -51,10 +51,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCpHSaMlQSwKgLQU7xpPF02NbhxW60Ayt8',
-    appId: '1:547095373091:android:5065a2c8ab97a6272d5896',
+    appId: '1:547095373091:android:7dcb8ca8acba54652d5896', // com.baggytsk.dplanner
     messagingSenderId: '547095373091',
     projectId: 'dplanner-6a650',
-    storageBucket: 'dplanner-6a650.appspot.com',
+    // google-services.json과 값이 달라지면 [core/duplicate-app] 오류로 앱이 멈춤
+    storageBucket: 'dplanner-6a650.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
