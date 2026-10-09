@@ -266,6 +266,7 @@ class _LoginPageState extends State<LoginPage> {
           OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
           await _onKakaoLoginSuccess(token);
         } catch (error) {
+          print('카카오계정으로 로그인 실패 $error');
           snackBar(title: "카카오 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
         }
       }
@@ -274,6 +275,7 @@ class _LoginPageState extends State<LoginPage> {
         OAuthToken token = await UserApi.instance.loginWithKakaoAccount();
         await _onKakaoLoginSuccess(token);
       } catch (error) {
+        print('카카오계정으로 로그인 실패 $error');
         snackBar(title: "카카오 로그인에 실패했습니다", content: "잠시 후 다시 시도해 주세요");
       }
     }

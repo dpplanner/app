@@ -11,6 +11,7 @@ Future<NaverAccount?> naverLogIn() async {
     final account = result.account;
     return NaverAccount(account?.email ?? '.', account?.name ?? '.');
   }
+  print('네이버 로그인 실패: ${result.status} ${result.errorMessage}');
   return null;
 }
 
