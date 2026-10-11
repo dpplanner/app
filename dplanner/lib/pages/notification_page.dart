@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../const/style.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../widgets/bottom_bar.dart';
 import 'package:dplanner/services/club_alert_api_service.dart';
 import 'package:dplanner/models/club_alert_message_model.dart';
@@ -62,7 +61,6 @@ class _NotificationPageState extends State<NotificationPage> {
                 final alerts = snapshot.data!;
                 return Column(
                   children: [
-                    const BannerAdWidget(),
                     Column(
                       children: alerts
                           .map((alert) => NotificationCard(

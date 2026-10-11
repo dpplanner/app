@@ -12,7 +12,6 @@ import 'package:get/get.dart';
 
 import '../controllers/size.dart';
 import '../const/style.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/outline_textform.dart';
 import '../widgets/underline_textform.dart';
@@ -107,7 +106,6 @@ class _ClubResourceListPageState extends State<ClubResourceListPage> {
         body: SafeArea(
           child: Column(
             children: [
-              const BannerAdWidget(),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 24),

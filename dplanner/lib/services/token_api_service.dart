@@ -35,8 +35,13 @@ class TokenApiService {
   }
 
   /// POST: /auth/login [client login] 로그인 후 JWT 토큰 발급
+  /// provider: apple/google/kakao/naver, token: apple·google = ID 토큰, kakao·naver = 액세스 토큰.
+  /// 서버가 token 을 직접 검증해 이메일을 얻는다 (email 은 서버에서 쓰지 않음, name 은 신규 가입 시 표시 이름).
   static Future<void> postToken(
-      {required String email, required String name}) async {
+      {required String provider,
+      required String token,
+      required String email,
+      required String name}) async {
     final url = Uri.parse('$baseUrl/auth/login');
     const storage = FlutterSecureStorage();
 
@@ -46,6 +51,8 @@ class TokenApiService {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
+        "provider": provider,
+        "token": token,
         "email": email,
         "name": name,
       }),

@@ -6,7 +6,6 @@ import 'package:dplanner/services/reservation_api_service.dart';
 import 'package:flutter/material.dart';
 
 import '../models/reservation_model.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../widgets/reservation_admin_card.dart';
 import 'error_page.dart';
 import 'loading_page.dart';
@@ -102,7 +101,6 @@ class _ClubReservationListTab1PageState
                           ) {
                             return Column(
                               children: [
-                                const BannerAdWidget(),
                                 ConstrainedBox(
                                   constraints: BoxConstraints(
                                       minHeight: constraints.maxHeight - 50),
@@ -125,7 +123,6 @@ class _ClubReservationListTab1PageState
                           } else if (snapshot.data == null && !_isLoading) {
                             return Column(
                               children: [
-                                const BannerAdWidget(),
                                 ConstrainedBox(
                                   constraints: BoxConstraints(
                                       minHeight: constraints.maxHeight - 50),
@@ -154,7 +151,6 @@ class _ClubReservationListTab1PageState
                           } else {
                             return Column(
                               children: [
-                                const BannerAdWidget(),
                                 const SizedBox(height: 8),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 24),

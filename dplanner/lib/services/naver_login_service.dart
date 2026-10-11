@@ -5,7 +5,8 @@ import 'naver_login_web.dart'
 class NaverAccount {
   final String email;
   final String name;
-  const NaverAccount(this.email, this.name);
+  final String accessToken;
+  const NaverAccount(this.email, this.name, this.accessToken);
 }
 
 /// 네이버 로그인. 성공 시 계정 정보, 실패/취소 시 null.

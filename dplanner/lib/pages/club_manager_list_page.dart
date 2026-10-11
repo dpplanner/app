@@ -11,7 +11,6 @@ import '../controllers/size.dart';
 import '../models/club_manager_model.dart';
 import '../services/club_manager_api_service.dart';
 import '../const/style.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../widgets/nextpage_button.dart';
 import '../widgets/underline_textform.dart';
 import 'error_page.dart';
@@ -83,7 +82,6 @@ class _ClubManagerListPageState extends State<ClubManagerListPage> {
         body: SafeArea(
           child: Column(
             children: [
-              const BannerAdWidget(),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 24),

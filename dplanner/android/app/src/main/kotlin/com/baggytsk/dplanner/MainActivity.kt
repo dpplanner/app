@@ -1,4 +1,4 @@
-package com.dancepozz.dplanner
+package com.baggytsk.dplanner
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

@@ -1,6 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/delete-account", "destination": "/delete-account.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

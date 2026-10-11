@@ -1,6 +1,6 @@
 import UIKit
 import Flutter
-import NaverThirdPartyLogin
+import NidThirdPartyLogin
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -22,8 +22,7 @@ import NaverThirdPartyLogin
          if url.absoluteString.hasPrefix("kakao"){
             super.application(app, open:url, options: options)
             return true
-         } else if url.absoluteString.contains("thirdPartyLoginResult") {
-            NaverThirdPartyLoginConnection.getSharedInstance().application(app, open: url, options: options)
+         } else if NidOAuth.shared.handleURL(url) == true { // 네이버 앱에서 돌아온 로그인 결과 (flutter_naver_login 2.1.0+)
             return true
          } else {
             return true

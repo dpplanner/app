@@ -30,7 +30,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "com.dancepozz.dplanner"
+    namespace "com.baggytsk.dplanner"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -50,13 +50,11 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.dancepozz.dplanner"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        // 기존 com.dancepozz.dplanner는 해지된 Play 계정에 묶여 재사용 불가 → 새 패키지명으로 재출시
+        applicationId "com.baggytsk.dplanner"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 34 //flutter.targetSdkVersion
-        versionCode 10
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
 

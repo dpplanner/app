@@ -10,7 +10,6 @@ import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
 import '../controllers/member.dart';
 import '../models/reservation_model.dart';
 import '../const/style.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../widgets/reservation_admin_card.dart';
 import 'error_page.dart';
 import 'loading_page.dart';
@@ -103,7 +102,6 @@ class _ClubReservationListTab2PageState
                           if (snapshot.data == null && !_isLoading) {
                             return Column(
                               children: [
-                                const BannerAdWidget(),
                                 ConstrainedBox(
                                   constraints: BoxConstraints(
                                       minHeight: constraints.maxHeight - 50),
@@ -132,7 +130,6 @@ class _ClubReservationListTab2PageState
                           } else {
                             return Column(
                               children: [
-                                const BannerAdWidget(),
                                 const SizedBox(height: 8),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 24),

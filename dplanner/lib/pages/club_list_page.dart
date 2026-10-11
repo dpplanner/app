@@ -17,7 +17,6 @@ import '../decode_token.dart';
 import '../models/club_model.dart';
 import '../services/club_member_api_service.dart';
 import '../services/token_api_service.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../widgets/snack_bar.dart';
 import 'error_page.dart';
 
@@ -127,7 +126,6 @@ class _ClubListPageState extends State<ClubListPage> {
                         } else {
                           return Column(
                             children: [
-                              const BannerAdWidget(),
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
                                 child: Column(

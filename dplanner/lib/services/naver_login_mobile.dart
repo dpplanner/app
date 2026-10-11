@@ -9,8 +9,14 @@ Future<NaverAccount?> naverLogIn() async {
   final NaverLoginResult result = await FlutterNaverLogin.logIn();
   if (result.status == NaverLoginStatus.loggedIn) {
     final account = result.account;
-    return NaverAccount(account?.email ?? '.', account?.name ?? '.');
+    // 로그인 결과에 토큰이 없는 플랫폼이 있어 현재 토큰을 다시 조회한다
+    final accessToken = result.accessToken?.accessToken.isNotEmpty == true
+        ? result.accessToken!.accessToken
+        : (await FlutterNaverLogin.getCurrentAccessToken()).accessToken;
+    return NaverAccount(
+        account?.email ?? '.', account?.name ?? '.', accessToken);
   }
+  print('네이버 로그인 실패: ${result.status} ${result.errorMessage}');
   return null;
 }
 

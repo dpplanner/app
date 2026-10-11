@@ -1,5 +1,4 @@
 import 'package:dplanner/pages/loading_page.dart';
-import 'package:dplanner/widgets/banner_ad_widget.dart';
 import 'package:dplanner/widgets/post_comment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sfsymbols/flutter_sfsymbols.dart';
@@ -148,7 +147,6 @@ class _PostPageState extends State<PostPage> {
                                 minHeight: constraints.maxHeight),
                             child: Column(
                               children: [
-                                const BannerAdWidget(),
                                 Obx(() {
                                   return PostController.to
                                               .getRxPost(widget.postId) ==
