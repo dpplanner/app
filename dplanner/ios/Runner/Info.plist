@@ -19,7 +19,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.0</string>
+	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -50,9 +50,11 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>GIDClientID</key>
 	<string>547095373091-g01u6sh5re5g09cuu4c7b7hb54k4d46d.apps.googleusercontent.com</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>kakaokompassauth</string>
@@ -93,6 +95,14 @@
 	<string>게시글에 등록할 이미지를 선택, 공용 물품 반납 시 증빙 사진을 촬영, 내 프로필을 등록하는 기능 사용을 위해 사진 라이브러리에 접근하도록 허용합니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>게시글에 등록할 이미지를 선택, 공용 물품 반납 시 증빙 사진을 촬영, 내 프로필을 등록하는 기능 사용을 위해 사진 라이브러리에 접근하도록 허용합니다.</string>
+	<key>NidAppName</key>
+	<string>DPlanner</string>
+	<key>NidClientID</key>
+	<string>ZID4vaD8GzH0M8ynfHA7</string>
+	<key>NidClientSecret</key>
+	<string>5otRIFDs0R</string>
+	<key>NidUrlScheme</key>
+	<string>DPlanner</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
