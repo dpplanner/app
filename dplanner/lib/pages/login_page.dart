@@ -172,7 +172,8 @@ class _LoginPageState extends State<LoginPage> {
         ],
       );
 
-      List<String> jwt = credential.identityToken?.split('.') ?? [];
+      final String identityToken = credential.identityToken!;
+      List<String> jwt = identityToken.split('.');
       String payload = jwt[1];
       payload = base64.normalize(payload);
 
@@ -186,7 +187,8 @@ class _LoginPageState extends State<LoginPage> {
       String name =
           "${credential.givenName ?? "."} ${credential.familyName ?? "."}";
 
-      await TokenApiService.postToken(email: email, name: name);
+      await TokenApiService.postToken(
+          provider: 'apple', token: identityToken, email: email, name: name);
       await storage.write(key: loginInfo, value: '$email $name apple');
 
       try {
@@ -221,7 +223,10 @@ class _LoginPageState extends State<LoginPage> {
     try {
       String email = googleUser.email;
       String name = googleUser.displayName ?? ".";
-      await TokenApiService.postToken(email: email, name: name);
+      final String? idToken = (await googleUser.authentication).idToken;
+      if (idToken == null) throw Exception('구글 ID 토큰을 받지 못했습니다');
+      await TokenApiService.postToken(
+          provider: 'google', token: idToken, email: email, name: name);
       await storage.write(key: loginInfo, value: '$email $name google');
 
       try {
@@ -287,7 +292,11 @@ class _LoginPageState extends State<LoginPage> {
 
       String email = user.kakaoAccount!.email ?? ".";
       String name = user.kakaoAccount!.name ?? ".";
-      await TokenApiService.postToken(email: email, name: name);
+      await TokenApiService.postToken(
+          provider: 'kakao',
+          token: token.accessToken,
+          email: email,
+          name: name);
       await storage.write(key: loginInfo, value: '$email $name kakao');
 
       try {
@@ -316,7 +325,11 @@ class _LoginPageState extends State<LoginPage> {
     try {
       String email = account.email;
       String name = account.name;
-      await TokenApiService.postToken(email: email, name: name);
+      await TokenApiService.postToken(
+          provider: 'naver',
+          token: account.accessToken,
+          email: email,
+          name: name);
       await storage.write(key: loginInfo, value: '$email $name naver');
 
       try {
