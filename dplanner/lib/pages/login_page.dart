@@ -319,7 +319,35 @@ class _LoginPageState extends State<LoginPage> {
 
   // 네이버 로그인
   Future<void> signInWithNaver() async {
-    final account = await naverLogIn();
+    final NaverAccount? account;
+    try {
+      account = await naverLogIn();
+    } on NaverLoginException catch (e) {
+      print(e.toString());
+      switch (e.failure) {
+        case NaverLoginFailure.cancelled:
+          // 사용자가 직접 취소한 경우는 안내하지 않는다
+          return;
+        case NaverLoginFailure.network:
+          snackBar(
+              title: "네이버 로그인에 실패했습니다",
+              content: "인터넷 연결을 확인하고 다시 시도해 주세요");
+          return;
+        case NaverLoginFailure.failed:
+        case NaverLoginFailure.sdk:
+          snackBar(
+              title: "네이버 로그인에 실패했습니다",
+              content: "잠시 후 다시 시도하거나 다른 방법으로 로그인해 주세요");
+          return;
+      }
+    } catch (e) {
+      print(e.toString());
+      snackBar(
+          title: "네이버 로그인에 실패했습니다",
+          content: "잠시 후 다시 시도하거나 다른 방법으로 로그인해 주세요");
+      return;
+    }
+    // 사용자 취소
     if (account == null) return;
 
     try {
